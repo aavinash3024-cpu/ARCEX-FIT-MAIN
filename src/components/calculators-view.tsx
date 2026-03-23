@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -15,7 +14,8 @@ import {
   Trophy,
   Activity,
   Info,
-  CircleHelp
+  CircleHelp,
+  AlertTriangle
 } from "lucide-react";
 import { 
   Select,
@@ -203,7 +203,6 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
             </CardContent>
           </Card>
 
-          {/* New Energy Balance Card styling matching request */}
           <Card className="border-none shadow-lg bg-white overflow-hidden">
             <CardContent className="p-6 space-y-6">
               <div className="text-center space-y-1">
@@ -278,41 +277,61 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <Button onClick={calculateOrm} className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">Calculate Max</Button>
             </CardContent>
           </Card>
+
           <Card className="border-none shadow-lg bg-white overflow-hidden">
             <CardContent className="p-6 space-y-6">
-              <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10 flex flex-col items-center text-center space-y-2">
-                <Trophy className="w-6 h-6 text-primary mb-1" />
-                <p className="text-[11px] font-black text-primary uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
-                <p className="text-4xl font-black text-foreground">{ormResult ? ormResult : '---'}<span className="text-sm ml-1 text-muted-foreground">kg</span></p>
+              <div className="text-center space-y-1">
+                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">STRENGTH PROFILE</h3>
+                <p className="text-[9px] font-bold text-muted-foreground uppercase">ESTIMATED PEAK POWER</p>
               </div>
 
-              {ormResult && (
-                <div className="space-y-3">
-                  <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest text-center">Strength Breakdown</h4>
-                  <div className="rounded-xl border border-muted/20 overflow-hidden">
-                    <Table>
-                      <TableHeader className="bg-muted/30">
-                        <TableRow>
-                          <TableHead className="h-8 text-[9px] font-black uppercase">Goal Reps</TableHead>
-                          <TableHead className="h-8 text-[9px] font-black uppercase text-right">Target Load (kg)</TableHead>
-                        </TableRow>
-                      </TableHeader>
-                      <TableBody>
-                        {[2, 4, 6, 8, 10, 12, 14, 16].map((repCount) => {
-                          // Epley: 1RM = w * (1 + r/30) => w = 1RM / (1 + r/30)
-                          const weightForReps = ormResult / (1 + (repCount / 30));
-                          return (
-                            <TableRow key={repCount}>
-                              <TableCell className="py-2 text-[10px] font-bold">{repCount} Reps</TableCell>
-                              <TableCell className="py-2 text-[10px] font-black text-right text-primary">{Math.round(weightForReps)} kg</TableCell>
-                            </TableRow>
-                          );
-                        })}
-                      </TableBody>
-                    </Table>
-                  </div>
+              <div className="bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10 flex flex-col items-center text-center space-y-2 shadow-inner relative overflow-hidden">
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
+                <Trophy className="w-8 h-8 text-primary mb-1 drop-shadow-sm" />
+                <p className="text-[11px] font-black text-primary uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
+                <div className="flex items-baseline gap-1">
+                  <p className="text-5xl font-black text-foreground">{ormResult ? ormResult : '---'}</p>
+                  <span className="text-sm font-bold text-muted-foreground uppercase tracking-tighter">kg</span>
                 </div>
-              )}
+              </div>
+
+              <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 flex items-start gap-3">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-[10px] text-amber-800 font-bold leading-relaxed uppercase tracking-tight">
+                  PR SAFETY: Always have a spotter or use safety bars when hitting a Personal Record. Take support to avoid injury.
+                </p>
+              </div>
+
+              <div className="space-y-3">
+                <div className="flex items-center gap-2">
+                  <Activity className="w-3.5 h-3.5 text-muted-foreground/40" />
+                  <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Load Breakdown</h4>
+                </div>
+                <div className="rounded-2xl border border-muted/20 overflow-hidden shadow-sm">
+                  <Table>
+                    <TableHeader className="bg-muted/30">
+                      <TableRow className="hover:bg-transparent border-b-muted/10">
+                        <TableHead className="h-9 text-[9px] font-black uppercase text-center w-1/2 border-r border-muted/10">Goal Reps</TableHead>
+                        <TableHead className="h-9 text-[9px] font-black uppercase text-center w-1/2">Target (kg)</TableHead>
+                      </TableRow>
+                    </TableHeader>
+                    <TableBody>
+                      {[2, 4, 6, 8, 10, 12, 14, 16].map((repCount) => {
+                        // Epley: 1RM = w * (1 + r/30) => w = 1RM / (1 + r/30)
+                        const weightForReps = ormResult ? ormResult / (1 + (repCount / 30)) : null;
+                        return (
+                          <TableRow key={repCount} className="hover:bg-muted/5 border-b-muted/10 last:border-0">
+                            <TableCell className="py-2.5 text-[10px] font-bold text-center border-r border-muted/10">{repCount} Reps</TableCell>
+                            <TableCell className="py-2.5 text-[10px] font-black text-center text-primary">
+                              {weightForReps ? `${Math.round(weightForReps)} kg` : '---'}
+                            </TableCell>
+                          </TableRow>
+                        );
+                      })}
+                    </TableBody>
+                  </Table>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </TabsContent>
@@ -355,7 +374,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Waist (cm)</Label>
-                  <Input type="number" value={waist} onChange={(e) => setWaist(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={waist} onChange={(e) => setNeck(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
                 </div>
                 {gender === 'female' && (
                   <div className="space-y-2">
