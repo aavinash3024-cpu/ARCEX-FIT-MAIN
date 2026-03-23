@@ -29,7 +29,7 @@ import {
 } from 'recharts';
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { isSameDay } from 'date-fns';
+import { isSameDay, format } from 'date-fns';
 import { type Task } from '@/components/tasks-view';
 import { cn } from '@/lib/utils';
 
@@ -70,21 +70,25 @@ export function DashboardView({
   const weightChange = latestWeightEntry && previousWeightEntry ? parseFloat((latestWeightEntry.weight - previousWeightEntry.weight).toFixed(1)) : 0;
 
   const chartData = useMemo(() => {
-    const history = [...weightHistory];
     const initialWeight = goalData?.weight ? parseFloat(goalData.weight) : 0;
     
-    if (history.length === 0) {
+    if (weightHistory.length === 0) {
       if (initialWeight > 0) {
         return [
-          { weight: initialWeight, isStart: true },
-          { weight: initialWeight, isStart: false }
+          { weight: initialWeight, isStart: true, formattedDate: 'Start' },
+          { weight: initialWeight, isStart: false, formattedDate: format(new Date(), 'MMM d') }
         ];
       }
       return [];
     }
 
+    const history = [...weightHistory].map(h => ({
+      ...h,
+      formattedDate: format(new Date(h.date), 'MMM d')
+    }));
+
     if (initialWeight > 0 && !history.find(h => h.isStart)) {
-      history.unshift({ weight: initialWeight, isStart: true });
+      history.unshift({ weight: initialWeight, isStart: true, formattedDate: 'Start' } as any);
     }
     return history;
   }, [weightHistory, goalData]);
@@ -107,15 +111,12 @@ export function DashboardView({
     let progress = 0;
     
     if (objective === 'loss') {
-      // If goal is loss, current must be lower than start to have progress
       if (currentWeight >= startWeight) return 0;
       progress = ((startWeight - currentWeight) / (startWeight - targetWeight)) * 100;
     } else if (objective === 'gain') {
-      // If goal is gain, current must be higher than start to have progress
       if (currentWeight <= startWeight) return 0;
       progress = ((currentWeight - startWeight) / (targetWeight - startWeight)) * 100;
     } else {
-      // Maintenance
       return 100;
     }
     
@@ -188,6 +189,12 @@ export function DashboardView({
       label: "Fat", 
       current: goalData?.fats ? Math.round(goalData.fats * 0.58) : 41, 
       target: goalData?.fats || 70, 
+      unit: "g" 
+    },
+    { 
+      label: "Fiber", 
+      current: goalData?.fiber ? Math.round(goalData.fiber * 0.45) : 14, 
+      target: goalData?.fiber || 30, 
       unit: "g" 
     },
   ];
@@ -542,6 +549,20 @@ export function DashboardView({
           ))}
         </div>
       </section>
+
+      <Card className="border-none shadow-sm overflow-hidden bg-white">
+        <CardContent className="p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
+              <Target className="w-3.5 h-3.5 text-primary" />
+              PulseFlow AI Suggestion
+            </h3>
+          </div>
+          <p className="text-[11px] text-muted-foreground leading-relaxed italic">
+            "Based on your activity level, increasing your daily steps to 10k will accelerate your {goalData?.objective || 'wellness'} journey by approximately 12%."
+          </p>
+        </CardContent>
+      </Card>
 
       <Card className="border-none shadow-sm overflow-hidden bg-white">
         <CardContent className="p-5 space-y-4">

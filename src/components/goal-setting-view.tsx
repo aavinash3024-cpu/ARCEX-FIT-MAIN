@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -102,6 +101,9 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
     const proteinGrams = Math.round(w * protAdj[0]);
     const proteinKcal = proteinGrams * 4;
     
+    // Fiber calculation: ~14g per 1000kcal
+    const fiberGrams = Math.round((finalCalories / 1000) * 14);
+    
     const remainingKcal = Math.max(0, finalCalories - proteinKcal);
     const carbKcal = remainingKcal * (carbRatio[0] / 100);
     const fatKcal = remainingKcal - carbKcal;
@@ -116,8 +118,6 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
     const weightDiff = Math.abs(tw - w);
     const weeksToGoal = derivedWeeklyRate > 0 ? (weightDiff / derivedWeeklyRate).toFixed(1) : "0";
 
-    const progressPercent = Math.round(((w - tw) / w) * 100); // Simple illustrative calculation
-
     return {
       bmr,
       tdee,
@@ -125,6 +125,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
       protein: proteinGrams,
       carbs: Math.round(carbKcal / 4),
       fats: Math.round(fatKcal / 9),
+      fiber: fiberGrams,
       proteinPct,
       carbPct,
       fatPct,
@@ -132,8 +133,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
       weeksToGoal,
       weightDiff,
       derivedWeeklyRate,
-      currentDeficitOrSurplus,
-      progressPercent
+      currentDeficitOrSurplus
     };
   }, [weight, height, age, gender, activity, objective, targetWeight, calAdj, protAdj, carbRatio]);
 
@@ -269,18 +269,22 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                   <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Nutritional Split</h4>
                 </div>
                 <div className="pl-1 space-y-6">
-                  <div className="space-y-4">
+                  <div className="grid grid-cols-2 gap-y-4">
                     <div>
                       <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Protein</p>
                       <p className="text-md font-black text-sky-600">{calculations.protein}g</p>
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Carbohydrates</p>
+                      <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Carbs</p>
                       <p className="text-md font-black text-primary">{calculations.carbs}g</p>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Fats</p>
                       <p className="text-md font-black text-yellow-600">{calculations.fats}g</p>
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Fiber</p>
+                      <p className="text-md font-black text-green-600">{calculations.fiber}g</p>
                     </div>
                   </div>
 
@@ -558,18 +562,22 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
 
                  <div className="space-y-5">
                     <p className="text-[10px] font-black uppercase text-center tracking-widest text-foreground/80">MACROS BREAKDOWN</p>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-4 gap-2">
                        <div className="text-center">
-                          <p className="text-lg font-bold text-sky-600">{calculations.protein}g</p>
-                          <p className="text-[8px] font-semibold text-muted-foreground uppercase">Protein</p>
+                          <p className="text-sm font-black text-sky-600">{calculations.protein}g</p>
+                          <p className="text-[7px] font-bold text-muted-foreground uppercase">Protein</p>
                        </div>
                        <div className="text-center">
-                          <p className="text-lg font-bold text-primary">{calculations.carbs}g</p>
-                          <p className="text-[8px] font-semibold text-muted-foreground uppercase">Carbs</p>
+                          <p className="text-sm font-black text-primary">{calculations.carbs}g</p>
+                          <p className="text-[7px] font-bold text-muted-foreground uppercase">Carbs</p>
                        </div>
                        <div className="text-center">
-                          <p className="text-lg font-bold text-yellow-600">{calculations.fats}g</p>
-                          <p className="text-[8px] font-semibold text-muted-foreground uppercase">Fats</p>
+                          <p className="text-sm font-black text-yellow-600">{calculations.fats}g</p>
+                          <p className="text-[7px] font-bold text-muted-foreground uppercase">Fats</p>
+                       </div>
+                       <div className="text-center">
+                          <p className="text-sm font-black text-green-600">{calculations.fiber}g</p>
+                          <p className="text-[7px] font-bold text-muted-foreground uppercase">Fiber</p>
                        </div>
                     </div>
                     
