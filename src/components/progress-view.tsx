@@ -70,21 +70,31 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
 
   const chartData = useMemo(() => {
     const history = [...weightHistory];
-    if (goalData?.weight && (history.length === 0 || history[0].weight !== parseFloat(goalData.weight))) {
-      const initialWeight = parseFloat(goalData.weight);
-      let startDateStr;
-      if (history.length > 0) {
-        const firstLogDate = new Date(history[0].date);
-        startDateStr = subDays(firstLogDate, 2).toISOString();
-      } else {
-        startDateStr = subDays(new Date(), 4).toISOString();
+    const initialWeight = goalData?.weight ? parseFloat(goalData.weight) : 0;
+
+    if (history.length === 0) {
+      if (initialWeight > 0) {
+        return [
+          { date: subDays(new Date(), 1).toISOString(), weight: initialWeight, isStart: true },
+          { date: new Date().toISOString(), weight: initialWeight, isStart: false }
+        ].map(entry => ({
+          ...entry,
+          formattedDate: entry.isStart ? 'Start' : format(new Date(entry.date), 'MMM d')
+        }));
       }
+      return [];
+    }
+
+    if (initialWeight > 0 && !history.find(h => h.isStart)) {
+      const firstLogDate = new Date(history[0].date);
+      const startDateStr = subDays(firstLogDate, 2).toISOString();
       history.unshift({
         date: startDateStr,
         weight: initialWeight,
         isStart: true
       });
     }
+
     return history.map(entry => ({
       ...entry,
       formattedDate: entry.isStart ? 'Start' : format(new Date(entry.date), 'MMM d')
@@ -111,7 +121,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
       <h1 className="text-2xl font-bold font-headline mb-2 px-1">Progress</h1>
 
       <div className="space-y-4 animate-in fade-in duration-500">
-        {/* 1. Current Status - Top Summary Card */}
+        {/* 1. Current Status */}
         <Card className="border-none shadow-sm bg-white overflow-hidden">
           <CardContent className="p-5 space-y-6">
             <div className="flex justify-between items-start">
@@ -147,7 +157,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
           </CardContent>
         </Card>
 
-        {/* 2. Next Milestone - Sleeker card */}
+        {/* 2. Next Milestone */}
         <Card className="border-none shadow-sm bg-primary/95 text-primary-foreground overflow-hidden rounded-[1rem]">
            <CardContent className="p-4 flex items-center justify-between">
               <div className="space-y-0.5">
@@ -166,7 +176,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
            </CardContent>
         </Card>
 
-        {/* 3. Weight Trend - Chart below stats */}
+        {/* 3. Weight Trend */}
         <Card className="border-none shadow-sm overflow-hidden bg-white">
           <CardContent className="p-5 space-y-4">
             <div className="flex items-center justify-between">
@@ -256,7 +266,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
           </DialogContent>
         </Dialog>
 
-        {/* 5. Log History with Delete */}
+        {/* 5. Log History */}
         <section className="space-y-3 pt-2">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70 flex items-center gap-2">

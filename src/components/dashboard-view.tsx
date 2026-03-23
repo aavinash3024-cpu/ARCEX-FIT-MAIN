@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRef, useState, useMemo } from 'react';
@@ -72,11 +71,20 @@ export function DashboardView({
 
   const chartData = useMemo(() => {
     const history = [...weightHistory];
-    if (goalData?.weight) {
-      const initialWeight = parseFloat(goalData.weight);
-      if (history.length === 0 || history[0].weight !== initialWeight) {
-        history.unshift({ weight: initialWeight, isStart: true });
+    const initialWeight = goalData?.weight ? parseFloat(goalData.weight) : 0;
+    
+    if (history.length === 0) {
+      if (initialWeight > 0) {
+        return [
+          { weight: initialWeight, isStart: true },
+          { weight: initialWeight, isStart: false }
+        ];
       }
+      return [];
+    }
+
+    if (initialWeight > 0 && !history.find(h => h.isStart)) {
+      history.unshift({ weight: initialWeight, isStart: true });
     }
     return history;
   }, [weightHistory, goalData]);
