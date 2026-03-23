@@ -382,29 +382,32 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
           </Card>
 
           <Card className="border-none shadow-lg bg-white overflow-hidden">
-            <CardContent className="p-6 space-y-6">
-              <div className="bg-primary/5 p-8 rounded-3xl border border-primary/10 flex flex-col items-center text-center space-y-2 relative overflow-hidden shadow-inner">
-                <Activity className="absolute -right-4 -top-4 w-24 h-24 text-primary/5 -rotate-12" />
-                <p className="text-[11px] font-black text-primary uppercase tracking-[0.2em]">Body Fat Percentage</p>
-                <p className="text-5xl font-black text-foreground">{bfResults ? bfResults.percentage : '---'}<span className="text-lg ml-1 text-muted-foreground">%</span></p>
-                {bfResults && <Badge className="bg-primary text-white font-black uppercase tracking-tighter text-[9px] mt-2">{bfResults.category}</Badge>}
+            <CardContent className="p-5 space-y-5">
+              <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10 flex flex-col items-center text-center space-y-1 relative overflow-hidden shadow-inner">
+                <Activity className="absolute -right-4 -top-4 w-16 h-16 text-primary/5 -rotate-12" />
+                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Body Fat Percentage</p>
+                <div className="flex items-baseline gap-1">
+                  <p className="text-4xl font-black text-foreground">{bfResults ? bfResults.percentage : '---'}</p>
+                  <span className="text-sm font-bold text-muted-foreground">%</span>
+                </div>
+                {bfResults && <Badge className="bg-primary text-white font-black uppercase tracking-tighter text-[8px] mt-1 h-5">{bfResults.category}</Badge>}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-muted/10 p-4 rounded-2xl border border-muted/20 text-center space-y-1">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Lean Body Mass</p>
-                  <p className="text-xl font-black">{bfResults ? bfResults.lbm : '---'}<span className="text-[10px] ml-1">kg</span></p>
+              <div className="grid grid-cols-2 gap-3">
+                <div className="bg-muted/10 p-3.5 rounded-2xl border border-muted/20 text-center space-y-1">
+                  <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Lean Mass</p>
+                  <p className="text-lg font-black">{bfResults ? bfResults.lbm : '---'}<span className="text-[9px] ml-1 font-bold">kg</span></p>
                 </div>
-                <div className="bg-muted/10 p-4 rounded-2xl border border-muted/20 text-center space-y-1">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Fat Mass</p>
-                  <p className="text-xl font-black">{bfResults && weight ? (parseFloat(weight) - bfResults.lbm).toFixed(1) : '---'}<span className="text-[10px] ml-1">kg</span></p>
+                <div className="bg-muted/10 p-3.5 rounded-2xl border border-muted/20 text-center space-y-1">
+                  <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Fat Mass</p>
+                  <p className="text-lg font-black">{bfResults && weight ? (parseFloat(weight) - bfResults.lbm).toFixed(1) : '---'}<span className="text-[9px] ml-1 font-bold">kg</span></p>
                 </div>
               </div>
               
-              <div className="bg-accent/5 p-4 rounded-2xl border border-accent/10 flex items-start gap-3">
-                <Info className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-                <p className="text-[10px] text-accent/80 font-medium leading-relaxed">
-                  Calculated using the U.S. Navy Method. This is an estimate based on circumferential measurements.
+              <div className="bg-accent/5 p-3 rounded-xl border border-accent/10 flex items-start gap-2.5">
+                <Info className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
+                <p className="text-[9px] text-accent/80 font-bold leading-tight uppercase tracking-tight">
+                  Calculated using U.S. Navy Method. This estimate is based on circumferential measurements.
                 </p>
               </div>
             </CardContent>
