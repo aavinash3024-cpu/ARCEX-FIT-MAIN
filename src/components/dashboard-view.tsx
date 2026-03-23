@@ -96,7 +96,7 @@ export function DashboardView() {
     <div className="space-y-6 pb-24 pt-8">
       {/* 1. Personal Guide - AI Suggestion Banner */}
       <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
-        <CardContent className="p-5 flex items-start gap-4">
+        <CardContent className="p-5 flex items-center gap-4">
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 shrink-0 relative bg-white/10">
             <Image 
               src={coachImage?.imageUrl || "https://images.unsplash.com/photo-1594381898411-846e7d193883?q=80&w=400&auto=format&fit=crop"} 
@@ -205,7 +205,7 @@ export function DashboardView() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
               <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
-                Weight Loss Goal
+                Goal
                 <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 text-[8px] h-3.5 py-0 uppercase">Loss</Badge>
               </h3>
               <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tight">Active Milestone</p>
