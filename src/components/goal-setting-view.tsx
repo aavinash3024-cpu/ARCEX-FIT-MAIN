@@ -54,11 +54,11 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   const [weeklyRate, setWeeklyRate] = useState<WeeklyRate>(0.5);
 
   // Step 3: Macros & Adjustments
-  const [calAdj, setCalAdj] = useState([0]); // +/- from target
+  const [calAdj, setCalAdj] = useState([0]); // Total offset from TDEE
   const [protAdj, setProtAdj] = useState([1.8]); // g per kg
   const [carbRatio, setCarbRatio] = useState([50]); // % of remaining calories
 
-  // Reset adjustments when objective changes
+  // Reset adjustments when objective changes to ensure slider ranges stay valid
   useEffect(() => {
     setCalAdj([0]);
   }, [objective]);
@@ -78,12 +78,8 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
     };
     const tdee = Math.round(bmr * activityMultipliers[activity]);
 
-    // Objective calories based on weekly rate (1kg/week approx 1100 deficit/surplus per day)
-    let baseTarget = tdee;
-    if (objective === 'loss') baseTarget -= (weeklyRate * 1100); 
-    if (objective === 'gain') baseTarget += (weeklyRate * 1100);
-
-    const finalCalories = Math.round(baseTarget + calAdj[0]);
+    // Use calAdj directly as the offset from TDEE
+    const finalCalories = Math.round(tdee + calAdj[0]);
     
     // Macros
     const proteinGrams = Math.round(w * protAdj[0]);
@@ -93,9 +89,13 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
     const carbKcal = remainingKcal * (carbRatio[0] / 100);
     const fatKcal = remainingKcal - carbKcal;
 
-    // Time estimate
+    // Derived stats for Step 4
+    const currentDeficitOrSurplus = Math.abs(finalCalories - tdee);
+    const derivedWeeklyRate = parseFloat((currentDeficitOrSurplus / 1100).toFixed(2));
+    
+    // Time estimate based on current adjustment
     const weightDiff = Math.abs(tw - w);
-    const weeksToGoal = weeklyRate > 0 ? (weightDiff / weeklyRate).toFixed(1) : "0";
+    const weeksToGoal = derivedWeeklyRate > 0 ? (weightDiff / derivedWeeklyRate).toFixed(1) : "0";
 
     return {
       tdee,
@@ -106,12 +106,21 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
       isWeightValid: objective === 'gain' ? tw > w : objective === 'loss' ? tw < w : tw === w,
       weeksToGoal,
       weightDiff,
-      weeklyRate
+      derivedWeeklyRate
     };
-  }, [weight, height, age, gender, activity, objective, targetWeight, weeklyRate, calAdj, protAdj, carbRatio]);
+  }, [weight, height, age, gender, activity, objective, targetWeight, calAdj, protAdj, carbRatio]);
 
   const nextStep = () => {
     if (step === 2 && !calculations.isWeightValid) return;
+    
+    // When moving from Step 2 to Step 3, initialize the slider to the preset rate's calorie change
+    if (step === 2) {
+      let initialOffset = 0;
+      if (objective === 'loss') initialOffset = -(weeklyRate * 1100);
+      if (objective === 'gain') initialOffset = (weeklyRate * 1100);
+      setCalAdj([Math.round(initialOffset)]);
+    }
+    
     setStep(s => s + 1);
   };
   
@@ -354,7 +363,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                 <div className="bg-primary/5 p-5 rounded-3xl text-center space-y-1">
                   <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Calculated Daily Intake</p>
                   <p className="text-4xl font-black">{calculations.finalCalories} <span className="text-xs text-muted-foreground">KCAL</span></p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-tight">Includes {calculations.weeklyRate}kg/wk {objective} goal</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-tight">Includes Goal Adjustment</p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
@@ -437,7 +446,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
 
                  <div className="bg-muted/10 p-4 rounded-2xl flex justify-between items-center">
                     <p className="text-[10px] font-black text-muted-foreground uppercase">Weekly Pace</p>
-                    <p className="text-sm font-black uppercase">{calculations.weeklyRate} kg / Week</p>
+                    <p className="text-sm font-black uppercase">{calculations.derivedWeeklyRate} kg / Week</p>
                  </div>
 
                  <div className="bg-muted/10 p-4 rounded-2xl flex justify-between items-center">
