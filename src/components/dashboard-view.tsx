@@ -1,4 +1,3 @@
-
 import { useRef, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -45,6 +44,7 @@ interface DashboardViewProps {
   onUpdateHydration: (amount: number) => void;
   onViewHydration?: () => void;
   onViewTasks?: () => void;
+  onViewCalculators?: () => void;
 }
 
 export function DashboardView({ 
@@ -53,7 +53,8 @@ export function DashboardView({
   hydrationAmount, 
   onUpdateHydration, 
   onViewHydration, 
-  onViewTasks 
+  onViewTasks,
+  onViewCalculators
 }: DashboardViewProps) {
   const metricsRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
@@ -126,12 +127,14 @@ export function DashboardView({
   ];
 
   // Logic to show today's tasks
-  const priorityWeight = { high: 3, medium: 2, low: 1 };
   const priorityBgColor = { low: 'bg-green-500', medium: 'bg-amber-500', high: 'bg-destructive' };
   
   const todaysTasks = tasks
     .filter(t => isSameDay(new Date(t.date), new Date()))
-    .sort((a, b) => priorityWeight[b.priority] - priorityWeight[a.priority]);
+    .sort((a, b) => {
+      const priorityWeight = { high: 3, medium: 2, low: 1 };
+      return priorityWeight[b.priority] - priorityWeight[a.priority];
+    });
 
   const stats = {
     done: todaysTasks.filter(t => t.completed).length,
@@ -444,6 +447,7 @@ export function DashboardView({
                 {calculators.map((calc, idx) => (
                   <button 
                     key={idx} 
+                    onClick={() => onViewCalculators?.()}
                     className="p-2 bg-primary/5 rounded-xl text-center hover:bg-primary/10 transition-colors border border-primary/10"
                   >
                     <p className="text-[9px] font-black uppercase text-primary leading-tight">{calc.label}</p>

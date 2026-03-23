@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -17,6 +16,7 @@ import { WorkoutView } from '@/components/workout-view';
 import { ProgressView } from '@/components/progress-view';
 import { HydrationView } from '@/components/hydration-view';
 import { TasksView, type Task } from '@/components/tasks-view';
+import { CalculatorsView } from '@/components/calculators-view';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -44,6 +44,7 @@ export default function PulseFlowApp() {
             onUpdateHydration={updateHydration}
             onViewHydration={() => setActiveTab('hydration')} 
             onViewTasks={() => setActiveTab('tasks')} 
+            onViewCalculators={() => setActiveTab('calculators')}
           />
         );
       case 'nutrition': return <NutritionView />;
@@ -63,6 +64,12 @@ export default function PulseFlowApp() {
             tasks={tasks}
             setTasks={setTasks}
             onBack={() => setActiveTab('dashboard')} 
+          />
+        );
+      case 'calculators':
+        return (
+          <CalculatorsView 
+            onBack={() => setActiveTab('dashboard')}
           />
         );
       default: return <DashboardView tasks={tasks} onToggleTask={toggleTask} hydrationAmount={hydrationAmount} onUpdateHydration={updateHydration} />;
