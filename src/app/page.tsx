@@ -22,6 +22,7 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 export default function PulseFlowApp() {
   const [activeTab, setActiveTab] = useState('dashboard');
+  const [activeCalculator, setActiveCalculator] = useState<'bmr' | '1rm' | 'bodyfat'>('bmr');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [hydrationAmount, setHydrationAmount] = useState(1800); // in ml
 
@@ -31,6 +32,16 @@ export default function PulseFlowApp() {
 
   const updateHydration = (amount: number) => {
     setHydrationAmount(prev => Math.max(0, prev + amount));
+  };
+
+  const handleOpenCalculator = (type: string) => {
+    const calcMap: Record<string, 'bmr' | '1rm' | 'bodyfat'> = {
+      '1 Rep Max': '1rm',
+      'Body Fat %': 'bodyfat',
+      'BMR / TDEE': 'bmr'
+    };
+    setActiveCalculator(calcMap[type] || 'bmr');
+    setActiveTab('calculators');
   };
 
   const renderContent = () => {
@@ -44,7 +55,7 @@ export default function PulseFlowApp() {
             onUpdateHydration={updateHydration}
             onViewHydration={() => setActiveTab('hydration')} 
             onViewTasks={() => setActiveTab('tasks')} 
-            onViewCalculators={() => setActiveTab('calculators')}
+            onViewCalculators={handleOpenCalculator}
           />
         );
       case 'nutrition': return <NutritionView />;
@@ -69,6 +80,7 @@ export default function PulseFlowApp() {
       case 'calculators':
         return (
           <CalculatorsView 
+            initialType={activeCalculator}
             onBack={() => setActiveTab('dashboard')}
           />
         );
@@ -136,8 +148,11 @@ export default function PulseFlowApp() {
             </button>
           );
         })}
-        <button className="flex flex-col items-center text-muted-foreground hover:text-primary/60 transition-colors flex-1">
-          <div className="p-1.5 rounded-xl hover:bg-muted">
+        <button 
+          onClick={() => setActiveTab('calculators')}
+          className={`flex flex-col items-center transition-colors flex-1 ${activeTab === 'calculators' ? 'text-primary' : 'text-muted-foreground hover:text-primary/60'}`}
+        >
+          <div className={`p-1.5 rounded-xl ${activeTab === 'calculators' ? 'bg-primary/10' : 'hover:bg-muted'}`}>
             <Settings className="w-5 h-5" />
           </div>
           <span className="text-[9px] font-bold uppercase tracking-tight opacity-0 h-0">More</span>

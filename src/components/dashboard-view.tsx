@@ -44,7 +44,7 @@ interface DashboardViewProps {
   onUpdateHydration: (amount: number) => void;
   onViewHydration?: () => void;
   onViewTasks?: () => void;
-  onViewCalculators?: () => void;
+  onViewCalculators?: (type: string) => void;
 }
 
 export function DashboardView({ 
@@ -447,7 +447,7 @@ export function DashboardView({
                 {calculators.map((calc, idx) => (
                   <button 
                     key={idx} 
-                    onClick={() => onViewCalculators?.()}
+                    onClick={() => onViewCalculators?.(calc.label)}
                     className="p-2 bg-primary/5 rounded-xl text-center hover:bg-primary/10 transition-colors border border-primary/10"
                   >
                     <p className="text-[9px] font-black uppercase text-primary leading-tight">{calc.label}</p>
