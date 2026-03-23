@@ -63,7 +63,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   const [protAdj, setProtAdj] = useState([1.8]); // g per kg
   const [carbRatio, setCarbRatio] = useState([50]); // % of remaining calories
 
-  // Reset adjustments when objective changes to ensure slider ranges stay valid
+  // Reset adjustments when objective changes
   useEffect(() => {
     setCalAdj([0]);
   }, [objective]);
@@ -83,10 +83,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
     };
     const tdee = Math.round(bmr * activityMultipliers[activity]);
 
-    // Use calAdj directly as the offset from TDEE
     const finalCalories = Math.round(tdee + calAdj[0]);
-    
-    // Macros
     const proteinGrams = Math.round(w * protAdj[0]);
     const proteinKcal = proteinGrams * 4;
     
@@ -94,16 +91,13 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
     const carbKcal = remainingKcal * (carbRatio[0] / 100);
     const fatKcal = remainingKcal - carbKcal;
 
-    // Ratios for UI
     const proteinPct = Math.round((proteinKcal / finalCalories) * 100);
     const carbPct = Math.round((carbKcal / finalCalories) * 100);
     const fatPct = 100 - proteinPct - carbPct;
 
-    // Derived stats for Step 4
     const currentDeficitOrSurplus = Math.abs(finalCalories - tdee);
     const derivedWeeklyRate = parseFloat((currentDeficitOrSurplus / 1100).toFixed(2));
     
-    // Time estimate based on current adjustment
     const weightDiff = Math.abs(tw - w);
     const weeksToGoal = derivedWeeklyRate > 0 ? (weightDiff / derivedWeeklyRate).toFixed(1) : "0";
 
@@ -126,182 +120,148 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
 
   const nextStep = () => {
     if (step === 2 && !calculations.isWeightValid) return;
-    
-    // When moving from Step 2 to Step 3, initialize the slider to the preset rate's calorie change
     if (step === 2) {
       let initialOffset = 0;
       if (objective === 'loss') initialOffset = -(weeklyRate * 1100);
       if (objective === 'gain') initialOffset = (weeklyRate * 1100);
       setCalAdj([Math.round(initialOffset)]);
     }
-    
     setStep(s => s + 1);
   };
   
   const prevStep = () => setStep(s => s - 1);
 
-  const savePlan = () => {
-    setIsSaved(true);
-  };
+  const savePlan = () => setIsSaved(true);
 
   if (isSaved) {
     return (
       <div className="space-y-6 pt-10 pb-24 animate-in fade-in zoom-in-95 duration-500">
-        {/* Header Section */}
         <div className="text-center space-y-2">
           <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
             <CheckCircle2 className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-2xl font-black uppercase tracking-tight">Plan Active</h1>
-          <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">PulseFlow AI calibrated</p>
+          <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">Personalized Strategy</p>
         </div>
 
-        {/* Detailed Transformation Report */}
-        <div className="space-y-4">
-          {/* Objective Card */}
-          <Card className="border-none shadow-md bg-white overflow-hidden">
-            <CardContent className="p-6 space-y-4">
-              <div className="flex justify-between items-center">
-                <div className="space-y-0.5">
-                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Target Objective</p>
+        <Card className="border-none shadow-xl bg-white overflow-hidden">
+          <CardContent className="p-0 divide-y divide-muted/10">
+            {/* Header Section: Objective */}
+            <div className="p-6 bg-primary/5">
+              <div className="flex justify-between items-start mb-4">
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Goal Objective</p>
                   <h3 className="text-xl font-black text-foreground uppercase tracking-tight flex items-center gap-2">
                     {objective === 'loss' ? <TrendingDown className="w-5 h-5 text-destructive" /> : objective === 'gain' ? <TrendingUp className="w-5 h-5 text-green-500" /> : <Activity className="w-5 h-5 text-primary" />}
                     {objective} Weight
                   </h3>
                 </div>
                 <div className="text-right">
-                  <Badge className="bg-primary text-white font-black h-7 text-sm px-3">{targetWeight} kg</Badge>
-                  <p className="text-[9px] font-bold text-muted-foreground uppercase mt-1">Goal Weight</p>
+                  <Badge className="bg-primary text-white font-black px-3 py-1">{targetWeight} kg</Badge>
+                  <p className="text-[9px] font-bold text-muted-foreground uppercase mt-1">Target</p>
                 </div>
               </div>
-
-              <div className="bg-muted/10 p-4 rounded-2xl flex justify-between items-center">
-                <div className="text-center flex-1 border-r border-muted/20">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase">Current</p>
+              <div className="flex gap-4 items-center">
+                <div className="flex-1 text-center bg-white/60 p-2 rounded-xl border border-white/40">
+                  <p className="text-[9px] font-bold text-muted-foreground uppercase">Current</p>
                   <p className="text-lg font-black">{weight}kg</p>
                 </div>
-                <div className="text-center flex-1">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase">Difference</p>
+                <div className="flex-1 text-center bg-white/60 p-2 rounded-xl border border-white/40">
+                  <p className="text-[9px] font-bold text-muted-foreground uppercase">Change</p>
                   <p className="text-lg font-black text-primary">{calculations.weightDiff.toFixed(1)}kg</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Energy & Budget Card */}
-          <Card className="border-none shadow-md bg-white overflow-hidden">
-            <CardContent className="p-6 space-y-6">
-              <div className="flex items-center gap-2 border-b border-muted/10 pb-2">
+            {/* Energy Section */}
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-2 mb-2">
                 <Flame className="w-4 h-4 text-primary" />
-                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Energy Balance</h4>
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Daily Energy Budget</h4>
               </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-primary/5 p-4 rounded-3xl border border-primary/10 space-y-1">
-                  <p className="text-[9px] font-black text-primary uppercase tracking-widest">Daily Budget</p>
-                  <p className="text-3xl font-black">{calculations.finalCalories}</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">KCAL / DAY</p>
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-3xl font-black text-primary">{calculations.finalCalories}</p>
+                  <p className="text-[9px] font-bold text-muted-foreground uppercase">Calories / Day</p>
                 </div>
-                <div className="bg-muted/5 p-4 rounded-3xl border border-muted/10 space-y-1">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Maintenance</p>
-                  <p className="text-3xl font-black text-foreground/40">{calculations.tdee}</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">TDEE (Baseline)</p>
+                <div className="text-right">
+                  <p className="text-lg font-bold text-foreground/40">{calculations.tdee}</p>
+                  <p className="text-[9px] font-bold text-muted-foreground uppercase">Maintenance (TDEE)</p>
                 </div>
               </div>
-
               <div className="bg-accent/5 p-3 rounded-xl border border-accent/10 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Zap className="w-3.5 h-3.5 text-accent" />
-                  <span className="text-[10px] font-black text-accent uppercase tracking-tight">Active Adjustment</span>
-                </div>
+                <span className="text-[10px] font-bold text-accent uppercase">Adjustment</span>
                 <span className="text-xs font-black text-accent">{calculations.finalCalories - calculations.tdee > 0 ? '+' : ''}{calculations.finalCalories - calculations.tdee} kcal</span>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Timeline & Pace Card */}
-          <Card className="border-none shadow-md bg-white overflow-hidden">
-            <CardContent className="p-6 space-y-4">
-              <div className="flex items-center gap-2 border-b border-muted/10 pb-2">
+            {/* Timeline Section */}
+            <div className="p-6 space-y-4">
+              <div className="flex items-center gap-2 mb-2">
                 <Clock className="w-4 h-4 text-primary" />
-                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Journey Timeline</h4>
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Journey Pace</h4>
               </div>
-
-              <div className="flex justify-between items-center bg-muted/10 p-4 rounded-2xl">
-                <div className="space-y-0.5">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Weekly Pace</p>
-                  <p className="text-lg font-black uppercase text-foreground">{calculations.derivedWeeklyRate} kg / week</p>
+              <div className="grid grid-cols-2 gap-6">
+                <div>
+                  <p className="text-lg font-black text-foreground">{calculations.derivedWeeklyRate} kg</p>
+                  <p className="text-[9px] font-bold text-muted-foreground uppercase">Loss / Week</p>
                 </div>
-                <div className="text-right space-y-0.5">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Estimated Time</p>
-                  <p className="text-lg font-black text-primary uppercase">{calculations.weeksToGoal} weeks</p>
+                <div className="text-right">
+                  <p className="text-lg font-black text-primary">{calculations.weeksToGoal} Weeks</p>
+                  <p className="text-[9px] font-bold text-muted-foreground uppercase">Est. Completion</p>
                 </div>
               </div>
-            </CardContent>
-          </Card>
+            </div>
 
-          {/* Detailed Macro Breakdown */}
-          <Card className="border-none shadow-md bg-white overflow-hidden">
-            <CardContent className="p-6 space-y-5">
-              <div className="flex items-center gap-2 border-b border-muted/10 pb-2">
-                <Activity className="w-4 h-4 text-primary" />
-                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Nutritional Split</h4>
+            {/* Macros Section */}
+            <div className="p-6 space-y-5">
+              <div className="flex items-center gap-2 mb-2">
+                <PieChart className="w-4 h-4 text-primary" />
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Macronutrient Split</h4>
               </div>
-
               <div className="grid grid-cols-3 gap-3">
-                 <div className="text-center p-3 rounded-2xl bg-accent/10 border border-accent/10">
+                 <div className="text-center p-3 rounded-2xl bg-accent/5 border border-accent/10">
                     <p className="text-xl font-black text-accent">{calculations.protein}g</p>
-                    <p className="text-[8px] font-black text-muted-foreground uppercase">Protein</p>
+                    <p className="text-[8px] font-bold text-muted-foreground uppercase">Protein</p>
                  </div>
-                 <div className="text-center p-3 rounded-2xl bg-primary/10 border border-primary/10">
+                 <div className="text-center p-3 rounded-2xl bg-primary/5 border border-primary/10">
                     <p className="text-xl font-black text-primary">{calculations.carbs}g</p>
-                    <p className="text-[8px] font-black text-muted-foreground uppercase">Carbs</p>
+                    <p className="text-[8px] font-bold text-muted-foreground uppercase">Carbs</p>
                  </div>
-                 <div className="text-center p-3 rounded-2xl bg-yellow-400/10 border border-yellow-400/10">
+                 <div className="text-center p-3 rounded-2xl bg-yellow-400/5 border border-yellow-400/10">
                     <p className="text-xl font-black text-yellow-600">{calculations.fats}g</p>
-                    <p className="text-[8px] font-black text-muted-foreground uppercase">Fats</p>
+                    <p className="text-[8px] font-bold text-muted-foreground uppercase">Fats</p>
                  </div>
               </div>
-              
-              <div className="space-y-3">
-                <div className="flex h-4 w-full rounded-full overflow-hidden shadow-inner bg-muted/20">
+              <div className="space-y-3 pt-2">
+                <div className="flex h-3 w-full rounded-full overflow-hidden shadow-inner bg-muted/20">
                    <div className="bg-accent h-full transition-all" style={{ width: `${calculations.proteinPct}%` }} />
                    <div className="bg-primary h-full transition-all" style={{ width: `${calculations.carbPct}%` }} />
                    <div className="bg-yellow-400 h-full transition-all" style={{ width: `${calculations.fatPct}%` }} />
                 </div>
-                <div className="flex justify-between px-1">
-                   <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-accent" />
-                      <span className="text-[9px] font-black uppercase text-muted-foreground">{calculations.proteinPct}% PROT</span>
-                   </div>
-                   <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                      <span className="text-[9px] font-black uppercase text-muted-foreground">{calculations.carbPct}% CARB</span>
-                   </div>
-                   <div className="flex items-center gap-1.5">
-                      <div className="w-2 h-2 rounded-full bg-yellow-400" />
-                      <span className="text-[9px] font-black uppercase text-muted-foreground">{calculations.fatPct}% FAT</span>
-                   </div>
+                <div className="flex justify-between px-1 text-[8px] font-bold text-muted-foreground uppercase">
+                   <span>{calculations.proteinPct}% Prot</span>
+                   <span>{calculations.carbPct}% Carb</span>
+                   <span>{calculations.fatPct}% Fat</span>
                 </div>
               </div>
-            </CardContent>
-          </Card>
-        </div>
+            </div>
+          </CardContent>
+        </Card>
 
-        {/* Action Buttons */}
         <div className="space-y-3 pt-4">
            <Button 
             onClick={() => setIsSaved(false)} 
-            variant="outline" 
-            className="w-full h-12 rounded-2xl border-muted/30 font-black uppercase text-[11px] tracking-widest hover:bg-muted/5"
+            variant="ghost" 
+            className="w-full text-muted-foreground font-bold uppercase text-[10px] tracking-widest"
            >
-            Change Active Goal
+            Edit Goal Parameters
            </Button>
            <Button 
             onClick={onBack} 
             className="w-full h-14 rounded-2xl bg-primary font-black uppercase text-[12px] tracking-widest shadow-xl shadow-primary/25 active:scale-[0.98] transition-all"
            >
-            Confirm & Finish
+            Back to Dashboard
            </Button>
         </div>
       </div>
@@ -317,7 +277,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
         <h1 className="text-2xl font-bold font-headline">Setup My Goal</h1>
       </div>
 
-      {/* Progress Steps */}
       <div className="flex items-center justify-between px-2 mb-6">
         {[1, 2, 3, 4].map((i) => (
           <div key={i} className="flex items-center flex-1 last:flex-none">
@@ -339,7 +298,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
             <CardContent className="p-6 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Scale className="w-4 h-4 text-primary" />
-                <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Step 1: Body Metrics</h2>
+                <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Body Metrics</h2>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -355,7 +314,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Age (Years)</Label>
+                  <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Age</Label>
                   <Input type="number" value={age} onChange={(e) => setAge(e.target.value)} className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
                 </div>
               </div>
@@ -376,7 +335,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
-                    <SelectItem value="sedentary">Sedentary (Office job)</SelectItem>
+                    <SelectItem value="sedentary">Sedentary</SelectItem>
                     <SelectItem value="light">Lightly Active</SelectItem>
                     <SelectItem value="moderate">Moderately Active</SelectItem>
                     <SelectItem value="active">Very Active</SelectItem>
@@ -393,7 +352,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
             <CardContent className="p-6 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Target className="w-4 h-4 text-primary" />
-                <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Step 2: Objective</h2>
+                <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Objective</h2>
               </div>
               
               <div className="grid grid-cols-3 gap-2">
@@ -402,8 +361,8 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                        key={obj}
                        onClick={() => setObjective(obj)}
                        className={cn(
-                          "p-3 rounded-2xl border transition-all text-center space-y-1",
-                          objective === obj ? "border-primary bg-primary/5 shadow-sm" : "border-muted/20 hover:border-muted/40"
+                          "p-3 rounded-2xl border transition-all text-center",
+                          objective === obj ? "border-primary bg-primary/5" : "border-muted/20"
                        )}
                     >
                        <p className={cn("text-[9px] font-black uppercase tracking-widest", objective === obj ? "text-primary" : "text-muted-foreground")}>{obj}</p>
@@ -419,12 +378,12 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                    onChange={(e) => setTargetWeight(e.target.value)} 
                    className={cn(
                       "rounded-xl h-11 text-xs font-bold",
-                      !calculations.isWeightValid ? "border-destructive focus-visible:ring-destructive" : "border-muted-foreground/10 bg-muted/5"
+                      !calculations.isWeightValid ? "border-destructive" : "border-muted-foreground/10 bg-muted/5"
                    )} 
                 />
                 {!calculations.isWeightValid && (
-                   <p className="text-[9px] font-bold text-destructive uppercase tracking-tight">
-                      Target weight must be {objective === 'gain' ? 'higher' : objective === 'loss' ? 'lower' : 'equal'} for {objective}
+                   <p className="text-[9px] font-bold text-destructive uppercase">
+                      Invalid target weight for {objective}
                    </p>
                 )}
               </div>
@@ -440,28 +399,23 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                                key={rate}
                                onClick={() => setWeeklyRate(rate as WeeklyRate)}
                                className={cn(
-                                  "p-4 rounded-xl border transition-all text-left flex justify-between items-center relative overflow-hidden",
+                                  "p-4 rounded-xl border transition-all text-left flex justify-between items-center",
                                   weeklyRate === rate ? "border-primary bg-primary/5" : "border-muted/20"
                                )}
                             >
-                               <div className="z-10">
-                                  <p className="text-[11px] font-black text-foreground">{rate} kg <span className="text-[8px] text-muted-foreground uppercase tracking-tighter">/ per week</span></p>
-                                  <p className="text-[9px] font-bold text-muted-foreground uppercase mt-0.5">
-                                    ~{Math.round(rate * 1100)} kcal {objective === 'loss' ? 'deficit' : 'surplus'} / day
-                                  </p>
+                               <div>
+                                  <p className="text-[11px] font-black">{rate} kg / week</p>
+                                  <p className="text-[9px] font-bold text-muted-foreground uppercase">~{Math.round(rate * 1100)} kcal deficit/surplus</p>
                                   {rate === 1.0 && (
-                                    <div className="mt-1.5 flex items-center gap-1">
-                                      <AlertTriangle className="w-3 h-3 text-destructive" />
-                                      <span className="text-[8px] font-black text-destructive uppercase tracking-tight">Consult doctor before doing it</span>
+                                    <div className="mt-1 flex items-center gap-1 text-destructive">
+                                      <AlertTriangle className="w-3 h-3" />
+                                      <span className="text-[8px] font-black uppercase">Medical Advisory Required</span>
                                     </div>
                                   )}
                                </div>
-                               <div className="text-right z-10">
-                                  <div className="flex items-center gap-1 text-primary">
-                                    <Clock className="w-3 h-3" />
-                                    <span className="text-xs font-black">{weeks}</span>
-                                  </div>
-                                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Weeks to reach</p>
+                               <div className="text-right">
+                                  <p className="text-xs font-black text-primary">{weeks} Weeks</p>
+                                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Estimated</p>
                                </div>
                             </button>
                           );
@@ -478,14 +432,13 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
             <CardContent className="p-6 space-y-8">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Settings2 className="w-4 h-4 text-primary" />
-                <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Step 3: Fine-Tuning</h2>
+                <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Fine-Tuning</h2>
               </div>
 
               <div className="space-y-4">
                 <div className="bg-primary/5 p-5 rounded-3xl text-center space-y-1">
                   <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Calculated Daily Intake</p>
                   <p className="text-4xl font-black">{calculations.finalCalories} <span className="text-xs text-muted-foreground">KCAL</span></p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-tight">Includes Goal Adjustment</p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
@@ -505,11 +458,10 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
               </div>
 
               <div className="space-y-8 pt-4">
-                {/* Calories Shifter - Dynamic range based on objective */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                       <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Adjust Calories</Label>
-                      <Badge variant="secondary" className="text-[9px] font-black">{calAdj[0] > 0 ? '+' : ''}{calAdj[0]} kcal</Badge>
+                      <Badge variant="secondary" className="text-[9px] font-black">{calAdj[0]} kcal</Badge>
                   </div>
                   <Slider 
                     value={calAdj} 
@@ -517,35 +469,23 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                     min={objective === 'loss' ? -1100 : 0} 
                     max={objective === 'gain' ? 1100 : 0} 
                     step={20} 
-                    className="py-2" 
                   />
-                  <div className="flex justify-between text-[8px] font-bold text-muted-foreground/40 uppercase">
-                    <span>{objective === 'loss' ? '-1100 kcal' : 'Baseline'}</span>
-                    <span>{objective === 'gain' ? '+1100 kcal' : 'Baseline'}</span>
-                  </div>
                 </div>
 
-                {/* Protein Shifter */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                       <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Protein Intensity</Label>
-                      <Badge variant="secondary" className="text-[9px] font-black">{protAdj[0]}g / kg</Badge>
+                      <Badge variant="secondary" className="text-[9px] font-black">{protAdj[0]}g/kg</Badge>
                   </div>
-                  <Slider value={protAdj} onValueChange={setProtAdj} min={1.2} max={2.5} step={0.1} className="py-2" />
+                  <Slider value={protAdj} onValueChange={setProtAdj} min={1.2} max={2.5} step={0.1} />
                 </div>
 
-                {/* Carbs/Fat Shifter */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
-                      <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Macro Ratio (Carbs/Fat)</Label>
+                      <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Carb:Fat Ratio</Label>
                       <Badge variant="secondary" className="text-[9px] font-black">{carbRatio[0]}:{100 - carbRatio[0]}</Badge>
                   </div>
-                  <Slider value={carbRatio} onValueChange={setCarbRatio} min={20} max={80} step={5} className="py-2" />
-                  <div className="flex justify-between text-[9px] font-black text-muted-foreground/40 uppercase">
-                      <span>Low Carb</span>
-                      <span>Balanced</span>
-                      <span>High Carb</span>
-                  </div>
+                  <Slider value={carbRatio} onValueChange={setCarbRatio} min={20} max={80} step={5} />
                 </div>
               </div>
             </CardContent>
@@ -557,57 +497,46 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
             <CardContent className="p-6 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Sparkles className="w-4 h-4 text-primary" />
-                <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Step 4: Review Plan</h2>
+                <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Review Strategy</h2>
               </div>
 
-              <div className="space-y-4">
-                 <div className="space-y-3">
-                   <div className="flex items-center justify-between p-4 bg-muted/10 rounded-2xl">
+              <div className="space-y-6">
+                 <div className="space-y-4">
+                   <div className="flex items-center justify-between">
                      <div className="space-y-0.5">
-                       <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Target Objective</p>
-                       <p className="text-sm font-black uppercase flex items-center gap-2">
-                         {objective === 'loss' ? <TrendingDown className="w-4 h-4 text-destructive" /> : <TrendingUp className="w-4 h-4 text-green-500" />}
-                         {objective} to {targetWeight} kg
-                       </p>
+                       <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Pace</p>
+                       <p className="text-sm font-bold uppercase">{calculations.derivedWeeklyRate} kg / week</p>
                      </div>
-                     <Badge className="bg-primary text-white font-black">{targetWeight} kg</Badge>
-                   </div>
-
-                   <div className="grid grid-cols-2 gap-3">
-                     <div className="bg-muted/10 p-4 rounded-2xl space-y-1">
-                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Daily Budget</p>
-                        <p className="text-lg font-black text-primary">{calculations.finalCalories} kcal</p>
-                     </div>
-                     <div className="bg-muted/10 p-4 rounded-2xl space-y-1">
-                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Maintenance</p>
-                        <p className="text-lg font-black text-foreground/60">{calculations.tdee} kcal</p>
-                     </div>
-                   </div>
-
-                   <div className="bg-muted/10 p-4 rounded-2xl flex justify-between items-center">
-                      <div className="space-y-0.5">
-                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Weekly Pace</p>
-                        <p className="text-sm font-black uppercase">{calculations.derivedWeeklyRate} kg / week</p>
-                      </div>
-                      <div className="text-right space-y-0.5">
+                     <div className="text-right space-y-0.5">
                         <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Estimated Time</p>
                         <p className="text-sm font-black text-primary uppercase">{calculations.weeksToGoal} weeks</p>
                       </div>
                    </div>
+
+                   <div className="grid grid-cols-2 gap-3">
+                     <div className="bg-muted/10 p-4 rounded-2xl">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase">Budget</p>
+                        <p className="text-lg font-black text-primary">{calculations.finalCalories} kcal</p>
+                     </div>
+                     <div className="bg-muted/10 p-4 rounded-2xl">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase">TDEE</p>
+                        <p className="text-lg font-black text-foreground/40">{calculations.tdee} kcal</p>
+                     </div>
+                   </div>
                  </div>
 
-                 <div className="rounded-2xl border border-muted/20 p-5 space-y-5 shadow-sm">
+                 <div className="space-y-5">
                     <p className="text-[10px] font-black text-muted-foreground uppercase text-center tracking-widest">MACROS BREAKDOWN</p>
                     <div className="grid grid-cols-3 gap-3">
-                       <div className="text-center p-2 rounded-xl bg-accent/5">
+                       <div className="text-center">
                           <p className="text-lg font-black text-accent">{calculations.protein}g</p>
                           <p className="text-[8px] font-bold text-muted-foreground uppercase">Protein</p>
                        </div>
-                       <div className="text-center p-2 rounded-xl bg-primary/5">
+                       <div className="text-center">
                           <p className="text-lg font-black text-primary">{calculations.carbs}g</p>
                           <p className="text-[8px] font-bold text-muted-foreground uppercase">Carbs</p>
                        </div>
-                       <div className="text-center p-2 rounded-xl bg-yellow-400/5">
+                       <div className="text-center">
                           <p className="text-lg font-black text-yellow-600">{calculations.fats}g</p>
                           <p className="text-[8px] font-bold text-muted-foreground uppercase">Fats</p>
                        </div>
@@ -620,32 +549,20 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                          <div className="bg-yellow-400" style={{ width: `${calculations.fatPct}%` }} />
                       </div>
                       <div className="flex justify-between text-[7px] font-black uppercase text-muted-foreground/40">
-                         <span>Prot ({calculations.proteinPct}%)</span>
-                         <span>Carbs ({calculations.carbPct}%)</span>
-                         <span>Fat ({calculations.fatPct}%)</span>
+                         <span>{calculations.proteinPct}% PROT</span>
+                         <span>{calculations.carbPct}% CARB</span>
+                         <span>{calculations.fatPct}% FAT</span>
                       </div>
                     </div>
-                 </div>
-
-                 <div className="bg-accent/5 p-4 rounded-2xl flex gap-3 items-start border border-accent/10">
-                    <Info className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-                    <p className="text-[10px] text-accent font-bold uppercase leading-tight">
-                       This plan requires a daily {objective === 'loss' ? 'deficit' : 'surplus'} of {calculations.currentDeficitOrSurplus} kcal. Consistent tracking is vital for achieving {targetWeight}kg.
-                    </p>
                  </div>
               </div>
             </CardContent>
           </Card>
         )}
 
-        {/* Navigation Buttons */}
         <div className="flex gap-4 pt-2">
           {step > 1 && (
-            <Button 
-               variant="outline" 
-               onClick={prevStep} 
-               className="h-12 w-16 rounded-xl border-muted/30"
-            >
+            <Button variant="outline" onClick={prevStep} className="h-12 w-16 rounded-xl border-muted/30">
                <ChevronLeft className="w-5 h-5" />
             </Button>
           )}
