@@ -144,9 +144,11 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
         </Button>
         
         <div className="flex flex-col items-center">
-          <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none mb-1">Active Date</span>
           <span className="text-sm font-black text-foreground">
             {format(selectedDate, 'EEEE, MMMM do')}
+          </span>
+          <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none mt-1">
+            {isSameDay(selectedDate, startOfToday()) ? 'TODAY' : 'TIME LINE'}
           </span>
         </div>
 
