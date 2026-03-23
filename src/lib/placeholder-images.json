@@ -1,3 +1,28 @@
 {
-  "placeholderImages": []
+  "placeholderImages": [
+    {
+      "id": "workout-bench",
+      "description": "Person doing bench press",
+      "imageUrl": "https://picsum.photos/seed/workout1/600/400",
+      "imageHint": "bench press"
+    },
+    {
+      "id": "workout-squat",
+      "description": "Person doing squats",
+      "imageUrl": "https://picsum.photos/seed/workout2/600/400",
+      "imageHint": "squats"
+    },
+    {
+      "id": "workout-yoga",
+      "description": "Person doing yoga",
+      "imageUrl": "https://picsum.photos/seed/workout3/600/400",
+      "imageHint": "yoga stretch"
+    },
+    {
+      "id": "meal-healthy",
+      "description": "Healthy salad bowl",
+      "imageUrl": "https://picsum.photos/seed/meal1/600/400",
+      "imageHint": "healthy salad"
+    }
+  ]
 }
