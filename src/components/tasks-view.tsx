@@ -291,7 +291,6 @@ export function TasksView({ onBack }: TasksViewProps) {
             <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
               <AlertCircle className="w-3 h-3" /> Daily Summary
             </h4>
-            <span className="text-[10px] font-black text-primary uppercase">{stats.total.done}/{stats.total.total} Done</span>
           </div>
           <div className="space-y-3 px-1">
             <div className="flex items-center justify-between">
@@ -315,6 +314,10 @@ export function TasksView({ onBack }: TasksViewProps) {
               </div>
               <span className="text-xs font-black text-muted-foreground">{stats.low.done}/{stats.low.total}</span>
             </div>
+            <div className="pt-3 mt-3 border-t border-muted/20 flex items-center justify-between">
+              <span className="text-[11px] font-black text-foreground uppercase tracking-widest">Total Tasks</span>
+              <span className="text-[11px] font-black text-primary uppercase">{stats.total.done}/{stats.total.total}</span>
+            </div>
           </div>
         </CardContent>
       </Card>
@@ -323,16 +326,20 @@ export function TasksView({ onBack }: TasksViewProps) {
       <Dialog open={!!editingTask} onOpenChange={(open) => !open && setEditingTask(null)}>
         <DialogContent className="rounded-2xl w-[90%] max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
-              <Pencil className="w-3 h-3" /> Edit Task Details
+            <DialogTitle className="text-xs font-black uppercase tracking-widest text-primary">
+              Edit Task Details
             </DialogTitle>
           </DialogHeader>
-          <div className="py-4 space-y-3">
-            <div className="space-y-1">
-              <p className="text-[10px] font-black text-muted-foreground uppercase">Objective</p>
-              <p className="text-sm font-bold">{editingTask?.title}</p>
+          <div className="py-4 space-y-4">
+            <div className="space-y-2">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                OBJECTIVE
+              </label>
+              <div className="p-3 rounded-xl border border-muted/20 bg-muted/5">
+                <p className="text-sm font-bold text-foreground">{editingTask?.title}</p>
+              </div>
             </div>
-            <div className="space-y-1.5">
+            <div className="space-y-2">
               <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                 ADDITIONAL NOTES
               </label>
@@ -340,12 +347,12 @@ export function TasksView({ onBack }: TasksViewProps) {
                 value={detailsText}
                 onChange={(e) => setDetailsText(e.target.value)}
                 placeholder="Add more information about this task..."
-                className="min-h-[120px] rounded-xl border-muted/20 text-xs font-medium focus:ring-primary/20"
+                className="min-h-[120px] rounded-xl border border-muted/20 text-xs font-medium focus:ring-primary/20 bg-white"
               />
             </div>
           </div>
           <DialogFooter>
-            <Button onClick={saveDetails} className="w-full h-12 rounded-xl bg-primary font-black uppercase text-[11px] tracking-widest gap-2">
+            <Button onClick={saveDetails} className="w-full h-12 rounded-xl bg-primary font-black uppercase text-[11px] tracking-widest gap-2 shadow-lg shadow-primary/20">
               <Save className="w-4 h-4" /> Save Details
             </Button>
           </DialogFooter>
