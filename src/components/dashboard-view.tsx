@@ -4,17 +4,30 @@ import { Badge } from "@/components/ui/badge";
 import { 
   Flame, 
   Droplets, 
-  CheckCircle2, 
   Footprints, 
   Target,
   ChevronRight,
-  Brain,
   Zap,
-  Leaf,
   Sparkles,
-  Dumbbell
+  Calculator,
+  TrendingDown,
+  Scale,
+  LineChart as ChartIcon
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
+import { 
+  AreaChart, 
+  Area, 
+  ResponsiveContainer 
+} from 'recharts';
+
+const weightData = [
+  { day: 'Mon', weight: 79.5 },
+  { day: 'Tue', weight: 79.2 },
+  { day: 'Wed', weight: 78.8 },
+  { day: 'Thu', weight: 78.9 },
+  { day: 'Fri', weight: 78.5 },
+];
 
 export function DashboardView() {
   const bmr = 1600;
@@ -30,6 +43,14 @@ export function DashboardView() {
       target: targetCal.toLocaleString(), 
       icon: <Flame className="w-4 h-4 text-orange-500" />, 
       color: "bg-orange-50" 
+    },
+    { 
+      label: "Streak", 
+      value: "12", 
+      unit: "days", 
+      target: "15", 
+      icon: <Zap className="w-4 h-4 text-yellow-500" />, 
+      color: "bg-yellow-50" 
     },
     { 
       label: "Hydration", 
@@ -56,8 +77,14 @@ export function DashboardView() {
     { label: "Fiber", current: 22, target: 35, unit: "g" },
   ];
 
+  const calculators = [
+    { label: "1 Rep Max", description: "Power" },
+    { label: "Body Fat %", description: "Body" },
+    { label: "BMR / TDEE", description: "Energy" },
+  ];
+
   return (
-    <div className="space-y-6 pb-20 pt-4">
+    <div className="space-y-6 pb-20 pt-8">
       {/* Your Personal Guide - AI Suggestion Banner */}
       <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
         <CardContent className="p-5 flex items-start gap-4">
@@ -83,7 +110,7 @@ export function DashboardView() {
           </span>
         </div>
 
-        {/* Metrics Belt - Compacted Height */}
+        {/* Metrics Belt */}
         <div className="flex gap-3 overflow-x-auto pb-2 swipe-container">
           {metrics.map((m, idx) => {
             const currentVal = parseFloat(m.value.replace(',', ''));
@@ -92,7 +119,7 @@ export function DashboardView() {
             const isCalories = m.label === "Calories";
 
             return (
-              <Card key={idx} className="min-w-[160px] flex-shrink-0 border-none shadow-sm glass-card">
+              <Card key={idx} className="min-w-[150px] flex-shrink-0 border-none shadow-sm glass-card">
                 <CardContent className="p-3 flex flex-col justify-between h-32">
                   <div className="flex justify-between items-center">
                     <div className={`p-1.5 rounded-lg ${m.color}`}>
@@ -115,12 +142,10 @@ export function DashboardView() {
                       
                       {isCalories && (
                         <>
-                          {/* BMR Marker */}
                           <div 
                             className="absolute top-0 h-4 w-[1px] bg-destructive/40" 
                             style={{ left: `${(bmr / targetVal) * 100}%` }}
                           />
-                          {/* TDEE Marker */}
                           <div 
                             className="absolute top-0 h-4 w-[1px] bg-accent/60" 
                             style={{ left: `${Math.min((tdee / targetVal) * 100, 100)}%` }}
@@ -135,6 +160,70 @@ export function DashboardView() {
           })}
         </div>
 
+        {/* Swipeable Tools: Weight & Calculators */}
+        <div className="flex gap-3 overflow-x-auto pb-2 swipe-container">
+          {/* Weight Card with Graph */}
+          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card overflow-hidden">
+            <CardContent className="p-4 space-y-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-1">
+                    <Scale className="w-3 h-3 text-primary" /> Current Weight
+                  </h3>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold">78.5</span>
+                    <span className="text-xs text-muted-foreground">kg</span>
+                  </div>
+                </div>
+                <Badge className="bg-green-100 text-green-700 border-none px-2 py-0.5 gap-1 text-[10px]">
+                  <TrendingDown className="w-3 h-3" /> -0.4kg
+                </Badge>
+              </div>
+              
+              <div className="h-16 w-full -mx-4 -mb-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={weightData}>
+                    <defs>
+                      <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <Area 
+                      type="monotone" 
+                      dataKey="weight" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={2} 
+                      fillOpacity={1} 
+                      fill="url(#colorWeight)" 
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Calculators Card */}
+          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card">
+            <CardContent className="p-4 space-y-3">
+              <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                <Calculator className="w-3 h-3 text-primary" /> Performance Tools
+              </h3>
+              <div className="grid grid-cols-3 gap-2">
+                {calculators.map((calc, idx) => (
+                  <button 
+                    key={idx} 
+                    className="p-2 bg-primary/5 rounded-xl text-center hover:bg-primary/10 transition-colors border border-primary/10"
+                  >
+                    <p className="text-[9px] font-black uppercase text-primary leading-tight">{calc.label}</p>
+                    <p className="text-[7px] font-bold text-muted-foreground/60 uppercase">{calc.description}</p>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
         {/* Integrated Macros Breakdown */}
         <Card className="border-none shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
           <CardContent className="p-5 space-y-4">
@@ -146,9 +235,7 @@ export function DashboardView() {
               {nutrients.map((n, idx) => (
                 <div key={idx} className="space-y-1.5">
                   <div className="flex justify-between items-center text-[10px]">
-                    <div className="flex items-center gap-1.5">
-                      <span className="font-bold text-muted-foreground uppercase">{n.label}</span>
-                    </div>
+                    <span className="font-bold text-muted-foreground uppercase">{n.label}</span>
                     <span className="text-muted-foreground font-mono font-medium">
                       {n.current}/{n.target}{n.unit}
                     </span>
@@ -160,60 +247,6 @@ export function DashboardView() {
           </CardContent>
         </Card>
       </section>
-
-      {/* Today's Workout Card */}
-      <Card className="border-none shadow-sm bg-white/50 backdrop-blur-sm">
-        <CardContent className="p-5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-primary/10 rounded-2xl">
-              <Dumbbell className="w-6 h-6 text-primary" />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-primary uppercase tracking-widest">Today's Workout</p>
-              <p className="text-sm font-bold">Push Day: Chest & Triceps</p>
-              <p className="text-[9px] font-bold text-muted-foreground uppercase mt-0.5">45-60 mins • Moderate Intensity</p>
-            </div>
-          </div>
-          <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
-        </CardContent>
-      </Card>
-
-      {/* Weekly Progress & Goals */}
-      <div className="grid grid-cols-1 gap-3">
-        <Card className="border-none shadow-sm">
-          <CardContent className="p-5 space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-sm font-bold flex items-center gap-2">
-                <CheckCircle2 className="w-4 h-4 text-primary" />
-                Weight Goal
-              </h3>
-              <Badge variant="secondary" className="text-[9px] font-bold px-2 py-0">LOSS</Badge>
-            </div>
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-[11px] font-medium">
-                <span>Journey to 75.0 kg</span>
-                <span className="text-primary font-bold">78.5 kg</span>
-              </div>
-              <Progress value={65} className="h-1.5" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-sm">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between p-3.5 bg-muted/40 rounded-xl">
-              <div>
-                <p className="text-[10px] text-muted-foreground font-bold uppercase">Current Weight</p>
-                <p className="text-xl font-bold">78.5 <span className="text-xs font-normal opacity-60">kg</span></p>
-              </div>
-              <div className="text-right">
-                <p className="text-xs text-green-600 font-bold flex items-center justify-end">-0.4 kg</p>
-                <p className="text-[9px] text-muted-foreground font-bold uppercase">vs last week</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
     </div>
   );
 }
