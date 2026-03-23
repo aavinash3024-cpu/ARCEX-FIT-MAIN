@@ -10,7 +10,6 @@ import {
   ChevronRight, 
   Plus, 
   Trash2,
-  Calendar,
   AlertCircle,
   ClipboardList
 } from "lucide-react";
@@ -125,102 +124,112 @@ export function TasksView({ onBack }: TasksViewProps) {
         </Button>
       </div>
 
-      {/* Redesigned Add Task Card */}
-      <Card className="border-none shadow-md bg-white">
-        <CardContent className="p-6 space-y-6">
-          <div className="space-y-1">
-            <h2 className="text-lg font-black text-foreground">Daily objectives</h2>
-            <p className="text-xs text-muted-foreground font-medium">Manage and create tasks for this date.</p>
-          </div>
+      {/* Unified Integrated Task Card */}
+      <Card className="border-none shadow-md bg-white overflow-hidden">
+        <CardContent className="p-0">
+          {/* Creation Section */}
+          <div className="p-6 space-y-6 border-b border-muted/10">
+            <div className="space-y-1">
+              <h2 className="text-lg font-black text-foreground uppercase tracking-tight">Daily objectives</h2>
+              <p className="text-xs text-muted-foreground font-medium">Log tasks for {format(selectedDate, 'EEEE, MMM do')}</p>
+            </div>
 
-          <div className="space-y-2">
-            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-              NEW OBJECTIVE
-            </label>
-            <input 
-              type="text" 
-              value={newTaskTitle}
-              onChange={(e) => setNewTaskTitle(e.target.value)}
-              placeholder="What needs to be done?" 
-              className="w-full h-14 px-5 bg-muted/10 rounded-xl text-sm border-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
-            />
-          </div>
+            <div className="space-y-4">
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                  NEW OBJECTIVE
+                </label>
+                <div className="relative group">
+                  <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+                    <Plus className="w-4 h-4 text-primary/40 group-focus-within:text-primary transition-colors" />
+                  </div>
+                  <input 
+                    type="text" 
+                    value={newTaskTitle}
+                    onChange={(e) => setNewTaskTitle(e.target.value)}
+                    placeholder="What needs to be done?" 
+                    className="w-full h-12 pl-10 pr-4 bg-muted/10 rounded-xl text-xs border-none focus:ring-2 focus:ring-primary/20 transition-all font-bold"
+                  />
+                </div>
+              </div>
 
-          <div className="space-y-3">
-            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-              SET PRIORITY
-            </label>
-            <div className="grid grid-cols-3 gap-1 bg-muted/10 p-1.5 rounded-2xl">
-              {(['low', 'medium', 'high'] as Priority[]).map((p) => (
-                <button
-                  key={p}
-                  onClick={() => setSelectedPriority(p)}
-                  className={cn(
-                    "py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-                    selectedPriority === p 
-                      ? "bg-white text-foreground shadow-sm scale-[1.02]" 
-                      : "text-muted-foreground hover:text-foreground/70"
-                  )}
-                >
-                  {p}
-                </button>
-              ))}
+              <div className="space-y-2">
+                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                  SET PRIORITY
+                </label>
+                <div className="grid grid-cols-3 gap-1 bg-muted/10 p-1 rounded-xl">
+                  {(['low', 'medium', 'high'] as Priority[]).map((p) => (
+                    <button
+                      key={p}
+                      onClick={() => setSelectedPriority(p)}
+                      className={cn(
+                        "py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
+                        selectedPriority === p 
+                          ? "bg-white text-primary shadow-sm scale-[1.02] border border-primary/5" 
+                          : "text-muted-foreground hover:text-foreground/70"
+                      )}
+                    >
+                      {p}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <Button 
+                onClick={addTask}
+                className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
+              >
+                Add to List
+              </Button>
             </div>
           </div>
 
-          <Button 
-            onClick={addTask}
-            className="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
-          >
-            Save task
-          </Button>
+          {/* Integrated Task List Section */}
+          <div className="max-h-[400px] overflow-y-auto swipe-container">
+            {filteredTasks.length === 0 ? (
+              <div className="text-center py-12 flex flex-col items-center gap-3 opacity-20">
+                <div className="w-12 h-12 rounded-full border-2 border-dashed border-foreground/30 flex items-center justify-center">
+                  <ClipboardList className="w-6 h-6" />
+                </div>
+                <p className="text-[9px] font-black uppercase tracking-widest">Awaiting tasks...</p>
+              </div>
+            ) : (
+              <div className="divide-y divide-muted/10">
+                {filteredTasks.map((task) => (
+                  <div key={task.id} className="p-4 flex items-center justify-between group hover:bg-muted/5 transition-colors">
+                    <div className="flex items-center gap-4 min-w-0">
+                      <Checkbox 
+                        checked={task.completed} 
+                        onCheckedChange={() => toggleTask(task.id)}
+                        className="h-5 w-5 rounded-md border-2 border-primary/20 data-[state=checked]:bg-primary"
+                      />
+                      <div className="space-y-0.5 min-w-0">
+                        <p className={cn(
+                          "text-xs font-bold transition-all truncate",
+                          task.completed ? "text-muted-foreground line-through opacity-50" : "text-foreground"
+                        )}>
+                          {task.title}
+                        </p>
+                        <Badge variant="outline" className={cn("text-[8px] h-3.5 px-1.5 py-0 font-black uppercase tracking-tighter border-none", priorityColor[task.priority])}>
+                          {task.priority}
+                        </Badge>
+                      </div>
+                    </div>
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => deleteTask(task.id)}
+                      className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive/40 hover:text-destructive hover:bg-destructive/5 rounded-full w-8 h-8"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </CardContent>
       </Card>
-
-      {/* Tasks List */}
-      <div className="space-y-3">
-        {filteredTasks.length === 0 ? (
-          <div className="text-center py-12 flex flex-col items-center gap-3 opacity-20">
-            <div className="w-16 h-16 rounded-full border-2 border-dashed border-foreground/30 flex items-center justify-center">
-              <ClipboardList className="w-8 h-8" />
-            </div>
-            <p className="text-[10px] font-black uppercase tracking-widest">NO TASKS LOGGED</p>
-          </div>
-        ) : (
-          filteredTasks.map((task) => (
-            <Card key={task.id} className="border-none shadow-sm bg-white overflow-hidden group">
-              <CardContent className="p-4 flex items-center justify-between">
-                <div className="flex items-center gap-4">
-                  <Checkbox 
-                    checked={task.completed} 
-                    onCheckedChange={() => toggleTask(task.id)}
-                    className="h-5 w-5 rounded-md border-2"
-                  />
-                  <div className="space-y-0.5">
-                    <p className={cn(
-                      "text-sm font-bold transition-all",
-                      task.completed ? "text-muted-foreground line-through opacity-50" : "text-foreground"
-                    )}>
-                      {task.title}
-                    </p>
-                    <Badge variant="outline" className={cn("text-[8px] h-4 font-black uppercase tracking-tighter", priorityColor[task.priority])}>
-                      {task.priority}
-                    </Badge>
-                  </div>
-                </div>
-                <Button 
-                  variant="ghost" 
-                  size="icon" 
-                  onClick={() => deleteTask(task.id)}
-                  className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive/40 hover:text-destructive hover:bg-destructive/5 rounded-full"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </Button>
-              </CardContent>
-            </Card>
-          ))
-        )}
-      </div>
 
       {/* Summary Card */}
       <Card className="border-none shadow-lg bg-white border border-muted/10 sticky bottom-4 z-10">
