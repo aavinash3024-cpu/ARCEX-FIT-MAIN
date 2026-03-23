@@ -13,7 +13,10 @@ import {
   Plus,
   Minus,
   CheckCircle2,
-  Circle
+  Circle,
+  PieChart,
+  Target,
+  ListTodo
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -280,7 +283,8 @@ export function DashboardView() {
       <Card className="border-none shadow-sm overflow-hidden bg-white">
         <CardContent className="p-5 space-y-5">
           <div className="flex items-center justify-start">
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-tight">
+            <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
+              <PieChart className="w-3.5 h-3.5 text-primary" />
               Today's Macros
             </h3>
           </div>
@@ -312,6 +316,7 @@ export function DashboardView() {
           <div className="flex items-center justify-between">
             <div className="space-y-0.5 flex flex-col items-start w-full">
               <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
+                <Target className="w-3.5 h-3.5 text-primary" />
                 Goal
                 <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 text-[8px] h-3.5 py-0 uppercase">Loss</Badge>
               </h3>
@@ -424,7 +429,8 @@ export function DashboardView() {
       <Card className="border-none shadow-sm overflow-hidden bg-white">
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-start">
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-tight">
+            <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
+              <ListTodo className="w-3.5 h-3.5 text-primary" />
               Today's Tasks
             </h3>
           </div>
