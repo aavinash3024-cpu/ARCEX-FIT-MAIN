@@ -14,13 +14,6 @@ import {
 } from "lucide-react";
 
 export function WorkoutView() {
-  const gridItems = [
-    { title: "Personal Records", subtitle: "8 new this month", icon: <Trophy className="w-5 h-5 text-orange-500" />, color: "bg-orange-50" },
-    { title: "Exercise Library", subtitle: "300+ Exercises", icon: <Library className="w-5 h-5 text-blue-500" />, color: "bg-blue-50" },
-    { title: "Workout History", subtitle: "View past sessions", icon: <History className="w-5 h-5 text-purple-500" />, color: "bg-purple-50" },
-    { title: "My Workout Split", subtitle: "4-day Push/Pull", icon: <Layout className="w-5 h-5 text-emerald-500" />, color: "bg-emerald-50" },
-  ];
-
   const protocolExercises = [
     { name: "Incline Guillotine Press", category: "CHEST • UPPER CHEST", status: "AWAITING DATA" },
     { name: "Cable Kickback (Triceps)", category: "TRICEPS • LATERAL HEAD", status: "AWAITING DATA" },
@@ -28,6 +21,7 @@ export function WorkoutView() {
 
   return (
     <div className="space-y-6 pb-24">
+      {/* Header Section */}
       <div className="flex items-center justify-between pt-2">
         <h1 className="text-2xl font-bold font-headline">Workout</h1>
         <Button size="sm" variant="ghost" className="rounded-full w-9 h-9 p-0 bg-muted/50">
@@ -35,24 +29,31 @@ export function WorkoutView() {
         </Button>
       </div>
 
-      {/* 2x2 Grid Menu */}
-      <div className="grid grid-cols-2 gap-3">
-        {gridItems.map((item, idx) => (
-          <Card key={idx} className="border-none shadow-sm hover:translate-y-[-2px] transition-all cursor-pointer group bg-white/60 backdrop-blur-sm">
-            <CardContent className="p-4 flex flex-col items-center text-center gap-3">
-              <div className={`p-3 rounded-2xl ${item.color} group-hover:scale-110 transition-transform`}>
-                {item.icon}
-              </div>
-              <div>
-                <p className="font-bold text-[11px] tracking-tight uppercase">{item.title}</p>
-                <p className="text-[9px] text-muted-foreground uppercase font-bold mt-0.5 opacity-60">{item.subtitle}</p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
+      {/* Small Option: Exercise Library */}
+      <div className="flex justify-start px-1">
+        <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] font-bold uppercase tracking-wider rounded-full border-muted-foreground/20 hover:bg-muted/30">
+          <Library className="w-3 h-3 mr-1.5" />
+          Exercise Library
+        </Button>
       </div>
 
-      {/* Today's Protocol Card - Styled like Meal Log Card */}
+      {/* 1. Personal Records Card (Hero Position) */}
+      <Card className="border-none shadow-sm bg-gradient-to-br from-orange-50 to-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
+        <CardContent className="p-5 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-orange-100 rounded-2xl group-hover:scale-110 transition-transform">
+              <Trophy className="w-6 h-6 text-orange-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-orange-900 uppercase tracking-tight">Personal Records</h3>
+              <p className="text-[10px] font-bold text-orange-600/60 uppercase">8 New this month</p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-orange-300" />
+        </CardContent>
+      </Card>
+
+      {/* 2. Today's Protocol Card (Styled like Meal Log Hub) */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         {/* Header - Logo on Left */}
         <div className="px-5 pt-5 pb-2">
@@ -63,15 +64,14 @@ export function WorkoutView() {
             <div className="flex-1 min-w-0">
               <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground/80">Today's Protocol</h2>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                COMPLETION: <span className="text-emerald-600">0/2 DONE</span>
+                COMPLETION: <span className="text-emerald-600 font-black">0/2 DONE</span>
               </p>
             </div>
           </div>
         </div>
 
         <CardContent className="p-4 space-y-4">
-          {/* Exercise Items - More refined */}
-          <div className="space-y-2">
+          <div className="space-y-2.5">
             {protocolExercises.map((ex, idx) => (
               <div key={idx} className="bg-white/80 backdrop-blur-sm p-3.5 rounded-xl border border-emerald-50/30 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-emerald-200/50">
                 <div className="flex justify-between items-start">
@@ -92,12 +92,38 @@ export function WorkoutView() {
             ))}
           </div>
 
-          {/* Add Movement Button - Styled like main log button */}
           <Button className="w-full h-12 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-black text-[11px] uppercase tracking-widest shadow-lg shadow-emerald-100 transition-all active:scale-[0.98] gap-2">
             <Plus className="w-4 h-4" /> Add Extra Movement
           </Button>
         </CardContent>
       </Card>
+
+      {/* 3. Bottom Grid: History & Split */}
+      <div className="grid grid-cols-2 gap-3">
+        <Card className="border-none shadow-sm hover:translate-y-[-2px] transition-all cursor-pointer group bg-white/60 backdrop-blur-sm">
+          <CardContent className="p-4 flex flex-col items-center text-center gap-3">
+            <div className="p-3 rounded-2xl bg-purple-50 group-hover:scale-110 transition-transform">
+              <History className="w-5 h-5 text-purple-500" />
+            </div>
+            <div>
+              <p className="font-bold text-[11px] tracking-tight uppercase">History</p>
+              <p className="text-[9px] text-muted-foreground uppercase font-bold mt-0.5 opacity-60">Past Sessions</p>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="border-none shadow-sm hover:translate-y-[-2px] transition-all cursor-pointer group bg-white/60 backdrop-blur-sm">
+          <CardContent className="p-4 flex flex-col items-center text-center gap-3">
+            <div className="p-3 rounded-2xl bg-blue-50 group-hover:scale-110 transition-transform">
+              <Layout className="w-5 h-5 text-blue-500" />
+            </div>
+            <div>
+              <p className="font-bold text-[11px] tracking-tight uppercase">My Split</p>
+              <p className="text-[9px] text-muted-foreground uppercase font-bold mt-0.5 opacity-60">Push/Pull/Legs</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
