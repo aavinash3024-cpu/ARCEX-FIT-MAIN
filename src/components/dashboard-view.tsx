@@ -133,88 +133,99 @@ export function DashboardView() {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold font-headline">Daily Overview</h2>
           <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider flex items-center">
-            SWIPE TO SEE <ChevronRight className="w-3 h-3 ml-1" />
+            SWIPE <ChevronRight className="w-3 h-3 ml-1" />
           </span>
         </div>
 
         {/* Metrics Belt */}
-        <div className="flex gap-3 overflow-x-auto pb-2 swipe-container">
-          {metrics.map((m, idx) => {
-            const currentVal = parseFloat(m.value.replace(',', ''));
-            const targetVal = parseFloat(m.target.replace(',', ''));
-            const percentage = Math.round((currentVal / targetVal) * 100);
-            const isCalories = m.label === "Calories";
-            const showDetails = m.label === "Hydration" || m.label === "Steps";
+        <div className="relative group">
+          <div className="flex gap-3 overflow-x-auto pb-2 swipe-container snap-x snap-mandatory">
+            {metrics.map((m, idx) => {
+              const currentVal = parseFloat(m.value.replace(',', ''));
+              const targetVal = parseFloat(m.target.replace(',', ''));
+              const percentage = Math.round((currentVal / targetVal) * 100);
+              const isCalories = m.label === "Calories";
+              const showDetails = m.label === "Hydration" || m.label === "Steps";
 
-            return (
-              <Card key={idx} className="min-w-[260px] flex-shrink-0 border-none shadow-sm glass-card">
-                <CardContent className="p-3 flex flex-col justify-between h-32">
-                  <div className="flex justify-between items-center">
-                    <div className={`p-1.5 rounded-lg ${m.color}`}>
-                      {m.icon}
+              return (
+                <Card key={idx} className="min-w-[260px] flex-shrink-0 border-none shadow-sm glass-card snap-center">
+                  <CardContent className="p-3 flex flex-col justify-between h-32">
+                    <div className="flex justify-between items-center">
+                      <div className={`p-1.5 rounded-lg ${m.color}`}>
+                        {m.icon}
+                      </div>
+                      <span className="text-[10px] font-bold text-muted-foreground">{percentage}%</span>
                     </div>
-                    <span className="text-[10px] font-bold text-muted-foreground">{percentage}%</span>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <div>
-                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight mb-0.5">{m.label}</p>
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-lg font-bold">{m.value}</span>
-                          <span className="text-[9px] text-muted-foreground font-medium">{m.unit}</span>
+                    
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight mb-0.5">{m.label}</p>
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-baseline gap-1">
+                            <span className="text-lg font-bold">{m.value}</span>
+                            <span className="text-[9px] text-muted-foreground font-medium">{m.unit}</span>
+                          </div>
+                          
+                          {m.label === "Hydration" && (
+                            <div className="flex items-center bg-muted/50 rounded-full px-2 py-0.5 gap-2 border border-border/50 shadow-sm">
+                              <button className="text-primary hover:text-primary/70 transition-colors">
+                                <Minus className="w-3 h-3" />
+                              </button>
+                              <span className="text-[9px] font-black text-foreground uppercase tracking-tighter">250ml</span>
+                              <button className="text-primary hover:text-primary/70 transition-colors">
+                                <Plus className="w-3 h-3" />
+                              </button>
+                            </div>
+                          )}
                         </div>
-                        
-                        {m.label === "Hydration" && (
-                          <div className="flex items-center bg-muted/50 rounded-full px-2 py-0.5 gap-2 border border-border/50 shadow-sm">
-                            <button className="text-primary hover:text-primary/70 transition-colors">
-                              <Minus className="w-3 h-3" />
-                            </button>
-                            <span className="text-[9px] font-black text-foreground uppercase tracking-tighter">250ml</span>
-                            <button className="text-primary hover:text-primary/70 transition-colors">
-                              <Plus className="w-3 h-3" />
-                            </button>
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="relative flex-1 h-6 flex items-center">
+                          <Progress value={Math.min(percentage, 100)} className="h-1.5 w-full" />
+                          
+                          {isCalories && (
+                            <>
+                              {/* BMR Marker */}
+                              <div 
+                                className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
+                                style={{ left: `${(bmr / targetVal) * 100}%` }}
+                              >
+                                <span className="text-[6px] font-bold text-destructive/60">BMR</span>
+                                <div className="h-2 w-[1px] bg-destructive/40" />
+                              </div>
+                              {/* TDEE Marker */}
+                              <div 
+                                className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
+                                style={{ left: `${Math.min((tdee / targetVal) * 100, 98)}%` }}
+                              >
+                                <span className="text-[6px] font-bold text-accent">TDEE</span>
+                                <div className="h-2 w-[1px] bg-accent/60" />
+                              </div>
+                            </>
+                          )}
+                        </div>
+                        {showDetails && (
+                          <div className="flex items-center gap-0.5 text-[8px] font-black text-primary uppercase shrink-0">
+                            Details <ChevronRight className="w-2.5 h-2.5" />
                           </div>
                         )}
                       </div>
                     </div>
-
-                    <div className="flex items-center gap-3">
-                      <div className="relative flex-1 h-6 flex items-center">
-                        <Progress value={Math.min(percentage, 100)} className="h-1.5 w-full" />
-                        
-                        {isCalories && (
-                          <>
-                            {/* BMR Marker */}
-                            <div 
-                              className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
-                              style={{ left: `${(bmr / targetVal) * 100}%` }}
-                            >
-                              <span className="text-[6px] font-bold text-destructive/60">BMR</span>
-                              <div className="h-2 w-[1px] bg-destructive/40" />
-                            </div>
-                            {/* TDEE Marker */}
-                            <div 
-                              className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
-                              style={{ left: `${Math.min((tdee / targetVal) * 100, 98)}%` }}
-                            >
-                              <span className="text-[6px] font-bold text-accent">TDEE</span>
-                              <div className="h-2 w-[1px] bg-accent/60" />
-                            </div>
-                          </>
-                        )}
-                      </div>
-                      {showDetails && (
-                        <div className="flex items-center gap-0.5 text-[8px] font-black text-primary uppercase shrink-0">
-                          Details <ChevronRight className="w-2.5 h-2.5" />
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            );
-          })}
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+          {/* Pagination Dots for Overview */}
+          <div className="flex justify-center gap-1.5 mt-2">
+            {metrics.map((_, i) => (
+              <div 
+                key={i} 
+                className={`h-1 rounded-full transition-all duration-300 ${i === 0 ? 'w-4 bg-primary' : 'w-1.5 bg-muted-foreground/30'}`} 
+              />
+            ))}
+          </div>
         </div>
       </section>
 
@@ -284,68 +295,79 @@ export function DashboardView() {
       </Card>
 
       {/* 5. Weight & Performance Tools (Swipeable) */}
-      <div className="flex gap-3 overflow-x-auto pb-4 swipe-container">
-        {/* Weight Card with Graph */}
-        <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card overflow-hidden">
-          <CardContent className="p-4 space-y-4">
-            <div className="flex justify-between items-start">
-              <div>
-                <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-1">
-                  <Scale className="w-3 h-3 text-primary" /> Current Weight
-                </h3>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold">{currentWeight}</span>
-                  <span className="text-xs text-muted-foreground">kg</span>
+      <section className="space-y-2">
+        <div className="flex gap-3 overflow-x-auto pb-4 swipe-container snap-x snap-mandatory">
+          {/* Weight Card with Graph */}
+          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card overflow-hidden snap-center">
+            <CardContent className="p-4 space-y-4">
+              <div className="flex justify-between items-start">
+                <div>
+                  <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-1">
+                    <Scale className="w-3 h-3 text-primary" /> Current Weight
+                  </h3>
+                  <div className="flex items-baseline gap-1">
+                    <span className="text-2xl font-bold">{currentWeight}</span>
+                    <span className="text-xs text-muted-foreground">kg</span>
+                  </div>
                 </div>
+                <Badge className="bg-green-100 text-green-700 border-none px-2 py-0.5 gap-1 text-[10px]">
+                  <TrendingDown className="w-3 h-3" /> -0.4kg
+                </Badge>
               </div>
-              <Badge className="bg-green-100 text-green-700 border-none px-2 py-0.5 gap-1 text-[10px]">
-                <TrendingDown className="w-3 h-3" /> -0.4kg
-              </Badge>
-            </div>
-            
-            <div className="h-16 w-full -mx-4 -mb-4">
-              <ResponsiveContainer width="100%" height="100%">
-                <AreaChart data={weightData}>
-                  <defs>
-                    <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
-                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                    </linearGradient>
-                  </defs>
-                  <Area 
-                    type="monotone" 
-                    dataKey="weight" 
-                    stroke="hsl(var(--primary))" 
-                    strokeWidth={2} 
-                    fillOpacity={1} 
-                    fill="url(#colorWeight)" 
-                  />
-                </AreaChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+              
+              <div className="h-16 w-full -mx-4 -mb-4">
+                <ResponsiveContainer width="100%" height="100%">
+                  <AreaChart data={weightData}>
+                    <defs>
+                      <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
+                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                      </linearGradient>
+                    </defs>
+                    <Area 
+                      type="monotone" 
+                      dataKey="weight" 
+                      stroke="hsl(var(--primary))" 
+                      strokeWidth={2} 
+                      fillOpacity={1} 
+                      fill="url(#colorWeight)" 
+                    />
+                  </AreaChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Calculators Card */}
-        <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card">
-          <CardContent className="p-4 space-y-3">
-            <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-              <Calculator className="w-3 h-3 text-primary" /> Performance Tools
-            </h3>
-            <div className="grid grid-cols-3 gap-2">
-              {calculators.map((calc, idx) => (
-                <button 
-                  key={idx} 
-                  className="p-2 bg-primary/5 rounded-xl text-center hover:bg-primary/10 transition-colors border border-primary/10"
-                >
-                  <p className="text-[9px] font-black uppercase text-primary leading-tight">{calc.label}</p>
-                  <p className="text-[7px] font-bold text-muted-foreground/60 uppercase">{calc.description}</p>
-                </button>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      </div>
+          {/* Calculators Card */}
+          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card snap-center">
+            <CardContent className="p-4 space-y-3">
+              <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+                <Calculator className="w-3 h-3 text-primary" /> Performance Tools
+              </h3>
+              <div className="grid grid-cols-3 gap-2">
+                {calculators.map((calc, idx) => (
+                  <button 
+                    key={idx} 
+                    className="p-2 bg-primary/5 rounded-xl text-center hover:bg-primary/10 transition-colors border border-primary/10"
+                  >
+                    <p className="text-[9px] font-black uppercase text-primary leading-tight">{calc.label}</p>
+                    <p className="text-[7px] font-bold text-muted-foreground/60 uppercase">{calc.description}</p>
+                  </button>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+        {/* Pagination Dots for Tools */}
+        <div className="flex justify-center gap-1.5 -mt-2">
+          {[0, 1].map((i) => (
+            <div 
+              key={i} 
+              className={`h-1 rounded-full transition-all duration-300 ${i === 0 ? 'w-4 bg-primary' : 'w-1.5 bg-muted-foreground/30'}`} 
+            />
+          ))}
+        </div>
+      </section>
 
       {/* 6. Today's Tasks (Now at the bottom) */}
       <Card className="border-none shadow-sm overflow-hidden bg-white/60 backdrop-blur-md">
