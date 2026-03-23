@@ -13,7 +13,9 @@ import {
   Calculator,
   TrendingDown,
   Scale,
-  Dumbbell
+  Dumbbell,
+  Plus,
+  Minus
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -127,7 +129,7 @@ export function DashboardView() {
           </span>
         </div>
 
-        {/* Metrics Belt - Increased width to 260px */}
+        {/* Metrics Belt */}
         <div className="flex gap-3 overflow-x-auto pb-2 swipe-container">
           {metrics.map((m, idx) => {
             const currentVal = parseFloat(m.value.replace(',', ''));
@@ -149,9 +151,23 @@ export function DashboardView() {
                   <div className="space-y-2">
                     <div>
                       <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight mb-0.5">{m.label}</p>
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-lg font-bold">{m.value}</span>
-                        <span className="text-[9px] text-muted-foreground font-medium">{m.unit}</span>
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-lg font-bold">{m.value}</span>
+                          <span className="text-[9px] text-muted-foreground font-medium">{m.unit}</span>
+                        </div>
+                        
+                        {m.label === "Hydration" && (
+                          <div className="flex items-center bg-muted/50 rounded-full px-2 py-0.5 gap-2 border border-border/50 shadow-sm">
+                            <button className="text-primary hover:text-primary/70 transition-colors">
+                              <Minus className="w-3 h-3" />
+                            </button>
+                            <span className="text-[9px] font-black text-foreground uppercase tracking-tighter">250ml</span>
+                            <button className="text-primary hover:text-primary/70 transition-colors">
+                              <Plus className="w-3 h-3" />
+                            </button>
+                          </div>
+                        )}
                       </div>
                     </div>
 
