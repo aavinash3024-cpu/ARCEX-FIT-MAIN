@@ -420,7 +420,7 @@ export function DashboardView() {
               key={i} 
               onClick={() => scrollTo(toolsRef, i)}
               className={`h-1 rounded-full transition-all duration-300 outline-none ${i === activeTool ? 'w-4 bg-primary' : 'w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50'}`} 
-            />
+              />
           ))}
         </div>
       </section>
@@ -428,11 +428,12 @@ export function DashboardView() {
       {/* 6. Today's Tasks */}
       <Card className="border-none shadow-sm overflow-hidden bg-white">
         <CardContent className="p-5 space-y-4">
-          <div className="flex items-center justify-start">
+          <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
               <ListTodo className="w-3.5 h-3.5 text-primary" />
               Today's Tasks
             </h3>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">0/0 done</span>
           </div>
           <div className="space-y-3">
             {tasks.slice(0, 2).map((task) => (
