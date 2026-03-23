@@ -39,18 +39,21 @@ export default function PulseFlowApp() {
 
   return (
     <div className="min-h-screen max-w-lg mx-auto bg-background flex flex-col relative shadow-xl border-x">
-      {/* Header with Boundary Line */}
-      <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b">
-        <div className="flex items-center gap-3">
+      {/* Header with Centered Logo */}
+      <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b relative">
+        <div className="flex items-center">
           <Avatar className="w-10 h-10 border-2 border-primary/20">
             <AvatarImage src="https://picsum.photos/seed/user/100/100" />
             <AvatarFallback>JD</AvatarFallback>
           </Avatar>
-          <div>
-            <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-widest">Welcome back</p>
-            <h2 className="font-bold text-lg">Jordan Flow</h2>
-          </div>
         </div>
+
+        {/* Center Logo */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center pointer-events-none">
+          <span className="font-black text-xl tracking-tighter text-black uppercase">arcex</span>
+          <span className="font-black text-xl tracking-tighter uppercase bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">fit</span>
+        </div>
+
         <div className="flex gap-2">
           <Button variant="ghost" size="icon" className="rounded-full bg-muted/50 w-9 h-9">
             <Search className="w-4 h-4" />
