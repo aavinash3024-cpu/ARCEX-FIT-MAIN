@@ -61,15 +61,12 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
     let progress = 0;
     
     if (objective === 'loss') {
-      // If goal is loss, current must be lower than start to have progress
       if (currentWeight >= startWeight) return 0;
       progress = ((startWeight - currentWeight) / (startWeight - targetWeight)) * 100;
     } else if (objective === 'gain') {
-      // If goal is gain, current must be higher than start to have progress
       if (currentWeight <= startWeight) return 0;
       progress = ((currentWeight - startWeight) / (targetWeight - startWeight)) * 100;
     } else {
-      // Maintenance
       return 100;
     }
     
@@ -142,14 +139,14 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
       <h1 className="text-2xl font-bold font-headline mb-2 px-1">Progress</h1>
 
       <div className="space-y-4 animate-in fade-in duration-500">
-        {/* 1. Current Status (Now at Top) */}
+        {/* 1. Current Status */}
         <Card className="border-none shadow-sm bg-white overflow-hidden">
           <CardContent className="p-5 space-y-6">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">Current Status</p>
                 <div className="flex items-baseline gap-1">
-                  <h2 className="text-4xl font-black text-foreground">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"}</h2>
+                  <h2 className="text-3xl font-black text-foreground">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"}</h2>
                   <span className="text-sm font-bold text-muted-foreground uppercase">kg</span>
                 </div>
               </div>
@@ -178,7 +175,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
           </CardContent>
         </Card>
 
-        {/* 2. Sleeker Next Milestone */}
+        {/* 2. Next Milestone */}
         <Card className="border-none shadow-sm bg-primary/95 text-primary-foreground overflow-hidden rounded-[1rem]">
            <CardContent className="p-3 px-4 flex items-center justify-between">
               <div className="space-y-0.5">
