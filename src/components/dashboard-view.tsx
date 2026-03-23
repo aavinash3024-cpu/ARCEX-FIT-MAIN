@@ -554,20 +554,6 @@ export function DashboardView({
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
-              <Target className="w-3.5 h-3.5 text-primary" />
-              PulseFlow AI Suggestion
-            </h3>
-          </div>
-          <p className="text-[11px] text-muted-foreground leading-relaxed italic">
-            "Based on your activity level, increasing your daily steps to 10k will accelerate your {goalData?.objective || 'wellness'} journey by approximately 12%."
-          </p>
-        </CardContent>
-      </Card>
-
-      <Card className="border-none shadow-sm overflow-hidden bg-white">
-        <CardContent className="p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
               <ListTodo className="w-3.5 h-3.5 text-primary" />
               Today's Tasks
             </h3>
