@@ -49,7 +49,7 @@ export function NutritionView() {
       {/* Compact Analysis Card */}
       <Card className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden">
         <CardContent className="p-0 flex items-center">
-          <div className="shrink-0 w-20 h-20 relative">
+          <div className="shrink-0 w-24 h-24 relative">
             <Image 
               src={analysisImage?.imageUrl || "https://picsum.photos/seed/meal-bowl/200/200"} 
               alt="AI Analysis"
@@ -80,8 +80,8 @@ export function NutritionView() {
             <div className="space-y-0.5">
               <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground/80">Meal Logging</h2>
               <div className="flex items-center gap-2">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Daily Progress:</p>
-                <Badge variant="secondary" className="text-[9px] bg-primary/10 text-primary border-none h-4">1,070 / 2,200 KCAL</Badge>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Today's Credits:</p>
+                <Badge variant="secondary" className="text-[9px] bg-primary/10 text-primary border-none h-4">25 / 25</Badge>
               </div>
             </div>
           </div>
