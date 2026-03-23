@@ -210,11 +210,11 @@ export function DashboardView() {
         </div>
       </section>
 
-      {/* 4. Nutrient Tracking (Macros Card) */}
-      <Card className="border-none shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
+      {/* 4. Today's Macros (Macros Card) */}
+      <Card className="border-none shadow-sm overflow-hidden glass-card">
         <CardContent className="p-5 space-y-4">
           <h3 className="text-sm font-bold">
-            Nutrient Tracking
+            Today's Macros
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
             {nutrients.map((n, idx) => (
