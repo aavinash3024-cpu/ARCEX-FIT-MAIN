@@ -67,8 +67,17 @@ export function TasksView({ onBack }: TasksViewProps) {
     high: 'bg-destructive'
   };
 
+  const priorityWeight: Record<Priority, number> = {
+    high: 3,
+    medium: 2,
+    low: 1
+  };
+
   const daysToShow = Array.from({ length: 7 }, (_, i) => addDays(selectedDate, i - 3));
-  const filteredTasks = tasks.filter(t => isSameDay(new Date(t.date), selectedDate));
+  
+  const filteredTasks = tasks
+    .filter(t => isSameDay(new Date(t.date), selectedDate))
+    .sort((a, b) => priorityWeight[b.priority] - priorityWeight[a.priority]);
 
   const addTask = () => {
     if (!newTaskTitle.trim()) return;
@@ -230,7 +239,6 @@ export function TasksView({ onBack }: TasksViewProps) {
                     key={task.id} 
                     className="relative flex items-center justify-between group hover:bg-muted/5 transition-colors p-4 pl-6"
                   >
-                    {/* Reliable Priority Indicator Bar */}
                     <div className={cn("absolute left-0 top-0 bottom-0 w-1.5", priorityBgColor[task.priority])} />
                     
                     <div className="flex items-center gap-4 min-w-0">
