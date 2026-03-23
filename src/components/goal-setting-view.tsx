@@ -78,7 +78,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
     };
     const tdee = Math.round(bmr * activityMultipliers[activity]);
 
-    // Objective calories
+    // Objective calories based on weekly rate (1kg/week approx 1100 deficit/surplus per day)
     let baseTarget = tdee;
     if (objective === 'loss') baseTarget -= (weeklyRate * 1100); 
     if (objective === 'gain') baseTarget += (weeklyRate * 1100);
@@ -105,7 +105,8 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
       fats: Math.round(fatKcal / 9),
       isWeightValid: objective === 'gain' ? tw > w : objective === 'loss' ? tw < w : tw === w,
       weeksToGoal,
-      weightDiff
+      weightDiff,
+      weeklyRate
     };
   }, [weight, height, age, gender, activity, objective, targetWeight, weeklyRate, calAdj, protAdj, carbRatio]);
 
@@ -155,9 +156,9 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
             <div className="space-y-3">
                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Macro Split</p>
                <div className="flex h-3 w-full rounded-full overflow-hidden shadow-inner">
-                  <div className="bg-primary" style={{ width: `${(calculations.carbs*4/calculations.finalCalories)*100}%` }} />
-                  <div className="bg-accent" style={{ width: `${(calculations.protein*4/calculations.finalCalories)*100}%` }} />
-                  <div className="bg-yellow-400" style={{ width: `${(calculations.fats*9/calculations.finalCalories)*100}%` }} />
+                  <div className="bg-primary" style={{ width: `${Math.max(0, (calculations.carbs*4/calculations.finalCalories)*100)}%` }} />
+                  <div className="bg-accent" style={{ width: `${Math.max(0, (calculations.protein*4/calculations.finalCalories)*100)}%` }} />
+                  <div className="bg-yellow-400" style={{ width: `${Math.max(0, (calculations.fats*9/calculations.finalCalories)*100)}%` }} />
                </div>
                <div className="flex justify-between text-[8px] font-black uppercase text-muted-foreground/60">
                   <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Carbs {calculations.carbs}g</span>
@@ -353,6 +354,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                 <div className="bg-primary/5 p-5 rounded-3xl text-center space-y-1">
                   <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Calculated Daily Intake</p>
                   <p className="text-4xl font-black">{calculations.finalCalories} <span className="text-xs text-muted-foreground">KCAL</span></p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-tight">Includes {calculations.weeklyRate}kg/wk {objective} goal</p>
                 </div>
 
                 <div className="grid grid-cols-3 gap-2">
@@ -434,12 +436,17 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                  </div>
 
                  <div className="bg-muted/10 p-4 rounded-2xl flex justify-between items-center">
+                    <p className="text-[10px] font-black text-muted-foreground uppercase">Weekly Pace</p>
+                    <p className="text-sm font-black uppercase">{calculations.weeklyRate} kg / Week</p>
+                 </div>
+
+                 <div className="bg-muted/10 p-4 rounded-2xl flex justify-between items-center">
                     <p className="text-[10px] font-black text-muted-foreground uppercase">Daily Budget</p>
                     <p className="text-sm font-black text-primary">{calculations.finalCalories} kcal</p>
                  </div>
 
                  <div className="rounded-2xl border border-muted/20 p-4 space-y-4">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase text-center">Recommended Breakdown</p>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase text-center">MACROS BREAKDOWN</p>
                     <div className="grid grid-cols-3 gap-2">
                        <div className="text-center">
                           <p className="text-lg font-black">{calculations.protein}g</p>
