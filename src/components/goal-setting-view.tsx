@@ -16,7 +16,10 @@ import {
   Sparkles,
   Info,
   Clock,
-  AlertTriangle
+  AlertTriangle,
+  TrendingDown,
+  TrendingUp,
+  Activity
 } from "lucide-react";
 import { 
   Select,
@@ -106,7 +109,8 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
       isWeightValid: objective === 'gain' ? tw > w : objective === 'loss' ? tw < w : tw === w,
       weeksToGoal,
       weightDiff,
-      derivedWeeklyRate
+      derivedWeeklyRate,
+      currentDeficitOrSurplus
     };
   }, [weight, height, age, gender, activity, objective, targetWeight, calAdj, protAdj, carbRatio]);
 
@@ -416,7 +420,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                       <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Macro Ratio (Carbs/Fat)</Label>
-                      <Badge variant="secondary" className="text-[9px] font-black">{carbRatio[0]}% Carbs</Badge>
+                      <Badge variant="secondary" className="text-[9px] font-black">{carbRatio[0]}:{100 - carbRatio[0]}</Badge>
                   </div>
                   <Slider value={carbRatio} onValueChange={setCarbRatio} min={20} max={80} step={5} className="py-2" />
                   <div className="flex justify-between text-[9px] font-black text-muted-foreground/40 uppercase">
@@ -439,43 +443,76 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
               </div>
 
               <div className="space-y-4">
-                 <div className="bg-muted/10 p-4 rounded-2xl flex justify-between items-center">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase">Goal</p>
-                    <p className="text-sm font-black uppercase">{objective} To {targetWeight} kg</p>
+                 <div className="space-y-3">
+                   <div className="flex items-center justify-between p-4 bg-muted/10 rounded-2xl">
+                     <div className="space-y-0.5">
+                       <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Target Objective</p>
+                       <p className="text-sm font-black uppercase flex items-center gap-2">
+                         {objective === 'loss' ? <TrendingDown className="w-4 h-4 text-destructive" /> : <TrendingUp className="w-4 h-4 text-green-500" />}
+                         {objective} to {targetWeight} kg
+                       </p>
+                     </div>
+                     <Badge className="bg-primary text-white font-black">{targetWeight} kg</Badge>
+                   </div>
+
+                   <div className="grid grid-cols-2 gap-3">
+                     <div className="bg-muted/10 p-4 rounded-2xl space-y-1">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Daily Budget</p>
+                        <p className="text-lg font-black text-primary">{calculations.finalCalories} kcal</p>
+                     </div>
+                     <div className="bg-muted/10 p-4 rounded-2xl space-y-1">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Maintenance</p>
+                        <p className="text-lg font-black text-foreground/60">{calculations.tdee} kcal</p>
+                     </div>
+                   </div>
+
+                   <div className="bg-muted/10 p-4 rounded-2xl flex justify-between items-center">
+                      <div className="space-y-0.5">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Weekly Pace</p>
+                        <p className="text-sm font-black uppercase">{calculations.derivedWeeklyRate} kg / week</p>
+                      </div>
+                      <div className="text-right space-y-0.5">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Estimated Time</p>
+                        <p className="text-sm font-black text-primary uppercase">{calculations.weeksToGoal} weeks</p>
+                      </div>
+                   </div>
                  </div>
 
-                 <div className="bg-muted/10 p-4 rounded-2xl flex justify-between items-center">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase">Weekly Pace</p>
-                    <p className="text-sm font-black uppercase">{calculations.derivedWeeklyRate} kg / Week</p>
-                 </div>
-
-                 <div className="bg-muted/10 p-4 rounded-2xl flex justify-between items-center">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase">Daily Budget</p>
-                    <p className="text-sm font-black text-primary">{calculations.finalCalories} kcal</p>
-                 </div>
-
-                 <div className="rounded-2xl border border-muted/20 p-4 space-y-4">
-                    <p className="text-[10px] font-black text-muted-foreground uppercase text-center">MACROS BREAKDOWN</p>
-                    <div className="grid grid-cols-3 gap-2">
-                       <div className="text-center">
-                          <p className="text-lg font-black">{calculations.protein}g</p>
+                 <div className="rounded-2xl border border-muted/20 p-5 space-y-5 shadow-sm">
+                    <p className="text-[10px] font-black text-muted-foreground uppercase text-center tracking-widest">MACROS BREAKDOWN</p>
+                    <div className="grid grid-cols-3 gap-3">
+                       <div className="text-center p-2 rounded-xl bg-accent/5">
+                          <p className="text-lg font-black text-accent">{calculations.protein}g</p>
                           <p className="text-[8px] font-bold text-muted-foreground uppercase">Protein</p>
                        </div>
-                       <div className="text-center">
-                          <p className="text-lg font-black">{calculations.carbs}g</p>
+                       <div className="text-center p-2 rounded-xl bg-primary/5">
+                          <p className="text-lg font-black text-primary">{calculations.carbs}g</p>
                           <p className="text-[8px] font-bold text-muted-foreground uppercase">Carbs</p>
                        </div>
-                       <div className="text-center">
-                          <p className="text-lg font-black">{calculations.fats}g</p>
+                       <div className="text-center p-2 rounded-xl bg-yellow-400/5">
+                          <p className="text-lg font-black text-yellow-600">{calculations.fats}g</p>
                           <p className="text-[8px] font-bold text-muted-foreground uppercase">Fats</p>
                        </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <div className="flex h-2 w-full rounded-full overflow-hidden">
+                         <div className="bg-primary" style={{ width: `${Math.max(0, (calculations.carbs*4/calculations.finalCalories)*100)}%` }} />
+                         <div className="bg-accent" style={{ width: `${Math.max(0, (calculations.protein*4/calculations.finalCalories)*100)}%` }} />
+                         <div className="bg-yellow-400" style={{ width: `${Math.max(0, (calculations.fats*9/calculations.finalCalories)*100)}%` }} />
+                      </div>
+                      <div className="flex justify-between text-[7px] font-black uppercase text-muted-foreground/40">
+                         <span>Carbs ({carbRatio[0]}%)</span>
+                         <span>Protein</span>
+                         <span>Fat</span>
+                      </div>
                     </div>
                  </div>
 
                  <div className="bg-accent/5 p-4 rounded-2xl flex gap-3 items-start border border-accent/10">
                     <Info className="w-4 h-4 text-accent shrink-0 mt-0.5" />
                     <p className="text-[10px] text-accent font-bold uppercase leading-tight">
-                       This plan is based on your TDEE ({calculations.tdee} kcal). Consistent tracking is key to reaching {targetWeight}kg.
+                       This plan requires a daily {objective === 'loss' ? 'deficit' : 'surplus'} of {calculations.currentDeficitOrSurplus} kcal. Consistent tracking is vital for achieving {targetWeight}kg.
                     </p>
                  </div>
               </div>
