@@ -4,7 +4,6 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
   Dumbbell, 
   Trophy, 
@@ -13,8 +12,7 @@ import {
   Layout, 
   Plus, 
   RefreshCw,
-  ChevronRight,
-  BookOpen
+  ChevronRight
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -54,7 +52,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 2. Today's Protocol Card (Matches Meal Log Hub) */}
+      {/* 2. Today's Protocol Card */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -98,7 +96,24 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 3. Grid: History & Library (Side-by-Side) */}
+      {/* 3. My Split (Shifted Up) */}
+      <Card className="border-none shadow-md bg-gradient-to-br from-indigo-50 to-white hover:translate-y-[-2px] transition-all cursor-pointer active:scale-[0.99] group border-l-4 border-l-indigo-400">
+        <CardContent className="p-5 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-indigo-100 rounded-2xl group-hover:scale-110 transition-transform">
+              <Layout className="w-6 h-6 text-indigo-600" />
+            </div>
+            <div>
+              <h3 className="text-[10px] font-black text-indigo-900 uppercase tracking-widest">Training Split</h3>
+              <p className="text-sm font-bold text-indigo-900/90">Push / Pull / Legs</p>
+              <p className="text-[9px] font-bold text-indigo-600/60 uppercase mt-0.5 tracking-tight">Hypertrophy Phase</p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-indigo-300" />
+        </CardContent>
+      </Card>
+
+      {/* 4. Grid: History & Library (Shifted to Last) */}
       <div className="grid grid-cols-2 gap-4">
         <Card className="border-none shadow-sm bg-gradient-to-br from-sky-50 to-white hover:translate-y-[-2px] transition-all cursor-pointer active:scale-95 group">
           <CardContent className="p-5 flex flex-col items-start gap-3">
@@ -124,23 +139,6 @@ export function WorkoutView() {
           </CardContent>
         </Card>
       </div>
-
-      {/* 4. My Split (Hero Bottom) */}
-      <Card className="border-none shadow-md bg-gradient-to-br from-indigo-50 to-white hover:translate-y-[-2px] transition-all cursor-pointer active:scale-[0.99] group border-l-4 border-l-indigo-400">
-        <CardContent className="p-5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-indigo-100 rounded-2xl group-hover:scale-110 transition-transform">
-              <Layout className="w-6 h-6 text-indigo-600" />
-            </div>
-            <div>
-              <h3 className="text-[10px] font-black text-indigo-900 uppercase tracking-widest">Training Split</h3>
-              <p className="text-sm font-bold text-indigo-900/90">Push / Pull / Legs</p>
-              <p className="text-[9px] font-bold text-indigo-600/60 uppercase mt-0.5 tracking-tight">Hypertrophy Phase</p>
-            </div>
-          </div>
-          <ChevronRight className="w-4 h-4 text-indigo-300" />
-        </CardContent>
-      </Card>
     </div>
   );
 }
