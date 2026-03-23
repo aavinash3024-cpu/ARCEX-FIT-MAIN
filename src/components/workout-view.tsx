@@ -36,7 +36,7 @@ export function WorkoutView() {
               alt="Personal Records"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
-              data-ai-hint="illustration"
+              data-ai-hint="barbell illustration"
             />
           </div>
           <div className="flex-1 p-4 flex items-center justify-between min-w-0">
