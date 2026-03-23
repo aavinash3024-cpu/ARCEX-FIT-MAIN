@@ -218,46 +218,14 @@ export function DashboardView() {
         </div>
       </section>
 
-      {/* 3. Today's Tasks */}
-      <Card className="border-none shadow-sm overflow-hidden bg-white/60 backdrop-blur-md">
-        <CardContent className="p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-foreground">
-              Today's Tasks
-            </h3>
-            <Badge variant="outline" className="text-[8px] font-bold border-accent/20 text-accent uppercase h-4 px-1.5">Action Plan</Badge>
-          </div>
-          <div className="space-y-3">
-            {tasks.map((task) => (
-              <div key={task.id} className="flex items-center justify-between p-3 rounded-xl bg-white/40 border border-white/20 shadow-sm group">
-                <div className="flex items-center gap-3">
-                  {task.completed ? (
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <Circle className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
-                  )}
-                  <div className="flex flex-col">
-                    <span className={`text-xs font-bold ${task.completed ? 'text-muted-foreground line-through decoration-muted-foreground/30' : 'text-foreground/80'}`}>
-                      {task.title}
-                    </span>
-                    <span className="text-[9px] font-bold text-muted-foreground/50 uppercase">{task.duration}</span>
-                  </div>
-                </div>
-                <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* 4. Today's Macros */}
+      {/* 3. Today's Macros */}
       <Card className="border-none shadow-sm overflow-hidden bg-white/60 backdrop-blur-md">
         <CardContent className="p-5 space-y-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-foreground uppercase tracking-tight">
+            <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
               Today's Macros
+              <Badge variant="outline" className="text-[8px] font-bold border-primary/20 text-primary uppercase h-4 px-1.5">Goal Tracking</Badge>
             </h3>
-            <Badge variant="outline" className="text-[8px] font-bold border-primary/20 text-primary uppercase h-4 px-1.5">Goal Tracking</Badge>
           </div>
           <div className="grid grid-cols-2 gap-x-8 gap-y-6">
             {nutrients.map((n, idx) => (
@@ -281,7 +249,7 @@ export function DashboardView() {
         </CardContent>
       </Card>
 
-      {/* 5. Goal Milestone Card (COMPACT) */}
+      {/* 4. Goal Milestone Card (COMPACT) */}
       <Card className="border-none shadow-sm bg-white overflow-hidden">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center justify-between">
@@ -315,7 +283,7 @@ export function DashboardView() {
         </CardContent>
       </Card>
 
-      {/* 6. Weight & Performance Tools (Swipeable) */}
+      {/* 5. Weight & Performance Tools (Swipeable) */}
       <div className="flex gap-3 overflow-x-auto pb-4 swipe-container">
         {/* Weight Card with Graph */}
         <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card overflow-hidden">
@@ -378,6 +346,43 @@ export function DashboardView() {
           </CardContent>
         </Card>
       </div>
+
+      {/* 6. Today's Tasks (Now at the bottom) */}
+      <Card className="border-none shadow-sm overflow-hidden bg-white/60 backdrop-blur-md">
+        <CardContent className="p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
+              Today's Tasks
+              <Badge variant="outline" className="text-[8px] font-bold border-accent/20 text-accent uppercase h-4 px-1.5">Action Plan</Badge>
+            </h3>
+          </div>
+          <div className="space-y-3">
+            {tasks.slice(0, 2).map((task) => (
+              <div key={task.id} className="flex items-center justify-between p-3 rounded-xl bg-white/40 border border-white/20 shadow-sm group">
+                <div className="flex items-center gap-3">
+                  {task.completed ? (
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Circle className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
+                  )}
+                  <div className="flex flex-col">
+                    <span className={`text-xs font-bold ${task.completed ? 'text-muted-foreground line-through decoration-muted-foreground/30' : 'text-foreground/80'}`}>
+                      {task.title}
+                    </span>
+                    <span className="text-[9px] font-bold text-muted-foreground/50 uppercase">{task.duration}</span>
+                  </div>
+                </div>
+                <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
+              </div>
+            ))}
+          </div>
+          <div className="pt-2 border-t border-muted/20 flex justify-center">
+            <button className="text-[10px] font-bold text-primary uppercase flex items-center gap-1 hover:opacity-70 transition-opacity">
+              See More <ChevronRight className="w-3 h-3" />
+            </button>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
