@@ -31,9 +31,9 @@ import {
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
-type Priority = 'low' | 'medium' | 'high';
+export type Priority = 'low' | 'medium' | 'high';
 
-interface Task {
+export interface Task {
   id: string;
   title: string;
   priority: Priority;
@@ -43,12 +43,13 @@ interface Task {
 }
 
 interface TasksViewProps {
+  tasks: Task[];
+  setTasks: React.Dispatch<React.SetStateAction<Task[]>>;
   onBack: () => void;
 }
 
-export function TasksView({ onBack }: TasksViewProps) {
+export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
   const [selectedDate, setSelectedDate] = useState(startOfToday());
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [selectedPriority, setSelectedPriority] = useState<Priority>('medium');
   

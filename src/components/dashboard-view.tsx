@@ -26,6 +26,9 @@ import {
 } from 'recharts';
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { isSameDay } from 'date-fns';
+import { type Task } from '@/components/tasks-view';
+import { cn } from '@/lib/utils';
 
 const weightData = [
   { day: 'Mon', weight: 79.5 },
@@ -36,11 +39,12 @@ const weightData = [
 ];
 
 interface DashboardViewProps {
+  tasks: Task[];
   onViewHydration?: () => void;
   onViewTasks?: () => void;
 }
 
-export function DashboardView({ onViewHydration, onViewTasks }: DashboardViewProps) {
+export function DashboardView({ tasks, onViewHydration, onViewTasks }: DashboardViewProps) {
   const metricsRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
   const [activeMetric, setActiveMetric] = useState(0);
@@ -111,11 +115,18 @@ export function DashboardView({ onViewHydration, onViewTasks }: DashboardViewPro
     { label: "BMR / TDEE", description: "Energy" },
   ];
 
-  const tasks = [
-    { id: 1, title: "Morning Meditation", duration: "10 min", completed: true },
-    { id: 2, title: "Post-Workout Protein", duration: "Now", completed: false },
-    { id: 3, title: "Evening Mobility", duration: "15 min", completed: false },
-  ];
+  // Logic to show today's tasks
+  const priorityWeight = { high: 3, medium: 2, low: 1 };
+  const priorityBgColor = { low: 'bg-green-500', medium: 'bg-amber-500', high: 'bg-destructive' };
+  
+  const todaysTasks = tasks
+    .filter(t => isSameDay(new Date(t.date), new Date()))
+    .sort((a, b) => priorityWeight[b.priority] - priorityWeight[a.priority]);
+
+  const stats = {
+    done: todaysTasks.filter(t => t.completed).length,
+    total: todaysTasks.length
+  };
 
   const handleScroll = (ref: React.RefObject<HTMLDivElement>, setter: (val: number) => void) => {
     if (!ref.current) return;
@@ -447,27 +458,34 @@ export function DashboardView({ onViewHydration, onViewTasks }: DashboardViewPro
               <ListTodo className="w-3.5 h-3.5 text-primary" />
               Today's Tasks
             </h3>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase">0/0 done</span>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase">{stats.done}/{stats.total} done</span>
           </div>
-          <div className="space-y-3">
-            {tasks.slice(0, 2).map((task) => (
-              <div key={task.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-muted/20 shadow-sm group">
-                <div className="flex items-center gap-3">
-                  {task.completed ? (
-                    <CheckCircle2 className="w-4 h-4 text-green-500" />
-                  ) : (
-                    <Circle className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
-                  )}
-                  <div className="flex flex-col">
-                    <span className={`text-xs font-bold ${task.completed ? 'text-muted-foreground line-through decoration-muted-foreground/30' : 'text-foreground/80'}`}>
-                      {task.title}
-                    </span>
-                    <span className="text-[9px] font-bold text-muted-foreground/50 uppercase">{task.duration}</span>
-                  </div>
-                </div>
-                <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
+          <div className="space-y-3 max-h-[220px] overflow-y-auto swipe-container">
+            {todaysTasks.length === 0 ? (
+              <div className="text-center py-6 opacity-30">
+                <p className="text-[10px] font-black uppercase tracking-widest">No tasks for today</p>
               </div>
-            ))}
+            ) : (
+              todaysTasks.map((task) => (
+                <div key={task.id} className="relative flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-muted/20 shadow-sm group overflow-hidden">
+                  <div className={cn("absolute left-0 top-0 bottom-0 w-1", priorityBgColor[task.priority])} />
+                  <div className="flex items-center gap-3 pl-2">
+                    {task.completed ? (
+                      <CheckCircle2 className="w-4 h-4 text-green-500" />
+                    ) : (
+                      <Circle className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
+                    )}
+                    <div className="flex flex-col">
+                      <span className={`text-xs font-bold ${task.completed ? 'text-muted-foreground line-through decoration-muted-foreground/30' : 'text-foreground/80'}`}>
+                        {task.title}
+                      </span>
+                      <span className="text-[9px] font-bold text-muted-foreground/50 uppercase">{task.priority} Priority</span>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
+                </div>
+              ))
+            )}
           </div>
           <div className="pt-2 border-t border-muted/20 flex justify-center">
             <button 
