@@ -12,7 +12,6 @@ import {
   AlertCircle,
   ClipboardList,
   MoreVertical,
-  Pencil,
   Save
 } from "lucide-react";
 import { addDays, format, startOfToday, isSameDay } from 'date-fns';
@@ -53,7 +52,6 @@ export function TasksView({ onBack }: TasksViewProps) {
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [selectedPriority, setSelectedPriority] = useState<Priority>('medium');
   
-  // States for editing details
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [detailsText, setDetailsText] = useState("");
 
@@ -123,7 +121,6 @@ export function TasksView({ onBack }: TasksViewProps) {
 
   return (
     <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
-      {/* Header */}
       <div className="flex items-center gap-4 pt-2">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
@@ -131,7 +128,6 @@ export function TasksView({ onBack }: TasksViewProps) {
         <h1 className="text-2xl font-bold font-headline">Daily Tasks</h1>
       </div>
 
-      {/* Date Shifter */}
       <div className="flex items-center justify-between bg-white p-2 rounded-2xl shadow-sm border border-muted/20">
         <Button variant="ghost" size="icon" onClick={() => setSelectedDate(addDays(selectedDate, -1))}>
           <ChevronLeft className="w-4 h-4" />
@@ -161,10 +157,8 @@ export function TasksView({ onBack }: TasksViewProps) {
         </Button>
       </div>
 
-      {/* Unified Integrated Task Card */}
       <Card className="border-none shadow-md bg-white overflow-hidden">
         <CardContent className="p-0">
-          {/* Creation Section */}
           <div className="p-6 space-y-6 border-b border-muted/10">
             <div className="space-y-1">
               <h2 className="text-lg font-black text-foreground uppercase tracking-tight">Daily objectives</h2>
@@ -185,7 +179,7 @@ export function TasksView({ onBack }: TasksViewProps) {
                     value={newTaskTitle}
                     onChange={(e) => setNewTaskTitle(e.target.value)}
                     placeholder="What needs to be done?" 
-                    className="w-full h-12 pl-10 pr-4 bg-muted/10 rounded-xl text-xs border-none focus:ring-2 focus:ring-primary/20 transition-all font-bold"
+                    className="w-full h-12 pl-10 pr-4 bg-muted/5 border border-muted/20 rounded-xl text-xs focus:ring-1 focus:ring-primary/20 transition-all font-bold"
                   />
                 </div>
               </div>
@@ -221,8 +215,7 @@ export function TasksView({ onBack }: TasksViewProps) {
             </div>
           </div>
 
-          {/* Integrated Task List Section - Scrollable, showing ~3 tasks */}
-          <div className="max-h-[260px] overflow-y-auto swipe-container scroll-smooth">
+          <div className="max-h-[220px] overflow-y-auto swipe-container scroll-smooth">
             {filteredTasks.length === 0 ? (
               <div className="text-center py-12 flex flex-col items-center gap-3 opacity-20">
                 <div className="w-12 h-12 rounded-full border-2 border-dashed border-foreground/30 flex items-center justify-center">
@@ -236,7 +229,7 @@ export function TasksView({ onBack }: TasksViewProps) {
                   <div 
                     key={task.id} 
                     className={cn(
-                      "p-4 flex items-center justify-between group hover:bg-muted/5 transition-colors border-l-4",
+                      "p-4 flex items-center justify-between group hover:bg-muted/5 transition-colors border-l-[6px]",
                       priorityBorderColor[task.priority]
                     )}
                   >
@@ -254,7 +247,7 @@ export function TasksView({ onBack }: TasksViewProps) {
                           {task.title}
                         </p>
                         {task.details && (
-                          <p className="text-[10px] text-muted-foreground truncate max-w-[200px] italic">
+                          <p className="text-[10px] text-muted-foreground truncate max-w-[200px] italic font-medium">
                             {task.details}
                           </p>
                         )}
@@ -269,10 +262,10 @@ export function TasksView({ onBack }: TasksViewProps) {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end" className="rounded-xl">
                         <DropdownMenuItem onClick={() => openEditDetails(task)} className="text-xs font-bold gap-2">
-                          <Pencil className="w-3.5 h-3.5" /> Edit Details
+                          Edit Details
                         </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => deleteTask(task.id)} className="text-xs font-bold gap-2 text-destructive">
-                          <Trash2 className="w-3.5 h-3.5" /> Delete
+                          Delete
                         </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
@@ -284,7 +277,6 @@ export function TasksView({ onBack }: TasksViewProps) {
         </CardContent>
       </Card>
 
-      {/* Summary Card */}
       <Card className="border-none shadow-lg bg-white border border-muted/10">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3 border-b border-muted/20 pb-2">
@@ -322,11 +314,10 @@ export function TasksView({ onBack }: TasksViewProps) {
         </CardContent>
       </Card>
 
-      {/* Edit Details Dialog */}
       <Dialog open={!!editingTask} onOpenChange={(open) => !open && setEditingTask(null)}>
         <DialogContent className="rounded-2xl w-[90%] max-w-sm">
           <DialogHeader>
-            <DialogTitle className="text-xs font-black uppercase tracking-widest text-primary">
+            <DialogTitle className="text-[11px] font-black uppercase tracking-widest text-primary">
               Edit Task Details
             </DialogTitle>
           </DialogHeader>
@@ -347,7 +338,7 @@ export function TasksView({ onBack }: TasksViewProps) {
                 value={detailsText}
                 onChange={(e) => setDetailsText(e.target.value)}
                 placeholder="Add more information about this task..."
-                className="min-h-[120px] rounded-xl border border-muted/20 text-xs font-medium focus:ring-primary/20 bg-white"
+                className="min-h-[120px] rounded-xl border border-muted/20 text-xs font-medium focus:ring-primary/20 bg-muted/5"
               />
             </div>
           </div>
