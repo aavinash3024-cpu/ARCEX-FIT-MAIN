@@ -70,16 +70,16 @@ export function NutritionView() {
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         {/* Upper Area Header */}
         <div className="px-5 pt-5 pb-2">
-          <div className="flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-muted/40 rounded-full shrink-0">
+              <Utensils className="w-4 h-4 text-muted-foreground/60" />
+            </div>
             <div className="space-y-0.5">
               <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground/80">Meal Logging</h2>
               <div className="flex items-center gap-2">
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Daily Progress:</p>
                 <Badge variant="secondary" className="text-[9px] bg-primary/10 text-primary border-none h-4">1,070 / 2,200 KCAL</Badge>
               </div>
-            </div>
-            <div className="p-2 bg-muted/40 rounded-full">
-              <Utensils className="w-4 h-4 text-muted-foreground/60" />
             </div>
           </div>
         </div>
