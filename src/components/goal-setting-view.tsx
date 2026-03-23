@@ -19,7 +19,9 @@ import {
   AlertTriangle,
   TrendingDown,
   TrendingUp,
-  Activity
+  Activity,
+  Flame,
+  Zap
 } from "lucide-react";
 import { 
   Select,
@@ -145,54 +147,162 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   if (isSaved) {
     return (
       <div className="space-y-6 pt-10 pb-24 animate-in fade-in zoom-in-95 duration-500">
+        {/* Header Section */}
         <div className="text-center space-y-2">
-          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4">
+          <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-4 shadow-sm">
             <CheckCircle2 className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-2xl font-black uppercase tracking-tight">Plan Active</h1>
           <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest">PulseFlow AI calibrated</p>
         </div>
 
-        <Card className="border-none shadow-lg bg-white overflow-hidden">
-          <CardContent className="p-6 space-y-6">
-            <div className="flex justify-between items-center border-b border-muted/20 pb-4">
-               <div>
+        {/* Detailed Transformation Report */}
+        <div className="space-y-4">
+          {/* Objective Card */}
+          <Card className="border-none shadow-md bg-white overflow-hidden">
+            <CardContent className="p-6 space-y-4">
+              <div className="flex justify-between items-center">
+                <div className="space-y-0.5">
                   <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Target Objective</p>
-                  <p className="text-lg font-black text-foreground uppercase tracking-tight">{objective} Weight</p>
-               </div>
-               <Badge className="bg-primary text-white font-black h-6">{targetWeight} kg</Badge>
-            </div>
+                  <h3 className="text-xl font-black text-foreground uppercase tracking-tight flex items-center gap-2">
+                    {objective === 'loss' ? <TrendingDown className="w-5 h-5 text-destructive" /> : objective === 'gain' ? <TrendingUp className="w-5 h-5 text-green-500" /> : <Activity className="w-5 h-5 text-primary" />}
+                    {objective} Weight
+                  </h3>
+                </div>
+                <div className="text-right">
+                  <Badge className="bg-primary text-white font-black h-7 text-sm px-3">{targetWeight} kg</Badge>
+                  <p className="text-[9px] font-bold text-muted-foreground uppercase mt-1">Goal Weight</p>
+                </div>
+              </div>
 
-            <div className="grid grid-cols-2 gap-4">
-               <div className="bg-muted/10 p-4 rounded-2xl space-y-1">
-                  <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Daily Target</p>
-                  <p className="text-2xl font-black text-primary">{calculations.finalCalories} <span className="text-[10px] text-muted-foreground">KCAL</span></p>
-               </div>
-               <div className="bg-muted/10 p-4 rounded-2xl space-y-1">
-                  <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Protein Goal</p>
-                  <p className="text-2xl font-black text-accent">{calculations.protein} <span className="text-[10px] text-muted-foreground">G</span></p>
-               </div>
-            </div>
+              <div className="bg-muted/10 p-4 rounded-2xl flex justify-between items-center">
+                <div className="text-center flex-1 border-r border-muted/20">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase">Current</p>
+                  <p className="text-lg font-black">{weight}kg</p>
+                </div>
+                <div className="text-center flex-1">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase">Difference</p>
+                  <p className="text-lg font-black text-primary">{calculations.weightDiff.toFixed(1)}kg</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
 
-            <div className="space-y-3">
-               <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Macro Split</p>
-               <div className="flex h-3 w-full rounded-full overflow-hidden shadow-inner">
-                  <div className="bg-accent" style={{ width: `${calculations.proteinPct}%` }} />
-                  <div className="bg-primary" style={{ width: `${calculations.carbPct}%` }} />
-                  <div className="bg-yellow-400" style={{ width: `${calculations.fatPct}%` }} />
-               </div>
-               <div className="flex justify-between text-[8px] font-black uppercase text-muted-foreground/60">
-                  <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-accent" /> Prot {calculations.protein}g ({calculations.proteinPct}%)</span>
-                  <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Carbs {calculations.carbs}g ({calculations.carbPct}%)</span>
-                  <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-yellow-400" /> Fat {calculations.fats}g ({calculations.fatPct}%)</span>
-               </div>
-            </div>
-          </CardContent>
-        </Card>
+          {/* Energy & Budget Card */}
+          <Card className="border-none shadow-md bg-white overflow-hidden">
+            <CardContent className="p-6 space-y-6">
+              <div className="flex items-center gap-2 border-b border-muted/10 pb-2">
+                <Flame className="w-4 h-4 text-primary" />
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Energy Balance</h4>
+              </div>
 
-        <div className="space-y-3">
-           <Button onClick={() => setIsSaved(false)} variant="outline" className="w-full h-12 rounded-xl border-muted/30 font-black uppercase text-[10px] tracking-widest">Edit Plan</Button>
-           <Button onClick={onBack} className="w-full h-12 rounded-xl bg-primary font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20">Go to Dashboard</Button>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="bg-primary/5 p-4 rounded-3xl border border-primary/10 space-y-1">
+                  <p className="text-[9px] font-black text-primary uppercase tracking-widest">Daily Budget</p>
+                  <p className="text-3xl font-black">{calculations.finalCalories}</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase">KCAL / DAY</p>
+                </div>
+                <div className="bg-muted/5 p-4 rounded-3xl border border-muted/10 space-y-1">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Maintenance</p>
+                  <p className="text-3xl font-black text-foreground/40">{calculations.tdee}</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase">TDEE (Baseline)</p>
+                </div>
+              </div>
+
+              <div className="bg-accent/5 p-3 rounded-xl border border-accent/10 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Zap className="w-3.5 h-3.5 text-accent" />
+                  <span className="text-[10px] font-black text-accent uppercase tracking-tight">Active Adjustment</span>
+                </div>
+                <span className="text-xs font-black text-accent">{calculations.finalCalories - calculations.tdee > 0 ? '+' : ''}{calculations.finalCalories - calculations.tdee} kcal</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Timeline & Pace Card */}
+          <Card className="border-none shadow-md bg-white overflow-hidden">
+            <CardContent className="p-6 space-y-4">
+              <div className="flex items-center gap-2 border-b border-muted/10 pb-2">
+                <Clock className="w-4 h-4 text-primary" />
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Journey Timeline</h4>
+              </div>
+
+              <div className="flex justify-between items-center bg-muted/10 p-4 rounded-2xl">
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Weekly Pace</p>
+                  <p className="text-lg font-black uppercase text-foreground">{calculations.derivedWeeklyRate} kg / week</p>
+                </div>
+                <div className="text-right space-y-0.5">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Estimated Time</p>
+                  <p className="text-lg font-black text-primary uppercase">{calculations.weeksToGoal} weeks</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Detailed Macro Breakdown */}
+          <Card className="border-none shadow-md bg-white overflow-hidden">
+            <CardContent className="p-6 space-y-5">
+              <div className="flex items-center gap-2 border-b border-muted/10 pb-2">
+                <Activity className="w-4 h-4 text-primary" />
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Nutritional Split</h4>
+              </div>
+
+              <div className="grid grid-cols-3 gap-3">
+                 <div className="text-center p-3 rounded-2xl bg-accent/10 border border-accent/10">
+                    <p className="text-xl font-black text-accent">{calculations.protein}g</p>
+                    <p className="text-[8px] font-black text-muted-foreground uppercase">Protein</p>
+                 </div>
+                 <div className="text-center p-3 rounded-2xl bg-primary/10 border border-primary/10">
+                    <p className="text-xl font-black text-primary">{calculations.carbs}g</p>
+                    <p className="text-[8px] font-black text-muted-foreground uppercase">Carbs</p>
+                 </div>
+                 <div className="text-center p-3 rounded-2xl bg-yellow-400/10 border border-yellow-400/10">
+                    <p className="text-xl font-black text-yellow-600">{calculations.fats}g</p>
+                    <p className="text-[8px] font-black text-muted-foreground uppercase">Fats</p>
+                 </div>
+              </div>
+              
+              <div className="space-y-3">
+                <div className="flex h-4 w-full rounded-full overflow-hidden shadow-inner bg-muted/20">
+                   <div className="bg-accent h-full transition-all" style={{ width: `${calculations.proteinPct}%` }} />
+                   <div className="bg-primary h-full transition-all" style={{ width: `${calculations.carbPct}%` }} />
+                   <div className="bg-yellow-400 h-full transition-all" style={{ width: `${calculations.fatPct}%` }} />
+                </div>
+                <div className="flex justify-between px-1">
+                   <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-accent" />
+                      <span className="text-[9px] font-black uppercase text-muted-foreground">{calculations.proteinPct}% PROT</span>
+                   </div>
+                   <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-primary" />
+                      <span className="text-[9px] font-black uppercase text-muted-foreground">{calculations.carbPct}% CARB</span>
+                   </div>
+                   <div className="flex items-center gap-1.5">
+                      <div className="w-2 h-2 rounded-full bg-yellow-400" />
+                      <span className="text-[9px] font-black uppercase text-muted-foreground">{calculations.fatPct}% FAT</span>
+                   </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        {/* Action Buttons */}
+        <div className="space-y-3 pt-4">
+           <Button 
+            onClick={() => setIsSaved(false)} 
+            variant="outline" 
+            className="w-full h-12 rounded-2xl border-muted/30 font-black uppercase text-[11px] tracking-widest hover:bg-muted/5"
+           >
+            Change Active Goal
+           </Button>
+           <Button 
+            onClick={onBack} 
+            className="w-full h-14 rounded-2xl bg-primary font-black uppercase text-[12px] tracking-widest shadow-xl shadow-primary/25 active:scale-[0.98] transition-all"
+           >
+            Confirm & Finish
+           </Button>
         </div>
       </div>
     );
