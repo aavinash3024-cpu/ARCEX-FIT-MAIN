@@ -137,7 +137,15 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
 
   if (isSaved) {
     return (
-      <div className="space-y-6 pt-10 pb-24 animate-in fade-in zoom-in-95 duration-500">
+      <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+        {/* Header with Back Button */}
+        <div className="flex items-center gap-4 pt-2">
+          <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-2xl font-bold font-headline">Saved Goal</h1>
+        </div>
+
         <Card className="border-none shadow-xl bg-white overflow-hidden rounded-[2rem]">
           <CardContent className="p-0 divide-y divide-muted/10">
             {/* Header Section: Objective */}
@@ -235,19 +243,13 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
           </CardContent>
         </Card>
 
-        <div className="space-y-3 pt-4">
+        <div className="pt-4">
            <Button 
             onClick={() => setIsSaved(false)} 
-            variant="ghost" 
-            className="w-full text-muted-foreground font-bold uppercase text-[10px] tracking-widest"
+            variant="outline" 
+            className="w-full h-14 rounded-2xl border-2 border-muted-foreground/10 text-muted-foreground font-black uppercase text-[12px] tracking-widest shadow-sm active:scale-[0.98] transition-all"
            >
             Edit Goal Parameters
-           </Button>
-           <Button 
-            onClick={onBack} 
-            className="w-full h-14 rounded-2xl bg-primary font-black uppercase text-[12px] tracking-widest shadow-xl shadow-primary/25 active:scale-[0.98] transition-all"
-           >
-            Back to Dashboard
            </Button>
         </div>
       </div>
