@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   LayoutDashboard, 
   UtensilsCrossed, 
@@ -27,6 +27,40 @@ export default function PulseFlowApp() {
   const [activeCalculator, setActiveCalculator] = useState<'bmr' | '1rm' | 'bodyfat'>('bmr');
   const [tasks, setTasks] = useState<Task[]>([]);
   const [hydrationAmount, setHydrationAmount] = useState(1800); // in ml
+  const [isLoaded, setIsLoaded] = useState(false);
+
+  // Load data from localStorage on mount
+  useEffect(() => {
+    const savedTasks = localStorage.getItem('pulseflow_tasks');
+    const savedHydration = localStorage.getItem('pulseflow_hydration');
+    
+    if (savedTasks) {
+      try {
+        setTasks(JSON.parse(savedTasks));
+      } catch (e) {
+        console.error("Failed to parse saved tasks", e);
+      }
+    }
+    
+    if (savedHydration) {
+      setHydrationAmount(Number(savedHydration));
+    }
+    
+    setIsLoaded(true);
+  }, []);
+
+  // Save data to localStorage whenever it changes
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('pulseflow_tasks', JSON.stringify(tasks));
+    }
+  }, [tasks, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('pulseflow_hydration', hydrationAmount.toString());
+    }
+  }, [hydrationAmount, isLoaded]);
 
   const toggleTask = (id: string) => {
     setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
@@ -47,6 +81,8 @@ export default function PulseFlowApp() {
   };
 
   const renderContent = () => {
+    if (!isLoaded) return <div className="flex-1 flex items-center justify-center opacity-20"><p className="text-[10px] font-black uppercase tracking-widest">Loading Your Flow...</p></div>;
+
     switch(activeTab) {
       case 'dashboard': 
         return (

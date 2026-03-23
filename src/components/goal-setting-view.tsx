@@ -14,16 +14,13 @@ import {
   CheckCircle2,
   Settings2,
   Sparkles,
-  Info,
   Clock,
   AlertTriangle,
   TrendingDown,
   TrendingUp,
   Activity,
   Flame,
-  Zap,
-  PieChart,
-  Check
+  PieChart
 } from "lucide-react";
 import { 
   Select,
@@ -47,6 +44,7 @@ interface GoalSettingViewProps {
 export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   const [step, setStep] = useState(1);
   const [isSaved, setIsSaved] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   // Step 1: Metrics
   const [gender, setGender] = useState<'male' | 'female'>('male');
@@ -61,14 +59,53 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   const [weeklyRate, setWeeklyRate] = useState<WeeklyRate>(0.5);
 
   // Step 3: Macros & Adjustments
-  const [calAdj, setCalAdj] = useState([0]); // Total offset from TDEE
-  const [protAdj, setProtAdj] = useState([1.8]); // g per kg
-  const [carbRatio, setCarbRatio] = useState([50]); // % of remaining calories
+  const [calAdj, setCalAdj] = useState([0]);
+  const [protAdj, setProtAdj] = useState([1.8]);
+  const [carbRatio, setCarbRatio] = useState([50]);
 
-  // Reset adjustments when objective changes
+  // Load from localStorage
   useEffect(() => {
-    setCalAdj([0]);
-  }, [objective]);
+    const saved = localStorage.getItem('pulseflow_goal_data');
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        setGender(data.gender || 'male');
+        setAge(data.age || "25");
+        setWeight(data.weight || "75");
+        setHeight(data.height || "175");
+        setActivity(data.activity || 'moderate');
+        setObjective(data.objective || 'loss');
+        setTargetWeight(data.targetWeight || "70");
+        setWeeklyRate(data.weeklyRate || 0.5);
+        setCalAdj(data.calAdj || [0]);
+        setProtAdj(data.protAdj || [1.8]);
+        setCarbRatio(data.carbRatio || [50]);
+        setIsSaved(data.isSaved || false);
+      } catch (e) {
+        console.error("Failed to load goal data", e);
+      }
+    }
+    setIsInitialized(true);
+  }, []);
+
+  // Save to localStorage
+  useEffect(() => {
+    if (isInitialized) {
+      const dataToSave = {
+        gender, age, weight, height, activity,
+        objective, targetWeight, weeklyRate,
+        calAdj, protAdj, carbRatio, isSaved
+      };
+      localStorage.setItem('pulseflow_goal_data', JSON.stringify(dataToSave));
+    }
+  }, [gender, age, weight, height, activity, objective, targetWeight, weeklyRate, calAdj, protAdj, carbRatio, isSaved, isInitialized]);
+
+  // Reset adjustments when objective changes (only after user interaction)
+  useEffect(() => {
+    if (isInitialized && step === 2) {
+      setCalAdj([0]);
+    }
+  }, [objective, isInitialized, step]);
 
   // Calculations
   const calculations = useMemo(() => {
@@ -93,8 +130,8 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
     const carbKcal = remainingKcal * (carbRatio[0] / 100);
     const fatKcal = remainingKcal - carbKcal;
 
-    const proteinPct = Math.round((proteinKcal / finalCalories) * 100);
-    const carbPct = Math.round((carbKcal / finalCalories) * 100);
+    const proteinPct = finalCalories > 0 ? Math.round((proteinKcal / finalCalories) * 100) : 0;
+    const carbPct = finalCalories > 0 ? Math.round((carbKcal / finalCalories) * 100) : 0;
     const fatPct = 100 - proteinPct - carbPct;
 
     const currentDeficitOrSurplus = Math.abs(finalCalories - tdee);
@@ -138,7 +175,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   if (isSaved) {
     return (
       <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
-        {/* Header with Back Button */}
         <div className="flex items-center gap-4 pt-2">
           <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
@@ -148,7 +184,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
 
         <Card className="border-none shadow-xl bg-white overflow-hidden rounded-[2rem]">
           <CardContent className="p-0 divide-y divide-muted/10">
-            {/* Header Section: Objective */}
             <div className="p-6 bg-muted/5">
               <div className="flex justify-between items-start mb-4">
                 <div className="space-y-1">
@@ -171,7 +206,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
               </div>
             </div>
 
-            {/* Energy Section */}
             <div className="p-6 space-y-4">
               <div className="flex items-center gap-2 mb-2">
                 <Flame className="w-4 h-4 text-primary" />
@@ -189,7 +223,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
               </div>
             </div>
 
-            {/* Timeline Section */}
             <div className="p-6 space-y-4">
               <div className="flex items-center gap-2 mb-2">
                 <Clock className="w-4 h-4 text-primary" />
@@ -207,7 +240,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
               </div>
             </div>
 
-            {/* Macros Section */}
             <div className="p-6 space-y-5">
               <div className="flex items-center gap-2 mb-2">
                 <PieChart className="w-4 h-4 text-primary" />
