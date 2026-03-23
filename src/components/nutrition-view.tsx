@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState } from 'react';
@@ -32,8 +33,7 @@ export function NutritionView() {
       carbs: "35g", 
       protein: "18g", 
       fat: "22g", 
-      time: "08:30 AM",
-      imageId: "meal-avocado-toast"
+      time: "08:30 AM"
     },
     { 
       type: "Lunch", 
@@ -42,8 +42,7 @@ export function NutritionView() {
       carbs: "55g", 
       protein: "42g", 
       fat: "15g", 
-      time: "01:15 PM",
-      imageId: "meal-quinoa-bowl"
+      time: "01:15 PM"
     },
   ];
 
@@ -184,19 +183,13 @@ export function NutritionView() {
         </div>
         <div className="grid gap-3">
           {meals.map((meal, idx) => {
-            const mealImage = PlaceHolderImages.find(img => img.id === meal.imageId);
             return (
               <Card key={idx} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group">
                 <CardContent className="p-0 flex h-20">
-                  <div className="w-20 relative bg-muted shrink-0 overflow-hidden">
-                    <Image 
-                      src={mealImage?.imageUrl || "https://images.unsplash.com/photo-1610398041455-acc134988950?q=80&w=400&auto=format&fit=crop"} 
-                      alt={meal.name}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                      data-ai-hint={mealImage?.imageHint || "meal"}
-                    />
-                    <div className="absolute inset-0 bg-black/5" />
+                  <div className="w-20 bg-muted/20 shrink-0 flex items-center justify-center">
+                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10 group-hover:scale-110 transition-transform duration-300">
+                      <Utensils className="w-5 h-5 text-muted-foreground/40" />
+                    </div>
                   </div>
                   <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
                     <div className="flex justify-between items-start">
