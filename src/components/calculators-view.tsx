@@ -26,10 +26,10 @@ type Gender = 'male' | 'female';
 type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'extreme';
 
 export function CalculatorsView({ onBack }: { onBack: () => void }) {
-  const [age, setAge] = useState<string>("25");
+  const [age, setAge] = useState<string>("");
   const [gender, setGender] = useState<Gender>('male');
-  const [weight, setWeight] = useState<string>("75");
-  const [height, setHeight] = useState<string>("175");
+  const [weight, setWeight] = useState<string>("");
+  const [height, setHeight] = useState<string>("");
   const [activity, setActivity] = useState<ActivityLevel>('moderate');
 
   const [results, setResults] = useState<{ bmr: number; tdee: number } | null>(null);
@@ -64,10 +64,6 @@ export function CalculatorsView({ onBack }: { onBack: () => void }) {
       tdee: Math.round(tdeeVal)
     });
   };
-
-  useEffect(() => {
-    calculate();
-  }, []);
 
   return (
     <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -107,6 +103,7 @@ export function CalculatorsView({ onBack }: { onBack: () => void }) {
                   type="number" 
                   value={age} 
                   onChange={(e) => setAge(e.target.value)}
+                  placeholder="e.g. 25"
                   className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold"
                 />
               </div>
@@ -119,6 +116,7 @@ export function CalculatorsView({ onBack }: { onBack: () => void }) {
                   type="number" 
                   value={weight} 
                   onChange={(e) => setWeight(e.target.value)}
+                  placeholder="e.g. 70"
                   className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold"
                 />
               </div>
@@ -128,6 +126,7 @@ export function CalculatorsView({ onBack }: { onBack: () => void }) {
                   type="number" 
                   value={height} 
                   onChange={(e) => setHeight(e.target.value)}
+                  placeholder="e.g. 175"
                   className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold"
                 />
               </div>
