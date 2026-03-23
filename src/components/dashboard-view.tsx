@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -37,6 +37,11 @@ const weightData = [
 ];
 
 export function DashboardView() {
+  const metricsRef = useRef<HTMLDivElement>(null);
+  const toolsRef = useRef<HTMLDivElement>(null);
+  const [activeMetric, setActiveMetric] = useState(0);
+  const [activeTool, setActiveTool] = useState(0);
+
   const bmr = 1600;
   const tdee = 2500;
   const currentCal = 1840;
@@ -104,6 +109,23 @@ export function DashboardView() {
     { id: 3, title: "Evening Mobility", duration: "15 min", completed: false },
   ];
 
+  const handleScroll = (ref: React.RefObject<HTMLDivElement>, setter: (val: number) => void) => {
+    if (!ref.current) return;
+    const scrollLeft = ref.current.scrollLeft;
+    const width = ref.current.offsetWidth;
+    const index = Math.round(scrollLeft / width);
+    setter(index);
+  };
+
+  const scrollTo = (ref: React.RefObject<HTMLDivElement>, index: number) => {
+    if (!ref.current) return;
+    const width = ref.current.offsetWidth;
+    ref.current.scrollTo({
+      left: index * width,
+      behavior: 'smooth'
+    });
+  };
+
   return (
     <div className="space-y-6 pb-24 pt-10">
       {/* 1. Personal Guide - AI Suggestion Banner */}
@@ -139,7 +161,11 @@ export function DashboardView() {
 
         {/* Metrics Belt */}
         <div className="relative group">
-          <div className="flex gap-3 overflow-x-auto pb-2 swipe-container snap-x snap-mandatory">
+          <div 
+            ref={metricsRef}
+            onScroll={() => handleScroll(metricsRef, setActiveMetric)}
+            className="flex gap-3 overflow-x-auto pb-2 swipe-container snap-x snap-mandatory scroll-smooth"
+          >
             {metrics.map((m, idx) => {
               const currentVal = parseFloat(m.value.replace(',', ''));
               const targetVal = parseFloat(m.target.replace(',', ''));
@@ -220,9 +246,10 @@ export function DashboardView() {
           {/* Pagination Dots for Overview */}
           <div className="flex justify-center gap-1.5 mt-2">
             {metrics.map((_, i) => (
-              <div 
+              <button 
                 key={i} 
-                className={`h-1 rounded-full transition-all duration-300 ${i === 0 ? 'w-4 bg-primary' : 'w-1.5 bg-muted-foreground/30'}`} 
+                onClick={() => scrollTo(metricsRef, i)}
+                className={`h-1 rounded-full transition-all duration-300 outline-none ${i === activeMetric ? 'w-4 bg-primary' : 'w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50'}`} 
               />
             ))}
           </div>
@@ -233,7 +260,7 @@ export function DashboardView() {
       <Card className="border-none shadow-sm overflow-hidden bg-white/60 backdrop-blur-md">
         <CardContent className="p-5 space-y-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
+            <h3 className="text-xs font-bold text-foreground flex items-center justify-center w-full gap-2">
               Today's Macros
               <Badge variant="outline" className="text-[8px] font-bold border-primary/20 text-primary uppercase h-4 px-1.5">Goal Tracking</Badge>
             </h3>
@@ -265,11 +292,11 @@ export function DashboardView() {
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
+              <h3 className="text-xs font-bold text-foreground flex items-center justify-center w-full gap-2">
                 Goal
                 <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 text-[8px] h-3.5 py-0 uppercase">Loss</Badge>
               </h3>
-              <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tight">Active Milestone</p>
+              <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tight text-center">Active Milestone</p>
             </div>
             <div className="text-right">
               <span className="text-lg font-black text-primary">{progressPercent}%</span>
@@ -296,7 +323,11 @@ export function DashboardView() {
 
       {/* 5. Weight & Performance Tools (Swipeable) */}
       <section className="space-y-2">
-        <div className="flex gap-3 overflow-x-auto pb-4 swipe-container snap-x snap-mandatory">
+        <div 
+          ref={toolsRef}
+          onScroll={() => handleScroll(toolsRef, setActiveTool)}
+          className="flex gap-3 overflow-x-auto pb-4 swipe-container snap-x snap-mandatory scroll-smooth"
+        >
           {/* Weight Card with Graph */}
           <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card overflow-hidden snap-center">
             <CardContent className="p-4 space-y-4">
@@ -361,9 +392,10 @@ export function DashboardView() {
         {/* Pagination Dots for Tools */}
         <div className="flex justify-center gap-1.5 -mt-2">
           {[0, 1].map((i) => (
-            <div 
+            <button 
               key={i} 
-              className={`h-1 rounded-full transition-all duration-300 ${i === 0 ? 'w-4 bg-primary' : 'w-1.5 bg-muted-foreground/30'}`} 
+              onClick={() => scrollTo(toolsRef, i)}
+              className={`h-1 rounded-full transition-all duration-300 outline-none ${i === activeTool ? 'w-4 bg-primary' : 'w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50'}`} 
             />
           ))}
         </div>
@@ -373,7 +405,7 @@ export function DashboardView() {
       <Card className="border-none shadow-sm overflow-hidden bg-white/60 backdrop-blur-md">
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
+            <h3 className="text-xs font-bold text-foreground flex items-center justify-center w-full gap-2">
               Today's Tasks
               <Badge variant="outline" className="text-[8px] font-bold border-accent/20 text-accent uppercase h-4 px-1.5">Action Plan</Badge>
             </h3>
