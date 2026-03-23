@@ -172,19 +172,25 @@ export function DashboardView() {
                     </div>
 
                     <div className="flex items-center gap-3">
-                      <div className="relative flex-1 h-4 flex items-center">
+                      <div className="relative flex-1 h-6 flex items-center">
                         <Progress value={Math.min(percentage, 100)} className="h-1.5 w-full" />
                         
                         {isCalories && (
                           <>
                             <div 
-                              className="absolute top-0 h-4 w-[1px] bg-destructive/40" 
+                              className="absolute top-0 flex flex-col items-center" 
                               style={{ left: `${(bmr / targetVal) * 100}%` }}
-                            />
+                            >
+                              <span className="text-[6px] font-bold text-destructive/60 mb-0.5">BMR</span>
+                              <div className="h-4 w-[1px] bg-destructive/40" />
+                            </div>
                             <div 
-                              className="absolute top-0 h-4 w-[1px] bg-accent/60" 
-                              style={{ left: `${Math.min((tdee / targetVal) * 100, 100)}%` }}
-                            />
+                              className="absolute top-0 flex flex-col items-center" 
+                              style={{ left: `${Math.min((tdee / targetVal) * 100, 98)}%` }}
+                            >
+                              <span className="text-[6px] font-bold text-accent mb-0.5">TDEE</span>
+                              <div className="h-4 w-[1px] bg-accent/60" />
+                            </div>
                           </>
                         )}
                       </div>
