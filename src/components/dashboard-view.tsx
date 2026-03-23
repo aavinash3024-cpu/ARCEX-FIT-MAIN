@@ -1,3 +1,4 @@
+
 import { useRef, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -15,7 +16,8 @@ import {
   Minus,
   PieChart,
   Target,
-  ListTodo
+  ListTodo,
+  ArrowRight
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -45,6 +47,7 @@ interface DashboardViewProps {
   onViewHydration?: () => void;
   onViewTasks?: () => void;
   onViewCalculators?: (type: string) => void;
+  onViewGoalSetting?: () => void;
 }
 
 export function DashboardView({ 
@@ -54,7 +57,8 @@ export function DashboardView({
   onUpdateHydration, 
   onViewHydration, 
   onViewTasks,
-  onViewCalculators
+  onViewCalculators,
+  onViewGoalSetting
 }: DashboardViewProps) {
   const metricsRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
@@ -381,10 +385,16 @@ export function DashboardView({
             </div>
           </div>
           
-          <div className="flex items-center justify-center pt-1">
-            <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">
+          <div className="flex items-center justify-between pt-1">
+            <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest text-left">
               {(currentWeight - goalWeight).toFixed(1)} kg to go
             </p>
+            <button 
+              onClick={onViewGoalSetting}
+              className="text-[9px] font-black text-primary uppercase flex items-center gap-1 hover:opacity-70 transition-all"
+            >
+              Details <ArrowRight className="w-3 h-3" />
+            </button>
           </div>
         </CardContent>
       </Card>

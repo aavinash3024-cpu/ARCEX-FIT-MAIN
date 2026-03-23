@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from 'react';
@@ -17,6 +18,7 @@ import { ProgressView } from '@/components/progress-view';
 import { HydrationView } from '@/components/hydration-view';
 import { TasksView, type Task } from '@/components/tasks-view';
 import { CalculatorsView } from '@/components/calculators-view';
+import { GoalSettingView } from '@/components/goal-setting-view';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -56,6 +58,7 @@ export default function PulseFlowApp() {
             onViewHydration={() => setActiveTab('hydration')} 
             onViewTasks={() => setActiveTab('tasks')} 
             onViewCalculators={handleOpenCalculator}
+            onViewGoalSetting={() => setActiveTab('goal-setting')}
           />
         );
       case 'nutrition': return <NutritionView />;
@@ -81,6 +84,12 @@ export default function PulseFlowApp() {
         return (
           <CalculatorsView 
             initialType={activeCalculator}
+            onBack={() => setActiveTab('dashboard')}
+          />
+        );
+      case 'goal-setting':
+        return (
+          <GoalSettingView 
             onBack={() => setActiveTab('dashboard')}
           />
         );
