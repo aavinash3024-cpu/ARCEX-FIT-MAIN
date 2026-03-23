@@ -54,7 +54,7 @@ export function NutritionView() {
   const analysisImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
 
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-4 pb-24">
       <div className="flex items-center justify-between pt-2">
         <h1 className="text-2xl font-bold font-headline">Nutrition</h1>
         <Button size="sm" variant="ghost" className="rounded-full w-9 h-9 p-0 bg-muted/50">

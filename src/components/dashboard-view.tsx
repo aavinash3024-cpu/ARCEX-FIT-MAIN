@@ -146,13 +146,14 @@ export function DashboardView() {
       
       container.scrollTo({
         left: targetCenter - containerWidth / 2,
+        horizontal: true,
         behavior: 'smooth'
-      });
+      } as any);
     }
   };
 
   return (
-    <div className="space-y-6 pb-24 pt-10">
+    <div className="space-y-4 pb-24 pt-10">
       {/* 1. Personal Guide - AI Suggestion Banner */}
       <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
         <CardContent className="p-5 flex items-center gap-4 min-h-[100px]">

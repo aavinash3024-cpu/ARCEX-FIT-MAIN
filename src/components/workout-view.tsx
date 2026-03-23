@@ -26,7 +26,7 @@ export function WorkoutView() {
   const splitImage = PlaceHolderImages.find(img => img.id === 'training-split-tool');
 
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-4 pb-24">
       {/* Page Title */}
       <div className="pt-2">
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
