@@ -99,7 +99,7 @@ export function DashboardView({
   
   const currentCal = Math.round(targetCal * 0.84);
   const calDiff = targetCal - currentCal;
-  const calStatus = calDiff >= 0 ? `${calDiff.toLocaleString()} Left` : `${Math.abs(calDiff).toLocaleString()} Over`;
+  const calStatus = `${Math.abs(calDiff).toLocaleString()} Kcal ${calDiff >= 0 ? 'left' : 'over'}`;
 
   const startWeight = goalData?.weight ? parseFloat(goalData.weight) : (weightHistory.length > 0 ? weightHistory[0].weight : 0);
   const targetWeight = goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 0;
@@ -174,15 +174,15 @@ export function DashboardView({
 
   const nutrients = [
     { 
-      label: "Protein", 
-      current: goalData?.protein ? Math.round(goalData.protein * 0.72) : 108, 
-      target: goalData?.protein || 150, 
-      unit: "g" 
-    },
-    { 
       label: "Carbs", 
       current: goalData?.carbs ? Math.round(goalData.carbs * 0.65) : 162, 
       target: goalData?.carbs || 250, 
+      unit: "g" 
+    },
+    { 
+      label: "Protein", 
+      current: goalData?.protein ? Math.round(goalData.protein * 0.72) : 108, 
+      target: goalData?.protein || 150, 
       unit: "g" 
     },
     { 
@@ -409,7 +409,7 @@ export function DashboardView({
                   <div className="flex justify-between items-baseline">
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{n.label}</span>
                     <div className="flex items-baseline gap-0.5">
-                      <span className={cn("text-xs font-black", isOver ? "text-destructive" : "text-foreground")}>
+                      <span className={cn("text-[10px] font-light", isOver ? "text-destructive" : "text-foreground")}>
                         {statusLabel}
                       </span>
                     </div>
