@@ -179,7 +179,7 @@ export function TasksView({ onBack }: TasksViewProps) {
                     value={newTaskTitle}
                     onChange={(e) => setNewTaskTitle(e.target.value)}
                     placeholder="What needs to be done?" 
-                    className="w-full h-12 pl-10 pr-4 bg-muted/5 border border-muted/20 rounded-xl text-xs focus:ring-1 focus:ring-primary/20 transition-all font-bold"
+                    className="w-full h-12 pl-10 pr-4 bg-muted/5 border border-muted-foreground/10 rounded-xl text-xs focus:ring-1 focus:ring-primary/20 transition-all font-bold"
                   />
                 </div>
               </div>
@@ -338,7 +338,7 @@ export function TasksView({ onBack }: TasksViewProps) {
                 value={detailsText}
                 onChange={(e) => setDetailsText(e.target.value)}
                 placeholder="Add more information about this task..."
-                className="min-h-[120px] rounded-xl border border-muted/20 text-xs font-medium focus:ring-primary/20 bg-muted/5"
+                className="min-h-[120px] rounded-xl border border-muted-foreground/10 text-xs font-medium focus:ring-primary/20 bg-muted/5"
               />
             </div>
           </div>
