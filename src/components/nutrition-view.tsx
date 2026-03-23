@@ -219,27 +219,33 @@ export function NutritionView() {
 
       {/* Improved Meal History & Calorie Trends */}
       <div className="grid grid-cols-2 gap-4 pb-6">
-        <Card className="border-none shadow-sm bg-gradient-to-br from-sky-50 to-white hover:translate-y-[-2px] transition-all cursor-pointer active:scale-95 group">
+        <Card className="border-none shadow-sm bg-white hover:bg-sky-50 transition-all cursor-pointer active:scale-95 group border border-muted/20">
           <CardContent className="p-5 flex flex-col items-start gap-3">
             <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center group-hover:bg-sky-200 transition-colors">
               <History className="w-5 h-5 text-sky-600" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-sky-900/40">Meal History</p>
-              <p className="text-xs font-bold text-sky-900/70">32 logged this week</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
+              <p className="text-xs font-bold text-foreground/80">32 logged this week</p>
             </div>
+            <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-sky-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
+              Details <ChevronRight className="w-3 h-3" />
+            </button>
           </CardContent>
         </Card>
         
-        <Card className="border-none shadow-sm bg-gradient-to-br from-purple-50 to-white hover:translate-y-[-2px] transition-all cursor-pointer active:scale-95 group">
+        <Card className="border-none shadow-sm bg-white hover:bg-purple-50 transition-all cursor-pointer active:scale-95 group border border-muted/20">
           <CardContent className="p-5 flex flex-col items-start gap-3">
             <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
               <PieChart className="w-5 h-5 text-purple-600" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-purple-900/40">Calorie Trends</p>
-              <p className="text-xs font-bold text-purple-900/70">Avg. 1,940 kcal</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Calorie Trends</p>
+              <p className="text-xs font-bold text-foreground/80">Avg. 1,940 kcal</p>
             </div>
+            <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-purple-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
+              Details <ChevronRight className="w-3 h-3" />
+            </button>
           </CardContent>
         </Card>
       </div>
