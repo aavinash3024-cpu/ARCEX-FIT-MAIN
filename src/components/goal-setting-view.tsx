@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -15,7 +15,8 @@ import {
   Settings2,
   Sparkles,
   Info,
-  Clock
+  Clock,
+  AlertTriangle
 } from "lucide-react";
 import { 
   Select,
@@ -56,6 +57,11 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   const [calAdj, setCalAdj] = useState([0]); // +/- from target
   const [protAdj, setProtAdj] = useState([1.8]); // g per kg
   const [carbRatio, setCarbRatio] = useState([50]); // % of remaining calories
+
+  // Reset adjustments when objective changes
+  useEffect(() => {
+    setCalAdj([0]);
+  }, [objective]);
 
   // Calculations
   const calculations = useMemo(() => {
@@ -302,17 +308,23 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                                key={rate}
                                onClick={() => setWeeklyRate(rate as WeeklyRate)}
                                className={cn(
-                                  "p-4 rounded-xl border transition-all text-left flex justify-between items-center",
+                                  "p-4 rounded-xl border transition-all text-left flex justify-between items-center relative overflow-hidden",
                                   weeklyRate === rate ? "border-primary bg-primary/5" : "border-muted/20"
                                )}
                             >
-                               <div>
+                               <div className="z-10">
                                   <p className="text-[11px] font-black text-foreground">{rate} kg <span className="text-[8px] text-muted-foreground uppercase tracking-tighter">/ per week</span></p>
                                   <p className="text-[9px] font-bold text-muted-foreground uppercase mt-0.5">
                                     ~{Math.round(rate * 1100)} kcal {objective === 'loss' ? 'deficit' : 'surplus'} / day
                                   </p>
+                                  {rate === 1.0 && (
+                                    <div className="mt-1.5 flex items-center gap-1">
+                                      <AlertTriangle className="w-3 h-3 text-destructive" />
+                                      <span className="text-[8px] font-black text-destructive uppercase tracking-tight">Consult doctor before doing it</span>
+                                    </div>
+                                  )}
                                </div>
-                               <div className="text-right">
+                               <div className="text-right z-10">
                                   <div className="flex items-center gap-1 text-primary">
                                     <Clock className="w-3 h-3" />
                                     <span className="text-xs font-black">{weeks}</span>
@@ -360,13 +372,24 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
               </div>
 
               <div className="space-y-8 pt-4">
-                {/* Calories Shifter */}
+                {/* Calories Shifter - Dynamic range based on objective */}
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                       <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Adjust Calories</Label>
                       <Badge variant="secondary" className="text-[9px] font-black">{calAdj[0] > 0 ? '+' : ''}{calAdj[0]} kcal</Badge>
                   </div>
-                  <Slider value={calAdj} onValueChange={setCalAdj} min={-500} max={500} step={20} className="py-2" />
+                  <Slider 
+                    value={calAdj} 
+                    onValueChange={setCalAdj} 
+                    min={objective === 'loss' ? -1100 : 0} 
+                    max={objective === 'gain' ? 1100 : 0} 
+                    step={20} 
+                    className="py-2" 
+                  />
+                  <div className="flex justify-between text-[8px] font-bold text-muted-foreground/40 uppercase">
+                    <span>{objective === 'loss' ? '-1100 kcal' : 'Baseline'}</span>
+                    <span>{objective === 'gain' ? '+1100 kcal' : 'Baseline'}</span>
+                  </div>
                 </div>
 
                 {/* Protein Shifter */}
