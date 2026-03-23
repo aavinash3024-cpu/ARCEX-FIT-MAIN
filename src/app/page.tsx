@@ -48,10 +48,10 @@ export default function PulseFlowApp() {
           </Avatar>
         </div>
 
-        {/* Center Logo */}
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center pointer-events-none">
+        {/* Center Logo: arcex fit */}
+        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none">
           <span className="font-black text-xl tracking-tighter text-black uppercase">arcex</span>
-          <span className="font-black text-xl tracking-tighter uppercase bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent">fit</span>
+          <span className="font-black text-xl tracking-tighter text-primary uppercase">fit</span>
         </div>
 
         <div className="flex gap-2">
