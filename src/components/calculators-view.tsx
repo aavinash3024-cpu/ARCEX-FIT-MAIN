@@ -91,7 +91,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
     const w = parseFloat(liftWeight);
     const r = parseFloat(reps);
     if (isNaN(w) || isNaN(r)) return;
-    const result = w * (1 + (r / 30)); // Epley
+    const result = w * (1 + (r / 30)); // Epley formula
     setOrmResult(Math.round(result));
   };
 
@@ -280,12 +280,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
 
           <Card className="border-none shadow-lg bg-white overflow-hidden">
             <CardContent className="p-6 space-y-6">
-              <div className="text-center space-y-1">
-                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">STRENGTH PROFILE</h3>
-                <p className="text-[9px] font-bold text-muted-foreground uppercase">ESTIMATED PEAK POWER</p>
-              </div>
-
-              <div className="bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10 flex flex-col items-center text-center space-y-2 shadow-inner relative overflow-hidden">
+              <div className="bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10 flex flex-col items-center text-center space-y-2 relative overflow-hidden shadow-inner">
                 <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
                 <Trophy className="w-8 h-8 text-primary mb-1 drop-shadow-sm" />
                 <p className="text-[11px] font-black text-primary uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
@@ -317,7 +312,6 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                     </TableHeader>
                     <TableBody>
                       {[2, 4, 6, 8, 10, 12, 14, 16].map((repCount) => {
-                        // Epley: 1RM = w * (1 + r/30) => w = 1RM / (1 + r/30)
                         const weightForReps = ormResult ? ormResult / (1 + (repCount / 30)) : null;
                         return (
                           <TableRow key={repCount} className="hover:bg-muted/5 border-b-muted/10 last:border-0">
@@ -374,7 +368,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Waist (cm)</Label>
-                  <Input type="number" value={waist} onChange={(e) => setNeck(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={waist} onChange={(e) => setWaist(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
                 </div>
                 {gender === 'female' && (
                   <div className="space-y-2">
@@ -386,12 +380,10 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <Button onClick={calculateBf} className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">Analyze Composition</Button>
             </CardContent>
           </Card>
+
           <Card className="border-none shadow-lg bg-white overflow-hidden">
             <CardContent className="p-6 space-y-6">
-              <div className="text-center">
-                <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Body Metric Analysis</h3>
-              </div>
-              <div className="bg-primary/5 p-8 rounded-3xl border border-primary/10 flex flex-col items-center text-center space-y-2 relative overflow-hidden">
+              <div className="bg-primary/5 p-8 rounded-3xl border border-primary/10 flex flex-col items-center text-center space-y-2 relative overflow-hidden shadow-inner">
                 <Activity className="absolute -right-4 -top-4 w-24 h-24 text-primary/5 -rotate-12" />
                 <p className="text-[11px] font-black text-primary uppercase tracking-[0.2em]">Body Fat Percentage</p>
                 <p className="text-5xl font-black text-foreground">{bfResults ? bfResults.percentage : '---'}<span className="text-lg ml-1 text-muted-foreground">%</span></p>
@@ -399,11 +391,11 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-muted/20 p-4 rounded-2xl border border-muted/30 text-center space-y-1">
+                <div className="bg-muted/10 p-4 rounded-2xl border border-muted/20 text-center space-y-1">
                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Lean Body Mass</p>
                   <p className="text-xl font-black">{bfResults ? bfResults.lbm : '---'}<span className="text-[10px] ml-1">kg</span></p>
                 </div>
-                <div className="bg-muted/20 p-4 rounded-2xl border border-muted/30 text-center space-y-1">
+                <div className="bg-muted/10 p-4 rounded-2xl border border-muted/20 text-center space-y-1">
                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Fat Mass</p>
                   <p className="text-xl font-black">{bfResults && weight ? (parseFloat(weight) - bfResults.lbm).toFixed(1) : '---'}<span className="text-[10px] ml-1">kg</span></p>
                 </div>
