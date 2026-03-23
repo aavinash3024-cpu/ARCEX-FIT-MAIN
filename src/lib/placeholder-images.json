@@ -50,9 +50,9 @@
     },
     {
       "id": "training-split-tool",
-      "description": "Black and red power tool representing mechanical split",
-      "imageUrl": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600&auto=format&fit=crop",
-      "imageHint": "power tool"
+      "description": "Close up of gym dumbbells representing training split",
+      "imageUrl": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop",
+      "imageHint": "gym weights"
     }
   ]
 }

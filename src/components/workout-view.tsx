@@ -101,24 +101,25 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 3. Training Split Card with Image */}
-      <Card className="border-none shadow-md bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-indigo-400">
-        <CardContent className="p-0 flex items-center">
-          <div className="shrink-0 w-28 h-28 relative">
+      {/* 3. Compact Training Split Card */}
+      <Card className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-indigo-400">
+        <CardContent className="p-0 flex items-center h-20">
+          <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600&auto=format&fit=crop"} 
+              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
               alt="Training Split"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
-              data-ai-hint="power tool"
+              data-ai-hint="gym weights"
             />
+            <div className="absolute inset-0 bg-indigo-900/10" />
           </div>
-          <div className="flex-1 p-4 flex items-center justify-between min-w-0">
-            <div className="space-y-1">
+          <div className="flex-1 px-4 flex items-center justify-between min-w-0">
+            <div className="space-y-0.5">
               <h3 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.15em] flex items-center gap-1.5">
                 <Layout className="w-3 h-3" /> Training Split
               </h3>
-              <p className="text-sm font-bold text-foreground/90 leading-tight">Push / Pull / Legs</p>
+              <p className="text-xs font-bold text-foreground/90 leading-tight">Push / Pull / Legs</p>
               <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 tracking-tight">Hypertrophy Phase</p>
             </div>
             <ChevronRight className="w-4 h-4 text-indigo-300/40" />
