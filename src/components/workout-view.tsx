@@ -9,9 +9,7 @@ import {
   History, 
   Layout, 
   Plus, 
-  ChevronRight,
-  RefreshCw,
-  Calendar
+  RefreshCw
 } from "lucide-react";
 
 export function WorkoutView() {
@@ -31,9 +29,6 @@ export function WorkoutView() {
     <div className="space-y-6 pb-24">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold font-headline">Workout</h1>
-        <Button size="sm" className="rounded-full gap-2 px-4 shadow-sm">
-          <Plus className="w-4 h-4" /> Start Workout
-        </Button>
       </div>
 
       {/* 2x2 Grid Menu */}
@@ -96,28 +91,6 @@ export function WorkoutView() {
           </Button>
         </CardContent>
       </Card>
-
-      {/* Quick History Snippet */}
-      <section className="space-y-3">
-        <div className="flex justify-between items-center px-1">
-          <h2 className="text-xs font-black uppercase tracking-widest text-muted-foreground">Recent Activity</h2>
-          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-        </div>
-        <Card className="border-none shadow-sm">
-          <CardContent className="p-4 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 bg-muted rounded-lg flex items-center justify-center">
-                <Calendar className="w-4 h-4 text-muted-foreground" />
-              </div>
-              <div>
-                <p className="text-xs font-bold">Leg Day Mastery</p>
-                <p className="text-[10px] text-muted-foreground">Yesterday • 55 mins</p>
-              </div>
-            </div>
-            <Badge variant="outline" className="text-[9px] font-bold border-muted-foreground/20">VIEW</Badge>
-          </CardContent>
-        </Card>
-      </section>
     </div>
   );
 }
