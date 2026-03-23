@@ -210,11 +210,11 @@ export function DashboardView() {
         </div>
       </section>
 
-      {/* 4. Today's Macros (Macros Card) - Improved and Simple */}
+      {/* 4. Today's Macros (Macros Card) - Updated Heading Style */}
       <Card className="border-none shadow-sm overflow-hidden bg-white/60 backdrop-blur-md">
         <CardContent className="p-5 space-y-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-black uppercase tracking-[0.15em] text-foreground/70">
+            <h3 className="text-xs font-bold text-foreground">
               Today's Macros
             </h3>
             <Badge variant="outline" className="text-[8px] font-bold border-primary/20 text-primary uppercase h-4 px-1.5">Goal Tracking</Badge>
