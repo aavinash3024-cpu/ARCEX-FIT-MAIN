@@ -32,7 +32,7 @@ import {
   DialogTrigger,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { format } from 'date-fns';
+import { format, subDays } from 'date-fns';
 
 interface ProgressViewProps {
   goalData?: any;
@@ -67,11 +67,34 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
   }, [weightHistory]);
 
   const chartData = useMemo(() => {
-    return weightHistory.map(entry => ({
+    const history = [...weightHistory];
+    
+    // Add the starting weight from goalData as the very first point if it exists
+    if (goalData?.weight) {
+      const initialWeight = parseFloat(goalData.weight);
+      
+      // Calculate a date for the starting point (e.g., the day the goal was set, or 3 days before first log)
+      let startDateStr;
+      if (history.length > 0) {
+        const firstLogDate = new Date(history[0].date);
+        startDateStr = subDays(firstLogDate, 2).toISOString();
+      } else {
+        startDateStr = subDays(new Date(), 4).toISOString();
+      }
+
+      // Prepend to the chart data
+      history.unshift({
+        date: startDateStr,
+        weight: initialWeight,
+        isStart: true
+      });
+    }
+
+    return history.map(entry => ({
       ...entry,
-      formattedDate: format(new Date(entry.date), 'MMM d')
+      formattedDate: entry.isStart ? 'Start' : format(new Date(entry.date), 'MMM d')
     }));
-  }, [weightHistory]);
+  }, [weightHistory, goalData]);
 
   const handleLogWeight = () => {
     const val = parseFloat(newWeight);
@@ -205,6 +228,8 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
                       fillOpacity={1} 
                       fill="url(#colorWeight)" 
                       animationDuration={1500}
+                      dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "#fff" }}
+                      activeDot={{ r: 6, strokeWidth: 0 }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
