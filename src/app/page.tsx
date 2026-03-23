@@ -40,7 +40,7 @@ export default function PulseFlowApp() {
   return (
     <div className="min-h-screen max-w-lg mx-auto bg-background flex flex-col relative shadow-xl border-x">
       {/* Header */}
-      <header className="p-6 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50">
+      <header className="p-6 pb-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50">
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10 border-2 border-primary/20">
             <AvatarImage src="https://picsum.photos/seed/user/100/100" />
@@ -52,12 +52,12 @@ export default function PulseFlowApp() {
           </div>
         </div>
         <div className="flex gap-2">
-          <Button variant="ghost" size="icon" className="rounded-full bg-muted/50">
-            <Search className="w-5 h-5" />
+          <Button variant="ghost" size="icon" className="rounded-full bg-muted/50 w-9 h-9">
+            <Search className="w-4 h-4" />
           </Button>
-          <Button variant="ghost" size="icon" className="rounded-full bg-muted/50 relative">
-            <Bell className="w-5 h-5" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-accent rounded-full border-2 border-background"></span>
+          <Button variant="ghost" size="icon" className="rounded-full bg-muted/50 w-9 h-9 relative">
+            <Bell className="w-4 h-4" />
+            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-accent rounded-full border border-background"></span>
           </Button>
         </div>
       </header>
@@ -67,8 +67,8 @@ export default function PulseFlowApp() {
         {renderContent()}
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white/80 backdrop-blur-xl border-t px-6 py-4 flex justify-between items-center z-50">
+      {/* Bottom Navigation - Compact Version */}
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white/90 backdrop-blur-xl border-t px-6 py-2 flex justify-between items-center z-50">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
@@ -76,22 +76,22 @@ export default function PulseFlowApp() {
             <button
               key={item.id}
               onClick={() => setActiveTab(item.id)}
-              className={`flex flex-col items-center gap-1 transition-all duration-300 group ${isActive ? 'text-primary scale-110' : 'text-muted-foreground hover:text-primary/60'}`}
+              className={`flex flex-col items-center gap-0.5 transition-all duration-300 group flex-1 ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-primary/60'}`}
             >
-              <div className={`p-2 rounded-2xl transition-all ${isActive ? 'bg-primary/10' : 'group-hover:bg-muted'}`}>
-                <Icon className={`w-6 h-6 ${isActive ? 'fill-primary/20' : ''}`} />
+              <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-primary/10' : 'group-hover:bg-muted'}`}>
+                <Icon className={`w-5 h-5 ${isActive ? 'fill-primary/20' : ''}`} />
               </div>
-              <span className={`text-[10px] font-bold uppercase tracking-tighter ${isActive ? 'opacity-100' : 'opacity-0 h-0 overflow-hidden group-hover:opacity-40'}`}>
+              <span className={`text-[9px] font-bold uppercase tracking-tight transition-all ${isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-90 h-0 overflow-hidden group-hover:opacity-40 group-hover:h-auto'}`}>
                 {item.label}
               </span>
             </button>
           );
         })}
-        <button className="flex flex-col items-center text-muted-foreground hover:text-primary/60 transition-colors">
-          <div className="p-2 rounded-2xl hover:bg-muted">
-            <Settings className="w-6 h-6" />
+        <button className="flex flex-col items-center text-muted-foreground hover:text-primary/60 transition-colors flex-1">
+          <div className="p-1.5 rounded-xl hover:bg-muted">
+            <Settings className="w-5 h-5" />
           </div>
-          <span className="text-[10px] font-bold uppercase tracking-tighter opacity-0 h-0">More</span>
+          <span className="text-[9px] font-bold uppercase tracking-tight opacity-0 h-0">More</span>
         </button>
       </nav>
     </div>
