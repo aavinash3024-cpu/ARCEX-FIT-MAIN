@@ -1,19 +1,15 @@
-import React, { useRef, useState, useEffect } from 'react';
+import { useRef, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
 import { 
   Flame, 
   Droplets, 
   Footprints, 
-  Target,
   ChevronRight,
   Zap,
-  Sparkles,
   Calculator,
   TrendingDown,
   Scale,
-  Dumbbell,
   Plus,
   Minus,
   CheckCircle2,
@@ -200,7 +196,7 @@ export function DashboardView() {
               const showDetails = m.label === "Hydration" || m.label === "Steps";
 
               return (
-                <Card key={idx} className="min-w-[260px] flex-shrink-0 border-none shadow-sm glass-card snap-center">
+                <Card key={idx} className="min-w-[260px] flex-shrink-0 border-none shadow-sm bg-white snap-center">
                   <CardContent className="p-3 flex flex-col justify-between h-32">
                     <div className="flex justify-between items-center">
                       <div className={`p-1.5 rounded-lg ${m.color}`}>
@@ -281,10 +277,10 @@ export function DashboardView() {
       </section>
 
       {/* 3. Today's Macros */}
-      <Card className="border-none shadow-sm overflow-hidden bg-white/60 backdrop-blur-md">
+      <Card className="border-none shadow-sm overflow-hidden bg-white">
         <CardContent className="p-5 space-y-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-foreground flex items-center justify-center w-full gap-2 text-center">
+            <h3 className="text-xs font-bold text-foreground flex items-center justify-center w-full gap-2 text-center uppercase tracking-tight">
               Today's Macros
               <Badge variant="outline" className="text-[8px] font-bold border-primary/20 text-primary uppercase h-4 px-1.5">Goal Tracking</Badge>
             </h3>
@@ -311,12 +307,12 @@ export function DashboardView() {
         </CardContent>
       </Card>
 
-      {/* 4. Goal Milestone Card (COMPACT) */}
+      {/* 4. Goal Milestone Card */}
       <Card className="border-none shadow-sm bg-white overflow-hidden">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5 flex flex-col items-center w-full">
-              <h3 className="text-xs font-bold text-foreground flex items-center justify-center gap-2">
+              <h3 className="text-xs font-bold text-foreground flex items-center justify-center gap-2 uppercase tracking-tight">
                 Goal
                 <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 text-[8px] h-3.5 py-0 uppercase">Loss</Badge>
               </h3>
@@ -353,7 +349,7 @@ export function DashboardView() {
           className="flex gap-3 overflow-x-auto pb-4 swipe-container snap-x snap-mandatory scroll-smooth"
         >
           {/* Weight Card with Graph */}
-          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card overflow-hidden snap-center">
+          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm bg-white overflow-hidden snap-center">
             <CardContent className="p-4 space-y-4">
               <div className="flex justify-between items-start">
                 <div>
@@ -394,7 +390,7 @@ export function DashboardView() {
           </Card>
 
           {/* Calculators Card */}
-          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card snap-center">
+          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm bg-white snap-center">
             <CardContent className="p-4 space-y-3">
               <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
                 <Calculator className="w-3 h-3 text-primary" /> Performance Tools
@@ -426,17 +422,17 @@ export function DashboardView() {
       </section>
 
       {/* 6. Today's Tasks */}
-      <Card className="border-none shadow-sm overflow-hidden bg-white/60 backdrop-blur-md">
+      <Card className="border-none shadow-sm overflow-hidden bg-white">
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-foreground flex items-center justify-center w-full gap-2 text-center">
+            <h3 className="text-xs font-bold text-foreground flex items-center justify-center w-full gap-2 text-center uppercase tracking-tight">
               Today's Tasks
               <Badge variant="outline" className="text-[8px] font-bold border-accent/20 text-accent uppercase h-4 px-1.5">Action Plan</Badge>
             </h3>
           </div>
           <div className="space-y-3">
             {tasks.slice(0, 2).map((task) => (
-              <div key={task.id} className="flex items-center justify-between p-3 rounded-xl bg-white/40 border border-white/20 shadow-sm group">
+              <div key={task.id} className="flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-muted/20 shadow-sm group">
                 <div className="flex items-center gap-3">
                   {task.completed ? (
                     <CheckCircle2 className="w-4 h-4 text-green-500" />
