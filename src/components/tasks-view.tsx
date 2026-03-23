@@ -42,6 +42,12 @@ export function TasksView({ onBack }: TasksViewProps) {
     high: 'text-destructive bg-destructive/10 border-destructive/20'
   };
 
+  const dotColor = {
+    low: 'bg-green-500',
+    medium: 'bg-amber-500',
+    high: 'bg-destructive'
+  };
+
   // Date Shift logic
   const daysToShow = Array.from({ length: 7 }, (_, i) => addDays(selectedDate, i - 3));
 
@@ -240,18 +246,27 @@ export function TasksView({ onBack }: TasksViewProps) {
             </h4>
             <span className="text-[10px] font-black text-primary uppercase">{stats.total.done}/{stats.total.total} Done</span>
           </div>
-          <div className="grid grid-cols-3 gap-2">
-            <div className="bg-destructive/5 p-2 rounded-xl text-center border border-destructive/10">
-              <p className="text-[8px] font-black text-destructive uppercase tracking-tighter">High</p>
-              <p className="text-xs font-black">{stats.high.done}/{stats.high.total}</p>
+          <div className="space-y-3 px-1">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={cn("w-2 h-2 rounded-full", dotColor.high)} />
+                <span className="text-sm font-normal text-foreground/80">High Priority Task</span>
+              </div>
+              <span className="text-xs font-black text-muted-foreground">{stats.high.done}/{stats.high.total}</span>
             </div>
-            <div className="bg-amber-50 p-2 rounded-xl text-center border border-amber-100">
-              <p className="text-[8px] font-black text-amber-500 uppercase tracking-tighter">Medium</p>
-              <p className="text-xs font-black">{stats.medium.done}/{stats.medium.total}</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={cn("w-2 h-2 rounded-full", dotColor.medium)} />
+                <span className="text-sm font-normal text-foreground/80">Medium Priority Task</span>
+              </div>
+              <span className="text-xs font-black text-muted-foreground">{stats.medium.done}/{stats.medium.total}</span>
             </div>
-            <div className="bg-green-50 p-2 rounded-xl text-center border border-green-100">
-              <p className="text-[8px] font-black text-green-500 uppercase tracking-tighter">Low</p>
-              <p className="text-xs font-black">{stats.low.done}/{stats.low.total}</p>
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className={cn("w-2 h-2 rounded-full", dotColor.low)} />
+                <span className="text-sm font-normal text-foreground/80">Low Priority Task</span>
+              </div>
+              <span className="text-xs font-black text-muted-foreground">{stats.low.done}/{stats.low.total}</span>
             </div>
           </div>
         </CardContent>
