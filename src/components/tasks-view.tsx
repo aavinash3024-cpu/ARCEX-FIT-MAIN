@@ -4,17 +4,33 @@ import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Badge } from "@/components/ui/badge";
 import { 
   ChevronLeft, 
   ChevronRight, 
   Plus, 
   Trash2,
   AlertCircle,
-  ClipboardList
+  ClipboardList,
+  MoreVertical,
+  Pencil,
+  Save
 } from "lucide-react";
 import { addDays, format, startOfToday, isSameDay } from 'date-fns';
 import { cn } from "@/lib/utils";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { Textarea } from "@/components/ui/textarea";
 
 type Priority = 'low' | 'medium' | 'high';
 
@@ -24,6 +40,7 @@ interface Task {
   priority: Priority;
   completed: boolean;
   date: Date;
+  details?: string;
 }
 
 interface TasksViewProps {
@@ -35,11 +52,15 @@ export function TasksView({ onBack }: TasksViewProps) {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [selectedPriority, setSelectedPriority] = useState<Priority>('medium');
+  
+  // States for editing details
+  const [editingTask, setEditingTask] = useState<Task | null>(null);
+  const [detailsText, setDetailsText] = useState("");
 
-  const priorityColor = {
-    low: 'text-green-600 bg-green-50 border-green-100',
-    medium: 'text-amber-600 bg-amber-50 border-amber-100',
-    high: 'text-destructive bg-destructive/10 border-destructive/20'
+  const priorityBorderColor = {
+    low: 'border-l-green-500',
+    medium: 'border-l-amber-500',
+    high: 'border-l-destructive'
   };
 
   const dotColor = {
@@ -48,9 +69,7 @@ export function TasksView({ onBack }: TasksViewProps) {
     high: 'bg-destructive'
   };
 
-  // Date Shift logic
   const daysToShow = Array.from({ length: 7 }, (_, i) => addDays(selectedDate, i - 3));
-
   const filteredTasks = tasks.filter(t => isSameDay(new Date(t.date), selectedDate));
 
   const addTask = () => {
@@ -60,7 +79,8 @@ export function TasksView({ onBack }: TasksViewProps) {
       title: newTaskTitle,
       priority: selectedPriority,
       completed: false,
-      date: selectedDate
+      date: selectedDate,
+      details: ""
     };
     setTasks([...tasks, newTask]);
     setNewTaskTitle("");
@@ -72,6 +92,17 @@ export function TasksView({ onBack }: TasksViewProps) {
 
   const deleteTask = (id: string) => {
     setTasks(tasks.filter(t => t.id !== id));
+  };
+
+  const openEditDetails = (task: Task) => {
+    setEditingTask(task);
+    setDetailsText(task.details || "");
+  };
+
+  const saveDetails = () => {
+    if (!editingTask) return;
+    setTasks(tasks.map(t => t.id === editingTask.id ? { ...t, details: detailsText } : t));
+    setEditingTask(null);
   };
 
   const getStats = () => {
@@ -190,8 +221,8 @@ export function TasksView({ onBack }: TasksViewProps) {
             </div>
           </div>
 
-          {/* Integrated Task List Section */}
-          <div className="max-h-[400px] overflow-y-auto swipe-container">
+          {/* Integrated Task List Section - Scrollable, showing ~3 tasks */}
+          <div className="max-h-[260px] overflow-y-auto swipe-container scroll-smooth">
             {filteredTasks.length === 0 ? (
               <div className="text-center py-12 flex flex-col items-center gap-3 opacity-20">
                 <div className="w-12 h-12 rounded-full border-2 border-dashed border-foreground/30 flex items-center justify-center">
@@ -202,7 +233,13 @@ export function TasksView({ onBack }: TasksViewProps) {
             ) : (
               <div className="divide-y divide-muted/10">
                 {filteredTasks.map((task) => (
-                  <div key={task.id} className="p-4 flex items-center justify-between group hover:bg-muted/5 transition-colors">
+                  <div 
+                    key={task.id} 
+                    className={cn(
+                      "p-4 flex items-center justify-between group hover:bg-muted/5 transition-colors border-l-4",
+                      priorityBorderColor[task.priority]
+                    )}
+                  >
                     <div className="flex items-center gap-4 min-w-0">
                       <Checkbox 
                         checked={task.completed} 
@@ -216,19 +253,29 @@ export function TasksView({ onBack }: TasksViewProps) {
                         )}>
                           {task.title}
                         </p>
-                        <Badge variant="outline" className={cn("text-[8px] h-3.5 px-1.5 py-0 font-black uppercase tracking-tighter border-none", priorityColor[task.priority])}>
-                          {task.priority}
-                        </Badge>
+                        {task.details && (
+                          <p className="text-[10px] text-muted-foreground truncate max-w-[200px] italic">
+                            {task.details}
+                          </p>
+                        )}
                       </div>
                     </div>
-                    <Button 
-                      variant="ghost" 
-                      size="icon" 
-                      onClick={() => deleteTask(task.id)}
-                      className="opacity-0 group-hover:opacity-100 transition-opacity text-destructive/40 hover:text-destructive hover:bg-destructive/5 rounded-full w-8 h-8"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
+                    
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground/40 hover:text-foreground">
+                          <MoreVertical className="w-4 h-4" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="rounded-xl">
+                        <DropdownMenuItem onClick={() => openEditDetails(task)} className="text-xs font-bold gap-2">
+                          <Pencil className="w-3.5 h-3.5" /> Edit Details
+                        </DropdownMenuItem>
+                        <DropdownMenuItem onClick={() => deleteTask(task.id)} className="text-xs font-bold gap-2 text-destructive">
+                          <Trash2 className="w-3.5 h-3.5" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
                   </div>
                 ))}
               </div>
@@ -238,7 +285,7 @@ export function TasksView({ onBack }: TasksViewProps) {
       </Card>
 
       {/* Summary Card */}
-      <Card className="border-none shadow-lg bg-white border border-muted/10 sticky bottom-4 z-10">
+      <Card className="border-none shadow-lg bg-white border border-muted/10">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3 border-b border-muted/20 pb-2">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
@@ -249,28 +296,61 @@ export function TasksView({ onBack }: TasksViewProps) {
           <div className="space-y-3 px-1">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={cn("w-2 h-2 rounded-full", dotColor.high)} />
-                <span className="text-sm font-normal text-foreground/80">High Priority Task</span>
+                <div className={cn("w-2.5 h-2.5 rounded-full", dotColor.high)} />
+                <span className="text-sm font-medium text-foreground/70">High Priority Task</span>
               </div>
               <span className="text-xs font-black text-muted-foreground">{stats.high.done}/{stats.high.total}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={cn("w-2 h-2 rounded-full", dotColor.medium)} />
-                <span className="text-sm font-normal text-foreground/80">Medium Priority Task</span>
+                <div className={cn("w-2.5 h-2.5 rounded-full", dotColor.medium)} />
+                <span className="text-sm font-medium text-foreground/70">Medium Priority Task</span>
               </div>
               <span className="text-xs font-black text-muted-foreground">{stats.medium.done}/{stats.medium.total}</span>
             </div>
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className={cn("w-2 h-2 rounded-full", dotColor.low)} />
-                <span className="text-sm font-normal text-foreground/80">Low Priority Task</span>
+                <div className={cn("w-2.5 h-2.5 rounded-full", dotColor.low)} />
+                <span className="text-sm font-medium text-foreground/70">Low Priority Task</span>
               </div>
               <span className="text-xs font-black text-muted-foreground">{stats.low.done}/{stats.low.total}</span>
             </div>
           </div>
         </CardContent>
       </Card>
+
+      {/* Edit Details Dialog */}
+      <Dialog open={!!editingTask} onOpenChange={(open) => !open && setEditingTask(null)}>
+        <DialogContent className="rounded-2xl w-[90%] max-w-sm">
+          <DialogHeader>
+            <DialogTitle className="text-xs font-black uppercase tracking-widest text-primary flex items-center gap-2">
+              <Pencil className="w-3 h-3" /> Edit Task Details
+            </DialogTitle>
+          </DialogHeader>
+          <div className="py-4 space-y-3">
+            <div className="space-y-1">
+              <p className="text-[10px] font-black text-muted-foreground uppercase">Objective</p>
+              <p className="text-sm font-bold">{editingTask?.title}</p>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                ADDITIONAL NOTES
+              </label>
+              <Textarea 
+                value={detailsText}
+                onChange={(e) => setDetailsText(e.target.value)}
+                placeholder="Add more information about this task..."
+                className="min-h-[120px] rounded-xl border-muted/20 text-xs font-medium focus:ring-primary/20"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button onClick={saveDetails} className="w-full h-12 rounded-xl bg-primary font-black uppercase text-[11px] tracking-widest gap-2">
+              <Save className="w-4 h-4" /> Save Details
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
