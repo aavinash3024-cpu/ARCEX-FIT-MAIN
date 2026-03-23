@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from 'react';
@@ -40,7 +41,7 @@ export default function PulseFlowApp() {
   return (
     <div className="min-h-screen max-w-lg mx-auto bg-background flex flex-col relative shadow-xl border-x">
       {/* Header */}
-      <header className="p-6 pb-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50">
+      <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50">
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10 border-2 border-primary/20">
             <AvatarImage src="https://picsum.photos/seed/user/100/100" />
@@ -62,8 +63,8 @@ export default function PulseFlowApp() {
         </div>
       </header>
 
-      {/* Main Content Area */}
-      <main className="flex-1 px-6 overflow-y-auto">
+      {/* Main Content Area - Reduced Padding for Wider Cards */}
+      <main className="flex-1 px-4 overflow-y-auto">
         {renderContent()}
       </main>
 

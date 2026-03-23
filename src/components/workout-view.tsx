@@ -14,8 +14,6 @@ import {
   Plus, 
   RefreshCw,
   ChevronRight,
-  Target,
-  Search,
   BookOpen
 } from "lucide-react";
 import Image from "next/image";
@@ -31,23 +29,10 @@ export function WorkoutView() {
 
   return (
     <div className="space-y-6 pb-24">
-      {/* Header Section */}
-      <div className="flex items-center justify-between pt-2">
-        <h1 className="text-2xl font-bold font-headline">Workout</h1>
-        <div className="flex gap-2">
-          <Button size="sm" variant="ghost" className="rounded-full w-9 h-9 p-0 bg-muted/50 text-primary">
-            <BookOpen className="w-4 h-4" />
-          </Button>
-          <Button size="sm" variant="ghost" className="rounded-full w-9 h-9 p-0 bg-muted/50">
-            <History className="w-4 h-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* 1. Personal Records Card (Hero Position) - Compact height matching Nutrition */}
-      <Card className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
+      {/* 1. Personal Records Card (Hero Top) */}
+      <Card className="border-none shadow-md bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all mt-2">
         <CardContent className="p-0 flex items-center">
-          <div className="shrink-0 w-24 h-24 relative">
+          <div className="shrink-0 w-28 h-28 relative">
             <Image 
               src={prImage?.imageUrl || "https://images.unsplash.com/photo-1634157703702-3c124b455499?q=80&w=600&auto=format&fit=crop"} 
               alt="Personal Records"
@@ -61,7 +46,7 @@ export function WorkoutView() {
               <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.15em] flex items-center gap-1.5">
                 <Trophy className="w-3 h-3" /> Personal Records
               </h3>
-              <p className="text-xs font-bold text-foreground/90">8 New milestones this month</p>
+              <p className="text-xs font-bold text-foreground/90 leading-tight">8 New milestones reached this month</p>
               <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60">Pushing limits</p>
             </div>
             <ChevronRight className="w-4 h-4 text-primary/30" />
@@ -69,7 +54,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 2. Today's Protocol Card - Matches Meal Log Hub Hub Styling */}
+      {/* 2. Today's Protocol Card (Matches Meal Log Hub) */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -113,7 +98,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 3. Grid: History & Library - Compact side-by-side matching Nutrition */}
+      {/* 3. Grid: History & Library (Side-by-Side) */}
       <div className="grid grid-cols-2 gap-4">
         <Card className="border-none shadow-sm bg-gradient-to-br from-sky-50 to-white hover:translate-y-[-2px] transition-all cursor-pointer active:scale-95 group">
           <CardContent className="p-5 flex flex-col items-start gap-3">
@@ -121,8 +106,8 @@ export function WorkoutView() {
               <History className="w-5 h-5 text-sky-600" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-sky-900/40">Workout History</p>
-              <p className="text-xs font-bold text-sky-900/70">14 sessions this month</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-sky-900/40">History</p>
+              <p className="text-xs font-bold text-sky-900/70">14 sessions</p>
             </div>
           </CardContent>
         </Card>
@@ -133,24 +118,24 @@ export function WorkoutView() {
               <Library className="w-5 h-5 text-purple-600" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-purple-900/40">Exercise Library</p>
-              <p className="text-xs font-bold text-purple-900/70">850+ Movements</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-purple-900/40">Library</p>
+              <p className="text-xs font-bold text-purple-900/70">850+ Moves</p>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* 4. My Split (Hero Bottom) - Matching PR Card structure */}
-      <Card className="border-none shadow-sm bg-gradient-to-br from-indigo-50 to-white hover:translate-y-[-2px] transition-all cursor-pointer active:scale-[0.99] group border-l-4 border-l-indigo-400">
+      {/* 4. My Split (Hero Bottom) */}
+      <Card className="border-none shadow-md bg-gradient-to-br from-indigo-50 to-white hover:translate-y-[-2px] transition-all cursor-pointer active:scale-[0.99] group border-l-4 border-l-indigo-400">
         <CardContent className="p-5 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <div className="p-3 bg-indigo-100 rounded-2xl group-hover:scale-110 transition-transform">
               <Layout className="w-6 h-6 text-indigo-600" />
             </div>
             <div>
-              <h3 className="text-[10px] font-black text-indigo-900 uppercase tracking-widest">My Training Split</h3>
+              <h3 className="text-[10px] font-black text-indigo-900 uppercase tracking-widest">Training Split</h3>
               <p className="text-sm font-bold text-indigo-900/90">Push / Pull / Legs</p>
-              <p className="text-[9px] font-bold text-indigo-600/60 uppercase mt-0.5">Phase: Hypertrophy</p>
+              <p className="text-[9px] font-bold text-indigo-600/60 uppercase mt-0.5 tracking-tight">Hypertrophy Phase</p>
             </div>
           </div>
           <ChevronRight className="w-4 h-4 text-indigo-300" />
