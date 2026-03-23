@@ -60,9 +60,20 @@ export function NutritionView() {
 
       {/* AI Meal Log Hub */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
+        {/* Upper Area Header */}
+        <div className="px-6 pt-6 pb-2">
+          <div className="flex items-center justify-between">
+            <div className="space-y-1">
+              <h2 className="text-sm font-black uppercase tracking-widest text-foreground/80">Log Your Nutrition</h2>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Today: 1,070 / 2,200 kcal</p>
+            </div>
+            <Badge variant="outline" className="border-primary/20 text-primary font-bold text-[9px] px-2 py-0">TRACKING</Badge>
+          </div>
+        </div>
+
         <CardContent className="p-0">
           <Tabs value={logTab} onValueChange={setLogTab} className="w-full">
-            <div className="px-4 pt-4">
+            <div className="px-4">
               <TabsList className="grid w-full grid-cols-3 h-9 bg-muted/50 p-1">
                 <TabsTrigger value="log" className="text-[10px] font-bold uppercase tracking-tight gap-1.5">
                   <Plus className="w-3 h-3" /> Log
@@ -76,7 +87,7 @@ export function NutritionView() {
               </TabsList>
             </div>
 
-            <TabsContent value="log" className="p-4 mt-0 space-y-3">
+            <TabsContent value="log" className="p-4 mt-0 space-y-4">
               <div className="relative group">
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                   <Sparkles className="w-4 h-4 text-primary/40 group-focus-within:text-primary transition-colors" />
@@ -95,6 +106,13 @@ export function NutritionView() {
                   </Button>
                 </div>
               </div>
+
+              {/* Log Meal Action Button */}
+              <Button className="w-full h-12 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-bold text-xs uppercase tracking-widest shadow-lg shadow-primary/20 flex items-center justify-center gap-2">
+                <Plus className="w-4 h-4" />
+                Log This Meal
+              </Button>
+
               <p className="text-[9px] text-center text-muted-foreground font-medium uppercase tracking-widest px-4">
                 AI can estimate calories and macros from your text or photo
               </p>
