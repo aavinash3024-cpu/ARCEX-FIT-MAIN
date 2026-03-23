@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRef, useState, useMemo } from 'react';
@@ -70,6 +69,19 @@ export function DashboardView({
   
   const currentWeight = latestWeightEntry ? latestWeightEntry.weight : (goalData?.weight ? parseFloat(goalData.weight) : 0);
   const weightChange = latestWeightEntry && previousWeightEntry ? parseFloat((latestWeightEntry.weight - previousWeightEntry.weight).toFixed(1)) : 0;
+
+  // Chart Data with Start Point
+  const chartData = useMemo(() => {
+    const history = [...weightHistory];
+    if (goalData?.weight) {
+      const initialWeight = parseFloat(goalData.weight);
+      // Add starting weight as first point if not already present
+      if (history.length === 0 || history[0].weight !== initialWeight) {
+        history.unshift({ weight: initialWeight, isStart: true });
+      }
+    }
+    return history;
+  }, [weightHistory, goalData]);
 
   // Use Goal Data or Fallbacks
   const targetCal = goalData?.finalCalories || 2200;
@@ -466,7 +478,7 @@ export function DashboardView({
               
               <div className="h-16 w-full -mx-4 -mb-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={weightHistory}>
+                  <AreaChart data={chartData}>
                     <defs>
                       <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
@@ -480,6 +492,7 @@ export function DashboardView({
                       strokeWidth={2} 
                       fillOpacity={1} 
                       fill="url(#colorWeight)" 
+                      dot={false}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
