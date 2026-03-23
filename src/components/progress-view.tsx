@@ -116,6 +116,12 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
     }));
   }, [weightHistory, goalData]);
 
+  const chartTicks = useMemo(() => {
+    if (chartData.length === 0) return [];
+    if (chartData.length === 1) return [chartData[0].formattedDate];
+    return [chartData[0].formattedDate, chartData[chartData.length - 1].formattedDate];
+  }, [chartData]);
+
   const sortedEntries = useMemo(() => {
     return [...weightHistory].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
   }, [weightHistory]);
@@ -136,7 +142,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
       <h1 className="text-2xl font-bold font-headline mb-2 px-1">Progress</h1>
 
       <div className="space-y-4 animate-in fade-in duration-500">
-        {/* 1. Current Status */}
+        {/* 1. Current Status (Now at Top) */}
         <Card className="border-none shadow-sm bg-white overflow-hidden">
           <CardContent className="p-5 space-y-6">
             <div className="flex justify-between items-start">
@@ -172,26 +178,26 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
           </CardContent>
         </Card>
 
-        {/* 2. Next Milestone */}
+        {/* 2. Sleeker Next Milestone */}
         <Card className="border-none shadow-sm bg-primary/95 text-primary-foreground overflow-hidden rounded-[1rem]">
-           <CardContent className="p-4 flex items-center justify-between">
+           <CardContent className="p-3 px-4 flex items-center justify-between">
               <div className="space-y-0.5">
-                 <p className="text-[8px] font-black uppercase tracking-[0.2em] opacity-70">Next Milestone</p>
-                 <h4 className="font-black text-xs uppercase tracking-tight">Reach {targetWeight > 0 ? targetWeight.toFixed(1) : "---"} kg</h4>
+                 <p className="text-[7px] font-black uppercase tracking-[0.2em] opacity-70">Next Milestone</p>
+                 <h4 className="font-black text-[11px] uppercase tracking-tight">Reach {targetWeight > 0 ? targetWeight.toFixed(1) : "---"} kg</h4>
               </div>
               <div className="flex items-center gap-3">
                  <div className="text-right">
-                    <span className="text-xl font-black">{progressPercent}%</span>
-                    <p className="text-[7px] font-black uppercase opacity-60">Complete</p>
+                    <span className="text-lg font-black">{progressPercent}%</span>
+                    <p className="text-[6px] font-black uppercase opacity-60">Complete</p>
                  </div>
-                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
-                   <ArrowUpRight className="w-4 h-4 text-accent" />
+                 <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center border border-white/10 shrink-0">
+                   <ArrowUpRight className="w-3.5 h-3.5 text-accent" />
                  </div>
               </div>
            </CardContent>
         </Card>
 
-        {/* 3. Weight Trend */}
+        {/* 3. Weight Trend Chart */}
         <Card className="border-none shadow-sm overflow-hidden bg-white">
           <CardContent className="p-5 space-y-4">
             <div className="flex items-center justify-between">
@@ -200,7 +206,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
               </h3>
             </div>
             <div className="h-[180px] w-full mt-2">
-              {chartData.length > 1 ? (
+              {chartData.length > 0 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
@@ -216,6 +222,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
                       tickLine={false} 
                       tick={{ fontSize: 9, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }} 
                       dy={10}
+                      ticks={chartTicks}
                     />
                     <YAxis 
                       domain={['dataMin - 2', 'dataMax + 2']} 
