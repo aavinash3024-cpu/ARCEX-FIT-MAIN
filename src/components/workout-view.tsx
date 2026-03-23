@@ -46,7 +46,7 @@ export function WorkoutView() {
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
             <div className="space-y-0.5">
-              <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.15em] flex items-center gap-1.5">
+              <h3 className="text-[10px] font-black text-primary uppercase tracking-tight flex items-center gap-1.5">
                 <Trophy className="w-3 h-3" /> Personal Records
               </h3>
               <p className="text-xs font-bold text-foreground/90 leading-tight">8 New milestones reached</p>
@@ -57,7 +57,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 2. Today's Protocol Card */}
+      {/* 2. Today's Workout Card */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -65,7 +65,7 @@ export function WorkoutView() {
               <Dumbbell className="w-4 h-4 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground/80">Today's Protocol</h2>
+              <h2 className="text-xs font-black uppercase tracking-tight text-foreground/80">Today's Workout</h2>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
                 COMPLETION: <span className="text-primary font-black">0/2 DONE</span>
               </p>
@@ -101,7 +101,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 3. Compact Training Split Card */}
+      {/* 3. Compact My Workout Split Card */}
       <Card className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-indigo-400">
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
@@ -116,11 +116,11 @@ export function WorkoutView() {
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
             <div className="space-y-0.5">
-              <h3 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.15em] flex items-center gap-1.5">
+              <h3 className="text-[10px] font-black text-indigo-600 uppercase tracking-tight flex items-center gap-1.5">
                 <Layout className="w-3 h-3" /> My Workout Split
               </h3>
               <p className="text-xs font-bold text-foreground/90 leading-tight">Create Your Gym Split</p>
-              <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 tracking-tight">Active Phase</p>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 tracking-tight">Start Discipline</p>
             </div>
             <ChevronRight className="w-4 h-4 text-indigo-300/40" />
           </div>
