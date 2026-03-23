@@ -481,14 +481,13 @@ export function DashboardView({ tasks, onToggleTask, onViewHydration, onViewTask
                         <span className={`text-xs font-bold ${task.completed ? 'text-muted-foreground line-through decoration-muted-foreground/30' : 'text-foreground/80'}`}>
                           {task.title}
                         </span>
-                        <span className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-tighter">{task.priority} Priority</span>
                       </div>
                     </div>
                     <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
                   </div>
                 ))}
                 {todaysTasks.length > 2 && (
-                  <div className="px-1 py-1">
+                  <div className="flex justify-center pt-1">
                     <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
                       + {todaysTasks.length - 2} more tasks
                     </p>
