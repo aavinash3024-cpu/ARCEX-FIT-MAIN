@@ -279,25 +279,25 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
           </Card>
 
           <Card className="border-none shadow-lg bg-white overflow-hidden">
-            <CardContent className="p-6 space-y-6">
-              <div className="bg-primary/5 p-8 rounded-[2.5rem] border border-primary/10 flex flex-col items-center text-center space-y-2 relative overflow-hidden shadow-inner">
-                <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/5 rounded-full blur-2xl" />
-                <Trophy className="w-8 h-8 text-primary mb-1 drop-shadow-sm" />
-                <p className="text-[11px] font-black text-primary uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
+            <CardContent className="p-5 space-y-5">
+              <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10 flex flex-col items-center text-center space-y-1.5 relative overflow-hidden shadow-inner">
+                <div className="absolute -right-4 -top-4 w-20 h-20 bg-primary/5 rounded-full blur-2xl" />
+                <Trophy className="w-7 h-7 text-primary mb-0.5 drop-shadow-sm" />
+                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
                 <div className="flex items-baseline gap-1">
-                  <p className="text-5xl font-black text-foreground">{ormResult ? ormResult : '---'}</p>
+                  <p className="text-4xl font-black text-foreground">{ormResult ? ormResult : '---'}</p>
                   <span className="text-sm font-bold text-muted-foreground uppercase tracking-tighter">kg</span>
                 </div>
               </div>
 
-              <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 flex items-start gap-3">
-                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <p className="text-[10px] text-amber-800 font-bold leading-relaxed uppercase tracking-tight">
+              <div className="bg-amber-50 p-3.5 rounded-2xl border border-amber-200 flex items-start gap-2.5">
+                <AlertTriangle className="w-3.5 h-3.5 text-amber-600 shrink-0 mt-0.5" />
+                <p className="text-[9px] text-amber-800 font-bold leading-tight uppercase tracking-tight">
                   PR SAFETY: Always have a spotter or use safety bars when hitting a Personal Record. Take support to avoid injury.
                 </p>
               </div>
 
-              <div className="space-y-3">
+              <div className="space-y-2.5">
                 <div className="flex items-center gap-2">
                   <Activity className="w-3.5 h-3.5 text-muted-foreground/40" />
                   <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Load Breakdown</h4>
@@ -306,17 +306,22 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                   <Table>
                     <TableHeader className="bg-muted/30">
                       <TableRow className="hover:bg-transparent border-b-muted/10">
-                        <TableHead className="h-9 text-[9px] font-black uppercase text-center w-1/2 border-r border-muted/10">Goal Reps</TableHead>
-                        <TableHead className="h-9 text-[9px] font-black uppercase text-center w-1/2">Target (kg)</TableHead>
+                        <TableHead className="h-8 text-[8px] font-black uppercase text-center border-r border-muted/10">Reps</TableHead>
+                        <TableHead className="h-8 text-[8px] font-black uppercase text-center border-r border-muted/10">Intensity</TableHead>
+                        <TableHead className="h-8 text-[8px] font-black uppercase text-center">Weight</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {[2, 4, 6, 8, 10, 12, 14, 16].map((repCount) => {
-                        const weightForReps = ormResult ? ormResult / (1 + (repCount / 30)) : null;
+                        const intensity = 1 / (1 + (repCount / 30));
+                        const weightForReps = ormResult ? ormResult * intensity : null;
                         return (
                           <TableRow key={repCount} className="hover:bg-muted/5 border-b-muted/10 last:border-0">
-                            <TableCell className="py-2.5 text-[10px] font-bold text-center border-r border-muted/10">{repCount} Reps</TableCell>
-                            <TableCell className="py-2.5 text-[10px] font-black text-center text-primary">
+                            <TableCell className="py-2 text-[10px] font-bold text-center border-r border-muted/10">{repCount}</TableCell>
+                            <TableCell className="py-2 text-[10px] font-bold text-center border-r border-muted/10 text-muted-foreground">
+                              {Math.round(intensity * 100)}%
+                            </TableCell>
+                            <TableCell className="py-2 text-[10px] font-black text-center text-primary">
                               {weightForReps ? `${Math.round(weightForReps)} kg` : '---'}
                             </TableCell>
                           </TableRow>
