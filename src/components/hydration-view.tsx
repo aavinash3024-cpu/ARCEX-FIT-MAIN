@@ -9,7 +9,7 @@ import {
   Pencil, 
   ChevronLeft, 
   Calendar,
-  TrendingUp
+  CheckCircle2
 } from "lucide-react";
 import { 
   AreaChart, 
@@ -51,6 +51,8 @@ export function HydrationView({ onBack }: HydrationViewProps) {
   const [tempTarget, setTempTarget] = useState(targetMl);
 
   const percentage = Math.min(Math.round((currentMl / targetMl) * 100), 100);
+  const avgIntake = (historyData.reduce((acc, curr) => acc + curr.amount, 0) / historyData.length).toFixed(1);
+  const goalsMet = historyData.filter(d => d.amount >= 2.5).length; // Assuming 2.5L was the general target
 
   const handleUpdateTarget = () => {
     setTargetMl(tempTarget);
@@ -71,11 +73,11 @@ export function HydrationView({ onBack }: HydrationViewProps) {
         <h1 className="text-2xl font-bold font-headline">Hydration Tracker</h1>
       </div>
 
-      {/* The Interactive Glass Card */}
+      {/* 1. The Interactive Tracker Card */}
       <Card className="border-none shadow-md overflow-hidden bg-white relative">
         <CardContent className="p-6 flex flex-col items-center relative">
           
-          {/* Top Row: Center Title/Subtitle, Right Pencil */}
+          {/* Top Row: Daily Progress */}
           <div className="w-full flex justify-center items-center mb-6 relative">
             <div className="text-center">
               <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">
@@ -115,7 +117,7 @@ export function HydrationView({ onBack }: HydrationViewProps) {
             </Dialog>
           </div>
 
-          {/* Center Glass & Side Buttons */}
+          {/* Center Glass & Side Buttons - Compacted Glass */}
           <div className="relative flex items-center justify-center w-full mb-6">
             {/* Minus Button Left */}
             <Button 
@@ -127,8 +129,8 @@ export function HydrationView({ onBack }: HydrationViewProps) {
               <Minus className="w-5 h-5" />
             </Button>
 
-            {/* Animated Water Glass */}
-            <div className="relative w-40 h-56 border-4 border-muted rounded-b-[2rem] rounded-t-lg overflow-hidden bg-muted/5 shadow-inner">
+            {/* Compact Animated Water Glass */}
+            <div className="relative w-32 h-48 border-4 border-muted/20 rounded-b-[2rem] rounded-t-lg overflow-hidden bg-muted/5 shadow-inner">
               {/* Water Fill */}
               <div 
                 className="absolute bottom-0 left-0 w-full bg-blue-500 transition-all duration-1000 ease-out"
@@ -139,15 +141,15 @@ export function HydrationView({ onBack }: HydrationViewProps) {
                 
                 {/* Bubbles */}
                 <div className="absolute inset-0 overflow-hidden">
-                  {[...Array(6)].map((_, i) => (
+                  {[...Array(5)].map((_, i) => (
                     <div 
                       key={i}
                       className="absolute bubble bg-white/20 rounded-full"
                       style={{
                         left: `${Math.random() * 100}%`,
                         bottom: `${Math.random() * 20}%`,
-                        width: `${Math.random() * 8 + 4}px`,
-                        height: `${Math.random() * 8 + 4}px`,
+                        width: `${Math.random() * 6 + 3}px`,
+                        height: `${Math.random() * 6 + 3}px`,
                         animationDelay: `${Math.random() * 3}s`,
                         animationDuration: `${Math.random() * 2 + 2}s`
                       }}
@@ -156,9 +158,9 @@ export function HydrationView({ onBack }: HydrationViewProps) {
                 </div>
               </div>
 
-              {/* Percentage Indicator */}
+              {/* Percentage Indicator - Bottom Aligned */}
               <div className="absolute bottom-4 inset-x-0 flex items-center justify-center pointer-events-none">
-                <span className={`text-sm font-black transition-colors duration-500 ${percentage > 30 ? 'text-white' : 'text-muted-foreground/40'}`}>
+                <span className={`text-[10px] font-black transition-colors duration-500 ${percentage > 20 ? 'text-white' : 'text-muted-foreground/40'}`}>
                   {percentage}%
                 </span>
               </div>
@@ -178,7 +180,7 @@ export function HydrationView({ onBack }: HydrationViewProps) {
           {/* Goal Progress Text */}
           <div className="text-center space-y-1">
             <p className="text-xl font-black text-foreground">
-              {currentMl} / <span className="text-muted-foreground">{targetMl}ml</span>
+              {currentMl} <span className="text-muted-foreground text-sm">/ {targetMl}ml</span>
             </p>
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
               Achieve daily goal
@@ -187,22 +189,22 @@ export function HydrationView({ onBack }: HydrationViewProps) {
         </CardContent>
       </Card>
 
-      {/* Detailed Analysis (7 Days) - Line Graph */}
+      {/* 2. Detailed History Card */}
       <Card className="border-none shadow-md bg-white overflow-hidden">
-        <CardContent className="p-6 space-y-6">
+        <CardContent className="p-5 space-y-6">
           <div className="flex justify-between items-center">
-            <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
               <Calendar className="w-3.5 h-3.5 text-blue-500" /> Last 7 Days
             </h3>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-40">Weekly Trend</span>
+            <span className="text-[9px] font-bold text-muted-foreground uppercase opacity-40">Liters (L)</span>
           </div>
 
-          <div className="h-[200px] w-full mt-4">
+          <div className="h-[180px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={historyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <AreaChart data={historyData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorHydration" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15}/>
                     <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
                   </linearGradient>
                 </defs>
@@ -211,13 +213,13 @@ export function HydrationView({ onBack }: HydrationViewProps) {
                   dataKey="day" 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fontSize: 10, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }} 
+                  tick={{ fontSize: 9, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }} 
                   dy={10}
                 />
                 <YAxis 
                   axisLine={false} 
                   tickLine={false} 
-                  tick={{ fontSize: 10, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }}
+                  tick={{ fontSize: 9, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }}
                 />
                 <Tooltip 
                   cursor={{ stroke: '#3b82f6', strokeWidth: 1 }}
@@ -227,27 +229,33 @@ export function HydrationView({ onBack }: HydrationViewProps) {
                   type="monotone" 
                   dataKey="amount" 
                   stroke="#3b82f6" 
-                  strokeWidth={3}
+                  strokeWidth={2.5}
                   fillOpacity={1} 
                   fill="url(#colorHydration)"
-                  dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }}
-                  activeDot={{ r: 6, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }}
+                  dot={{ r: 3, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }}
+                  activeDot={{ r: 5, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }}
                 />
               </AreaChart>
             </ResponsiveContainer>
           </div>
+        </CardContent>
+      </Card>
 
-          <div className="pt-2 flex justify-between items-center text-[10px] font-black text-muted-foreground uppercase tracking-widest border-t border-muted/20">
-            <div className="flex flex-col pt-2">
-              <span className="text-primary text-base">2.4 L</span>
-              <span className="text-[8px] opacity-60">Avg. Intake</span>
+      {/* 3. Performance Summary Card (Thin Card) */}
+      <Card className="border-none shadow-sm bg-primary/5 border border-primary/10">
+        <CardContent className="p-4 flex justify-between items-center">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+              <CheckCircle2 className="w-4 h-4 text-blue-600" />
             </div>
-            <div className="flex gap-4 items-center pt-2">
-              <div className="flex items-center gap-1.5">
-                <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
-                <span className="text-[8px] opacity-60">Daily Intake</span>
-              </div>
+            <div className="space-y-0.5">
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none">Goal Streak</p>
+              <p className="text-xs font-bold text-foreground">{goalsMet} / 7 Days Met</p>
             </div>
+          </div>
+          <div className="text-right space-y-0.5">
+            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none">Weekly Avg</p>
+            <p className="text-xs font-black text-blue-600 uppercase">{avgIntake} Liters</p>
           </div>
         </CardContent>
       </Card>
