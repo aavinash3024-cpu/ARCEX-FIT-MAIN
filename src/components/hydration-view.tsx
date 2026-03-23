@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -75,115 +75,118 @@ export function HydrationView({ onBack }: HydrationViewProps) {
         <h1 className="text-2xl font-bold font-headline">Hydration Tracker</h1>
       </div>
 
-      {/* 1. The Interactive Glass Card */}
+      {/* The Interactive Glass Card */}
       <Card className="border-none shadow-md overflow-hidden bg-white relative">
-        <CardContent className="p-6 flex flex-col items-center">
-          <div className="w-full flex justify-between items-start mb-6">
-            <div className="space-y-1">
-              <h3 className="text-xs font-black text-primary uppercase tracking-wider flex items-center gap-1.5">
-                <Droplets className="w-3.5 h-3.5" /> Daily Target
-              </h3>
-              <div className="flex items-center gap-2">
-                <p className="text-2xl font-black text-foreground">{(targetMl / 1000).toFixed(1)} <span className="text-sm font-bold text-muted-foreground">L</span></p>
-                <Dialog open={isEditing} onOpenChange={setIsEditing}>
-                  <DialogTrigger asChild>
-                    <Button variant="ghost" size="icon" className="h-7 w-7 rounded-full bg-primary/5 text-primary">
-                      <Pencil className="w-3.5 h-3.5" />
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className="rounded-2xl w-[90%] max-w-sm">
-                    <DialogHeader>
-                      <DialogTitle className="text-center font-black uppercase text-xs tracking-widest text-primary">Set Daily Target</DialogTitle>
-                    </DialogHeader>
-                    <div className="py-6 flex flex-col items-center gap-4">
-                      <div className="flex items-center gap-3">
-                        <Input 
-                          type="number" 
-                          value={tempTarget} 
-                          onChange={(e) => setTempTarget(Number(e.target.value))}
-                          className="w-32 text-center text-xl font-bold rounded-xl border-muted-foreground/10 h-12"
-                        />
-                        <span className="font-bold text-muted-foreground">ML</span>
-                      </div>
-                      <p className="text-[10px] text-muted-foreground uppercase font-bold">Typical target: 2000 - 4000 ml</p>
-                    </div>
-                    <DialogFooter>
-                      <Button onClick={handleUpdateTarget} className="w-full h-12 rounded-xl bg-primary font-black uppercase text-[11px] tracking-widest">Update Goal</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
-              </div>
-            </div>
-            <Badge className="bg-primary/10 text-primary border-none text-[10px] font-black uppercase py-1 px-3">
-              {percentage}% Reached
-            </Badge>
-          </div>
-
-          {/* Animated Water Glass */}
-          <div className="relative w-40 h-56 border-4 border-muted rounded-b-[2rem] rounded-t-lg overflow-hidden bg-muted/5 shadow-inner mb-8">
-            {/* Water Fill */}
-            <div 
-              className="absolute bottom-0 left-0 w-full bg-primary/80 transition-all duration-1000 ease-out"
-              style={{ height: `${percentage}%` }}
-            >
-              {/* Wave effect at the top of water */}
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-[150%] h-8 bg-primary/80 rounded-[40%] water-wave" />
-              
-              {/* Bubbles */}
-              <div className="absolute inset-0 overflow-hidden">
-                {[...Array(6)].map((_, i) => (
-                  <div 
-                    key={i}
-                    className="absolute bubble bg-white/20 rounded-full"
-                    style={{
-                      left: `${Math.random() * 100}%`,
-                      bottom: `${Math.random() * 20}%`,
-                      width: `${Math.random() * 8 + 4}px`,
-                      height: `${Math.random() * 8 + 4}px`,
-                      animationDelay: `${Math.random() * 3}s`,
-                      animationDuration: `${Math.random() * 2 + 2}s`
-                    }}
-                  />
-                ))}
-              </div>
-            </div>
-
-            {/* Percentage Indicator */}
-            <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-              <span className={`text-4xl font-black transition-colors duration-500 ${percentage > 50 ? 'text-white' : 'text-muted-foreground/40'}`}>
-                {percentage}%
-              </span>
-            </div>
-          </div>
-
-          {/* Controls */}
-          <div className="w-full space-y-4">
-            <div className="flex justify-between items-center bg-muted/20 p-4 rounded-2xl border border-muted/30">
-              <div className="space-y-0.5">
-                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Progress</p>
-                <p className="text-lg font-black text-foreground">{(currentMl / 1000).toFixed(1)} <span className="text-xs font-bold text-muted-foreground">/ {(targetMl / 1000).toFixed(1)} L</span></p>
-              </div>
-              <div className="flex items-center gap-2">
-                <Button 
-                  onClick={() => addWater(-250)}
-                  variant="outline" size="icon" className="rounded-xl h-10 w-10 border-primary/20 text-primary hover:bg-primary/5">
-                  <Minus className="w-4 h-4" />
+        <CardContent className="p-6 flex flex-col items-center relative">
+          
+          {/* Top Row: Center Title, Right Pencil */}
+          <div className="w-full flex justify-center items-center mb-8 relative">
+            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+              Daily Progress
+            </h3>
+            
+            <Dialog open={isEditing} onOpenChange={setIsEditing}>
+              <DialogTrigger asChild>
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-muted/30 text-muted-foreground absolute right-0">
+                  <Pencil className="w-3.5 h-3.5" />
                 </Button>
-                <div className="bg-primary/10 px-3 py-2 rounded-xl">
-                  <span className="text-xs font-black text-primary">250ml</span>
+              </DialogTrigger>
+              <DialogContent className="rounded-2xl w-[90%] max-w-sm">
+                <DialogHeader>
+                  <DialogTitle className="text-center font-black uppercase text-xs tracking-widest text-primary">Set Daily Target</DialogTitle>
+                </DialogHeader>
+                <div className="py-6 flex flex-col items-center gap-4">
+                  <div className="flex items-center gap-3">
+                    <Input 
+                      type="number" 
+                      value={tempTarget} 
+                      onChange={(e) => setTempTarget(Number(e.target.value))}
+                      className="w-32 text-center text-xl font-bold rounded-xl border-muted-foreground/10 h-12"
+                    />
+                    <span className="font-bold text-muted-foreground">ML</span>
+                  </div>
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Typical target: 2000 - 4000 ml</p>
                 </div>
-                <Button 
-                  onClick={() => addWater(250)}
-                  variant="outline" size="icon" className="rounded-xl h-10 w-10 border-primary/20 text-primary hover:bg-primary/5">
-                  <Plus className="w-4 h-4" />
-                </Button>
+                <DialogFooter>
+                  <Button onClick={handleUpdateTarget} className="w-full h-12 rounded-xl bg-primary font-black uppercase text-[11px] tracking-widest">Update Goal</Button>
+                </DialogFooter>
+              </DialogContent>
+            </Dialog>
+          </div>
+
+          {/* Center Glass & Side Buttons */}
+          <div className="relative flex items-center justify-center w-full mb-8">
+            {/* Minus Button Left */}
+            <Button 
+              onClick={() => addWater(-250)}
+              variant="outline" 
+              size="icon" 
+              className="absolute left-4 rounded-full h-12 w-12 border-primary/20 text-primary hover:bg-primary/5 shadow-sm"
+            >
+              <Minus className="w-5 h-5" />
+            </Button>
+
+            {/* Animated Water Glass */}
+            <div className="relative w-40 h-56 border-4 border-muted rounded-b-[2rem] rounded-t-lg overflow-hidden bg-muted/5 shadow-inner">
+              {/* Water Fill */}
+              <div 
+                className="absolute bottom-0 left-0 w-full bg-primary/80 transition-all duration-1000 ease-out"
+                style={{ height: `${percentage}%` }}
+              >
+                {/* Wave effect at the top of water */}
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-[150%] h-8 bg-primary/80 rounded-[40%] water-wave" />
+                
+                {/* Bubbles */}
+                <div className="absolute inset-0 overflow-hidden">
+                  {[...Array(6)].map((_, i) => (
+                    <div 
+                      key={i}
+                      className="absolute bubble bg-white/20 rounded-full"
+                      style={{
+                        left: `${Math.random() * 100}%`,
+                        bottom: `${Math.random() * 20}%`,
+                        width: `${Math.random() * 8 + 4}px`,
+                        height: `${Math.random() * 8 + 4}px`,
+                        animationDelay: `${Math.random() * 3}s`,
+                        animationDuration: `${Math.random() * 2 + 2}s`
+                      }}
+                    />
+                  ))}
+                </div>
+              </div>
+
+              {/* Percentage Indicator (Shifted to bottom, smaller font) */}
+              <div className="absolute bottom-6 inset-x-0 flex items-center justify-center pointer-events-none">
+                <span className={`text-xl font-black transition-colors duration-500 ${percentage > 30 ? 'text-white' : 'text-muted-foreground/40'}`}>
+                  {percentage}%
+                </span>
               </div>
             </div>
+
+            {/* Plus Button Right */}
+            <Button 
+              onClick={() => addWater(250)}
+              variant="outline" 
+              size="icon" 
+              className="absolute right-4 rounded-full h-12 w-12 border-primary/20 text-primary hover:bg-primary/5 shadow-sm"
+            >
+              <Plus className="w-5 h-5" />
+            </Button>
+          </div>
+
+          {/* Goal Progress Text */}
+          <div className="text-center space-y-1">
+            <p className="text-xl font-black text-foreground">
+              {currentMl} / <span className="text-muted-foreground">{targetMl}ml</span>
+            </p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
+              Achieve daily goal
+            </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* 2. Analysis Insight Card */}
+      {/* Analysis Insight Card */}
       <Card className="border-none shadow-sm bg-accent/5 border-l-4 border-l-accent overflow-hidden">
         <CardContent className="p-4 flex items-center gap-4">
           <div className="p-2.5 bg-accent/10 rounded-xl shrink-0">
@@ -196,7 +199,7 @@ export function HydrationView({ onBack }: HydrationViewProps) {
         </CardContent>
       </Card>
 
-      {/* 3. Detailed Analysis (7 Days) */}
+      {/* Detailed Analysis (7 Days) */}
       <Card className="border-none shadow-md bg-white overflow-hidden">
         <CardContent className="p-6 space-y-6">
           <div className="flex justify-between items-start">
