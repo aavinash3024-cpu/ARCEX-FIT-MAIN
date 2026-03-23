@@ -142,7 +142,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
             <CheckCircle2 className="w-8 h-8 text-primary" />
           </div>
           <h1 className="text-2xl font-bold uppercase tracking-tight">Plan Active</h1>
-          <p className="text-xs text-muted-foreground font-semibold uppercase tracking-widest">Personalized Strategy</p>
+          <p className="text-[10px] text-muted-foreground font-semibold uppercase tracking-widest">Personalized Strategy</p>
         </div>
 
         <Card className="border-none shadow-xl bg-white overflow-hidden">
@@ -163,11 +163,11 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                 </div>
               </div>
               <div className="flex gap-4 items-center">
-                <div className="flex-1 text-center bg-white/60 p-2 rounded-xl border border-white/40">
+                <div className="flex-1 text-center bg-white p-3 rounded-2xl border border-white/40 shadow-sm">
                   <p className="text-[9px] font-semibold text-muted-foreground uppercase">Current</p>
                   <p className="text-lg font-bold">{weight}kg</p>
                 </div>
-                <div className="flex-1 text-center bg-white/60 p-2 rounded-xl border border-white/40">
+                <div className="flex-1 text-center bg-white p-3 rounded-2xl border border-white/40 shadow-sm">
                   <p className="text-[9px] font-semibold text-muted-foreground uppercase">Change</p>
                   <p className="text-lg font-bold text-primary">{calculations.weightDiff.toFixed(1)}kg</p>
                 </div>
@@ -241,9 +241,9 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                    <div className="bg-yellow-400 h-full transition-all" style={{ width: `${calculations.fatPct}%` }} />
                 </div>
                 <div className="flex justify-between px-1 text-[8px] font-semibold text-muted-foreground uppercase">
-                   <span>{calculations.proteinPct}% Prot</span>
-                   <span>{calculations.carbPct}% Carb</span>
-                   <span>{calculations.fatPct}% Fat</span>
+                   <span>{calculations.proteinPct}% Protein</span>
+                   <span>{calculations.carbPct}% Carbs</span>
+                   <span>{calculations.fatPct}% Fats</span>
                 </div>
               </div>
             </div>
@@ -550,9 +550,9 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                          <div className="bg-yellow-400" style={{ width: `${calculations.fatPct}%` }} />
                       </div>
                       <div className="flex justify-between text-[7px] font-semibold uppercase text-muted-foreground/40">
-                         <span>{calculations.proteinPct}% PROT</span>
-                         <span>{calculations.carbPct}% CARB</span>
-                         <span>{calculations.fatPct}% FAT</span>
+                         <span>{calculations.proteinPct}% Protein</span>
+                         <span>{calculations.carbPct}% Carbs</span>
+                         <span>{calculations.fatPct}% Fats</span>
                       </div>
                     </div>
                  </div>
