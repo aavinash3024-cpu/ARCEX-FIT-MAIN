@@ -279,10 +279,9 @@ export function DashboardView() {
       {/* 3. Today's Macros */}
       <Card className="border-none shadow-sm overflow-hidden bg-white">
         <CardContent className="p-5 space-y-5">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-foreground flex items-center justify-center w-full gap-2 text-center uppercase tracking-tight">
+          <div className="flex items-center justify-start">
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-tight">
               Today's Macros
-              <Badge variant="outline" className="text-[8px] font-bold border-primary/20 text-primary uppercase h-4 px-1.5">Goal Tracking</Badge>
             </h3>
           </div>
           <div className="grid grid-cols-2 gap-x-8 gap-y-6">
@@ -311,12 +310,12 @@ export function DashboardView() {
       <Card className="border-none shadow-sm bg-white overflow-hidden">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center justify-between">
-            <div className="space-y-0.5 flex flex-col items-center w-full">
-              <h3 className="text-xs font-bold text-foreground flex items-center justify-center gap-2 uppercase tracking-tight">
+            <div className="space-y-0.5 flex flex-col items-start w-full">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
                 Goal
                 <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 text-[8px] h-3.5 py-0 uppercase">Loss</Badge>
               </h3>
-              <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tight text-center">Active Milestone</p>
+              <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tight">Active Milestone</p>
             </div>
             <div className="absolute right-8 text-right">
               <span className="text-lg font-black text-primary">{progressPercent}%</span>
@@ -424,10 +423,9 @@ export function DashboardView() {
       {/* 6. Today's Tasks */}
       <Card className="border-none shadow-sm overflow-hidden bg-white">
         <CardContent className="p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-foreground flex items-center justify-center w-full gap-2 text-center uppercase tracking-tight">
+          <div className="flex items-center justify-start">
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-tight">
               Today's Tasks
-              <Badge variant="outline" className="text-[8px] font-bold border-accent/20 text-accent uppercase h-4 px-1.5">Action Plan</Badge>
             </h3>
           </div>
           <div className="space-y-3">
