@@ -56,10 +56,25 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
 
   const progressPercent = useMemo(() => {
     if (!startWeight || !targetWeight || startWeight === targetWeight) return 0;
-    const totalDiff = Math.abs(startWeight - targetWeight);
-    const completedDiff = Math.abs(startWeight - currentWeight);
-    return Math.min(100, Math.max(0, Math.round((completedDiff / totalDiff) * 100)));
-  }, [startWeight, targetWeight, currentWeight]);
+    
+    const objective = goalData?.objective || 'loss';
+    let progress = 0;
+    
+    if (objective === 'loss') {
+      // If goal is loss, current must be lower than start to have progress
+      if (currentWeight >= startWeight) return 0;
+      progress = ((startWeight - currentWeight) / (startWeight - targetWeight)) * 100;
+    } else if (objective === 'gain') {
+      // If goal is gain, current must be higher than start to have progress
+      if (currentWeight <= startWeight) return 0;
+      progress = ((currentWeight - startWeight) / (targetWeight - startWeight)) * 100;
+    } else {
+      // Maintenance
+      return 100;
+    }
+    
+    return Math.min(100, Math.max(0, Math.round(progress)));
+  }, [startWeight, targetWeight, currentWeight, goalData]);
 
   const weightChange = useMemo(() => {
     if (weightHistory.length < 2) return 0;
