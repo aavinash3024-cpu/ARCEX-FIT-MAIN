@@ -1,6 +1,7 @@
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { 
   Flame, 
   Droplets, 
@@ -11,7 +12,8 @@ import {
   Sparkles,
   Calculator,
   TrendingDown,
-  Scale
+  Scale,
+  Dumbbell
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -93,7 +95,7 @@ export function DashboardView() {
   ];
 
   return (
-    <div className="space-y-6 pb-24 pt-8">
+    <div className="space-y-6 pb-24 pt-10">
       {/* 1. Personal Guide - AI Suggestion Banner */}
       <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
         <CardContent className="p-5 flex items-center gap-4">
@@ -125,7 +127,7 @@ export function DashboardView() {
           </span>
         </div>
 
-        {/* Metrics Belt */}
+        {/* Metrics Belt - Increased width from 150px to 200px */}
         <div className="flex gap-3 overflow-x-auto pb-2 swipe-container">
           {metrics.map((m, idx) => {
             const currentVal = parseFloat(m.value.replace(',', ''));
@@ -134,7 +136,7 @@ export function DashboardView() {
             const isCalories = m.label === "Calories";
 
             return (
-              <Card key={idx} className="min-w-[150px] flex-shrink-0 border-none shadow-sm glass-card">
+              <Card key={idx} className="min-w-[200px] flex-shrink-0 border-none shadow-sm glass-card">
                 <CardContent className="p-3 flex flex-col justify-between h-32">
                   <div className="flex justify-between items-center">
                     <div className={`p-1.5 rounded-lg ${m.color}`}>
@@ -176,11 +178,26 @@ export function DashboardView() {
         </div>
       </section>
 
-      {/* 3. Nutrient Tracking (Macros Card) */}
+      {/* 3. Today's Workout Card */}
+      <Card className="border-none shadow-sm bg-white overflow-hidden">
+        <CardContent className="p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-primary/10 rounded-xl">
+              <Dumbbell className="w-5 h-5 text-primary" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold">Today's Workout</h3>
+              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Push Protocol • 45 mins</p>
+            </div>
+          </div>
+          <Button size="sm" variant="ghost" className="text-[10px] font-bold uppercase tracking-widest text-primary hover:bg-primary/5">Start</Button>
+        </CardContent>
+      </Card>
+
+      {/* 4. Nutrient Tracking (Macros Card) - Icon Removed */}
       <Card className="border-none shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
         <CardContent className="p-5 space-y-4">
-          <h3 className="text-sm font-bold flex items-center gap-2">
-            <Target className="w-4 h-4 text-primary" />
+          <h3 className="text-sm font-bold">
             Nutrient Tracking
           </h3>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
@@ -199,7 +216,7 @@ export function DashboardView() {
         </CardContent>
       </Card>
 
-      {/* 4. Goal Milestone Card - Normal with Bar (COMPACT) */}
+      {/* 5. Goal Milestone Card - Normal with Bar (COMPACT) */}
       <Card className="border-none shadow-sm bg-white overflow-hidden">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center justify-between">
@@ -233,7 +250,7 @@ export function DashboardView() {
         </CardContent>
       </Card>
 
-      {/* 5. Weight & Performance Tools (Swipeable) */}
+      {/* 6. Weight & Performance Tools (Swipeable) */}
       <div className="flex gap-3 overflow-x-auto pb-4 swipe-container">
         {/* Weight Card with Graph */}
         <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card overflow-hidden">
