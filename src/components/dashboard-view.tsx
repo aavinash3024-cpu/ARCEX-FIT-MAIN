@@ -35,7 +35,11 @@ const weightData = [
   { day: 'Fri', weight: 78.5 },
 ];
 
-export function DashboardView() {
+interface DashboardViewProps {
+  onViewHydration?: () => void;
+}
+
+export function DashboardView({ onViewHydration }: DashboardViewProps) {
   const metricsRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
   const [activeMetric, setActiveMetric] = useState(0);
@@ -56,6 +60,7 @@ export function DashboardView() {
 
   const metrics = [
     { 
+      id: 'calories',
       label: "Calories", 
       value: currentCal.toLocaleString(), 
       unit: "kcal", 
@@ -64,6 +69,7 @@ export function DashboardView() {
       color: "bg-orange-50" 
     },
     { 
+      id: 'streak',
       label: "Streak", 
       value: "12", 
       unit: "days", 
@@ -72,6 +78,7 @@ export function DashboardView() {
       color: "bg-yellow-50" 
     },
     { 
+      id: 'hydration',
       label: "Hydration", 
       value: "1.8", 
       unit: "L", 
@@ -80,6 +87,7 @@ export function DashboardView() {
       color: "bg-sky-50" 
     },
     { 
+      id: 'steps',
       label: "Steps", 
       value: "8,432", 
       unit: "steps", 
@@ -197,7 +205,8 @@ export function DashboardView() {
               const targetVal = parseFloat(m.target.replace(',', ''));
               const percentage = Math.round((currentVal / targetVal) * 100);
               const isCalories = m.label === "Calories";
-              const showDetails = m.label === "Hydration" || m.label === "Steps";
+              const isHydration = m.label === "Hydration";
+              const showDetails = isHydration || m.label === "Steps";
 
               return (
                 <Card key={idx} className="min-w-[260px] flex-shrink-0 border-none shadow-sm bg-white snap-center">
@@ -218,7 +227,7 @@ export function DashboardView() {
                             <span className="text-[9px] text-muted-foreground font-medium">{m.unit}</span>
                           </div>
                           
-                          {m.label === "Hydration" && (
+                          {isHydration && (
                             <div className="flex items-center bg-muted/50 rounded-full px-2 py-0.5 gap-2 border border-border/50 shadow-sm">
                               <button className="text-primary hover:text-primary/70 transition-colors">
                                 <Minus className="w-3 h-3" />
@@ -256,9 +265,12 @@ export function DashboardView() {
                           )}
                         </div>
                         {showDetails && (
-                          <div className="flex items-center gap-0.5 text-[8px] font-black text-primary uppercase shrink-0">
+                          <button 
+                            onClick={() => isHydration && onViewHydration?.()}
+                            className="flex items-center gap-0.5 text-[8px] font-black text-primary uppercase shrink-0 hover:opacity-70 transition-opacity"
+                          >
                             Details <ChevronRight className="w-2.5 h-2.5" />
-                          </div>
+                          </button>
                         )}
                       </div>
                     </div>
