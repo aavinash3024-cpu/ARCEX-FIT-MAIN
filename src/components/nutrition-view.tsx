@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -226,7 +225,7 @@ export function NutritionView() {
             </div>
             <div className="space-y-0.5">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
-              <p className="text-xs font-bold text-foreground/80">32 logged this week</p>
+              <p className="text-xs font-bold text-foreground/80">32 logged</p>
             </div>
             <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-sky-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
               Details <ChevronRight className="w-3 h-3" />

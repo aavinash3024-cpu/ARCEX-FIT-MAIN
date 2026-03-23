@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -33,7 +32,7 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      {/* 1. Sleek Personal Records Card - Resized to match AI Insight card */}
+      {/* 1. Sleek Personal Records Card */}
       <Card className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
         <CardContent className="p-0 flex items-center">
           <div className="shrink-0 w-20 h-20 relative">
@@ -128,7 +127,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 4. Grid: History & Library */}
+      {/* 4. Grid: Workout History & Workout Library */}
       <div className="grid grid-cols-2 gap-4">
         <Card className="border-none shadow-sm bg-white hover:bg-sky-50 transition-all cursor-pointer active:scale-95 group border border-muted/20">
           <CardContent className="p-5 flex flex-col items-start gap-3">
@@ -136,7 +135,7 @@ export function WorkoutView() {
               <History className="w-5 h-5 text-sky-600" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">History</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Workout History</p>
               <p className="text-xs font-bold text-foreground/80">14 sessions</p>
             </div>
             <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-sky-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
@@ -151,7 +150,7 @@ export function WorkoutView() {
               <Library className="w-5 h-5 text-purple-600" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Library</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Workout Library</p>
               <p className="text-xs font-bold text-foreground/80">850+ Moves</p>
             </div>
             <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-purple-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
