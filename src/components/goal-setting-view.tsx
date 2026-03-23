@@ -138,17 +138,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   if (isSaved) {
     return (
       <div className="space-y-6 pt-10 pb-24 animate-in fade-in zoom-in-95 duration-500">
-        {/* New Screenshot Style Header */}
-        <div className="flex flex-col items-center justify-center space-y-4 py-8">
-          <div className="w-20 h-20 bg-muted/30 rounded-full flex items-center justify-center border-4 border-white shadow-sm">
-            <Check className="w-10 h-10 text-primary/40" />
-          </div>
-          <div className="text-center space-y-1">
-            <h1 className="text-2xl font-black uppercase tracking-tight text-foreground/80">Plan Active</h1>
-            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Personalized Strategy</p>
-          </div>
-        </div>
-
         <Card className="border-none shadow-xl bg-white overflow-hidden rounded-[2rem]">
           <CardContent className="p-0 divide-y divide-muted/10">
             {/* Header Section: Objective */}
@@ -160,10 +149,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                     {objective === 'loss' ? <TrendingDown className="w-5 h-5 text-destructive" /> : objective === 'gain' ? <TrendingUp className="w-5 h-5 text-green-500" /> : <Activity className="w-5 h-5 text-primary" />}
                     {objective} Weight
                   </h3>
-                </div>
-                <div className="flex flex-col items-center">
-                  <Badge className="bg-primary/70 text-white font-bold px-4 py-1.5 rounded-full text-xs">{targetWeight} kg</Badge>
-                  <p className="text-[9px] font-bold text-muted-foreground uppercase mt-1 tracking-widest">Target</p>
                 </div>
               </div>
               <div className="flex gap-4 items-center">
