@@ -35,6 +35,12 @@ export function DashboardView() {
   const currentCal = 1840;
   const targetCal = 2200;
 
+  // Goal Weights
+  const startWeight = 81.0;
+  const currentWeight = 78.5;
+  const goalWeight = 77.0;
+  const progressPercent = Math.round(((startWeight - currentWeight) / (startWeight - goalWeight)) * 100);
+
   const metrics = [
     { 
       label: "Calories", 
@@ -184,19 +190,36 @@ export function DashboardView() {
         </CardContent>
       </Card>
 
-      {/* 4. Goal Milestone Card */}
-      <Card className="border-none shadow-sm bg-primary text-primary-foreground overflow-hidden">
-        <CardContent className="p-5 flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-[10px] font-bold uppercase tracking-wider opacity-80">Next Goal Milestone</p>
-            <h4 className="font-bold text-lg">Reach 77.0 kg</h4>
-          </div>
-          <div className="flex flex-col items-end">
-            <div className="flex items-center gap-2">
-              <span className="text-2xl font-bold">45%</span>
-              <ArrowUpRight className="w-5 h-5 text-accent" />
+      {/* 4. Goal Milestone Card - Normal with Bar */}
+      <Card className="border-none shadow-sm bg-white overflow-hidden">
+        <CardContent className="p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div className="space-y-0.5">
+              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+                Weight Loss Goal
+                <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 text-[9px] h-4 py-0 uppercase">Loss</Badge>
+              </h3>
+              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tight">Active Milestone</p>
             </div>
-            <p className="text-[9px] font-bold uppercase opacity-60">1.5kg remaining</p>
+            <div className="text-right">
+              <span className="text-xl font-black text-primary">{progressPercent}%</span>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase">Done</p>
+            </div>
+          </div>
+
+          <div className="space-y-2">
+            <Progress value={progressPercent} className="h-2 bg-muted" />
+            <div className="flex justify-between items-center text-[10px] font-bold text-muted-foreground">
+              <span>{startWeight.toFixed(1)} kg</span>
+              <span className="text-primary">{currentWeight.toFixed(1)} kg</span>
+              <span>{goalWeight.toFixed(1)} kg</span>
+            </div>
+          </div>
+          
+          <div className="pt-2 flex items-center justify-center gap-2">
+            <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
+              {(currentWeight - goalWeight).toFixed(1)} kg to go
+            </p>
           </div>
         </CardContent>
       </Card>
@@ -212,7 +235,7 @@ export function DashboardView() {
                   <Scale className="w-3 h-3 text-primary" /> Current Weight
                 </h3>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-2xl font-bold">78.5</span>
+                  <span className="text-2xl font-bold">{currentWeight}</span>
                   <span className="text-xs text-muted-foreground">kg</span>
                 </div>
               </div>

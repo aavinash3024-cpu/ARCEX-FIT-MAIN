@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -40,8 +39,8 @@ export default function PulseFlowApp() {
 
   return (
     <div className="min-h-screen max-w-lg mx-auto bg-background flex flex-col relative shadow-xl border-x">
-      {/* Header */}
-      <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50">
+      {/* Header with Boundary Line */}
+      <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b">
         <div className="flex items-center gap-3">
           <Avatar className="w-10 h-10 border-2 border-primary/20">
             <AvatarImage src="https://picsum.photos/seed/user/100/100" />
@@ -63,12 +62,12 @@ export default function PulseFlowApp() {
         </div>
       </header>
 
-      {/* Main Content Area - Reduced Padding for Wider Cards */}
+      {/* Main Content Area */}
       <main className="flex-1 px-4 overflow-y-auto">
         {renderContent()}
       </main>
 
-      {/* Bottom Navigation - Compact Version */}
+      {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white/90 backdrop-blur-xl border-t px-6 py-2 flex justify-between items-center z-50">
         {navItems.map((item) => {
           const Icon = item.icon;
