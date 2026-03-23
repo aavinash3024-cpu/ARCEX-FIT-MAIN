@@ -156,7 +156,7 @@ export function HydrationView({ onBack }: HydrationViewProps) {
                 </div>
               </div>
 
-              {/* Percentage Indicator (Reduced size & at bottom) */}
+              {/* Percentage Indicator */}
               <div className="absolute bottom-4 inset-x-0 flex items-center justify-center pointer-events-none">
                 <span className={`text-sm font-black transition-colors duration-500 ${percentage > 30 ? 'text-white' : 'text-muted-foreground/40'}`}>
                   {percentage}%
@@ -190,22 +190,11 @@ export function HydrationView({ onBack }: HydrationViewProps) {
       {/* Detailed Analysis (7 Days) - Line Graph */}
       <Card className="border-none shadow-md bg-white overflow-hidden">
         <CardContent className="p-6 space-y-6">
-          <div className="flex justify-between items-start">
-            <div className="space-y-1">
-              <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                <Calendar className="w-3.5 h-3.5 text-blue-500" /> Last 7 Days
-              </h3>
-              <div className="flex items-baseline gap-1">
-                <span className="text-2xl font-black text-foreground">2.4</span>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase">L Avg</span>
-              </div>
-            </div>
-            <div className="text-right space-y-0.5">
-              <div className="bg-green-100 text-green-700 rounded-full px-2 py-0.5 flex items-center gap-1 text-[10px] font-black uppercase">
-                <TrendingUp className="w-3 h-3" /> +12%
-              </div>
-              <p className="text-[8px] font-bold text-muted-foreground uppercase">Vs. last week</p>
-            </div>
+          <div className="flex justify-between items-center">
+            <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+              <Calendar className="w-3.5 h-3.5 text-blue-500" /> Last 7 Days
+            </h3>
+            <span className="text-[10px] font-bold text-muted-foreground uppercase opacity-40">Weekly Trend</span>
           </div>
 
           <div className="h-[200px] w-full mt-4">
@@ -248,12 +237,15 @@ export function HydrationView({ onBack }: HydrationViewProps) {
             </ResponsiveContainer>
           </div>
 
-          <div className="pt-2 flex justify-between items-center text-[9px] font-black text-muted-foreground/60 uppercase tracking-widest">
-            <span>Progress Trend</span>
-            <div className="flex gap-4">
+          <div className="pt-2 flex justify-between items-center text-[10px] font-black text-muted-foreground uppercase tracking-widest border-t border-muted/20">
+            <div className="flex flex-col pt-2">
+              <span className="text-primary text-base">2.4 L</span>
+              <span className="text-[8px] opacity-60">Avg. Intake</span>
+            </div>
+            <div className="flex gap-4 items-center pt-2">
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-blue-500" />
-                <span>Intake (L)</span>
+                <div className="w-1.5 h-1.5 rounded-full bg-blue-500" />
+                <span className="text-[8px] opacity-60">Daily Intake</span>
               </div>
             </div>
           </div>
