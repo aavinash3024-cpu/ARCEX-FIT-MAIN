@@ -1,10 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { 
   ChevronLeft, 
@@ -12,7 +11,8 @@ import {
   Plus, 
   Trash2,
   Calendar,
-  AlertCircle
+  AlertCircle,
+  ClipboardList
 } from "lucide-react";
 import { addDays, format, startOfToday, isSameDay } from 'date-fns';
 import { cn } from "@/lib/utils";
@@ -35,24 +35,12 @@ export function TasksView({ onBack }: TasksViewProps) {
   const [selectedDate, setSelectedDate] = useState(startOfToday());
   const [tasks, setTasks] = useState<Task[]>([]);
   const [newTaskTitle, setNewTaskTitle] = useState("");
-  const [priorityValue, setPriorityValue] = useState([1]); // 0=low, 1=medium, 2=high
-
-  const priorityMap: Record<number, Priority> = {
-    0: 'low',
-    1: 'medium',
-    2: 'high'
-  };
+  const [selectedPriority, setSelectedPriority] = useState<Priority>('medium');
 
   const priorityColor = {
-    low: 'text-green-500 bg-green-50 border-green-100',
-    medium: 'text-amber-500 bg-amber-50 border-amber-100',
+    low: 'text-green-600 bg-green-50 border-green-100',
+    medium: 'text-amber-600 bg-amber-50 border-amber-100',
     high: 'text-destructive bg-destructive/10 border-destructive/20'
-  };
-
-  const prioritySliderColor = {
-    0: 'bg-green-500',
-    1: 'bg-amber-500',
-    2: 'bg-destructive'
   };
 
   // Date Shift logic
@@ -65,7 +53,7 @@ export function TasksView({ onBack }: TasksViewProps) {
     const newTask: Task = {
       id: Math.random().toString(36).substr(2, 9),
       title: newTaskTitle,
-      priority: priorityMap[priorityValue[0]],
+      priority: selectedPriority,
       completed: false,
       date: selectedDate
     };
@@ -107,7 +95,7 @@ export function TasksView({ onBack }: TasksViewProps) {
         <h1 className="text-2xl font-bold font-headline">Daily Tasks</h1>
       </div>
 
-      {/* 1. Date Shifter */}
+      {/* Date Shifter */}
       <div className="flex items-center justify-between bg-white p-2 rounded-2xl shadow-sm border border-muted/20">
         <Button variant="ghost" size="icon" onClick={() => setSelectedDate(addDays(selectedDate, -1))}>
           <ChevronLeft className="w-4 h-4" />
@@ -137,53 +125,66 @@ export function TasksView({ onBack }: TasksViewProps) {
         </Button>
       </div>
 
-      {/* 2. Add Task Card */}
+      {/* Redesigned Add Task Card */}
       <Card className="border-none shadow-md bg-white">
-        <CardContent className="p-5 space-y-6">
+        <CardContent className="p-6 space-y-6">
+          <div className="space-y-1">
+            <h2 className="text-lg font-black text-foreground">Daily objectives</h2>
+            <p className="text-xs text-muted-foreground font-medium">Manage and create tasks for this date.</p>
+          </div>
+
           <div className="space-y-2">
-            <h3 className="text-[10px] font-black text-foreground uppercase tracking-widest flex items-center gap-2">
-              <Plus className="w-3.5 h-3.5 text-primary" /> Create New Task
-            </h3>
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+              NEW OBJECTIVE
+            </label>
             <input 
               type="text" 
               value={newTaskTitle}
               onChange={(e) => setNewTaskTitle(e.target.value)}
-              placeholder="E.g., 30 min morning run" 
-              className="w-full h-12 px-4 bg-muted/20 rounded-xl text-sm border-none focus:ring-2 focus:ring-primary/20"
+              placeholder="What needs to be done?" 
+              className="w-full h-14 px-5 bg-muted/10 rounded-xl text-sm border-none focus:ring-2 focus:ring-primary/20 transition-all font-medium"
             />
           </div>
 
-          <div className="space-y-4">
-            <div className="flex justify-between items-center">
-              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Set Priority</span>
-              <Badge className={cn("uppercase text-[9px] font-black tracking-widest px-2 py-0.5", priorityColor[priorityMap[priorityValue[0]]])}>
-                {priorityMap[priorityValue[0]]}
-              </Badge>
+          <div className="space-y-3">
+            <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+              SET PRIORITY
+            </label>
+            <div className="grid grid-cols-3 gap-1 bg-muted/10 p-1.5 rounded-2xl">
+              {(['low', 'medium', 'high'] as Priority[]).map((p) => (
+                <button
+                  key={p}
+                  onClick={() => setSelectedPriority(p)}
+                  className={cn(
+                    "py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
+                    selectedPriority === p 
+                      ? "bg-white text-foreground shadow-sm scale-[1.02]" 
+                      : "text-muted-foreground hover:text-foreground/70"
+                  )}
+                >
+                  {p}
+                </button>
+              ))}
             </div>
-            <Slider
-              value={priorityValue}
-              onValueChange={setPriorityValue}
-              max={2}
-              step={1}
-              className="py-2"
-            />
           </div>
 
           <Button 
             onClick={addTask}
-            className="w-full h-12 rounded-xl bg-primary text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
+            className="w-full h-14 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
           >
-            Add Task to {format(selectedDate, 'MMM d')}
+            Save task
           </Button>
         </CardContent>
       </Card>
 
-      {/* 3. Tasks List */}
+      {/* Tasks List */}
       <div className="space-y-3">
         {filteredTasks.length === 0 ? (
-          <div className="text-center py-10 opacity-30">
-            <Calendar className="w-10 h-10 mx-auto mb-2" />
-            <p className="text-[10px] font-bold uppercase tracking-widest">No tasks for this date</p>
+          <div className="text-center py-12 flex flex-col items-center gap-3 opacity-20">
+            <div className="w-16 h-16 rounded-full border-2 border-dashed border-foreground/30 flex items-center justify-center">
+              <ClipboardList className="w-8 h-8" />
+            </div>
+            <p className="text-[10px] font-black uppercase tracking-widest">NO TASKS LOGGED</p>
           </div>
         ) : (
           filteredTasks.map((task) => (
@@ -193,7 +194,7 @@ export function TasksView({ onBack }: TasksViewProps) {
                   <Checkbox 
                     checked={task.completed} 
                     onCheckedChange={() => toggleTask(task.id)}
-                    className="h-5 w-5 rounded-md"
+                    className="h-5 w-5 rounded-md border-2"
                   />
                   <div className="space-y-0.5">
                     <p className={cn(
@@ -221,7 +222,7 @@ export function TasksView({ onBack }: TasksViewProps) {
         )}
       </div>
 
-      {/* 4. Summary Card (Fixed at Bottom Area) */}
+      {/* Summary Card */}
       <Card className="border-none shadow-lg bg-white border border-muted/10 sticky bottom-4 z-10">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3 border-b border-muted/20 pb-2">
