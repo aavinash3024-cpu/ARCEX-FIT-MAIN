@@ -37,9 +37,10 @@ const weightData = [
 
 interface DashboardViewProps {
   onViewHydration?: () => void;
+  onViewTasks?: () => void;
 }
 
-export function DashboardView({ onViewHydration }: DashboardViewProps) {
+export function DashboardView({ onViewHydration, onViewTasks }: DashboardViewProps) {
   const metricsRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
   const [activeMetric, setActiveMetric] = useState(0);
@@ -469,7 +470,10 @@ export function DashboardView({ onViewHydration }: DashboardViewProps) {
             ))}
           </div>
           <div className="pt-2 border-t border-muted/20 flex justify-center">
-            <button className="text-[10px] font-bold text-primary uppercase flex items-center gap-1 hover:opacity-70 transition-opacity">
+            <button 
+              onClick={() => onViewTasks?.()}
+              className="text-[10px] font-bold text-primary uppercase flex items-center gap-1 hover:opacity-70 transition-opacity"
+            >
               See More <ChevronRight className="w-3 h-3" />
             </button>
           </div>

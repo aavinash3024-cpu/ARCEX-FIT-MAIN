@@ -15,6 +15,7 @@ import { NutritionView } from '@/components/nutrition-view';
 import { WorkoutView } from '@/components/workout-view';
 import { ProgressView } from '@/components/progress-view';
 import { HydrationView } from '@/components/hydration-view';
+import { TasksView } from '@/components/tasks-view';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
@@ -23,11 +24,12 @@ export default function PulseFlowApp() {
 
   const renderContent = () => {
     switch(activeTab) {
-      case 'dashboard': return <DashboardView onViewHydration={() => setActiveTab('hydration')} />;
+      case 'dashboard': return <DashboardView onViewHydration={() => setActiveTab('hydration')} onViewTasks={() => setActiveTab('tasks')} />;
       case 'nutrition': return <NutritionView />;
       case 'workout': return <WorkoutView />;
       case 'rank': return <ProgressView />;
       case 'hydration': return <HydrationView onBack={() => setActiveTab('dashboard')} />;
+      case 'tasks': return <TasksView onBack={() => setActiveTab('dashboard')} />;
       default: return <DashboardView />;
     }
   };
