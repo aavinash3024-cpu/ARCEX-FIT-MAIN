@@ -53,6 +53,18 @@
       "description": "Close up of gym dumbbells representing training split",
       "imageUrl": "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop",
       "imageHint": "gym weights"
+    },
+    {
+      "id": "meal-avocado-toast",
+      "description": "Healthy avocado toast with egg",
+      "imageUrl": "https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=400&auto=format&fit=crop",
+      "imageHint": "avocado toast"
+    },
+    {
+      "id": "meal-quinoa-bowl",
+      "description": "Chicken and quinoa salad bowl",
+      "imageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=400&auto=format&fit=crop",
+      "imageHint": "salad bowl"
     }
   ]
 }

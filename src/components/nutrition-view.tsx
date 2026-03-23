@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState } from 'react';
@@ -26,8 +25,26 @@ export function NutritionView() {
   const [logTab, setLogTab] = useState("log");
 
   const meals = [
-    { type: "Breakfast", name: "Avocado Toast & Egg", calories: 420, carbs: "35g", protein: "18g", fat: "22g", time: "08:30 AM" },
-    { type: "Lunch", name: "Chicken Quinoa Bowl", calories: 650, carbs: "55g", protein: "42g", fat: "15g", time: "01:15 PM" },
+    { 
+      type: "Breakfast", 
+      name: "Avocado Toast & Egg", 
+      calories: 420, 
+      carbs: "35g", 
+      protein: "18g", 
+      fat: "22g", 
+      time: "08:30 AM",
+      imageId: "meal-avocado-toast"
+    },
+    { 
+      type: "Lunch", 
+      name: "Chicken Quinoa Bowl", 
+      calories: 650, 
+      carbs: "55g", 
+      protein: "42g", 
+      fat: "15g", 
+      time: "01:15 PM",
+      imageId: "meal-quinoa-bowl"
+    },
   ];
 
   const recentMeals = [
@@ -37,7 +54,6 @@ export function NutritionView() {
   ];
 
   const analysisImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
-  const loggedMealImage = PlaceHolderImages.find(img => img.id === 'logged-meal-utensils');
 
   return (
     <div className="space-y-6 pb-24">
@@ -167,40 +183,44 @@ export function NutritionView() {
           <span className="text-[9px] font-bold text-primary uppercase flex items-center">View Summary <ChevronRight className="w-3 h-3 ml-0.5" /></span>
         </div>
         <div className="grid gap-3">
-          {meals.map((meal, idx) => (
-            <Card key={idx} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group">
-              <CardContent className="p-0 flex h-20">
-                <div className="w-20 relative bg-muted shrink-0 overflow-hidden">
-                  <Image 
-                    src={loggedMealImage?.imageUrl || "https://images.unsplash.com/photo-1610398041455-acc134988950?q=80&w=400&auto=format&fit=crop"} 
-                    alt={meal.name}
-                    fill
-                    className="object-cover group-hover:scale-110 transition-transform duration-500"
-                  />
-                  <div className="absolute inset-0 bg-black/5" />
-                </div>
-                <div className="flex-1 p-3 flex flex-col justify-between">
-                  <div className="flex justify-between items-start">
-                    <div className="min-w-0">
-                      <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
-                      <h4 className="font-bold text-sm text-foreground/90 truncate">{meal.name}</h4>
-                    </div>
-                    <span className="text-[9px] font-bold text-muted-foreground/40 shrink-0">{meal.time}</span>
+          {meals.map((meal, idx) => {
+            const mealImage = PlaceHolderImages.find(img => img.id === meal.imageId);
+            return (
+              <Card key={idx} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group">
+                <CardContent className="p-0 flex h-20">
+                  <div className="w-20 relative bg-muted shrink-0 overflow-hidden">
+                    <Image 
+                      src={mealImage?.imageUrl || "https://images.unsplash.com/photo-1610398041455-acc134988950?q=80&w=400&auto=format&fit=crop"} 
+                      alt={meal.name}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                      data-ai-hint={mealImage?.imageHint || "meal"}
+                    />
+                    <div className="absolute inset-0 bg-black/5" />
                   </div>
-                  <div className="flex justify-between items-end">
-                    <div className="flex gap-2 text-[9px] font-bold text-muted-foreground/60 uppercase">
-                      <span>P: {meal.protein}</span>
-                      <span>C: {meal.carbs}</span>
-                      <span>F: {meal.fat}</span>
+                  <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
+                    <div className="flex justify-between items-start">
+                      <div className="min-w-0">
+                        <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
+                        <h4 className="font-bold text-sm text-foreground/90 truncate">{meal.name}</h4>
+                      </div>
+                      <span className="text-[9px] font-bold text-muted-foreground/40 shrink-0">{meal.time}</span>
                     </div>
-                    <Badge variant="secondary" className="text-[9px] h-5 px-2 bg-primary/5 text-primary-foreground/80 font-black border-none">
-                      {meal.calories} KCAL
-                    </Badge>
+                    <div className="flex justify-between items-end">
+                      <div className="flex gap-2 text-[9px] font-bold text-muted-foreground/60 uppercase">
+                        <span>P: {meal.protein}</span>
+                        <span>C: {meal.carbs}</span>
+                        <span>F: {meal.fat}</span>
+                      </div>
+                      <Badge variant="secondary" className="text-[9px] h-5 px-2 bg-primary/5 text-primary-foreground/80 font-black border-none">
+                        {meal.calories} KCAL
+                      </Badge>
+                    </div>
                   </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
       </section>
 
