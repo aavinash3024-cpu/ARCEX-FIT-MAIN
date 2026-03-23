@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRef, useState, useMemo } from 'react';
@@ -63,19 +64,16 @@ export function DashboardView({
   const [activeMetric, setActiveMetric] = useState(0);
   const [activeTool, setActiveTool] = useState(0);
 
-  // Functional Weight Metrics
   const latestWeightEntry = weightHistory.length > 0 ? weightHistory[weightHistory.length - 1] : null;
   const previousWeightEntry = weightHistory.length > 1 ? weightHistory[weightHistory.length - 2] : null;
   
   const currentWeight = latestWeightEntry ? latestWeightEntry.weight : (goalData?.weight ? parseFloat(goalData.weight) : 0);
   const weightChange = latestWeightEntry && previousWeightEntry ? parseFloat((latestWeightEntry.weight - previousWeightEntry.weight).toFixed(1)) : 0;
 
-  // Chart Data with Start Point
   const chartData = useMemo(() => {
     const history = [...weightHistory];
     if (goalData?.weight) {
       const initialWeight = parseFloat(goalData.weight);
-      // Add starting weight as first point if not already present
       if (history.length === 0 || history[0].weight !== initialWeight) {
         history.unshift({ weight: initialWeight, isStart: true });
       }
@@ -83,12 +81,10 @@ export function DashboardView({
     return history;
   }, [weightHistory, goalData]);
 
-  // Use Goal Data or Fallbacks
   const targetCal = goalData?.finalCalories || 2200;
   const bmr = goalData?.bmr || 1600;
   const tdee = goalData?.tdee || 2500;
   
-  // Simulated current intake (80% of target for visualization)
   const currentCal = Math.round(targetCal * 0.84);
   const calDiff = targetCal - currentCal;
   const calStatus = calDiff >= 0 ? `${calDiff.toLocaleString()} Left` : `${Math.abs(calDiff).toLocaleString()} Over`;
@@ -198,24 +194,19 @@ export function DashboardView({
     const container = ref.current;
     const scrollLeft = container.scrollLeft;
     const containerWidth = container.offsetWidth;
-    
     const children = Array.from(container.children) as HTMLElement[];
     if (children.length === 0) return;
-
     let closestIndex = 0;
     let minDistance = Infinity;
-
     children.forEach((child, index) => {
       const childCenter = child.offsetLeft + child.offsetWidth / 2;
       const scrollCenter = scrollLeft + containerWidth / 2;
       const distance = Math.abs(childCenter - scrollCenter);
-      
       if (distance < minDistance) {
         minDistance = distance;
         closestIndex = index;
       }
     });
-
     setter(closestIndex);
   };
 
@@ -224,11 +215,9 @@ export function DashboardView({
     const container = ref.current;
     const children = Array.from(container.children) as HTMLElement[];
     const target = children[index];
-    
     if (target) {
       const containerWidth = container.offsetWidth;
       const targetCenter = target.offsetLeft + target.offsetWidth / 2;
-      
       container.scrollTo({
         left: targetCenter - containerWidth / 2,
         horizontal: true,
@@ -492,7 +481,7 @@ export function DashboardView({
                       strokeWidth={2} 
                       fillOpacity={1} 
                       fill="url(#colorWeight)" 
-                      dot={false}
+                      dot={{ r: 3, fill: "hsl(var(--primary))", strokeWidth: 1, stroke: "#fff" }}
                     />
                   </AreaChart>
                 </ResponsiveContainer>
