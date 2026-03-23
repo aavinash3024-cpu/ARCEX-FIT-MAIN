@@ -3,26 +3,22 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
   Plus, 
   Minus, 
   Pencil, 
   ChevronLeft, 
-  Droplets,
-  Sparkles,
-  TrendingUp,
-  Calendar
+  Calendar,
+  TrendingUp
 } from "lucide-react";
 import { 
-  BarChart, 
-  Bar, 
+  AreaChart, 
+  Area, 
   XAxis, 
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer,
-  Cell
+  ResponsiveContainer
 } from 'recharts';
 import { 
   Dialog,
@@ -79,11 +75,16 @@ export function HydrationView({ onBack }: HydrationViewProps) {
       <Card className="border-none shadow-md overflow-hidden bg-white relative">
         <CardContent className="p-6 flex flex-col items-center relative">
           
-          {/* Top Row: Center Title, Right Pencil */}
-          <div className="w-full flex justify-center items-center mb-8 relative">
-            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-              Daily Progress
-            </h3>
+          {/* Top Row: Center Title/Subtitle, Right Pencil */}
+          <div className="w-full flex justify-center items-center mb-6 relative">
+            <div className="text-center">
+              <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">
+                Daily Progress
+              </h3>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tight mt-0.5">
+                track your water intake
+              </p>
+            </div>
             
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
               <DialogTrigger asChild>
@@ -115,13 +116,13 @@ export function HydrationView({ onBack }: HydrationViewProps) {
           </div>
 
           {/* Center Glass & Side Buttons */}
-          <div className="relative flex items-center justify-center w-full mb-8">
+          <div className="relative flex items-center justify-center w-full mb-6">
             {/* Minus Button Left */}
             <Button 
               onClick={() => addWater(-250)}
               variant="outline" 
               size="icon" 
-              className="absolute left-4 rounded-full h-12 w-12 border-primary/20 text-primary hover:bg-primary/5 shadow-sm"
+              className="absolute left-4 rounded-full h-12 w-12 border-blue-200 text-blue-500 hover:bg-blue-50 shadow-sm"
             >
               <Minus className="w-5 h-5" />
             </Button>
@@ -130,11 +131,11 @@ export function HydrationView({ onBack }: HydrationViewProps) {
             <div className="relative w-40 h-56 border-4 border-muted rounded-b-[2rem] rounded-t-lg overflow-hidden bg-muted/5 shadow-inner">
               {/* Water Fill */}
               <div 
-                className="absolute bottom-0 left-0 w-full bg-primary/80 transition-all duration-1000 ease-out"
+                className="absolute bottom-0 left-0 w-full bg-blue-500 transition-all duration-1000 ease-out"
                 style={{ height: `${percentage}%` }}
               >
                 {/* Wave effect at the top of water */}
-                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-[150%] h-8 bg-primary/80 rounded-[40%] water-wave" />
+                <div className="absolute -top-3 left-1/2 -translate-x-1/2 w-[150%] h-8 bg-blue-500 rounded-[40%] water-wave" />
                 
                 {/* Bubbles */}
                 <div className="absolute inset-0 overflow-hidden">
@@ -155,9 +156,9 @@ export function HydrationView({ onBack }: HydrationViewProps) {
                 </div>
               </div>
 
-              {/* Percentage Indicator (Shifted to bottom, smaller font) */}
-              <div className="absolute bottom-6 inset-x-0 flex items-center justify-center pointer-events-none">
-                <span className={`text-xl font-black transition-colors duration-500 ${percentage > 30 ? 'text-white' : 'text-muted-foreground/40'}`}>
+              {/* Percentage Indicator (Reduced size & at bottom) */}
+              <div className="absolute bottom-4 inset-x-0 flex items-center justify-center pointer-events-none">
+                <span className={`text-sm font-black transition-colors duration-500 ${percentage > 30 ? 'text-white' : 'text-muted-foreground/40'}`}>
                   {percentage}%
                 </span>
               </div>
@@ -168,7 +169,7 @@ export function HydrationView({ onBack }: HydrationViewProps) {
               onClick={() => addWater(250)}
               variant="outline" 
               size="icon" 
-              className="absolute right-4 rounded-full h-12 w-12 border-primary/20 text-primary hover:bg-primary/5 shadow-sm"
+              className="absolute right-4 rounded-full h-12 w-12 border-blue-200 text-blue-500 hover:bg-blue-50 shadow-sm"
             >
               <Plus className="w-5 h-5" />
             </Button>
@@ -186,26 +187,13 @@ export function HydrationView({ onBack }: HydrationViewProps) {
         </CardContent>
       </Card>
 
-      {/* Analysis Insight Card */}
-      <Card className="border-none shadow-sm bg-accent/5 border-l-4 border-l-accent overflow-hidden">
-        <CardContent className="p-4 flex items-center gap-4">
-          <div className="p-2.5 bg-accent/10 rounded-xl shrink-0">
-            <Sparkles className="w-5 h-5 text-accent" />
-          </div>
-          <div className="space-y-0.5">
-            <h3 className="text-[10px] font-black text-accent uppercase tracking-widest leading-tight">AI Analysis</h3>
-            <p className="text-[11px] text-muted-foreground font-medium leading-tight">You've hit your target 4 out of the last 7 days. Consistency is key for optimal metabolism.</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      {/* Detailed Analysis (7 Days) */}
+      {/* Detailed Analysis (7 Days) - Line Graph */}
       <Card className="border-none shadow-md bg-white overflow-hidden">
         <CardContent className="p-6 space-y-6">
           <div className="flex justify-between items-start">
             <div className="space-y-1">
               <h3 className="text-xs font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                <Calendar className="w-3.5 h-3.5 text-primary" /> Last 7 Days
+                <Calendar className="w-3.5 h-3.5 text-blue-500" /> Last 7 Days
               </h3>
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl font-black text-foreground">2.4</span>
@@ -213,16 +201,22 @@ export function HydrationView({ onBack }: HydrationViewProps) {
               </div>
             </div>
             <div className="text-right space-y-0.5">
-              <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 border-none px-2 py-0.5 gap-1 text-[10px] font-black uppercase">
+              <div className="bg-green-100 text-green-700 rounded-full px-2 py-0.5 flex items-center gap-1 text-[10px] font-black uppercase">
                 <TrendingUp className="w-3 h-3" /> +12%
-              </Badge>
+              </div>
               <p className="text-[8px] font-bold text-muted-foreground uppercase">Vs. last week</p>
             </div>
           </div>
 
           <div className="h-[200px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={historyData} margin={{ top: 0, right: 0, left: -25, bottom: 0 }}>
+              <AreaChart data={historyData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="colorHydration" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#3b82f6" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
                 <XAxis 
                   dataKey="day" 
@@ -237,22 +231,20 @@ export function HydrationView({ onBack }: HydrationViewProps) {
                   tick={{ fontSize: 10, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }}
                 />
                 <Tooltip 
-                  cursor={{ fill: 'hsl(var(--muted)/0.2)', radius: 8 }}
+                  cursor={{ stroke: '#3b82f6', strokeWidth: 1 }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', fontSize: '10px', fontWeight: 'bold' }}
                 />
-                <Bar 
+                <Area 
+                  type="monotone" 
                   dataKey="amount" 
-                  radius={[6, 6, 0, 0]}
-                  barSize={24}
-                >
-                  {historyData.map((entry, index) => (
-                    <Cell 
-                      key={`cell-${index}`} 
-                      fill={entry.amount >= (targetMl / 1000) ? 'hsl(var(--primary))' : 'hsl(var(--primary)/0.3)'} 
-                    />
-                  ))}
-                </Bar>
-              </BarChart>
+                  stroke="#3b82f6" 
+                  strokeWidth={3}
+                  fillOpacity={1} 
+                  fill="url(#colorHydration)"
+                  dot={{ r: 4, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }}
+                  activeDot={{ r: 6, fill: '#3b82f6', strokeWidth: 2, stroke: '#fff' }}
+                />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
 
@@ -260,12 +252,8 @@ export function HydrationView({ onBack }: HydrationViewProps) {
             <span>Progress Trend</span>
             <div className="flex gap-4">
               <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-primary" />
-                <span>Goal Met</span>
-              </div>
-              <div className="flex items-center gap-1.5">
-                <div className="w-2 h-2 rounded-full bg-primary/30" />
-                <span>Below Goal</span>
+                <div className="w-2 h-2 rounded-full bg-blue-500" />
+                <span>Intake (L)</span>
               </div>
             </div>
           </div>
