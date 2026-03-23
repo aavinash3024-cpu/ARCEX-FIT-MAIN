@@ -1,6 +1,8 @@
+
 import { useRef, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
 import { 
   Flame, 
   Droplets, 
@@ -12,8 +14,6 @@ import {
   Scale,
   Plus,
   Minus,
-  CheckCircle2,
-  Circle,
   PieChart,
   Target,
   ListTodo
@@ -40,11 +40,12 @@ const weightData = [
 
 interface DashboardViewProps {
   tasks: Task[];
+  onToggleTask: (id: string) => void;
   onViewHydration?: () => void;
   onViewTasks?: () => void;
 }
 
-export function DashboardView({ tasks, onViewHydration, onViewTasks }: DashboardViewProps) {
+export function DashboardView({ tasks, onToggleTask, onViewHydration, onViewTasks }: DashboardViewProps) {
   const metricsRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
   const [activeMetric, setActiveMetric] = useState(0);
@@ -460,31 +461,40 @@ export function DashboardView({ tasks, onViewHydration, onViewTasks }: Dashboard
             </h3>
             <span className="text-[10px] font-bold text-muted-foreground uppercase">{stats.done}/{stats.total} done</span>
           </div>
-          <div className="space-y-3 max-h-[220px] overflow-y-auto swipe-container">
+          <div className="space-y-3">
             {todaysTasks.length === 0 ? (
               <div className="text-center py-6 opacity-30">
                 <p className="text-[10px] font-black uppercase tracking-widest">No tasks for today</p>
               </div>
             ) : (
-              todaysTasks.map((task) => (
-                <div key={task.id} className="relative flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-muted/20 shadow-sm group overflow-hidden">
-                  <div className={cn("absolute left-0 top-0 bottom-0 w-1", priorityBgColor[task.priority])} />
-                  <div className="flex items-center gap-3 pl-2">
-                    {task.completed ? (
-                      <CheckCircle2 className="w-4 h-4 text-green-500" />
-                    ) : (
-                      <Circle className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
-                    )}
-                    <div className="flex flex-col">
-                      <span className={`text-xs font-bold ${task.completed ? 'text-muted-foreground line-through decoration-muted-foreground/30' : 'text-foreground/80'}`}>
-                        {task.title}
-                      </span>
-                      <span className="text-[9px] font-bold text-muted-foreground/50 uppercase">{task.priority} Priority</span>
+              <>
+                {todaysTasks.slice(0, 2).map((task) => (
+                  <div key={task.id} className="relative flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-muted/20 shadow-sm group overflow-hidden">
+                    <div className={cn("absolute left-0 top-0 bottom-0 w-1", priorityBgColor[task.priority])} />
+                    <div className="flex items-center gap-3 pl-2">
+                      <Checkbox 
+                        checked={task.completed} 
+                        onCheckedChange={() => onToggleTask(task.id)}
+                        className="h-4 w-4 rounded-md border-2 border-primary/20 data-[state=checked]:bg-primary"
+                      />
+                      <div className="flex flex-col">
+                        <span className={`text-xs font-bold ${task.completed ? 'text-muted-foreground line-through decoration-muted-foreground/30' : 'text-foreground/80'}`}>
+                          {task.title}
+                        </span>
+                        <span className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-tighter">{task.priority} Priority</span>
+                      </div>
                     </div>
+                    <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
                   </div>
-                  <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
-                </div>
-              ))
+                ))}
+                {todaysTasks.length > 2 && (
+                  <div className="px-1 py-1">
+                    <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
+                      + {todaysTasks.length - 2} more tasks
+                    </p>
+                  </div>
+                )}
+              </>
             )}
           </div>
           <div className="pt-2 border-t border-muted/20 flex justify-center">

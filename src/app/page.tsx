@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from 'react';
@@ -23,12 +24,17 @@ export default function PulseFlowApp() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [tasks, setTasks] = useState<Task[]>([]);
 
+  const toggleTask = (id: string) => {
+    setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  };
+
   const renderContent = () => {
     switch(activeTab) {
       case 'dashboard': 
         return (
           <DashboardView 
             tasks={tasks}
+            onToggleTask={toggleTask}
             onViewHydration={() => setActiveTab('hydration')} 
             onViewTasks={() => setActiveTab('tasks')} 
           />
@@ -45,7 +51,7 @@ export default function PulseFlowApp() {
             onBack={() => setActiveTab('dashboard')} 
           />
         );
-      default: return <DashboardView tasks={tasks} />;
+      default: return <DashboardView tasks={tasks} onToggleTask={toggleTask} />;
     }
   };
 
