@@ -28,6 +28,7 @@ export default function PulseFlowApp() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [hydrationAmount, setHydrationAmount] = useState(1800);
   const [goalData, setGoalData] = useState<any>(null);
+  const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load data from localStorage on mount
@@ -35,6 +36,7 @@ export default function PulseFlowApp() {
     const savedTasks = localStorage.getItem('pulseflow_tasks');
     const savedHydration = localStorage.getItem('pulseflow_hydration');
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
+    const savedWeight = localStorage.getItem('pulseflow_weight_history');
     
     if (savedTasks) {
       try {
@@ -55,6 +57,14 @@ export default function PulseFlowApp() {
         console.error("Failed to parse saved goal", e);
       }
     }
+
+    if (savedWeight) {
+      try {
+        setWeightHistory(JSON.parse(savedWeight));
+      } catch (e) {
+        console.error("Failed to parse weight history", e);
+      }
+    }
     
     setIsLoaded(true);
   }, []);
@@ -71,6 +81,12 @@ export default function PulseFlowApp() {
       localStorage.setItem('pulseflow_hydration', hydrationAmount.toString());
     }
   }, [hydrationAmount, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('pulseflow_weight_history', JSON.stringify(weightHistory));
+    }
+  }, [weightHistory, isLoaded]);
 
   const refreshGoalData = () => {
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
@@ -97,6 +113,13 @@ export default function PulseFlowApp() {
     setActiveTab('calculators');
   };
 
+  const handleLogWeight = (newEntry: { date: string, weight: number }) => {
+    setWeightHistory(prev => {
+      const updated = [...prev, newEntry].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
+      return updated;
+    });
+  };
+
   const renderContent = () => {
     if (!isLoaded) return <div className="flex-1 flex items-center justify-center opacity-20"><p className="text-[10px] font-black uppercase tracking-widest">Loading Your Flow...</p></div>;
 
@@ -117,7 +140,14 @@ export default function PulseFlowApp() {
         );
       case 'nutrition': return <NutritionView />;
       case 'workout': return <WorkoutView />;
-      case 'rank': return <ProgressView goalData={goalData} />;
+      case 'rank': 
+        return (
+          <ProgressView 
+            goalData={goalData} 
+            weightHistory={weightHistory}
+            onLogWeight={handleLogWeight}
+          />
+        );
       case 'hydration': 
         return (
           <HydrationView 
