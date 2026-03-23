@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -14,14 +14,9 @@ import {
   CheckCircle2,
   Settings2,
   Sparkles,
-  Clock,
   AlertTriangle,
-  TrendingDown,
-  TrendingUp,
-  Activity,
-  Flame,
-  PieChart,
-  ChevronDown
+  ChevronDown,
+  PieChart
 } from "lucide-react";
 import { 
   Select,
@@ -169,7 +164,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   if (isSaved) {
     return (
       <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
-        <div className="flex items-center gap-4 pt-2">
+        <div className="flex items-center gap-4 pt-2 mb-2">
           <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
           </Button>
@@ -178,33 +173,32 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
 
         <Card className="border-none shadow-xl bg-white overflow-hidden rounded-[1.5rem] border border-muted/20">
           <CardContent className="p-0">
-            {/* Header Like Section */}
+            {/* Objective Header */}
             <div className="p-6 flex items-center justify-between border-b border-muted/10">
-              <h3 className="text-sm font-black text-foreground uppercase tracking-widest">
-                {objective} weight
-              </h3>
-              <div className="flex items-center gap-2">
-                <span className="text-xs font-bold text-muted-foreground opacity-40">0%</span>
-                <ChevronDown className="w-4 h-4 text-muted-foreground/40" />
+              <div className="space-y-0.5">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">Goal Objective</p>
+                <h3 className="text-lg font-black text-foreground uppercase tracking-tight">
+                  {objective} weight
+                </h3>
               </div>
+              <ChevronDown className="w-4 h-4 text-muted-foreground/40" />
             </div>
 
-            {/* Stats Row */}
+            {/* Weights Stats Row */}
             <div className="flex bg-muted/5">
               <div className="flex-1 p-5 border-r border-muted/10">
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Current Weight</p>
                 <p className="text-2xl font-black text-foreground mt-1">{weight}kg</p>
               </div>
               <div className="flex-1 p-5 text-right">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Target Goal</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Target Weight</p>
                 <div className="flex items-center justify-end gap-1.5 mt-1">
                   <p className="text-2xl font-black text-primary">{targetWeight}kg</p>
-                  <span className="text-[10px] font-bold text-primary opacity-60">Goal</span>
                 </div>
               </div>
             </div>
 
-            {/* Vertically Aligned Data Sections */}
+            {/* Data Sections */}
             <div className="p-6 space-y-8">
               {/* Energy Budget Section */}
               <div className="space-y-4">
@@ -242,11 +236,11 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
 
               {/* Macro Section */}
               <div className="space-y-4">
-                <div className="border-l-4 border-sky-400 pl-4 py-0.5">
-                  <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Macronutrient Ratio</h4>
+                <div className="border-l-4 border-sky-400 pl-4 py-0.5 flex items-center gap-2">
+                  <PieChart className="w-3 h-3 text-sky-400" />
+                  <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Nutritional Split</h4>
                 </div>
                 <div className="pl-1 space-y-6">
-                  {/* Gram Breakdown Stacked */}
                   <div className="space-y-4">
                     <div>
                       <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Protein</p>
@@ -262,7 +256,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                     </div>
                   </div>
 
-                  {/* Ratio Bar */}
                   <div className="space-y-2 pt-2">
                     <div className="flex h-3 w-full rounded-full overflow-hidden shadow-inner bg-muted/20">
                       <div className="bg-sky-400 h-full transition-all" style={{ width: `${calculations.proteinPct}%` }} />
@@ -279,17 +272,16 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
               </div>
             </div>
           </CardContent>
+          <CardFooter className="p-0 border-t border-muted/10">
+            <Button 
+              onClick={() => setIsSaved(false)} 
+              variant="ghost" 
+              className="w-full h-16 rounded-none text-muted-foreground font-black uppercase text-[10px] tracking-widest active:scale-[0.98] transition-all hover:bg-muted/5"
+            >
+              Edit Goal Parameters
+            </Button>
+          </CardFooter>
         </Card>
-
-        <div className="pt-4">
-           <Button 
-            onClick={() => setIsSaved(false)} 
-            variant="outline" 
-            className="w-full h-14 rounded-2xl border-2 border-muted-foreground/10 text-muted-foreground font-black uppercase text-[10px] tracking-widest shadow-sm active:scale-[0.98] transition-all hover:bg-muted/5"
-           >
-            Edit Goal Parameters
-           </Button>
-        </div>
       </div>
     );
   }
@@ -599,4 +591,3 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
     </div>
   );
 }
-
