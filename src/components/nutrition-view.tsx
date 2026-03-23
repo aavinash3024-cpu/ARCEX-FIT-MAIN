@@ -1,3 +1,6 @@
+
+'use client';
+
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -50,7 +53,7 @@ export function NutritionView() {
         <CardContent className="p-0 flex items-center">
           <div className="shrink-0 w-20 h-20 relative">
             <Image 
-              src={analysisImage?.imageUrl || "https://picsum.photos/seed/meal-bowl/200/200"} 
+              src={analysisImage?.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=400&auto=format&fit=crop"} 
               alt="AI Analysis"
               fill
               className="object-cover"
@@ -169,7 +172,7 @@ export function NutritionView() {
               <CardContent className="p-0 flex h-20">
                 <div className="w-20 relative bg-muted shrink-0 overflow-hidden">
                   <Image 
-                    src={loggedMealImage?.imageUrl || "https://picsum.photos/seed/utensils/200/200"} 
+                    src={loggedMealImage?.imageUrl || "https://images.unsplash.com/photo-1610398041455-acc134988950?q=80&w=400&auto=format&fit=crop"} 
                     alt={meal.name}
                     fill
                     className="object-cover group-hover:scale-110 transition-transform duration-500"
