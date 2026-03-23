@@ -190,34 +190,34 @@ export function DashboardView() {
         </CardContent>
       </Card>
 
-      {/* 4. Goal Milestone Card - Normal with Bar */}
+      {/* 4. Goal Milestone Card - Normal with Bar (COMPACT) */}
       <Card className="border-none shadow-sm bg-white overflow-hidden">
-        <CardContent className="p-5 space-y-4">
+        <CardContent className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5">
-              <h3 className="text-sm font-bold text-foreground flex items-center gap-2">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
                 Weight Loss Goal
-                <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 text-[9px] h-4 py-0 uppercase">Loss</Badge>
+                <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 text-[8px] h-3.5 py-0 uppercase">Loss</Badge>
               </h3>
-              <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-tight">Active Milestone</p>
+              <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tight">Active Milestone</p>
             </div>
             <div className="text-right">
-              <span className="text-xl font-black text-primary">{progressPercent}%</span>
-              <p className="text-[9px] font-bold text-muted-foreground uppercase">Done</p>
+              <span className="text-lg font-black text-primary">{progressPercent}%</span>
+              <p className="text-[8px] font-bold text-muted-foreground uppercase">Done</p>
             </div>
           </div>
 
-          <div className="space-y-2">
-            <Progress value={progressPercent} className="h-2 bg-muted" />
-            <div className="flex justify-between items-center text-[10px] font-bold text-muted-foreground">
+          <div className="space-y-1.5">
+            <Progress value={progressPercent} className="h-1.5 bg-muted" />
+            <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground">
               <span>{startWeight.toFixed(1)} kg</span>
               <span className="text-primary">{currentWeight.toFixed(1)} kg</span>
               <span>{goalWeight.toFixed(1)} kg</span>
             </div>
           </div>
           
-          <div className="pt-2 flex items-center justify-center gap-2">
-            <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
+          <div className="flex items-center justify-center pt-1">
+            <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest">
               {(currentWeight - goalWeight).toFixed(1)} kg to go
             </p>
           </div>
