@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from 'react';
@@ -73,8 +74,6 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
     medium: 2,
     low: 1
   };
-
-  const daysToShow = Array.from({ length: 7 }, (_, i) => addDays(selectedDate, i - 3));
   
   const filteredTasks = tasks
     .filter(t => isSameDay(new Date(t.date), selectedDate))
@@ -138,32 +137,21 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
         <h1 className="text-2xl font-bold font-headline">Daily Tasks</h1>
       </div>
 
-      <div className="flex items-center justify-between bg-white p-2 rounded-2xl shadow-sm border border-muted/20">
-        <Button variant="ghost" size="icon" onClick={() => setSelectedDate(addDays(selectedDate, -1))}>
-          <ChevronLeft className="w-4 h-4" />
+      {/* Simplified Date Shifter */}
+      <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20">
+        <Button variant="ghost" size="icon" onClick={() => setSelectedDate(addDays(selectedDate, -1))} className="rounded-full hover:bg-muted">
+          <ChevronLeft className="w-5 h-5 text-primary" />
         </Button>
         
-        <div className="flex gap-2 overflow-x-auto swipe-container px-2">
-          {daysToShow.map((day, i) => {
-            const isSelected = isSameDay(day, selectedDate);
-            return (
-              <button
-                key={i}
-                onClick={() => setSelectedDate(day)}
-                className={cn(
-                  "flex flex-col items-center justify-center min-w-[45px] h-14 rounded-xl transition-all",
-                  isSelected ? "bg-primary text-primary-foreground shadow-md scale-110" : "bg-muted/30 text-muted-foreground hover:bg-muted/50"
-                )}
-              >
-                <span className="text-[10px] font-bold uppercase opacity-60">{format(day, 'EEE')}</span>
-                <span className="text-sm font-black">{format(day, 'd')}</span>
-              </button>
-            );
-          })}
+        <div className="flex flex-col items-center">
+          <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none mb-1">Active Date</span>
+          <span className="text-sm font-black text-foreground">
+            {format(selectedDate, 'EEEE, MMMM do')}
+          </span>
         </div>
 
-        <Button variant="ghost" size="icon" onClick={() => setSelectedDate(addDays(selectedDate, 1))}>
-          <ChevronRight className="w-4 h-4" />
+        <Button variant="ghost" size="icon" onClick={() => setSelectedDate(addDays(selectedDate, 1))} className="rounded-full hover:bg-muted">
+          <ChevronRight className="w-5 h-5 text-primary" />
         </Button>
       </div>
 
@@ -317,7 +305,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
             </div>
             <div className="pt-3 mt-3 border-t border-muted/20 flex items-center justify-between">
               <span className="text-[11px] font-black text-foreground uppercase tracking-widest">Total Tasks</span>
-              <span className="text-[11px] font-black text-primary uppercase">{stats.total.done}/{stats.total.total}</span>
+              <span className="text-[11px] font-black text-primary uppercase">{stats.total.total}</span>
             </div>
           </div>
         </CardContent>
