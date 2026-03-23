@@ -107,10 +107,65 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
 
   return (
     <div className="space-y-4 pb-32 pt-4">
-      <h1 className="text-2xl font-bold font-headline mb-2">Progress</h1>
+      <h1 className="text-2xl font-bold font-headline mb-2 px-1">Progress</h1>
 
       <div className="space-y-4 animate-in fade-in duration-500">
-        {/* 1. Weight Trend */}
+        {/* 1. Current Status - Moved to Top */}
+        <Card className="border-none shadow-sm bg-white overflow-hidden">
+          <CardContent className="p-5 space-y-6">
+            <div className="flex justify-between items-start">
+              <div className="space-y-1">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">Current Status</p>
+                <div className="flex items-baseline gap-1">
+                  <h2 className="text-4xl font-black text-foreground">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"}</h2>
+                  <span className="text-sm font-bold text-muted-foreground uppercase">kg</span>
+                </div>
+              </div>
+              {weightChange !== 0 && (
+                <Badge className={weightChange < 0 ? "bg-green-100 text-green-700 hover:bg-green-100 border-none px-3 py-1 gap-1 text-[10px] font-black uppercase" : "bg-orange-100 text-orange-700 hover:bg-orange-100 border-none px-3 py-1 gap-1 text-[10px] font-black uppercase"}>
+                  {weightChange < 0 ? <TrendingDown className="w-3 h-3" /> : <ArrowUpRight className="w-3 h-3" />}
+                  {Math.abs(weightChange)}kg {weightChange < 0 ? 'Loss' : 'Gain'}
+                </Badge>
+              )}
+            </div>
+
+            <div className="grid grid-cols-3 gap-3">
+              <div className="text-center p-3 bg-muted/20 rounded-2xl border border-muted/30">
+                 <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1">Start</p>
+                 <p className="font-black text-sm">{startWeight > 0 ? startWeight.toFixed(1) : "---"} <span className="text-[8px] opacity-40">kg</span></p>
+              </div>
+              <div className="text-center p-3 bg-muted/20 rounded-2xl border border-muted/30">
+                 <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1">Goal</p>
+                 <p className="font-black text-sm">{targetWeight > 0 ? targetWeight.toFixed(1) : "---"} <span className="text-[8px] opacity-40">kg</span></p>
+              </div>
+              <div className="text-center p-3 bg-primary/5 rounded-2xl border border-primary/10">
+                 <p className="text-[9px] text-primary uppercase font-black tracking-widest mb-1">Left</p>
+                 <p className="font-black text-sm text-primary">{targetWeight > 0 ? Math.abs(currentWeight - targetWeight).toFixed(1) : "---"} <span className="text-[8px] opacity-40">kg</span></p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* 2. Next Milestone - Sleeker little bit */}
+        <Card className="border-none shadow-sm bg-primary/95 text-primary-foreground overflow-hidden rounded-[1rem]">
+           <CardContent className="p-4 flex items-center justify-between">
+              <div className="space-y-0.5">
+                 <p className="text-[8px] font-black uppercase tracking-[0.2em] opacity-70">Next Milestone</p>
+                 <h4 className="font-black text-xs uppercase tracking-tight">Reach {targetWeight > 0 ? targetWeight.toFixed(1) : "---"} kg</h4>
+              </div>
+              <div className="flex items-center gap-3">
+                 <div className="text-right">
+                    <span className="text-xl font-black">{progressPercent}%</span>
+                    <p className="text-[7px] font-black uppercase opacity-60">Complete</p>
+                 </div>
+                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center border border-white/10">
+                   <ArrowUpRight className="w-4 h-4 text-accent" />
+                 </div>
+              </div>
+           </CardContent>
+        </Card>
+
+        {/* 3. Weight Trend - Moved below cards */}
         <Card className="border-none shadow-sm overflow-hidden bg-white">
           <CardContent className="p-5 space-y-4">
             <div className="flex items-center justify-between">
@@ -118,7 +173,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
                 <ChartIcon className="w-3.5 h-3.5 text-primary" /> Weight Trend
               </h3>
             </div>
-            <div className="h-[200px] w-full mt-2">
+            <div className="h-[180px] w-full mt-2">
               {chartData.length > 1 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
@@ -169,62 +224,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
           </CardContent>
         </Card>
 
-        {/* 2. Next Milestone */}
-        <Card className="border-none shadow-sm bg-primary/90 text-primary-foreground overflow-hidden">
-           <CardContent className="p-5 flex items-center justify-between">
-              <div className="space-y-0.5">
-                 <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-70">Next Milestone</p>
-                 <h4 className="font-black text-sm">Reach {targetWeight > 0 ? targetWeight.toFixed(1) : "---"} kg</h4>
-              </div>
-              <div className="flex items-center gap-3">
-                 <div className="text-right">
-                    <span className="text-2xl font-black">{progressPercent}%</span>
-                    <p className="text-[8px] font-bold uppercase opacity-60">Completed</p>
-                 </div>
-                 <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">
-                   <ArrowUpRight className="w-5 h-5 text-accent" />
-                 </div>
-              </div>
-           </CardContent>
-        </Card>
-
-        {/* 3. Current Status */}
-        <Card className="border-none shadow-sm bg-white overflow-hidden">
-          <CardContent className="p-5 space-y-6">
-            <div className="flex justify-between items-start">
-              <div className="space-y-1">
-                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">Current Status</p>
-                <div className="flex items-baseline gap-1">
-                  <h2 className="text-4xl font-black text-foreground">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"}</h2>
-                  <span className="text-sm font-bold text-muted-foreground uppercase">kg</span>
-                </div>
-              </div>
-              {weightChange !== 0 && (
-                <Badge className={weightChange < 0 ? "bg-green-100 text-green-700 hover:bg-green-100 border-none px-3 py-1 gap-1 text-[10px] font-black uppercase" : "bg-orange-100 text-orange-700 hover:bg-orange-100 border-none px-3 py-1 gap-1 text-[10px] font-black uppercase"}>
-                  {weightChange < 0 ? <TrendingDown className="w-3 h-3" /> : <ArrowUpRight className="w-3 h-3" />}
-                  {Math.abs(weightChange)}kg {weightChange < 0 ? 'Loss' : 'Gain'}
-                </Badge>
-              )}
-            </div>
-
-            <div className="grid grid-cols-3 gap-3">
-              <div className="text-center p-3 bg-muted/20 rounded-2xl border border-muted/30">
-                 <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1">Start</p>
-                 <p className="font-black text-sm">{startWeight > 0 ? startWeight.toFixed(1) : "---"} <span className="text-[8px] opacity-40">kg</span></p>
-              </div>
-              <div className="text-center p-3 bg-muted/20 rounded-2xl border border-muted/30">
-                 <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1">Goal</p>
-                 <p className="font-black text-sm">{targetWeight > 0 ? targetWeight.toFixed(1) : "---"} <span className="text-[8px] opacity-40">kg</span></p>
-              </div>
-              <div className="text-center p-3 bg-primary/5 rounded-2xl border border-primary/10">
-                 <p className="text-[9px] text-primary uppercase font-black tracking-widest mb-1">Left</p>
-                 <p className="font-black text-sm text-primary">{targetWeight > 0 ? Math.abs(currentWeight - targetWeight).toFixed(1) : "---"} <span className="text-[8px] opacity-40">kg</span></p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 4. Log New Weight Entry */}
+        {/* 4. Log New Weight Entry Button */}
         <Dialog open={isLogOpen} onOpenChange={setIsLogOpen}>
           <DialogTrigger asChild>
             <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2">
