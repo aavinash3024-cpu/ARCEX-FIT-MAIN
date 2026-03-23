@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from 'react';
@@ -6,7 +7,6 @@ import { Button } from "@/components/ui/button";
 import { 
   Plus, 
   Minus, 
-  Pencil, 
   ChevronLeft, 
   Calendar,
   CheckCircle2
@@ -41,11 +41,12 @@ const historyData = [
 ];
 
 interface HydrationViewProps {
+  currentMl: number;
+  onUpdateMl: (amount: number) => void;
   onBack: () => void;
 }
 
-export function HydrationView({ onBack }: HydrationViewProps) {
-  const [currentMl, setCurrentMl] = useState(1800);
+export function HydrationView({ currentMl, onUpdateMl, onBack }: HydrationViewProps) {
   const [targetMl, setTargetMl] = useState(3000);
   const [isEditing, setIsEditing] = useState(false);
   const [tempTarget, setTempTarget] = useState(targetMl);
@@ -57,10 +58,6 @@ export function HydrationView({ onBack }: HydrationViewProps) {
   const handleUpdateTarget = () => {
     setTargetMl(tempTarget);
     setIsEditing(false);
-  };
-
-  const addWater = (amount: number) => {
-    setCurrentMl(prev => Math.max(0, prev + amount));
   };
 
   return (
@@ -90,8 +87,9 @@ export function HydrationView({ onBack }: HydrationViewProps) {
             
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
               <DialogTrigger asChild>
+                {/* No pencil icon as per user request */}
                 <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-muted/30 text-muted-foreground absolute right-0">
-                  <Pencil className="w-3.5 h-3.5" />
+                  <Plus className="w-3.5 h-3.5" />
                 </Button>
               </DialogTrigger>
               <DialogContent className="rounded-2xl w-[90%] max-w-sm">
@@ -121,7 +119,7 @@ export function HydrationView({ onBack }: HydrationViewProps) {
           <div className="relative flex items-center justify-center w-full mb-6">
             {/* Minus Button Left */}
             <Button 
-              onClick={() => addWater(-250)}
+              onClick={() => onUpdateMl(-250)}
               variant="outline" 
               size="icon" 
               className="absolute left-4 rounded-full h-12 w-12 border-blue-200 text-blue-500 hover:bg-blue-50 shadow-sm"
@@ -180,7 +178,7 @@ export function HydrationView({ onBack }: HydrationViewProps) {
 
             {/* Plus Button Right */}
             <Button 
-              onClick={() => addWater(250)}
+              onClick={() => onUpdateMl(250)}
               variant="outline" 
               size="icon" 
               className="absolute right-4 rounded-full h-12 w-12 border-blue-200 text-blue-500 hover:bg-blue-50 shadow-sm"

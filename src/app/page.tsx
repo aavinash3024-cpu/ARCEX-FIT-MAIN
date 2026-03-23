@@ -23,9 +23,14 @@ import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 export default function PulseFlowApp() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [tasks, setTasks] = useState<Task[]>([]);
+  const [hydrationAmount, setHydrationAmount] = useState(1800); // in ml
 
   const toggleTask = (id: string) => {
     setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+  };
+
+  const updateHydration = (amount: number) => {
+    setHydrationAmount(prev => Math.max(0, prev + amount));
   };
 
   const renderContent = () => {
@@ -35,6 +40,8 @@ export default function PulseFlowApp() {
           <DashboardView 
             tasks={tasks}
             onToggleTask={toggleTask}
+            hydrationAmount={hydrationAmount}
+            onUpdateHydration={updateHydration}
             onViewHydration={() => setActiveTab('hydration')} 
             onViewTasks={() => setActiveTab('tasks')} 
           />
@@ -42,7 +49,14 @@ export default function PulseFlowApp() {
       case 'nutrition': return <NutritionView />;
       case 'workout': return <WorkoutView />;
       case 'rank': return <ProgressView />;
-      case 'hydration': return <HydrationView onBack={() => setActiveTab('dashboard')} />;
+      case 'hydration': 
+        return (
+          <HydrationView 
+            currentMl={hydrationAmount}
+            onUpdateMl={updateHydration}
+            onBack={() => setActiveTab('dashboard')} 
+          />
+        );
       case 'tasks': 
         return (
           <TasksView 
@@ -51,7 +65,7 @@ export default function PulseFlowApp() {
             onBack={() => setActiveTab('dashboard')} 
           />
         );
-      default: return <DashboardView tasks={tasks} onToggleTask={toggleTask} />;
+      default: return <DashboardView tasks={tasks} onToggleTask={toggleTask} hydrationAmount={hydrationAmount} onUpdateHydration={updateHydration} />;
     }
   };
 

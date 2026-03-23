@@ -41,11 +41,20 @@ const weightData = [
 interface DashboardViewProps {
   tasks: Task[];
   onToggleTask: (id: string) => void;
+  hydrationAmount: number;
+  onUpdateHydration: (amount: number) => void;
   onViewHydration?: () => void;
   onViewTasks?: () => void;
 }
 
-export function DashboardView({ tasks, onToggleTask, onViewHydration, onViewTasks }: DashboardViewProps) {
+export function DashboardView({ 
+  tasks, 
+  onToggleTask, 
+  hydrationAmount, 
+  onUpdateHydration, 
+  onViewHydration, 
+  onViewTasks 
+}: DashboardViewProps) {
   const metricsRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
   const [activeMetric, setActiveMetric] = useState(0);
@@ -86,7 +95,7 @@ export function DashboardView({ tasks, onToggleTask, onViewHydration, onViewTask
     { 
       id: 'hydration',
       label: "Hydration", 
-      value: "1.8", 
+      value: (hydrationAmount / 1000).toFixed(1), 
       unit: "L", 
       target: "3.0", 
       icon: <Droplets className="w-4 h-4 text-sky-500" />, 
@@ -214,12 +223,12 @@ export function DashboardView({ tasks, onToggleTask, onViewHydration, onViewTask
             className="flex gap-3 overflow-x-auto pb-2 swipe-container snap-x snap-mandatory scroll-smooth"
           >
             {metrics.map((m, idx) => {
-              const currentVal = parseFloat(m.value.replace(',', ''));
-              const targetVal = parseFloat(m.target.replace(',', ''));
-              const percentage = Math.round((currentVal / targetVal) * 100);
-              const isCalories = m.label === "Calories";
-              const isHydration = m.label === "Hydration";
-              const showDetails = isHydration || m.label === "Steps";
+              const valNum = parseFloat(m.value.replace(',', ''));
+              const targetNum = parseFloat(m.target.replace(',', ''));
+              const percentage = Math.round((valNum / targetNum) * 100);
+              const isCalories = m.id === "calories";
+              const isHydration = m.id === "hydration";
+              const showDetails = isHydration || m.id === "steps";
 
               return (
                 <Card key={idx} className="min-w-[260px] flex-shrink-0 border-none shadow-sm bg-white snap-center">
@@ -242,11 +251,17 @@ export function DashboardView({ tasks, onToggleTask, onViewHydration, onViewTask
                           
                           {isHydration && (
                             <div className="flex items-center bg-muted/50 rounded-full px-2 py-0.5 gap-2 border border-border/50 shadow-sm">
-                              <button className="text-primary hover:text-primary/70 transition-colors">
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); onUpdateHydration(-250); }}
+                                className="text-primary hover:text-primary/70 transition-colors"
+                              >
                                 <Minus className="w-3 h-3" />
                               </button>
                               <span className="text-[9px] font-black text-foreground uppercase tracking-tighter">250ml</span>
-                              <button className="text-primary hover:text-primary/70 transition-colors">
+                              <button 
+                                onClick={(e) => { e.stopPropagation(); onUpdateHydration(250); }}
+                                className="text-primary hover:text-primary/70 transition-colors"
+                              >
                                 <Plus className="w-3 h-3" />
                               </button>
                             </div>
@@ -262,14 +277,14 @@ export function DashboardView({ tasks, onToggleTask, onViewHydration, onViewTask
                             <>
                               <div 
                                 className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
-                                style={{ left: `${(bmr / targetVal) * 100}%` }}
+                                style={{ left: `${(bmr / targetNum) * 100}%` }}
                               >
                                 <span className="text-[6px] font-bold text-destructive/60">BMR</span>
                                 <div className="h-2 w-[1px] bg-destructive/40" />
                               </div>
                               <div 
                                 className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
-                                style={{ left: `${Math.min((tdee / targetVal) * 100, 98)}%` }}
+                                style={{ left: `${Math.min((tdee / targetNum) * 100, 98)}%` }}
                               >
                                 <span className="text-[6px] font-bold text-accent">TDEE</span>
                                 <div className="h-2 w-[1px] bg-accent/60" />
