@@ -177,19 +177,21 @@ export function DashboardView() {
                         
                         {isCalories && (
                           <>
+                            {/* BMR Marker */}
                             <div 
-                              className="absolute top-0 flex flex-col items-center" 
+                              className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
                               style={{ left: `${(bmr / targetVal) * 100}%` }}
                             >
-                              <span className="text-[6px] font-bold text-destructive/60 mb-0.5">BMR</span>
-                              <div className="h-4 w-[1px] bg-destructive/40" />
+                              <span className="text-[6px] font-bold text-destructive/60">BMR</span>
+                              <div className="h-2 w-[1px] bg-destructive/40" />
                             </div>
+                            {/* TDEE Marker */}
                             <div 
-                              className="absolute top-0 flex flex-col items-center" 
+                              className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
                               style={{ left: `${Math.min((tdee / targetVal) * 100, 98)}%` }}
                             >
-                              <span className="text-[6px] font-bold text-accent mb-0.5">TDEE</span>
-                              <div className="h-4 w-[1px] bg-accent/60" />
+                              <span className="text-[6px] font-bold text-accent">TDEE</span>
+                              <div className="h-2 w-[1px] bg-accent/60" />
                             </div>
                           </>
                         )}
