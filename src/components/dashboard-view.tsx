@@ -8,10 +8,10 @@ import {
   Footprints, 
   Target,
   ChevronRight,
-  TrendingUp,
   Brain,
   Zap,
-  Leaf
+  Leaf,
+  Sparkles
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
@@ -27,7 +27,7 @@ export function DashboardView() {
       value: currentCal.toLocaleString(), 
       unit: "kcal", 
       target: targetCal.toLocaleString(), 
-      icon: <Flame className="w-5 h-5 text-orange-500" />, 
+      icon: <Flame className="w-4 h-4 text-orange-500" />, 
       color: "bg-orange-50" 
     },
     { 
@@ -35,23 +35,15 @@ export function DashboardView() {
       value: "1.8", 
       unit: "L", 
       target: "3.0", 
-      icon: <Droplets className="w-5 h-5 text-sky-500" />, 
+      icon: <Droplets className="w-4 h-4 text-sky-500" />, 
       color: "bg-sky-50" 
-    },
-    { 
-      label: "Fiber", 
-      value: "22", 
-      unit: "g", 
-      target: "35", 
-      icon: <Leaf className="w-5 h-5 text-emerald-500" />, 
-      color: "bg-emerald-50" 
     },
     { 
       label: "Steps", 
       value: "8,432", 
       unit: "steps", 
       target: "10,000", 
-      icon: <Footprints className="w-5 h-5 text-green-500" />, 
+      icon: <Footprints className="w-4 h-4 text-green-500" />, 
       color: "bg-green-50" 
     },
   ];
@@ -65,28 +57,33 @@ export function DashboardView() {
 
   return (
     <div className="space-y-6 pb-20">
-      {/* AI Suggestion Banner */}
-      <Card className="border-none bg-primary text-primary-foreground overflow-hidden">
-        <CardContent className="p-6 flex items-start gap-4">
-          <div className="p-3 bg-white/20 rounded-full">
-            <Brain className="w-6 h-6 text-white" />
+      {/* Your Personal Guide - AI Suggestion Banner */}
+      <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
+        <CardContent className="p-5 flex items-start gap-4">
+          <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm border border-white/10 shrink-0">
+            <Sparkles className="w-5 h-5 text-accent" />
           </div>
           <div className="space-y-1">
-            <h3 className="font-semibold text-lg">PulseFlow Insight</h3>
-            <p className="text-sm opacity-90">Based on your activity, try increasing protein by 15g today to support muscle recovery from yesterday's lift.</p>
+            <h3 className="font-bold text-sm flex items-center gap-2">
+              Your Personal Guide
+              <Badge variant="outline" className="text-[9px] h-4 border-white/20 text-white font-normal uppercase tracking-tighter">AI Pulse</Badge>
+            </h3>
+            <p className="text-xs opacity-90 leading-relaxed">Increase protein by 15g today to support muscle recovery from yesterday's heavy lifting session.</p>
           </div>
         </CardContent>
       </Card>
 
       {/* Daily Overview */}
-      <section className="space-y-6">
+      <section className="space-y-4">
         <div className="flex items-center justify-between">
-          <h2 className="text-xl font-bold font-headline">Daily Overview</h2>
-          <span className="text-xs text-muted-foreground flex items-center">Scroll for metrics <ChevronRight className="w-3 h-3 ml-1" /></span>
+          <h2 className="text-lg font-bold font-headline">Daily Overview</h2>
+          <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider flex items-center">
+            View all <ChevronRight className="w-3 h-3 ml-1" />
+          </span>
         </div>
 
-        {/* Metrics Belt */}
-        <div className="flex gap-4 overflow-x-auto pb-4 swipe-container">
+        {/* Metrics Belt - Compacted Height */}
+        <div className="flex gap-3 overflow-x-auto pb-2 swipe-container">
           {metrics.map((m, idx) => {
             const currentVal = parseFloat(m.value.replace(',', ''));
             const targetVal = parseFloat(m.target.replace(',', ''));
@@ -94,45 +91,39 @@ export function DashboardView() {
             const isCalories = m.label === "Calories";
 
             return (
-              <Card key={idx} className="min-w-[200px] flex-shrink-0 border-none shadow-sm glass-card">
-                <CardContent className="p-4 flex flex-col justify-between h-48">
-                  <div className="flex justify-between items-start">
-                    <div className={`p-2 rounded-xl ${m.color}`}>
+              <Card key={idx} className="min-w-[160px] flex-shrink-0 border-none shadow-sm glass-card">
+                <CardContent className="p-3 flex flex-col justify-between h-32">
+                  <div className="flex justify-between items-center">
+                    <div className={`p-1.5 rounded-lg ${m.color}`}>
                       {m.icon}
                     </div>
-                    <Badge variant="outline" className="text-[10px] font-normal border-muted-foreground/20">
-                      {percentage}%
-                    </Badge>
+                    <span className="text-[10px] font-bold text-muted-foreground">{percentage}%</span>
                   </div>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     <div>
-                      <p className="text-xs text-muted-foreground mb-1">{m.label}</p>
+                      <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight mb-0.5">{m.label}</p>
                       <div className="flex items-baseline gap-1">
-                        <span className="text-xl font-bold">{m.value}</span>
-                        <span className="text-[10px] text-muted-foreground">{m.unit}</span>
+                        <span className="text-lg font-bold">{m.value}</span>
+                        <span className="text-[9px] text-muted-foreground font-medium">{m.unit}</span>
                       </div>
                     </div>
 
-                    <div className="relative h-6 flex items-center">
-                      <Progress value={Math.min(percentage, 100)} className="h-2 w-full" />
+                    <div className="relative h-4 flex items-center">
+                      <Progress value={Math.min(percentage, 100)} className="h-1.5 w-full" />
                       
                       {isCalories && (
                         <>
                           {/* BMR Marker */}
                           <div 
-                            className="absolute top-0 h-6 w-[2px] bg-destructive/50 flex flex-col items-center" 
+                            className="absolute top-0 h-4 w-[1px] bg-destructive/40" 
                             style={{ left: `${(bmr / targetVal) * 100}%` }}
-                          >
-                            <span className="absolute -top-4 text-[7px] font-bold text-destructive uppercase">BMR</span>
-                          </div>
+                          />
                           {/* TDEE Marker */}
                           <div 
-                            className="absolute top-0 h-6 w-[2px] bg-accent/80 flex flex-col items-center" 
+                            className="absolute top-0 h-4 w-[1px] bg-accent/60" 
                             style={{ left: `${Math.min((tdee / targetVal) * 100, 100)}%` }}
-                          >
-                            <span className="absolute -bottom-4 text-[7px] font-bold text-accent uppercase">TDEE</span>
-                          </div>
+                          />
                         </>
                       )}
                     </div>
@@ -144,25 +135,25 @@ export function DashboardView() {
         </div>
 
         {/* Integrated Macros Breakdown */}
-        <Card className="border-none shadow-sm overflow-hidden">
-          <CardContent className="p-6 space-y-6">
-            <h3 className="font-semibold flex items-center gap-2">
-              <Target className="w-5 h-5 text-primary" />
+        <Card className="border-none shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
+          <CardContent className="p-5 space-y-4">
+            <h3 className="text-sm font-bold flex items-center gap-2">
+              <Target className="w-4 h-4 text-primary" />
               Nutrient Tracking
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
               {nutrients.map((n, idx) => (
-                <div key={idx} className="space-y-2">
-                  <div className="flex justify-between items-center text-xs">
-                    <div className="flex items-center gap-2">
+                <div key={idx} className="space-y-1.5">
+                  <div className="flex justify-between items-center text-[10px]">
+                    <div className="flex items-center gap-1.5">
                       {n.icon}
-                      <span className="font-medium">{n.label}</span>
+                      <span className="font-bold text-muted-foreground uppercase">{n.label}</span>
                     </div>
-                    <span className="text-muted-foreground font-mono">
-                      {n.current} / {n.target}{n.unit}
+                    <span className="text-muted-foreground font-mono font-medium">
+                      {n.current}/{n.target}{n.unit}
                     </span>
                   </div>
-                  <Progress value={(n.current / n.target) * 100} className="h-1.5" />
+                  <Progress value={(n.current / n.target) * 100} className="h-1" />
                 </div>
               ))}
             </div>
@@ -171,36 +162,36 @@ export function DashboardView() {
       </section>
 
       {/* Weekly Progress & Goals */}
-      <div className="grid grid-cols-1 gap-4">
+      <div className="grid grid-cols-1 gap-3">
         <Card className="border-none shadow-sm">
-          <CardContent className="p-6 space-y-4">
+          <CardContent className="p-5 space-y-3">
             <div className="flex items-center justify-between">
-              <h3 className="font-semibold flex items-center gap-2">
-                <CheckCircle2 className="w-5 h-5 text-primary" />
-                Weight Goal (Loss)
+              <h3 className="text-sm font-bold flex items-center gap-2">
+                <CheckCircle2 className="w-4 h-4 text-primary" />
+                Weight Goal
               </h3>
-              <Badge variant="secondary">Active</Badge>
+              <Badge variant="secondary" className="text-[9px] font-bold px-2 py-0">LOSS</Badge>
             </div>
-            <div className="space-y-2">
-              <div className="flex justify-between text-sm">
+            <div className="space-y-1.5">
+              <div className="flex justify-between text-[11px] font-medium">
                 <span>Journey to 75.0 kg</span>
-                <span className="font-medium">78.5 kg</span>
+                <span className="text-primary font-bold">78.5 kg</span>
               </div>
-              <Progress value={65} className="h-2" />
+              <Progress value={65} className="h-1.5" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-none shadow-sm">
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl">
+          <CardContent className="p-5">
+            <div className="flex items-center justify-between p-3.5 bg-muted/40 rounded-xl">
               <div>
-                <p className="text-xs text-muted-foreground">Current Weight</p>
-                <p className="text-2xl font-bold">78.5 kg</p>
+                <p className="text-[10px] text-muted-foreground font-bold uppercase">Current Weight</p>
+                <p className="text-xl font-bold">78.5 <span className="text-xs font-normal opacity-60">kg</span></p>
               </div>
               <div className="text-right">
-                <p className="text-xs text-green-500 font-medium">-0.4 kg</p>
-                <p className="text-[10px] text-muted-foreground">vs last week</p>
+                <p className="text-xs text-green-600 font-bold flex items-center justify-end">-0.4 kg</p>
+                <p className="text-[9px] text-muted-foreground font-bold uppercase">vs last week</p>
               </div>
             </div>
           </CardContent>
