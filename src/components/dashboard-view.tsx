@@ -15,7 +15,9 @@ import {
   Scale,
   Dumbbell,
   Plus,
-  Minus
+  Minus,
+  CheckCircle2,
+  Circle
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -94,6 +96,12 @@ export function DashboardView() {
     { label: "1 Rep Max", description: "Power" },
     { label: "Body Fat %", description: "Body" },
     { label: "BMR / TDEE", description: "Energy" },
+  ];
+
+  const tasks = [
+    { id: 1, title: "Morning Meditation", duration: "10 min", completed: true },
+    { id: 2, title: "Post-Workout Protein", duration: "Now", completed: false },
+    { id: 3, title: "Evening Mobility", duration: "15 min", completed: false },
   ];
 
   return (
@@ -210,11 +218,43 @@ export function DashboardView() {
         </div>
       </section>
 
-      {/* 4. Today's Macros (Macros Card) - Updated Heading Style */}
+      {/* 3. Today's Tasks */}
+      <Card className="border-none shadow-sm overflow-hidden bg-white/60 backdrop-blur-md">
+        <CardContent className="p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-bold text-foreground">
+              Today's Tasks
+            </h3>
+            <Badge variant="outline" className="text-[8px] font-bold border-accent/20 text-accent uppercase h-4 px-1.5">Action Plan</Badge>
+          </div>
+          <div className="space-y-3">
+            {tasks.map((task) => (
+              <div key={task.id} className="flex items-center justify-between p-3 rounded-xl bg-white/40 border border-white/20 shadow-sm group">
+                <div className="flex items-center gap-3">
+                  {task.completed ? (
+                    <CheckCircle2 className="w-4 h-4 text-green-500" />
+                  ) : (
+                    <Circle className="w-4 h-4 text-muted-foreground/30 group-hover:text-primary transition-colors" />
+                  )}
+                  <div className="flex flex-col">
+                    <span className={`text-xs font-bold ${task.completed ? 'text-muted-foreground line-through decoration-muted-foreground/30' : 'text-foreground/80'}`}>
+                      {task.title}
+                    </span>
+                    <span className="text-[9px] font-bold text-muted-foreground/50 uppercase">{task.duration}</span>
+                  </div>
+                </div>
+                <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* 4. Today's Macros */}
       <Card className="border-none shadow-sm overflow-hidden bg-white/60 backdrop-blur-md">
         <CardContent className="p-5 space-y-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-foreground">
+            <h3 className="text-xs font-bold text-foreground uppercase tracking-tight">
               Today's Macros
             </h3>
             <Badge variant="outline" className="text-[8px] font-bold border-primary/20 text-primary uppercase h-4 px-1.5">Goal Tracking</Badge>
