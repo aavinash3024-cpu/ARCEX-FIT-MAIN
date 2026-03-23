@@ -92,6 +92,11 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
     const carbKcal = remainingKcal * (carbRatio[0] / 100);
     const fatKcal = remainingKcal - carbKcal;
 
+    // Ratios for UI
+    const proteinPct = Math.round((proteinKcal / finalCalories) * 100);
+    const carbPct = Math.round((carbKcal / finalCalories) * 100);
+    const fatPct = 100 - proteinPct - carbPct;
+
     // Derived stats for Step 4
     const currentDeficitOrSurplus = Math.abs(finalCalories - tdee);
     const derivedWeeklyRate = parseFloat((currentDeficitOrSurplus / 1100).toFixed(2));
@@ -106,6 +111,9 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
       protein: proteinGrams,
       carbs: Math.round(carbKcal / 4),
       fats: Math.round(fatKcal / 9),
+      proteinPct,
+      carbPct,
+      fatPct,
       isWeightValid: objective === 'gain' ? tw > w : objective === 'loss' ? tw < w : tw === w,
       weeksToGoal,
       weightDiff,
@@ -169,14 +177,14 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
             <div className="space-y-3">
                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Macro Split</p>
                <div className="flex h-3 w-full rounded-full overflow-hidden shadow-inner">
-                  <div className="bg-primary" style={{ width: `${Math.max(0, (calculations.carbs*4/calculations.finalCalories)*100)}%` }} />
-                  <div className="bg-accent" style={{ width: `${Math.max(0, (calculations.protein*4/calculations.finalCalories)*100)}%` }} />
-                  <div className="bg-yellow-400" style={{ width: `${Math.max(0, (calculations.fats*9/calculations.finalCalories)*100)}%` }} />
+                  <div className="bg-accent" style={{ width: `${calculations.proteinPct}%` }} />
+                  <div className="bg-primary" style={{ width: `${calculations.carbPct}%` }} />
+                  <div className="bg-yellow-400" style={{ width: `${calculations.fatPct}%` }} />
                </div>
                <div className="flex justify-between text-[8px] font-black uppercase text-muted-foreground/60">
-                  <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Carbs {calculations.carbs}g</span>
-                  <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-accent" /> Prot {calculations.protein}g</span>
-                  <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-yellow-400" /> Fat {calculations.fats}g</span>
+                  <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-accent" /> Prot {calculations.protein}g ({calculations.proteinPct}%)</span>
+                  <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Carbs {calculations.carbs}g ({calculations.carbPct}%)</span>
+                  <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-yellow-400" /> Fat {calculations.fats}g ({calculations.fatPct}%)</span>
                </div>
             </div>
           </CardContent>
@@ -497,14 +505,14 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                     
                     <div className="space-y-2">
                       <div className="flex h-2 w-full rounded-full overflow-hidden">
-                         <div className="bg-primary" style={{ width: `${Math.max(0, (calculations.carbs*4/calculations.finalCalories)*100)}%` }} />
-                         <div className="bg-accent" style={{ width: `${Math.max(0, (calculations.protein*4/calculations.finalCalories)*100)}%` }} />
-                         <div className="bg-yellow-400" style={{ width: `${Math.max(0, (calculations.fats*9/calculations.finalCalories)*100)}%` }} />
+                         <div className="bg-accent" style={{ width: `${calculations.proteinPct}%` }} />
+                         <div className="bg-primary" style={{ width: `${calculations.carbPct}%` }} />
+                         <div className="bg-yellow-400" style={{ width: `${calculations.fatPct}%` }} />
                       </div>
                       <div className="flex justify-between text-[7px] font-black uppercase text-muted-foreground/40">
-                         <span>Carbs ({carbRatio[0]}%)</span>
-                         <span>Protein</span>
-                         <span>Fat</span>
+                         <span>Prot ({calculations.proteinPct}%)</span>
+                         <span>Carbs ({calculations.carbPct}%)</span>
+                         <span>Fat ({calculations.fatPct}%)</span>
                       </div>
                     </div>
                  </div>
