@@ -132,6 +132,7 @@ export default function PulseFlowApp() {
             hydrationAmount={hydrationAmount}
             onUpdateHydration={updateHydration}
             goalData={goalData}
+            weightHistory={weightHistory}
             onViewHydration={() => setActiveTab('hydration')} 
             onViewTasks={() => setActiveTab('tasks')} 
             onViewCalculators={handleOpenCalculator}
@@ -185,6 +186,7 @@ export default function PulseFlowApp() {
           hydrationAmount={hydrationAmount} 
           onUpdateHydration={updateHydration} 
           goalData={goalData}
+          weightHistory={weightHistory}
         />
       );
     }

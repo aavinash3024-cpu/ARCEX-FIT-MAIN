@@ -13,7 +13,9 @@ import {
   ArrowUpRight, 
   LineChart as ChartIcon,
   ChevronRight,
-  Scale
+  Scale,
+  Calendar,
+  History
 } from "lucide-react";
 import { 
   XAxis, 
@@ -69,11 +71,10 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
   const chartData = useMemo(() => {
     const history = [...weightHistory];
     
-    // Add the starting weight from goalData as the very first point if it exists
-    if (goalData?.weight) {
+    // Ensure we always have a start point if possible
+    if (goalData?.weight && (history.length === 0 || history[0].weight !== parseFloat(goalData.weight))) {
       const initialWeight = parseFloat(goalData.weight);
       
-      // Calculate a date for the starting point (e.g., the day the goal was set, or 3 days before first log)
       let startDateStr;
       if (history.length > 0) {
         const firstLogDate = new Date(history[0].date);
@@ -82,7 +83,6 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
         startDateStr = subDays(new Date(), 4).toISOString();
       }
 
-      // Prepend to the chart data
       history.unshift({
         date: startDateStr,
         weight: initialWeight,
@@ -95,6 +95,10 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
       formattedDate: entry.isStart ? 'Start' : format(new Date(entry.date), 'MMM d')
     }));
   }, [weightHistory, goalData]);
+
+  const sortedEntries = useMemo(() => {
+    return [...weightHistory].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+  }, [weightHistory]);
 
   const handleLogWeight = () => {
     const val = parseFloat(newWeight);
@@ -109,7 +113,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
   };
 
   return (
-    <div className="space-y-4 pb-24 pt-4">
+    <div className="space-y-4 pb-32 pt-4">
       <div className="flex flex-col gap-4">
         <h1 className="text-2xl font-bold font-headline">Progress</h1>
       </div>
@@ -193,7 +197,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
             </div>
             
             <div className="h-[200px] w-full mt-2">
-              {chartData.length > 0 ? (
+              {chartData.length > 1 ? (
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                     <defs>
@@ -261,6 +265,47 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
               </div>
            </CardContent>
         </Card>
+
+        {/* Log History Entries */}
+        <section className="space-y-3 pt-2">
+          <div className="flex items-center justify-between px-1">
+            <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70 flex items-center gap-2">
+              <History className="w-3 h-3" /> Log History
+            </h3>
+          </div>
+          <div className="space-y-2">
+            {sortedEntries.length === 0 ? (
+              <div className="text-center py-8 opacity-20">
+                <p className="text-[10px] font-black uppercase tracking-widest">No entries yet</p>
+              </div>
+            ) : (
+              sortedEntries.map((entry, idx) => (
+                <Card key={idx} className="border-none shadow-sm bg-white hover:bg-muted/5 transition-colors group">
+                  <CardContent className="p-4 flex items-center justify-between">
+                    <div className="flex items-center gap-4">
+                      <div className="w-9 h-9 rounded-xl bg-primary/5 flex items-center justify-center">
+                        <Calendar className="w-4 h-4 text-primary" />
+                      </div>
+                      <div className="space-y-0.5">
+                        <p className="text-[11px] font-black text-foreground/80 uppercase tracking-tight">
+                          {format(new Date(entry.date), 'EEEE')}
+                        </p>
+                        <p className="text-[9px] font-bold text-muted-foreground uppercase">
+                          {format(new Date(entry.date), 'MMMM do, yyyy')}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="text-right">
+                      <p className="text-sm font-black text-foreground">
+                        {entry.weight.toFixed(1)} <span className="text-[9px] text-muted-foreground">kg</span>
+                      </p>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </section>
       </div>
     </div>
   );

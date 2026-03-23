@@ -1,7 +1,7 @@
 
 "use client";
 
-import { useRef, useState } from 'react';
+import { useRef, useState, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -13,6 +13,7 @@ import {
   Zap,
   Calculator,
   TrendingDown,
+  ArrowUpRight,
   Scale,
   Plus,
   Minus,
@@ -33,20 +34,13 @@ import { isSameDay } from 'date-fns';
 import { type Task } from '@/components/tasks-view';
 import { cn } from '@/lib/utils';
 
-const weightData = [
-  { day: 'Mon', weight: 79.5 },
-  { day: 'Tue', weight: 79.2 },
-  { day: 'Wed', weight: 78.8 },
-  { day: 'Thu', weight: 78.9 },
-  { day: 'Fri', weight: 78.5 },
-];
-
 interface DashboardViewProps {
   tasks: Task[];
   onToggleTask: (id: string) => void;
   hydrationAmount: number;
   onUpdateHydration: (amount: number) => void;
   goalData: any;
+  weightHistory?: any[];
   onViewHydration?: () => void;
   onViewTasks?: () => void;
   onViewCalculators?: (type: string) => void;
@@ -59,6 +53,7 @@ export function DashboardView({
   hydrationAmount, 
   onUpdateHydration, 
   goalData,
+  weightHistory = [],
   onViewHydration, 
   onViewTasks,
   onViewCalculators,
@@ -69,20 +64,32 @@ export function DashboardView({
   const [activeMetric, setActiveMetric] = useState(0);
   const [activeTool, setActiveTool] = useState(0);
 
+  // Functional Weight Metrics
+  const latestWeightEntry = weightHistory.length > 0 ? weightHistory[weightHistory.length - 1] : null;
+  const previousWeightEntry = weightHistory.length > 1 ? weightHistory[weightHistory.length - 2] : null;
+  
+  const currentWeight = latestWeightEntry ? latestWeightEntry.weight : (goalData?.weight ? parseFloat(goalData.weight) : 0);
+  const weightChange = latestWeightEntry && previousWeightEntry ? parseFloat((latestWeightEntry.weight - previousWeightEntry.weight).toFixed(1)) : 0;
+
   // Use Goal Data or Fallbacks
+  const targetCal = goalData?.finalCalories || 2200;
   const bmr = goalData?.bmr || 1600;
   const tdee = goalData?.tdee || 2500;
-  const targetCal = goalData?.finalCalories || 2200;
   
   // Simulated current intake (80% of target for visualization)
   const currentCal = Math.round(targetCal * 0.84);
   const calDiff = targetCal - currentCal;
   const calStatus = calDiff >= 0 ? `${calDiff.toLocaleString()} Left` : `${Math.abs(calDiff).toLocaleString()} Over`;
 
-  const startWeight = goalData?.weight ? parseFloat(goalData.weight) : 81.0;
-  const targetWeight = goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 77.0;
-  const currentWeight = goalData?.weight ? parseFloat(goalData.weight) : 78.5; 
-  const progressPercent = goalData?.progressPercent || Math.round(((startWeight - currentWeight) / (startWeight - targetWeight)) * 100);
+  const startWeight = goalData?.weight ? parseFloat(goalData.weight) : (weightHistory.length > 0 ? weightHistory[0].weight : 0);
+  const targetWeight = goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 0;
+  
+  const progressPercent = useMemo(() => {
+    if (!startWeight || !targetWeight || startWeight === targetWeight) return 0;
+    const totalDiff = Math.abs(startWeight - targetWeight);
+    const completedDiff = Math.abs(startWeight - currentWeight);
+    return Math.min(100, Math.max(0, Math.round((completedDiff / totalDiff) * 100)));
+  }, [startWeight, targetWeight, currentWeight]);
 
   const coachImage = PlaceHolderImages.find(img => img.id === 'gym-coach');
 
@@ -114,9 +121,9 @@ export function DashboardView({
       label: "Hydration", 
       value: (hydrationAmount / 1000).toFixed(1), 
       unit: "L", 
-      target: "3.0", 
+      target: (goalData?.hydrationTargetLiters || 3.0).toFixed(1), 
       current: hydrationAmount / 1000,
-      targetVal: 3.0,
+      targetVal: goalData?.hydrationTargetLiters || 3.0,
       icon: <Droplets className="w-4 h-4 text-sky-500" />, 
       color: "bg-sky-50" 
     },
@@ -152,12 +159,6 @@ export function DashboardView({
       target: goalData?.fats || 70, 
       unit: "g" 
     },
-    { 
-      label: "Fiber", 
-      current: 22, 
-      target: 35, 
-      unit: "g" 
-    },
   ];
 
   const calculators = [
@@ -171,8 +172,8 @@ export function DashboardView({
   const todaysTasks = tasks
     .filter(t => isSameDay(new Date(t.date), new Date()))
     .sort((a, b) => {
-      const priorityWeight = { high: 3, medium: 2, low: 1 };
-      return priorityWeight[b.priority] - priorityWeight[a.priority];
+      const pWeight = { high: 3, medium: 2, low: 1 };
+      return pWeight[b.priority] - pWeight[a.priority];
     });
 
   const stats = {
@@ -417,15 +418,15 @@ export function DashboardView({
           <div className="space-y-1.5">
             <Progress value={progressPercent} className="h-1.5 bg-muted" />
             <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground">
-              <span>{startWeight.toFixed(1)} kg</span>
-              <span className="text-primary">{currentWeight.toFixed(1)} kg</span>
-              <span>{targetWeight.toFixed(1)} kg</span>
+              <span>{startWeight > 0 ? startWeight.toFixed(1) : "---"} kg</span>
+              <span className="text-primary">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"} kg</span>
+              <span>{targetWeight > 0 ? targetWeight.toFixed(1) : "---"} kg</span>
             </div>
           </div>
           
           <div className="flex items-center justify-between pt-1">
             <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest text-left">
-              {goalData ? `${Math.abs(currentWeight - targetWeight).toFixed(1)} kg to go` : "Set your target weight"}
+              {targetWeight > 0 ? `${Math.abs(currentWeight - targetWeight).toFixed(1)} kg to go` : "Set your target weight"}
             </p>
             <button 
               onClick={onViewGoalSetting}
@@ -451,18 +452,21 @@ export function DashboardView({
                     <Scale className="w-3 h-3 text-primary" /> Current Weight
                   </h3>
                   <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-bold">{currentWeight}</span>
+                    <span className="text-2xl font-bold">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"}</span>
                     <span className="text-xs text-muted-foreground">kg</span>
                   </div>
                 </div>
-                <Badge className="bg-green-100 text-green-700 border-none px-2 py-0.5 gap-1 text-[10px]">
-                  <TrendingDown className="w-3 h-3" /> -0.4kg
-                </Badge>
+                {weightChange !== 0 && (
+                  <Badge className={cn("border-none px-2 py-0.5 gap-1 text-[10px]", weightChange < 0 ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700")}>
+                    {weightChange < 0 ? <TrendingDown className="w-3 h-3" /> : <ArrowUpRight className="w-3 h-3" />}
+                    {Math.abs(weightChange)}kg
+                  </Badge>
+                )}
               </div>
               
               <div className="h-16 w-full -mx-4 -mb-4">
                 <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={weightData}>
+                  <AreaChart data={weightHistory}>
                     <defs>
                       <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
                         <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
