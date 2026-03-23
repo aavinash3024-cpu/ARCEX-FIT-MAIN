@@ -72,12 +72,16 @@ export function DashboardView({
   // Use Goal Data or Fallbacks
   const bmr = goalData?.bmr || 1600;
   const tdee = goalData?.tdee || 2500;
-  const currentCal = goalData?.finalCalories ? Math.round(goalData.finalCalories * 0.8) : 1840; // Simulated current intake
   const targetCal = goalData?.finalCalories || 2200;
+  
+  // Simulated current intake (80% of target for visualization)
+  const currentCal = Math.round(targetCal * 0.84);
+  const calDiff = targetCal - currentCal;
+  const calStatus = calDiff >= 0 ? `${calDiff.toLocaleString()} Left` : `${Math.abs(calDiff).toLocaleString()} Over`;
 
   const startWeight = goalData?.weight ? parseFloat(goalData.weight) : 81.0;
   const targetWeight = goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 77.0;
-  const currentWeight = goalData?.weight ? parseFloat(goalData.weight) : 78.5; // In a real app this would be current logged weight
+  const currentWeight = goalData?.weight ? parseFloat(goalData.weight) : 78.5; 
   const progressPercent = goalData?.progressPercent || Math.round(((startWeight - currentWeight) / (startWeight - targetWeight)) * 100);
 
   const coachImage = PlaceHolderImages.find(img => img.id === 'gym-coach');
@@ -86,9 +90,11 @@ export function DashboardView({
     { 
       id: 'calories',
       label: "Calories", 
-      value: currentCal.toLocaleString(), 
-      unit: "kcal", 
+      value: calStatus, 
+      unit: "", 
       target: targetCal.toLocaleString(), 
+      current: currentCal,
+      targetVal: targetCal,
       icon: <Flame className="w-4 h-4 text-orange-500" />, 
       color: "bg-orange-50" 
     },
@@ -98,6 +104,8 @@ export function DashboardView({
       value: "12", 
       unit: "days", 
       target: "15", 
+      current: 12,
+      targetVal: 15,
       icon: <Zap className="w-4 h-4 text-yellow-500" />, 
       color: "bg-yellow-50" 
     },
@@ -107,6 +115,8 @@ export function DashboardView({
       value: (hydrationAmount / 1000).toFixed(1), 
       unit: "L", 
       target: "3.0", 
+      current: hydrationAmount / 1000,
+      targetVal: 3.0,
       icon: <Droplets className="w-4 h-4 text-sky-500" />, 
       color: "bg-sky-50" 
     },
@@ -116,16 +126,38 @@ export function DashboardView({
       value: "8,432", 
       unit: "steps", 
       target: "10,000", 
+      current: 8432,
+      targetVal: 10000,
       icon: <Footprints className="w-4 h-4 text-green-500" />, 
       color: "bg-green-50" 
     },
   ];
 
   const nutrients = [
-    { label: "Protein", current: goalData?.protein ? Math.round(goalData.protein * 0.7) : 120, target: goalData?.protein || 150, unit: "g" },
-    { label: "Carbs", current: goalData?.carbs ? Math.round(goalData.carbs * 0.75) : 185, target: goalData?.carbs || 250, unit: "g" },
-    { label: "Fat", current: goalData?.fats ? Math.round(goalData.fats * 0.6) : 52, target: goalData?.fats || 70, unit: "g" },
-    { label: "Fiber", current: 22, target: 35, unit: "g" },
+    { 
+      label: "Protein", 
+      current: goalData?.protein ? Math.round(goalData.protein * 0.72) : 108, 
+      target: goalData?.protein || 150, 
+      unit: "g" 
+    },
+    { 
+      label: "Carbs", 
+      current: goalData?.carbs ? Math.round(goalData.carbs * 0.65) : 162, 
+      target: goalData?.carbs || 250, 
+      unit: "g" 
+    },
+    { 
+      label: "Fat", 
+      current: goalData?.fats ? Math.round(goalData.fats * 0.58) : 41, 
+      target: goalData?.fats || 70, 
+      unit: "g" 
+    },
+    { 
+      label: "Fiber", 
+      current: 22, 
+      target: 35, 
+      unit: "g" 
+    },
   ];
 
   const calculators = [
@@ -232,9 +264,7 @@ export function DashboardView({
             className="flex gap-3 overflow-x-auto pb-2 swipe-container snap-x snap-mandatory scroll-smooth"
           >
             {metrics.map((m, idx) => {
-              const valNum = parseFloat(m.value.replace(',', ''));
-              const targetNum = parseFloat(m.target.replace(',', ''));
-              const percentage = Math.round((valNum / targetNum) * 100);
+              const percentage = Math.round((m.current / m.targetVal) * 100);
               const isCalories = m.id === "calories";
               const isHydration = m.id === "hydration";
               const showDetails = isHydration || m.id === "steps";
@@ -286,14 +316,14 @@ export function DashboardView({
                             <>
                               <div 
                                 className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
-                                style={{ left: `${(bmr / targetNum) * 100}%` }}
+                                style={{ left: `${(bmr / m.targetVal) * 100}%` }}
                               >
                                 <span className="text-[6px] font-bold text-destructive/60">BMR</span>
                                 <div className="h-2 w-[1px] bg-destructive/40" />
                               </div>
                               <div 
                                 className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
-                                style={{ left: `${Math.min((tdee / targetNum) * 100, 98)}%` }}
+                                style={{ left: `${Math.min((tdee / m.targetVal) * 100, 98)}%` }}
                               >
                                 <span className="text-[6px] font-bold text-accent">TDEE</span>
                                 <div className="h-2 w-[1px] bg-accent/60" />
@@ -337,23 +367,30 @@ export function DashboardView({
             </h3>
           </div>
           <div className="grid grid-cols-2 gap-x-8 gap-y-6">
-            {nutrients.map((n, idx) => (
-              <div key={idx} className="space-y-2">
-                <div className="flex justify-between items-baseline">
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{n.label}</span>
-                  <div className="flex items-baseline gap-0.5">
-                    <span className="text-xs font-black text-foreground">{n.current}</span>
-                    <span className="text-[8px] font-bold text-muted-foreground">/ {n.target}{n.unit}</span>
+            {nutrients.map((n, idx) => {
+              const diff = n.target - n.current;
+              const statusLabel = diff >= 0 ? `${diff}${n.unit} Left` : `${Math.abs(diff)}${n.unit} Over`;
+              const isOver = diff < 0;
+
+              return (
+                <div key={idx} className="space-y-2">
+                  <div className="flex justify-between items-baseline">
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{n.label}</span>
+                    <div className="flex items-baseline gap-0.5">
+                      <span className={cn("text-xs font-black", isOver ? "text-destructive" : "text-foreground")}>
+                        {statusLabel}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="h-1 w-full bg-muted/30 rounded-full overflow-hidden">
+                    <div 
+                      className={cn("h-full transition-all duration-700 ease-out rounded-full", isOver ? "bg-destructive" : "bg-primary")} 
+                      style={{ width: `${Math.min((n.current / n.target) * 100, 100)}%` }}
+                    />
                   </div>
                 </div>
-                <div className="h-1 w-full bg-muted/30 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-primary rounded-full transition-all duration-700 ease-out" 
-                    style={{ width: `${Math.min((n.current / n.target) * 100, 100)}%` }}
-                  />
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </CardContent>
       </Card>
