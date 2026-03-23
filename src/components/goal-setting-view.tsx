@@ -179,93 +179,94 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
           <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-2xl font-bold font-headline">Saved Goal</h1>
+          <h1 className="text-xl font-bold font-headline">Saved Goal</h1>
         </div>
 
         <Card className="border-none shadow-xl bg-white overflow-hidden rounded-[2rem]">
           <CardContent className="p-0 divide-y divide-muted/10">
-            <div className="p-6 bg-muted/5">
-              <div className="flex justify-between items-start mb-4">
-                <div className="space-y-1">
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Goal Objective</p>
-                  <h3 className="text-xl font-black text-foreground uppercase tracking-tight flex items-center gap-2">
-                    {objective === 'loss' ? <TrendingDown className="w-5 h-5 text-destructive" /> : objective === 'gain' ? <TrendingUp className="w-5 h-5 text-green-500" /> : <Activity className="w-5 h-5 text-primary" />}
+            <div className="p-5 bg-muted/5">
+              <div className="flex flex-col gap-1 mb-4">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Goal Objective</p>
+                <div className="flex items-center justify-between">
+                  <h3 className="text-lg font-black text-foreground uppercase tracking-tight flex items-center gap-2">
+                    {objective === 'loss' ? <TrendingDown className="w-4 h-4 text-destructive" /> : objective === 'gain' ? <TrendingUp className="w-4 h-4 text-green-500" /> : <Activity className="w-4 h-4 text-primary" />}
                     {objective} Weight
                   </h3>
+                  <Badge variant="outline" className="border-primary/20 text-primary text-[8px] h-4 uppercase">Target</Badge>
                 </div>
               </div>
-              <div className="flex gap-4 items-center">
-                <div className="flex-1 text-center bg-white p-4 rounded-2xl border border-muted/10 shadow-sm">
-                  <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Current</p>
-                  <p className="text-xl font-black">{weight}kg</p>
+              <div className="flex gap-3 items-center">
+                <div className="flex-1 text-center bg-white p-3 rounded-2xl border border-muted/10 shadow-sm">
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Current</p>
+                  <p className="text-lg font-black">{weight}kg</p>
                 </div>
-                <div className="flex-1 text-center bg-white p-4 rounded-2xl border border-muted/10 shadow-sm">
-                  <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Target</p>
-                  <p className="text-xl font-black">{targetWeight}kg</p>
+                <div className="flex-1 text-center bg-white p-3 rounded-2xl border border-muted/10 shadow-sm">
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Target</p>
+                  <p className="text-lg font-black">{targetWeight}kg</p>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 space-y-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Flame className="w-4 h-4 text-primary" />
-                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Daily Energy Budget</h4>
+            <div className="p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <Flame className="w-3.5 h-3.5 text-primary" />
+                <h4 className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Daily Energy Budget</h4>
               </div>
               <div className="flex items-end justify-between">
-                <div className="space-y-1">
-                  <p className="text-4xl font-black text-primary">{calculations.finalCalories}</p>
-                  <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Calories / Day</p>
+                <div className="space-y-0.5">
+                  <p className="text-3xl font-black text-primary">{calculations.finalCalories}</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Calories / Day</p>
                 </div>
-                <div className="text-right space-y-1">
-                  <p className="text-xl font-bold text-foreground/40">{calculations.tdee}</p>
-                  <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Maintenance (TDEE)</p>
+                <div className="text-right space-y-0.5">
+                  <p className="text-lg font-bold text-foreground/40">{calculations.tdee}</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Maintenance</p>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 space-y-4">
-              <div className="flex items-center gap-2 mb-2">
-                <Clock className="w-4 h-4 text-primary" />
-                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Journey Pace</h4>
+            <div className="p-5 space-y-3">
+              <div className="flex items-center gap-2">
+                <Clock className="w-3.5 h-3.5 text-primary" />
+                <h4 className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Journey Pace</h4>
               </div>
-              <div className="grid grid-cols-2 gap-6">
+              <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <p className="text-lg font-black text-foreground">{calculations.derivedWeeklyRate} kg</p>
-                  <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Rate / Week</p>
+                  <p className="text-md font-black text-foreground">{calculations.derivedWeeklyRate} kg</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Rate / Week</p>
                 </div>
                 <div className="text-right">
-                  <p className="text-lg font-black text-primary">{calculations.weeksToGoal} Weeks</p>
-                  <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Est. Completion</p>
+                  <p className="text-md font-black text-primary">{calculations.weeksToGoal} Weeks</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Est. Duration</p>
                 </div>
               </div>
             </div>
 
-            <div className="p-6 space-y-5">
-              <div className="flex items-center gap-2 mb-2">
-                <PieChart className="w-4 h-4 text-primary" />
-                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Macronutrient Split</h4>
+            <div className="p-5 space-y-4">
+              <div className="flex items-center gap-2">
+                <PieChart className="w-3.5 h-3.5 text-primary" />
+                <h4 className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Macronutrient Split</h4>
               </div>
-              <div className="grid grid-cols-3 gap-3">
-                 <div className="text-center p-3 rounded-2xl bg-accent/5 border border-accent/10">
-                    <p className="text-xl font-black text-accent">{calculations.protein}g</p>
-                    <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-tighter">Protein</p>
+              <div className="grid grid-cols-3 gap-2">
+                 <div className="text-center p-2.5 rounded-2xl bg-accent/5 border border-accent/10">
+                    <p className="text-md font-black text-accent">{calculations.protein}g</p>
+                    <p className="text-[7px] font-bold text-muted-foreground uppercase tracking-tighter">Protein</p>
                  </div>
-                 <div className="text-center p-3 rounded-2xl bg-primary/5 border border-primary/10">
-                    <p className="text-xl font-black text-primary">{calculations.carbs}g</p>
-                    <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-tighter">Carbs</p>
+                 <div className="text-center p-2.5 rounded-2xl bg-primary/5 border border-primary/10">
+                    <p className="text-md font-black text-primary">{calculations.carbs}g</p>
+                    <p className="text-[7px] font-bold text-muted-foreground uppercase tracking-tighter">Carbs</p>
                  </div>
-                 <div className="text-center p-3 rounded-2xl bg-yellow-400/5 border border-yellow-400/10">
-                    <p className="text-xl font-black text-yellow-600">{calculations.fats}g</p>
-                    <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-tighter">Fats</p>
+                 <div className="text-center p-2.5 rounded-2xl bg-yellow-400/5 border border-yellow-400/10">
+                    <p className="text-md font-black text-yellow-600">{calculations.fats}g</p>
+                    <p className="text-[7px] font-bold text-muted-foreground uppercase tracking-tighter">Fats</p>
                  </div>
               </div>
-              <div className="space-y-3 pt-2">
-                <div className="flex h-3 w-full rounded-full overflow-hidden shadow-inner bg-muted/20">
+              <div className="space-y-2 pt-1">
+                <div className="flex h-2 w-full rounded-full overflow-hidden shadow-inner bg-muted/20">
                    <div className="bg-accent h-full transition-all" style={{ width: `${calculations.proteinPct}%` }} />
                    <div className="bg-primary h-full transition-all" style={{ width: `${calculations.carbPct}%` }} />
                    <div className="bg-yellow-400 h-full transition-all" style={{ width: `${calculations.fatPct}%` }} />
                 </div>
-                <div className="flex justify-between px-1 text-[8px] font-bold text-muted-foreground uppercase tracking-tighter">
+                <div className="flex justify-between px-0.5 text-[7px] font-bold text-muted-foreground uppercase tracking-tighter">
                    <span>{calculations.proteinPct}% Protein</span>
                    <span>{calculations.carbPct}% Carbs</span>
                    <span>{calculations.fatPct}% Fats</span>
@@ -275,11 +276,11 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
           </CardContent>
         </Card>
 
-        <div className="pt-4">
+        <div className="pt-2">
            <Button 
             onClick={() => setIsSaved(false)} 
             variant="outline" 
-            className="w-full h-14 rounded-2xl border-2 border-muted-foreground/10 text-muted-foreground font-black uppercase text-[12px] tracking-widest shadow-sm active:scale-[0.98] transition-all"
+            className="w-full h-12 rounded-2xl border-2 border-muted-foreground/10 text-muted-foreground font-bold uppercase text-[10px] tracking-widest shadow-sm active:scale-[0.98] transition-all"
            >
             Edit Goal Parameters
            </Button>
