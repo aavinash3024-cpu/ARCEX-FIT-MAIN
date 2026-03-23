@@ -11,7 +11,8 @@ import {
   Brain,
   Zap,
   Leaf,
-  Sparkles
+  Sparkles,
+  Dumbbell
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 
@@ -49,14 +50,14 @@ export function DashboardView() {
   ];
 
   const nutrients = [
-    { label: "Carbs", current: 185, target: 250, unit: "g", icon: <Zap className="w-4 h-4 text-amber-500" /> },
-    { label: "Protein", current: 120, target: 150, unit: "g", icon: <Target className="w-4 h-4 text-blue-500" /> },
-    { label: "Fat", current: 52, target: 70, unit: "g", icon: <Flame className="w-4 h-4 text-red-400" /> },
-    { label: "Fiber", current: 22, target: 35, unit: "g", icon: <Leaf className="w-4 h-4 text-emerald-500" /> },
+    { label: "Carbs", current: 185, target: 250, unit: "g" },
+    { label: "Protein", current: 120, target: 150, unit: "g" },
+    { label: "Fat", current: 52, target: 70, unit: "g" },
+    { label: "Fiber", current: 22, target: 35, unit: "g" },
   ];
 
   return (
-    <div className="space-y-6 pb-20">
+    <div className="space-y-6 pb-20 pt-4">
       {/* Your Personal Guide - AI Suggestion Banner */}
       <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
         <CardContent className="p-5 flex items-start gap-4">
@@ -78,7 +79,7 @@ export function DashboardView() {
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold font-headline">Daily Overview</h2>
           <span className="text-[10px] text-muted-foreground uppercase font-bold tracking-wider flex items-center">
-            View all <ChevronRight className="w-3 h-3 ml-1" />
+            SWIPE TO SEE <ChevronRight className="w-3 h-3 ml-1" />
           </span>
         </div>
 
@@ -146,7 +147,6 @@ export function DashboardView() {
                 <div key={idx} className="space-y-1.5">
                   <div className="flex justify-between items-center text-[10px]">
                     <div className="flex items-center gap-1.5">
-                      {n.icon}
                       <span className="font-bold text-muted-foreground uppercase">{n.label}</span>
                     </div>
                     <span className="text-muted-foreground font-mono font-medium">
@@ -160,6 +160,23 @@ export function DashboardView() {
           </CardContent>
         </Card>
       </section>
+
+      {/* Today's Workout Card */}
+      <Card className="border-none shadow-sm bg-white/50 backdrop-blur-sm">
+        <CardContent className="p-5 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-primary/10 rounded-2xl">
+              <Dumbbell className="w-6 h-6 text-primary" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-primary uppercase tracking-widest">Today's Workout</p>
+              <p className="text-sm font-bold">Push Day: Chest & Triceps</p>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase mt-0.5">45-60 mins • Moderate Intensity</p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
+        </CardContent>
+      </Card>
 
       {/* Weekly Progress & Goals */}
       <div className="grid grid-cols-1 gap-3">
