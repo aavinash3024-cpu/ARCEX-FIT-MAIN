@@ -52,7 +52,7 @@ export function HydrationView({ onBack }: HydrationViewProps) {
 
   const percentage = Math.min(Math.round((currentMl / targetMl) * 100), 100);
   const avgIntake = (historyData.reduce((acc, curr) => acc + curr.amount, 0) / historyData.length).toFixed(1);
-  const goalsMet = historyData.filter(d => d.amount >= 2.5).length; // Assuming 2.5L was the general target
+  const goalsMet = historyData.filter(d => d.amount >= 2.5).length; 
 
   const handleUpdateTarget = () => {
     setTargetMl(tempTarget);
@@ -117,7 +117,7 @@ export function HydrationView({ onBack }: HydrationViewProps) {
             </Dialog>
           </div>
 
-          {/* Center Glass & Side Buttons - Compacted Glass */}
+          {/* Center Glass & Side Buttons */}
           <div className="relative flex items-center justify-center w-full mb-6">
             {/* Minus Button Left */}
             <Button 
@@ -129,8 +129,8 @@ export function HydrationView({ onBack }: HydrationViewProps) {
               <Minus className="w-5 h-5" />
             </Button>
 
-            {/* Compact Animated Water Glass */}
-            <div className="relative w-32 h-48 border-4 border-muted/20 rounded-b-[2rem] rounded-t-lg overflow-hidden bg-muted/5 shadow-inner">
+            {/* Animated Water Glass */}
+            <div className="relative w-32 h-44 border-[6px] border-blue-100 rounded-b-[2.5rem] rounded-t-lg overflow-hidden bg-muted/5 shadow-inner">
               {/* Water Fill */}
               <div 
                 className="absolute bottom-0 left-0 w-full bg-blue-500 transition-all duration-1000 ease-out"
@@ -158,9 +158,21 @@ export function HydrationView({ onBack }: HydrationViewProps) {
                 </div>
               </div>
 
-              {/* Percentage Indicator - Bottom Aligned */}
-              <div className="absolute bottom-4 inset-x-0 flex items-center justify-center pointer-events-none">
-                <span className={`text-[10px] font-black transition-colors duration-500 ${percentage > 20 ? 'text-white' : 'text-muted-foreground/40'}`}>
+              {/* Cute Face Overlay */}
+              <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-10 opacity-30">
+                <div className="relative w-12 h-10 mb-4">
+                  {/* Left Eye (Wink) */}
+                  <div className="absolute left-0 top-1 w-3 h-3 border-b-2 border-r-2 border-foreground rotate-45 rounded-sm" />
+                  {/* Right Eye (Dot) */}
+                  <div className="absolute right-0 top-1 w-2.5 h-2.5 bg-foreground rounded-full" />
+                  {/* Smile */}
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-7 h-3.5 border-b-2 border-foreground rounded-full" />
+                </div>
+              </div>
+
+              {/* Percentage Indicator */}
+              <div className="absolute bottom-3 inset-x-0 flex items-center justify-center pointer-events-none z-20">
+                <span className={`text-[10px] font-black transition-colors duration-500 ${percentage > 15 ? 'text-white' : 'text-muted-foreground/40'}`}>
                   {percentage}%
                 </span>
               </div>
@@ -241,8 +253,8 @@ export function HydrationView({ onBack }: HydrationViewProps) {
         </CardContent>
       </Card>
 
-      {/* 3. Performance Summary Card (Thin Card) */}
-      <Card className="border-none shadow-sm bg-primary/5 border border-primary/10">
+      {/* 3. Performance Summary Card (White) */}
+      <Card className="border-none shadow-sm bg-white border border-muted/20">
         <CardContent className="p-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
