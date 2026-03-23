@@ -47,6 +47,12 @@
       "description": "Professional fitness coach",
       "imageUrl": "https://images.unsplash.com/photo-1594381898411-846e7d193883?q=80&w=400&auto=format&fit=crop",
       "imageHint": "fitness coach"
+    },
+    {
+      "id": "training-split-tool",
+      "description": "Black and red power tool representing mechanical split",
+      "imageUrl": "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600&auto=format&fit=crop",
+      "imageHint": "power tool"
     }
   ]
 }

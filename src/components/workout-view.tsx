@@ -23,6 +23,7 @@ export function WorkoutView() {
   ];
 
   const prImage = PlaceHolderImages.find(img => img.id === 'personal-records-illustration');
+  const splitImage = PlaceHolderImages.find(img => img.id === 'training-split-tool');
 
   return (
     <div className="space-y-6 pb-24">
@@ -100,20 +101,28 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 3. My Split */}
-      <Card className="border-none shadow-md bg-gradient-to-br from-indigo-50 to-white hover:translate-y-[-2px] transition-all cursor-pointer active:scale-[0.99] group border-l-4 border-l-indigo-400">
-        <CardContent className="p-5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-indigo-100 rounded-2xl group-hover:scale-110 transition-transform">
-              <Layout className="w-6 h-6 text-indigo-600" />
-            </div>
-            <div>
-              <h3 className="text-[10px] font-black text-indigo-900 uppercase tracking-widest">Training Split</h3>
-              <p className="text-sm font-bold text-indigo-900/90">Push / Pull / Legs</p>
-              <p className="text-[9px] font-bold text-indigo-600/60 uppercase mt-0.5 tracking-tight">Hypertrophy Phase</p>
-            </div>
+      {/* 3. Training Split Card with Image */}
+      <Card className="border-none shadow-md bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-indigo-400">
+        <CardContent className="p-0 flex items-center">
+          <div className="shrink-0 w-28 h-28 relative">
+            <Image 
+              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1581092160562-40aa08e78837?q=80&w=600&auto=format&fit=crop"} 
+              alt="Training Split"
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              data-ai-hint="power tool"
+            />
           </div>
-          <ChevronRight className="w-4 h-4 text-indigo-300" />
+          <div className="flex-1 p-4 flex items-center justify-between min-w-0">
+            <div className="space-y-1">
+              <h3 className="text-[10px] font-black text-indigo-600 uppercase tracking-[0.15em] flex items-center gap-1.5">
+                <Layout className="w-3 h-3" /> Training Split
+              </h3>
+              <p className="text-sm font-bold text-foreground/90 leading-tight">Push / Pull / Legs</p>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 tracking-tight">Hypertrophy Phase</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-indigo-300/40" />
+          </div>
         </CardContent>
       </Card>
 
