@@ -98,7 +98,7 @@ export function DashboardView() {
     <div className="space-y-6 pb-24 pt-10">
       {/* 1. Personal Guide - AI Suggestion Banner */}
       <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
-        <CardContent className="p-5 flex items-center gap-4">
+        <CardContent className="p-5 flex items-center gap-4 min-h-[100px]">
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 shrink-0 relative bg-white/10">
             <Image 
               src={coachImage?.imageUrl || "https://images.unsplash.com/photo-1594381898411-846e7d193883?q=80&w=400&auto=format&fit=crop"} 
@@ -127,16 +127,17 @@ export function DashboardView() {
           </span>
         </div>
 
-        {/* Metrics Belt - Increased width from 150px to 200px */}
+        {/* Metrics Belt - Increased width to 260px */}
         <div className="flex gap-3 overflow-x-auto pb-2 swipe-container">
           {metrics.map((m, idx) => {
             const currentVal = parseFloat(m.value.replace(',', ''));
             const targetVal = parseFloat(m.target.replace(',', ''));
             const percentage = Math.round((currentVal / targetVal) * 100);
             const isCalories = m.label === "Calories";
+            const showDetails = m.label === "Hydration" || m.label === "Steps";
 
             return (
-              <Card key={idx} className="min-w-[200px] flex-shrink-0 border-none shadow-sm glass-card">
+              <Card key={idx} className="min-w-[260px] flex-shrink-0 border-none shadow-sm glass-card">
                 <CardContent className="p-3 flex flex-col justify-between h-32">
                   <div className="flex justify-between items-center">
                     <div className={`p-1.5 rounded-lg ${m.color}`}>
@@ -154,20 +155,27 @@ export function DashboardView() {
                       </div>
                     </div>
 
-                    <div className="relative h-4 flex items-center">
-                      <Progress value={Math.min(percentage, 100)} className="h-1.5 w-full" />
-                      
-                      {isCalories && (
-                        <>
-                          <div 
-                            className="absolute top-0 h-4 w-[1px] bg-destructive/40" 
-                            style={{ left: `${(bmr / targetVal) * 100}%` }}
-                          />
-                          <div 
-                            className="absolute top-0 h-4 w-[1px] bg-accent/60" 
-                            style={{ left: `${Math.min((tdee / targetVal) * 100, 100)}%` }}
-                          />
-                        </>
+                    <div className="flex items-center gap-3">
+                      <div className="relative flex-1 h-4 flex items-center">
+                        <Progress value={Math.min(percentage, 100)} className="h-1.5 w-full" />
+                        
+                        {isCalories && (
+                          <>
+                            <div 
+                              className="absolute top-0 h-4 w-[1px] bg-destructive/40" 
+                              style={{ left: `${(bmr / targetVal) * 100}%` }}
+                            />
+                            <div 
+                              className="absolute top-0 h-4 w-[1px] bg-accent/60" 
+                              style={{ left: `${Math.min((tdee / targetVal) * 100, 100)}%` }}
+                            />
+                          </>
+                        )}
+                      </div>
+                      {showDetails && (
+                        <div className="flex items-center gap-0.5 text-[8px] font-black text-primary uppercase shrink-0">
+                          Details <ChevronRight className="w-2.5 h-2.5" />
+                        </div>
                       )}
                     </div>
                   </div>
@@ -178,23 +186,7 @@ export function DashboardView() {
         </div>
       </section>
 
-      {/* 3. Today's Workout Card */}
-      <Card className="border-none shadow-sm bg-white overflow-hidden">
-        <CardContent className="p-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-xl">
-              <Dumbbell className="w-5 h-5 text-primary" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold">Today's Workout</h3>
-              <p className="text-[10px] text-muted-foreground uppercase font-bold tracking-tight">Push Protocol • 45 mins</p>
-            </div>
-          </div>
-          <Button size="sm" variant="ghost" className="text-[10px] font-bold uppercase tracking-widest text-primary hover:bg-primary/5">Start</Button>
-        </CardContent>
-      </Card>
-
-      {/* 4. Nutrient Tracking (Macros Card) - Icon Removed */}
+      {/* 4. Nutrient Tracking (Macros Card) */}
       <Card className="border-none shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
         <CardContent className="p-5 space-y-4">
           <h3 className="text-sm font-bold">
@@ -216,7 +208,7 @@ export function DashboardView() {
         </CardContent>
       </Card>
 
-      {/* 5. Goal Milestone Card - Normal with Bar (COMPACT) */}
+      {/* 5. Goal Milestone Card (COMPACT) */}
       <Card className="border-none shadow-sm bg-white overflow-hidden">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center justify-between">
