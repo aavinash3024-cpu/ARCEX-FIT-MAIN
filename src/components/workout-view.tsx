@@ -1,3 +1,6 @@
+
+'use client';
+
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -10,14 +13,19 @@ import {
   Layout, 
   Plus, 
   RefreshCw,
-  ChevronRight
+  ChevronRight,
+  Target
 } from "lucide-react";
+import Image from "next/image";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 export function WorkoutView() {
   const protocolExercises = [
     { name: "Incline Guillotine Press", category: "CHEST • UPPER CHEST", status: "AWAITING DATA" },
     { name: "Cable Kickback (Triceps)", category: "TRICEPS • LATERAL HEAD", status: "AWAITING DATA" },
   ];
+
+  const prImage = PlaceHolderImages.find(img => img.id === 'personal-records-illustration');
 
   return (
     <div className="space-y-6 pb-24">
@@ -29,33 +37,33 @@ export function WorkoutView() {
         </Button>
       </div>
 
-      {/* Small Option: Exercise Library */}
-      <div className="flex justify-start px-1">
-        <Button variant="outline" size="sm" className="h-7 px-3 text-[10px] font-bold uppercase tracking-wider rounded-full border-muted-foreground/20 hover:bg-muted/30">
-          <Library className="w-3 h-3 mr-1.5" />
-          Exercise Library
-        </Button>
-      </div>
-
       {/* 1. Personal Records Card (Hero Position) */}
-      <Card className="border-none shadow-sm bg-gradient-to-br from-orange-50 to-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
-        <CardContent className="p-5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="p-3 bg-orange-100 rounded-2xl group-hover:scale-110 transition-transform">
-              <Trophy className="w-6 h-6 text-orange-600" />
-            </div>
-            <div>
-              <h3 className="text-sm font-bold text-orange-900 uppercase tracking-tight">Personal Records</h3>
-              <p className="text-[10px] font-bold text-orange-600/60 uppercase">8 New this month</p>
-            </div>
+      <Card className="border-none shadow-md bg-gradient-to-br from-blue-50 to-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
+        <CardContent className="p-0 flex h-32 items-center">
+          <div className="shrink-0 w-32 h-full relative">
+            <Image 
+              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1634157703702-3c124b455499?q=80&w=600&auto=format&fit=crop"} 
+              alt="Personal Records"
+              fill
+              className="object-cover"
+              data-ai-hint="illustration"
+            />
           </div>
-          <ChevronRight className="w-4 h-4 text-orange-300" />
+          <div className="flex-1 p-5 flex items-center justify-between">
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-blue-900 uppercase tracking-tight flex items-center gap-2">
+                <Trophy className="w-4 h-4 text-blue-600" />
+                Personal Records
+              </h3>
+              <p className="text-[10px] font-bold text-blue-600/60 uppercase">8 New this month</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-blue-300" />
+          </div>
         </CardContent>
       </Card>
 
-      {/* 2. Today's Protocol Card (Styled like Meal Log Hub) */}
+      {/* 2. Today's Protocol Card */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
-        {/* Header - Logo on Left */}
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-emerald-100/50 rounded-full shrink-0">
@@ -98,7 +106,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 3. Bottom Grid: History & Split */}
+      {/* 3. Mid Grid: History & Exercise Library */}
       <div className="grid grid-cols-2 gap-3">
         <Card className="border-none shadow-sm hover:translate-y-[-2px] transition-all cursor-pointer group bg-white/60 backdrop-blur-sm">
           <CardContent className="p-4 flex flex-col items-center text-center gap-3">
@@ -106,7 +114,7 @@ export function WorkoutView() {
               <History className="w-5 h-5 text-purple-500" />
             </div>
             <div>
-              <p className="font-bold text-[11px] tracking-tight uppercase">History</p>
+              <p className="font-bold text-[11px] tracking-tight uppercase text-purple-900">History</p>
               <p className="text-[9px] text-muted-foreground uppercase font-bold mt-0.5 opacity-60">Past Sessions</p>
             </div>
           </CardContent>
@@ -114,16 +122,32 @@ export function WorkoutView() {
 
         <Card className="border-none shadow-sm hover:translate-y-[-2px] transition-all cursor-pointer group bg-white/60 backdrop-blur-sm">
           <CardContent className="p-4 flex flex-col items-center text-center gap-3">
-            <div className="p-3 rounded-2xl bg-blue-50 group-hover:scale-110 transition-transform">
-              <Layout className="w-5 h-5 text-blue-500" />
+            <div className="p-3 rounded-2xl bg-amber-50 group-hover:scale-110 transition-transform">
+              <Library className="w-5 h-5 text-amber-500" />
             </div>
             <div>
-              <p className="font-bold text-[11px] tracking-tight uppercase">My Split</p>
-              <p className="text-[9px] text-muted-foreground uppercase font-bold mt-0.5 opacity-60">Push/Pull/Legs</p>
+              <p className="font-bold text-[11px] tracking-tight uppercase text-amber-900">Library</p>
+              <p className="text-[9px] text-muted-foreground uppercase font-bold mt-0.5 opacity-60">Exercises</p>
             </div>
           </CardContent>
         </Card>
       </div>
+
+      {/* 4. My Split (Full Width at bottom) */}
+      <Card className="border-none shadow-md bg-gradient-to-br from-indigo-50 to-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
+        <CardContent className="p-5 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="p-3 bg-indigo-100 rounded-2xl group-hover:scale-110 transition-transform">
+              <Layout className="w-6 h-6 text-indigo-600" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-indigo-900 uppercase tracking-tight">My Workout Split</h3>
+              <p className="text-[10px] font-bold text-indigo-600/60 uppercase">Currently: Push/Pull/Legs</p>
+            </div>
+          </div>
+          <ChevronRight className="w-4 h-4 text-indigo-300" />
+        </CardContent>
+      </Card>
     </div>
   );
 }
