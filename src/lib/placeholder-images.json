@@ -41,6 +41,12 @@
       "description": "Hand holding a blue can illustration",
       "imageUrl": "https://images.unsplash.com/photo-1634157703702-3c124b455499?q=80&w=600&auto=format&fit=crop",
       "imageHint": "illustration"
+    },
+    {
+      "id": "gym-coach",
+      "description": "Professional fitness coach",
+      "imageUrl": "https://images.unsplash.com/photo-1594381898411-846e7d193883?q=80&w=400&auto=format&fit=crop",
+      "imageHint": "fitness coach"
     }
   ]
 }

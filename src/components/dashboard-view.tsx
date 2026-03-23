@@ -11,8 +11,7 @@ import {
   Sparkles,
   Calculator,
   TrendingDown,
-  Scale,
-  ArrowUpRight
+  Scale
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -20,6 +19,8 @@ import {
   Area, 
   ResponsiveContainer 
 } from 'recharts';
+import Image from "next/image";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 const weightData = [
   { day: 'Mon', weight: 79.5 },
@@ -40,6 +41,8 @@ export function DashboardView() {
   const currentWeight = 78.5;
   const goalWeight = 77.0;
   const progressPercent = Math.round(((startWeight - currentWeight) / (startWeight - goalWeight)) * 100);
+
+  const coachImage = PlaceHolderImages.find(img => img.id === 'gym-coach');
 
   const metrics = [
     { 
@@ -94,8 +97,14 @@ export function DashboardView() {
       {/* 1. Personal Guide - AI Suggestion Banner */}
       <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
         <CardContent className="p-5 flex items-start gap-4">
-          <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm border border-white/10 shrink-0">
-            <Sparkles className="w-5 h-5 text-accent" />
+          <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 shrink-0 relative bg-white/10">
+            <Image 
+              src={coachImage?.imageUrl || "https://images.unsplash.com/photo-1594381898411-846e7d193883?q=80&w=400&auto=format&fit=crop"} 
+              alt="Coach"
+              fill
+              className="object-cover"
+              data-ai-hint="fitness coach"
+            />
           </div>
           <div className="space-y-1">
             <h3 className="font-bold text-sm flex items-center gap-2">
