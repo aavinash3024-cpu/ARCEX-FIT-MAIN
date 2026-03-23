@@ -210,22 +210,31 @@ export function DashboardView() {
         </div>
       </section>
 
-      {/* 4. Today's Macros (Macros Card) */}
-      <Card className="border-none shadow-sm overflow-hidden glass-card">
-        <CardContent className="p-5 space-y-4">
-          <h3 className="text-sm font-bold">
-            Today's Macros
-          </h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+      {/* 4. Today's Macros (Macros Card) - Improved and Simple */}
+      <Card className="border-none shadow-sm overflow-hidden bg-white/60 backdrop-blur-md">
+        <CardContent className="p-5 space-y-5">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-black uppercase tracking-[0.15em] text-foreground/70">
+              Today's Macros
+            </h3>
+            <Badge variant="outline" className="text-[8px] font-bold border-primary/20 text-primary uppercase h-4 px-1.5">Goal Tracking</Badge>
+          </div>
+          <div className="grid grid-cols-2 gap-x-8 gap-y-6">
             {nutrients.map((n, idx) => (
-              <div key={idx} className="space-y-1.5">
-                <div className="flex justify-between items-center text-[10px]">
-                  <span className="font-bold text-muted-foreground uppercase">{n.label}</span>
-                  <span className="text-muted-foreground font-mono font-medium">
-                    {n.current}/{n.target}{n.unit}
-                  </span>
+              <div key={idx} className="space-y-2">
+                <div className="flex justify-between items-baseline">
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{n.label}</span>
+                  <div className="flex items-baseline gap-0.5">
+                    <span className="text-xs font-black text-foreground">{n.current}</span>
+                    <span className="text-[8px] font-bold text-muted-foreground">/ {n.target}{n.unit}</span>
+                  </div>
                 </div>
-                <Progress value={(n.current / n.target) * 100} className="h-1" />
+                <div className="h-1 w-full bg-muted/30 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary rounded-full transition-all duration-700 ease-out" 
+                    style={{ width: `${Math.min((n.current / n.target) * 100, 100)}%` }}
+                  />
+                </div>
               </div>
             ))}
           </div>
