@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -120,6 +119,10 @@ export default function PulseFlowApp() {
     });
   };
 
+  const handleDeleteWeight = (date: string) => {
+    setWeightHistory(prev => prev.filter(entry => entry.date !== date));
+  };
+
   const renderContent = () => {
     if (!isLoaded) return <div className="flex-1 flex items-center justify-center opacity-20"><p className="text-[10px] font-black uppercase tracking-widest">Loading Your Flow...</p></div>;
 
@@ -147,6 +150,7 @@ export default function PulseFlowApp() {
             goalData={goalData} 
             weightHistory={weightHistory}
             onLogWeight={handleLogWeight}
+            onDeleteWeight={handleDeleteWeight}
           />
         );
       case 'hydration': 

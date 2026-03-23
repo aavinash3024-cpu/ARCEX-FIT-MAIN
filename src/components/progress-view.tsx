@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo } from 'react';
@@ -15,7 +14,8 @@ import {
   ChevronRight,
   Scale,
   Calendar,
-  History
+  History,
+  Trash2
 } from "lucide-react";
 import { 
   XAxis, 
@@ -40,9 +40,10 @@ interface ProgressViewProps {
   goalData?: any;
   weightHistory: any[];
   onLogWeight: (entry: { date: string, weight: number }) => void;
+  onDeleteWeight: (date: string) => void;
 }
 
-export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressViewProps) {
+export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWeight }: ProgressViewProps) {
   const [isLogOpen, setIsLogOpen] = useState(false);
   const [newWeight, setNewWeight] = useState("");
 
@@ -110,7 +111,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
       <h1 className="text-2xl font-bold font-headline mb-2 px-1">Progress</h1>
 
       <div className="space-y-4 animate-in fade-in duration-500">
-        {/* 1. Current Status - Moved to Top */}
+        {/* 1. Current Status - Top Summary Card */}
         <Card className="border-none shadow-sm bg-white overflow-hidden">
           <CardContent className="p-5 space-y-6">
             <div className="flex justify-between items-start">
@@ -146,7 +147,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
           </CardContent>
         </Card>
 
-        {/* 2. Next Milestone - Sleeker little bit */}
+        {/* 2. Next Milestone - Sleeker card */}
         <Card className="border-none shadow-sm bg-primary/95 text-primary-foreground overflow-hidden rounded-[1rem]">
            <CardContent className="p-4 flex items-center justify-between">
               <div className="space-y-0.5">
@@ -165,7 +166,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
            </CardContent>
         </Card>
 
-        {/* 3. Weight Trend - Moved below cards */}
+        {/* 3. Weight Trend - Chart below stats */}
         <Card className="border-none shadow-sm overflow-hidden bg-white">
           <CardContent className="p-5 space-y-4">
             <div className="flex items-center justify-between">
@@ -224,7 +225,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
           </CardContent>
         </Card>
 
-        {/* 4. Log New Weight Entry Button */}
+        {/* 4. Log New Weight Button */}
         <Dialog open={isLogOpen} onOpenChange={setIsLogOpen}>
           <DialogTrigger asChild>
             <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2">
@@ -255,7 +256,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
           </DialogContent>
         </Dialog>
 
-        {/* Log History */}
+        {/* 5. Log History with Delete */}
         <section className="space-y-3 pt-2">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70 flex items-center gap-2">
@@ -284,10 +285,18 @@ export function ProgressView({ goalData, weightHistory, onLogWeight }: ProgressV
                         </p>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right flex items-center gap-3">
                       <p className="text-sm font-black text-foreground">
                         {entry.weight.toFixed(1)} <span className="text-[9px] text-muted-foreground">kg</span>
                       </p>
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 text-muted-foreground/30 hover:text-destructive transition-colors rounded-full"
+                        onClick={() => onDeleteWeight(entry.date)}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
