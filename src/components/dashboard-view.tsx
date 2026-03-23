@@ -12,7 +12,7 @@ import {
   Calculator,
   TrendingDown,
   Scale,
-  LineChart as ChartIcon
+  ArrowUpRight
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -84,8 +84,8 @@ export function DashboardView() {
   ];
 
   return (
-    <div className="space-y-6 pb-20 pt-8">
-      {/* Your Personal Guide - AI Suggestion Banner */}
+    <div className="space-y-6 pb-24 pt-8">
+      {/* 1. Personal Guide - AI Suggestion Banner */}
       <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
         <CardContent className="p-5 flex items-start gap-4">
           <div className="p-2.5 bg-white/20 rounded-xl backdrop-blur-sm border border-white/10 shrink-0">
@@ -101,7 +101,7 @@ export function DashboardView() {
         </CardContent>
       </Card>
 
-      {/* Daily Overview */}
+      {/* 2. Daily Overview */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold font-headline">Daily Overview</h2>
@@ -159,94 +159,111 @@ export function DashboardView() {
             );
           })}
         </div>
+      </section>
 
-        {/* Swipeable Tools: Weight & Calculators */}
-        <div className="flex gap-3 overflow-x-auto pb-2 swipe-container">
-          {/* Weight Card with Graph */}
-          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card overflow-hidden">
-            <CardContent className="p-4 space-y-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-1">
-                    <Scale className="w-3 h-3 text-primary" /> Current Weight
-                  </h3>
-                  <div className="flex items-baseline gap-1">
-                    <span className="text-2xl font-bold">78.5</span>
-                    <span className="text-xs text-muted-foreground">kg</span>
-                  </div>
+      {/* 3. Nutrient Tracking (Macros Card) */}
+      <Card className="border-none shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
+        <CardContent className="p-5 space-y-4">
+          <h3 className="text-sm font-bold flex items-center gap-2">
+            <Target className="w-4 h-4 text-primary" />
+            Nutrient Tracking
+          </h3>
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
+            {nutrients.map((n, idx) => (
+              <div key={idx} className="space-y-1.5">
+                <div className="flex justify-between items-center text-[10px]">
+                  <span className="font-bold text-muted-foreground uppercase">{n.label}</span>
+                  <span className="text-muted-foreground font-mono font-medium">
+                    {n.current}/{n.target}{n.unit}
+                  </span>
                 </div>
-                <Badge className="bg-green-100 text-green-700 border-none px-2 py-0.5 gap-1 text-[10px]">
-                  <TrendingDown className="w-3 h-3" /> -0.4kg
-                </Badge>
+                <Progress value={(n.current / n.target) * 100} className="h-1" />
               </div>
-              
-              <div className="h-16 w-full -mx-4 -mb-4">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={weightData}>
-                    <defs>
-                      <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
-                        <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                      </linearGradient>
-                    </defs>
-                    <Area 
-                      type="monotone" 
-                      dataKey="weight" 
-                      stroke="hsl(var(--primary))" 
-                      strokeWidth={2} 
-                      fillOpacity={1} 
-                      fill="url(#colorWeight)" 
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
-          {/* Calculators Card */}
-          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card">
-            <CardContent className="p-4 space-y-3">
-              <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
-                <Calculator className="w-3 h-3 text-primary" /> Performance Tools
-              </h3>
-              <div className="grid grid-cols-3 gap-2">
-                {calculators.map((calc, idx) => (
-                  <button 
-                    key={idx} 
-                    className="p-2 bg-primary/5 rounded-xl text-center hover:bg-primary/10 transition-colors border border-primary/10"
-                  >
-                    <p className="text-[9px] font-black uppercase text-primary leading-tight">{calc.label}</p>
-                    <p className="text-[7px] font-bold text-muted-foreground/60 uppercase">{calc.description}</p>
-                  </button>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        </div>
+      {/* 4. Goal Milestone Card */}
+      <Card className="border-none shadow-sm bg-primary text-primary-foreground overflow-hidden">
+        <CardContent className="p-5 flex items-center justify-between">
+          <div className="space-y-1">
+            <p className="text-[10px] font-bold uppercase tracking-wider opacity-80">Next Goal Milestone</p>
+            <h4 className="font-bold text-lg">Reach 77.0 kg</h4>
+          </div>
+          <div className="flex flex-col items-end">
+            <div className="flex items-center gap-2">
+              <span className="text-2xl font-bold">45%</span>
+              <ArrowUpRight className="w-5 h-5 text-accent" />
+            </div>
+            <p className="text-[9px] font-bold uppercase opacity-60">1.5kg remaining</p>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Integrated Macros Breakdown */}
-        <Card className="border-none shadow-sm overflow-hidden bg-white/50 backdrop-blur-sm">
-          <CardContent className="p-5 space-y-4">
-            <h3 className="text-sm font-bold flex items-center gap-2">
-              <Target className="w-4 h-4 text-primary" />
-              Nutrient Tracking
+      {/* 5. Weight & Performance Tools (Swipeable) */}
+      <div className="flex gap-3 overflow-x-auto pb-4 swipe-container">
+        {/* Weight Card with Graph */}
+        <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card overflow-hidden">
+          <CardContent className="p-4 space-y-4">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5 mb-1">
+                  <Scale className="w-3 h-3 text-primary" /> Current Weight
+                </h3>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-2xl font-bold">78.5</span>
+                  <span className="text-xs text-muted-foreground">kg</span>
+                </div>
+              </div>
+              <Badge className="bg-green-100 text-green-700 border-none px-2 py-0.5 gap-1 text-[10px]">
+                <TrendingDown className="w-3 h-3" /> -0.4kg
+              </Badge>
+            </div>
+            
+            <div className="h-16 w-full -mx-4 -mb-4">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={weightData}>
+                  <defs>
+                    <linearGradient id="colorWeight" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
+                      <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <Area 
+                    type="monotone" 
+                    dataKey="weight" 
+                    stroke="hsl(var(--primary))" 
+                    strokeWidth={2} 
+                    fillOpacity={1} 
+                    fill="url(#colorWeight)" 
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </CardContent>
+        </Card>
+
+        {/* Calculators Card */}
+        <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm glass-card">
+          <CardContent className="p-4 space-y-3">
+            <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
+              <Calculator className="w-3 h-3 text-primary" /> Performance Tools
             </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-6 gap-y-4">
-              {nutrients.map((n, idx) => (
-                <div key={idx} className="space-y-1.5">
-                  <div className="flex justify-between items-center text-[10px]">
-                    <span className="font-bold text-muted-foreground uppercase">{n.label}</span>
-                    <span className="text-muted-foreground font-mono font-medium">
-                      {n.current}/{n.target}{n.unit}
-                    </span>
-                  </div>
-                  <Progress value={(n.current / n.target) * 100} className="h-1" />
-                </div>
+            <div className="grid grid-cols-3 gap-2">
+              {calculators.map((calc, idx) => (
+                <button 
+                  key={idx} 
+                  className="p-2 bg-primary/5 rounded-xl text-center hover:bg-primary/10 transition-colors border border-primary/10"
+                >
+                  <p className="text-[9px] font-black uppercase text-primary leading-tight">{calc.label}</p>
+                  <p className="text-[7px] font-bold text-muted-foreground/60 uppercase">{calc.description}</p>
+                </button>
               ))}
             </div>
           </CardContent>
         </Card>
-      </section>
+      </div>
     </div>
   );
 }
