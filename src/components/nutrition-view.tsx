@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -32,6 +33,8 @@ export function NutritionView() {
     { name: "Almond Butter Toast", calories: 320 },
   ];
 
+  const analysisImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
+
   return (
     <div className="space-y-5 pb-24">
       <div className="flex items-center justify-between">
@@ -48,11 +51,11 @@ export function NutritionView() {
         <CardContent className="p-0 flex items-center">
           <div className="shrink-0 w-20 h-20 relative">
             <Image 
-              src="https://picsum.photos/seed/meal-bowl-healthy/200/200" 
+              src={analysisImage?.imageUrl || "https://picsum.photos/seed/meal-bowl/200/200"} 
               alt="AI Analysis"
               fill
               className="object-cover"
-              data-ai-hint="healthy bowl"
+              data-ai-hint="noodle bowl"
             />
           </div>
           <div className="flex-1 p-3 min-w-0">
@@ -68,7 +71,7 @@ export function NutritionView() {
 
       {/* AI Meal Log Hub - Structured with Header & Tabs */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
-        {/* Upper Area Header */}
+        {/* Upper Area Header - Icon on the Left */}
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-muted/40 rounded-full shrink-0">
