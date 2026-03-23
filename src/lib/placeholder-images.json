@@ -29,6 +29,12 @@
       "description": "A bowl of noodles, carrots, mushrooms, and eggs",
       "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=400&auto=format&fit=crop",
       "imageHint": "noodle bowl"
+    },
+    {
+      "id": "logged-meal-utensils",
+      "description": "Green plastic utensils on a black surface",
+      "imageUrl": "https://images.unsplash.com/photo-1610398041455-acc134988950?q=80&w=400&auto=format&fit=crop",
+      "imageHint": "utensils"
     }
   ]
 }
