@@ -40,26 +40,23 @@ interface GoalSettingViewProps {
 export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   const [step, setStep] = useState(1);
   const [isSaved, setIsSaved] = useState(false);
+  const [hasExistingGoal, setHasExistingGoal] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Step 1: Metrics
+  // Setup/Draft States
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [age, setAge] = useState<string>("25");
   const [weight, setWeight] = useState<string>("75");
   const [height, setHeight] = useState<string>("175");
   const [activity, setActivity] = useState<ActivityLevel>('moderate');
-
-  // Step 2: Objectives
   const [objective, setObjective] = useState<Objective>('loss');
   const [targetWeight, setTargetWeight] = useState<string>("70");
   const [weeklyRate, setWeeklyRate] = useState<WeeklyRate>(0.5);
-
-  // Step 3: Macros & Adjustments
   const [calAdj, setCalAdj] = useState([0]);
   const [protAdj, setProtAdj] = useState([1.8]);
   const [carbRatio, setCarbRatio] = useState([50]);
 
-  // Load from localStorage
+  // Load from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('pulseflow_goal_data');
     if (saved) {
@@ -77,6 +74,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
         setProtAdj(data.protAdj || [1.8]);
         setCarbRatio(data.carbRatio || [50]);
         setIsSaved(data.isSaved || false);
+        setHasExistingGoal(data.isSaved || false);
       } catch (e) {
         console.error("Failed to load goal data", e);
       }
@@ -84,19 +82,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
     setIsInitialized(true);
   }, []);
 
-  // Save to localStorage
-  useEffect(() => {
-    if (isInitialized) {
-      const dataToSave = {
-        gender, age, weight, height, activity,
-        objective, targetWeight, weeklyRate,
-        calAdj, protAdj, carbRatio, isSaved
-      };
-      localStorage.setItem('pulseflow_goal_data', JSON.stringify(dataToSave));
-    }
-  }, [gender, age, weight, height, activity, objective, targetWeight, weeklyRate, calAdj, protAdj, carbRatio, isSaved, isInitialized]);
-
-  // Calculations
+  // Calculations for current draft or saved data
   const calculations = useMemo(() => {
     const w = parseFloat(weight) || 75;
     const h = parseFloat(height) || 175;
@@ -149,6 +135,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   const nextStep = () => {
     if (step === 2 && !calculations.isWeightValid) return;
     if (step === 2) {
+      // Suggest initial calorie adjustment based on chosen weekly rate
       let initialOffset = 0;
       if (objective === 'loss') initialOffset = -(weeklyRate * 1100);
       if (objective === 'gain') initialOffset = (weeklyRate * 1100);
@@ -159,7 +146,47 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   
   const prevStep = () => setStep(s => s - 1);
 
-  const savePlan = () => setIsSaved(true);
+  const savePlan = () => {
+    const dataToSave = {
+      gender, age, weight, height, activity,
+      objective, targetWeight, weeklyRate,
+      calAdj, protAdj, carbRatio, isSaved: true
+    };
+    localStorage.setItem('pulseflow_goal_data', JSON.stringify(dataToSave));
+    setIsSaved(true);
+    setHasExistingGoal(true);
+  };
+
+  const handleEdit = () => {
+    setIsSaved(false);
+    setStep(1);
+  };
+
+  const handleHeaderBack = () => {
+    if (!isSaved && hasExistingGoal) {
+      // If we were editing, go back to the saved report and reload original data
+      const saved = localStorage.getItem('pulseflow_goal_data');
+      if (saved) {
+        const data = JSON.parse(saved);
+        setGender(data.gender);
+        setAge(data.age);
+        setWeight(data.weight);
+        setHeight(data.height);
+        setActivity(data.activity);
+        setObjective(data.objective);
+        setTargetWeight(data.targetWeight);
+        setWeeklyRate(data.weeklyRate);
+        setCalAdj(data.calAdj);
+        setProtAdj(data.protAdj);
+        setCarbRatio(data.carbRatio);
+        setIsSaved(true);
+      }
+    } else {
+      onBack();
+    }
+  };
+
+  if (!isInitialized) return null;
 
   if (isSaved) {
     return (
@@ -188,17 +215,19 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
             <div className="flex bg-muted/5">
               <div className="flex-1 p-5 border-r border-muted/10">
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Current Weight</p>
-                <p className="text-2xl font-black text-foreground mt-1">{weight}kg</p>
+                <div className="bg-white p-3 rounded-xl border border-muted/10 mt-1 shadow-sm">
+                  <p className="text-xl font-black text-foreground text-center">{weight}kg</p>
+                </div>
               </div>
-              <div className="flex-1 p-5 text-right">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Target Weight</p>
-                <div className="flex items-center justify-end gap-1.5 mt-1">
-                  <p className="text-2xl font-black text-primary">{targetWeight}kg</p>
+              <div className="flex-1 p-5">
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight text-right">Target Weight</p>
+                <div className="bg-white p-3 rounded-xl border border-muted/10 mt-1 shadow-sm">
+                  <p className="text-xl font-black text-primary text-center">{targetWeight}kg</p>
                 </div>
               </div>
             </div>
 
-            {/* Data Sections */}
+            {/* Data Sections Stacked Vertically */}
             <div className="p-6 space-y-8">
               {/* Energy Budget Section */}
               <div className="space-y-4">
@@ -208,11 +237,11 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                 <div className="space-y-4 pl-1">
                   <div>
                     <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Daily Goal</p>
-                    <p className="text-xl font-black text-primary">{calculations.finalCalories} kcal</p>
+                    <p className="text-lg font-black text-primary">{calculations.finalCalories} kcal</p>
                   </div>
                   <div>
                     <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Maintenance (TDEE)</p>
-                    <p className="text-lg font-black text-foreground/60">{calculations.tdee} kcal</p>
+                    <p className="text-md font-black text-foreground/60">{calculations.tdee} kcal</p>
                   </div>
                 </div>
               </div>
@@ -225,11 +254,11 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                 <div className="space-y-4 pl-1">
                   <div>
                     <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Weekly Change</p>
-                    <p className="text-lg font-black text-foreground">{calculations.derivedWeeklyRate} kg / Week</p>
+                    <p className="text-md font-black text-foreground">{calculations.derivedWeeklyRate} kg / Week</p>
                   </div>
                   <div>
                     <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Estimated Duration</p>
-                    <p className="text-lg font-black text-foreground">{calculations.weeksToGoal} Weeks</p>
+                    <p className="text-md font-black text-foreground">{calculations.weeksToGoal} Weeks</p>
                   </div>
                 </div>
               </div>
@@ -244,15 +273,15 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                   <div className="space-y-4">
                     <div>
                       <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Protein</p>
-                      <p className="text-lg font-black text-sky-600">{calculations.protein}g</p>
+                      <p className="text-md font-black text-sky-600">{calculations.protein}g</p>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Carbohydrates</p>
-                      <p className="text-lg font-black text-primary">{calculations.carbs}g</p>
+                      <p className="text-md font-black text-primary">{calculations.carbs}g</p>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Fats</p>
-                      <p className="text-lg font-black text-yellow-600">{calculations.fats}g</p>
+                      <p className="text-md font-black text-yellow-600">{calculations.fats}g</p>
                     </div>
                   </div>
 
@@ -274,9 +303,9 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
           </CardContent>
           <CardFooter className="p-0 border-t border-muted/10">
             <Button 
-              onClick={() => setIsSaved(false)} 
+              onClick={handleEdit} 
               variant="ghost" 
-              className="w-full h-16 rounded-none text-muted-foreground font-black uppercase text-[10px] tracking-widest active:scale-[0.98] transition-all hover:bg-muted/5"
+              className="w-full h-14 rounded-none text-muted-foreground font-black uppercase text-[10px] tracking-widest active:scale-[0.98] transition-all hover:bg-muted/5"
             >
               Edit Goal Parameters
             </Button>
@@ -289,10 +318,10 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
   return (
     <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
+        <Button variant="ghost" size="icon" onClick={handleHeaderBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
         </Button>
-        <h1 className="text-2xl font-bold font-headline">Setup My Goal</h1>
+        <h1 className="text-2xl font-bold font-headline">{hasExistingGoal ? "Edit Goal" : "Setup My Goal"}</h1>
       </div>
 
       <div className="flex items-center justify-between px-2 mb-6">
@@ -456,7 +485,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
               <div className="space-y-4">
                 <div className="bg-primary/5 p-5 rounded-3xl text-center space-y-1">
                   <p className="text-[9px] font-semibold text-primary uppercase tracking-[0.2em]">Calculated Daily Intake</p>
-                  <p className="text-4xl font-bold">{calculations.finalCalories} <span className="text-xs text-muted-foreground">KCAL</span></p>
+                  <p className="text-3xl font-bold">{calculations.finalCalories} <span className="text-xs text-muted-foreground">KCAL</span></p>
                 </div>
               </div>
 
