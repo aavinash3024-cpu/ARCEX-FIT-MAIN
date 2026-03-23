@@ -48,13 +48,13 @@ export function WorkoutView() {
         ))}
       </div>
 
-      {/* Today's Protocol Card */}
-      <Card className="border-none shadow-sm bg-emerald-50/30 overflow-hidden border-2 border-emerald-100/50">
+      {/* Today's Protocol Card - Updated background to be more whitish */}
+      <Card className="border-none shadow-sm bg-white/40 backdrop-blur-md overflow-hidden border-2 border-emerald-100/30">
         <CardContent className="p-5 space-y-5">
           {/* Protocol Header */}
           <div className="flex justify-between items-start">
             <div className="flex gap-3">
-              <div className="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center">
+              <div className="w-10 h-10 rounded-full bg-emerald-50 flex items-center justify-center">
                 <Dumbbell className="w-5 h-5 text-emerald-600" />
               </div>
               <div className="space-y-0.5">
@@ -62,7 +62,7 @@ export function WorkoutView() {
                 <p className="text-xs font-bold text-emerald-700/60 uppercase">Monday</p>
               </div>
             </div>
-            <Badge className="bg-emerald-100 text-emerald-700 border-none px-3 py-1 font-bold text-[10px]">
+            <Badge className="bg-emerald-50 text-emerald-700 border-none px-3 py-1 font-bold text-[10px]">
               0/2 DONE
             </Badge>
           </div>
@@ -70,7 +70,7 @@ export function WorkoutView() {
           {/* Exercise Items */}
           <div className="space-y-3">
             {protocolExercises.map((ex, idx) => (
-              <div key={idx} className="bg-white/80 backdrop-blur-sm p-4 rounded-2xl border border-emerald-100/50 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all">
+              <div key={idx} className="bg-white/90 backdrop-blur-sm p-4 rounded-2xl border border-emerald-50/50 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all">
                 <div className="flex justify-between items-start">
                   <div className="space-y-1">
                     <h4 className="font-black text-[13px] uppercase tracking-tight text-emerald-900">{ex.name}</h4>
@@ -79,14 +79,14 @@ export function WorkoutView() {
                   <RefreshCw className="w-4 h-4 text-muted-foreground/40" />
                 </div>
                 <div className="mt-4">
-                  <span className="text-[9px] font-black text-emerald-600/30 uppercase tracking-[0.2em]">{ex.status}</span>
+                  <span className="text-[9px] font-black text-emerald-600/40 uppercase tracking-[0.2em]">{ex.status}</span>
                 </div>
               </div>
             ))}
           </div>
 
           {/* Add Movement Button */}
-          <Button variant="ghost" className="w-full h-12 rounded-2xl border-2 border-dashed border-emerald-200/50 text-emerald-600/60 hover:bg-emerald-100/50 hover:text-emerald-700 font-bold text-xs gap-2">
+          <Button variant="ghost" className="w-full h-12 rounded-2xl border-2 border-dashed border-emerald-100/60 text-emerald-600/60 hover:bg-emerald-50/50 hover:text-emerald-700 font-bold text-xs gap-2">
             <Plus className="w-4 h-4" /> ADD EXTRA MOVEMENT
           </Button>
         </CardContent>
