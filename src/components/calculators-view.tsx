@@ -14,7 +14,8 @@ import {
   Scale,
   Trophy,
   Activity,
-  Info
+  Info,
+  CircleHelp
 } from "lucide-react";
 import { 
   Select,
@@ -153,7 +154,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
             <CardContent className="p-6 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Calculator className="w-4 h-4 text-primary" />
-                <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Energy Requirements</h2>
+                <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Input Metrics</h2>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -170,17 +171,17 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Age (Years)</Label>
-                  <Input type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="Age" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Weight (kg)</Label>
-                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="kg" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Height (cm)</Label>
-                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="cm" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="space-y-2">
@@ -201,24 +202,57 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <Button onClick={calculateBmr} className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">Calculate KCAL</Button>
             </CardContent>
           </Card>
+
+          {/* New Energy Balance Card styling matching request */}
           <Card className="border-none shadow-lg bg-white overflow-hidden">
             <CardContent className="p-6 space-y-6">
-              <div className="text-center">
-                <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Energy Balance</h3>
+              <div className="text-center space-y-1">
+                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">YOUR ENERGY BALANCE</h3>
+                <p className="text-[9px] font-bold text-muted-foreground uppercase">ESTIMATED DAILY REQUIREMENTS</p>
               </div>
+
               <div className="grid grid-cols-2 gap-4">
-                <div className="bg-primary/5 p-4 rounded-2xl border border-primary/10 flex flex-col items-center text-center space-y-1">
-                  <Flame className="w-4 h-4 text-primary" />
-                  <p className="text-[9px] font-black text-primary uppercase tracking-widest">BMR</p>
-                  <p className="text-2xl font-black">{bmrResults ? bmrResults.bmr : '---'}</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Base KCAL</p>
+                <div className="bg-muted/10 p-5 rounded-3xl border border-muted/20 flex flex-col items-center text-center space-y-2">
+                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                    <Flame className="w-5 h-5 text-muted-foreground/40" />
+                  </div>
+                  <p className="text-[10px] font-black text-primary uppercase tracking-widest">BMR</p>
+                  <p className="text-3xl font-black">{bmrResults ? bmrResults.bmr : '---'}</p>
+                  <p className="text-[8px] font-black text-muted-foreground uppercase tracking-tighter">KCAL/DAY</p>
                 </div>
-                <div className="bg-accent/5 p-4 rounded-2xl border border-accent/10 flex flex-col items-center text-center space-y-1">
-                  <Zap className="w-4 h-4 text-accent" />
-                  <p className="text-[9px] font-black text-accent uppercase tracking-widest">TDEE</p>
-                  <p className="text-2xl font-black">{bmrResults ? bmrResults.tdee : '---'}</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Target KCAL</p>
+                <div className="bg-muted/10 p-5 rounded-3xl border border-muted/20 flex flex-col items-center text-center space-y-2">
+                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                    <Zap className="w-5 h-5 text-accent" />
+                  </div>
+                  <p className="text-[10px] font-black text-accent uppercase tracking-widest">TDEE</p>
+                  <p className="text-3xl font-black">{bmrResults ? bmrResults.tdee : '---'}</p>
+                  <p className="text-[8px] font-black text-muted-foreground uppercase tracking-tighter">KCAL/DAY</p>
                 </div>
+              </div>
+
+              <div className="bg-muted/10 p-4 rounded-2xl border border-muted/20 space-y-3">
+                <div className="flex items-start gap-3">
+                  <CircleHelp className="w-4 h-4 text-muted-foreground/60 shrink-0 mt-0.5" />
+                  <div className="space-y-1">
+                    <p className="text-[10px] font-black uppercase text-foreground/80">WHAT DO THESE MEAN?</p>
+                    <p className="text-[10px] leading-relaxed text-muted-foreground font-medium">
+                      <span className="font-bold text-foreground/70">BMR:</span> Calories your body burns at rest just to stay alive.
+                    </p>
+                    <p className="text-[10px] leading-relaxed text-muted-foreground font-medium">
+                      <span className="font-bold text-foreground/70">TDEE:</span> Total calories you burn daily including all activity.
+                    </p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-[#6b85a3] p-5 rounded-2xl text-white space-y-1">
+                <p className="text-[9px] font-black uppercase tracking-widest opacity-80">MAINTENANCE GOAL</p>
+                <p className="text-xs font-bold">
+                  {bmrResults 
+                    ? `Eat approximately ${bmrResults.tdee} calories per day to maintain your current weight.` 
+                    : "Enter your data above to see your maintenance goal."
+                  }
+                </p>
               </div>
             </CardContent>
           </Card>
@@ -259,17 +293,21 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                     <Table>
                       <TableHeader className="bg-muted/30">
                         <TableRow>
-                          <TableHead className="h-8 text-[9px] font-black uppercase">Percentage</TableHead>
-                          <TableHead className="h-8 text-[9px] font-black uppercase text-right">Load (kg)</TableHead>
+                          <TableHead className="h-8 text-[9px] font-black uppercase">Goal Reps</TableHead>
+                          <TableHead className="h-8 text-[9px] font-black uppercase text-right">Target Load (kg)</TableHead>
                         </TableRow>
                       </TableHeader>
                       <TableBody>
-                        {[95, 90, 85, 80, 75].map((pct) => (
-                          <TableRow key={pct}>
-                            <TableCell className="py-2 text-[10px] font-bold">{pct}% of Max</TableCell>
-                            <TableCell className="py-2 text-[10px] font-black text-right text-primary">{Math.round(ormResult * (pct / 100))} kg</TableCell>
-                          </TableRow>
-                        ))}
+                        {[2, 4, 6, 8, 10, 12, 14, 16].map((repCount) => {
+                          // Epley: 1RM = w * (1 + r/30) => w = 1RM / (1 + r/30)
+                          const weightForReps = ormResult / (1 + (repCount / 30));
+                          return (
+                            <TableRow key={repCount}>
+                              <TableCell className="py-2 text-[10px] font-bold">{repCount} Reps</TableCell>
+                              <TableCell className="py-2 text-[10px] font-black text-right text-primary">{Math.round(weightForReps)} kg</TableCell>
+                            </TableRow>
+                          );
+                        })}
                       </TableBody>
                     </Table>
                   </div>
@@ -301,28 +339,28 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Weight (kg)</Label>
-                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="Weight" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Height (cm)</Label>
-                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="Height" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Neck (cm)</Label>
-                  <Input type="number" value={neck} onChange={(e) => setNeck(e.target.value)} placeholder="Neck" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={neck} onChange={(e) => setNeck(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Waist (cm)</Label>
-                  <Input type="number" value={waist} onChange={(e) => setWaist(e.target.value)} placeholder="Waist" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={waist} onChange={(e) => setWaist(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
                 </div>
                 {gender === 'female' && (
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Hip (cm)</Label>
-                    <Input type="number" value={hip} onChange={(e) => setHip(e.target.value)} placeholder="Hip" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                    <Input type="number" value={hip} onChange={(e) => setHip(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
                   </div>
                 )}
               </div>
