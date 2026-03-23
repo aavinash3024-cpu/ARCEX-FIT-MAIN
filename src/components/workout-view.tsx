@@ -32,10 +32,10 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      {/* 1. Sleek Personal Records Card */}
-      <Card className="border-none shadow-md bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
+      {/* 1. Sleek Personal Records Card - Resized to match AI Insight card */}
+      <Card className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
         <CardContent className="p-0 flex items-center">
-          <div className="shrink-0 w-28 h-28 relative">
+          <div className="shrink-0 w-20 h-20 relative">
             <Image 
               src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
               alt="Personal Records"
@@ -44,12 +44,12 @@ export function WorkoutView() {
               data-ai-hint="barbell illustration"
             />
           </div>
-          <div className="flex-1 p-4 flex items-center justify-between min-w-0">
-            <div className="space-y-1">
+          <div className="flex-1 p-3 flex items-center justify-between min-w-0">
+            <div className="space-y-0.5">
               <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.15em] flex items-center gap-1.5">
                 <Trophy className="w-3 h-3" /> Personal Records
               </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">8 New milestones reached this month</p>
+              <p className="text-[11px] font-bold text-foreground/90 leading-tight">8 New milestones reached</p>
               <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60">Pushing limits</p>
             </div>
             <ChevronRight className="w-4 h-4 text-primary/30" />
