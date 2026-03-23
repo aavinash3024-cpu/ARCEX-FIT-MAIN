@@ -10,14 +10,12 @@ import {
   ChevronLeft, 
   ChevronRight, 
   Target, 
-  Activity, 
   Scale, 
-  Zap,
-  Flame,
   CheckCircle2,
   Settings2,
   Sparkles,
-  Info
+  Info,
+  Clock
 } from "lucide-react";
 import { 
   Select,
@@ -76,7 +74,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
 
     // Objective calories
     let baseTarget = tdee;
-    if (objective === 'loss') baseTarget -= (weeklyRate * 1100); // Rough estimate 7700kcal per kg
+    if (objective === 'loss') baseTarget -= (weeklyRate * 1100); 
     if (objective === 'gain') baseTarget += (weeklyRate * 1100);
 
     const finalCalories = Math.round(baseTarget + calAdj[0]);
@@ -85,9 +83,13 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
     const proteinGrams = Math.round(w * protAdj[0]);
     const proteinKcal = proteinGrams * 4;
     
-    const remainingKcal = finalCalories - proteinKcal;
+    const remainingKcal = Math.max(0, finalCalories - proteinKcal);
     const carbKcal = remainingKcal * (carbRatio[0] / 100);
     const fatKcal = remainingKcal - carbKcal;
+
+    // Time estimate
+    const weightDiff = Math.abs(tw - w);
+    const weeksToGoal = weeklyRate > 0 ? (weightDiff / weeklyRate).toFixed(1) : "0";
 
     return {
       tdee,
@@ -95,7 +97,9 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
       protein: proteinGrams,
       carbs: Math.round(carbKcal / 4),
       fats: Math.round(fatKcal / 9),
-      isWeightValid: objective === 'gain' ? tw > w : objective === 'loss' ? tw < w : tw === w
+      isWeightValid: objective === 'gain' ? tw > w : objective === 'loss' ? tw < w : tw === w,
+      weeksToGoal,
+      weightDiff
     };
   }, [weight, height, age, gender, activity, objective, targetWeight, weeklyRate, calAdj, protAdj, carbRatio]);
 
@@ -290,22 +294,34 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
               {objective !== 'maintain' && (
                  <div className="space-y-4">
                     <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Weekly Rate</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                       {[0.25, 0.5, 0.75, 1.0].map((rate) => (
-                          <button
-                             key={rate}
-                             onClick={() => setWeeklyRate(rate as WeeklyRate)}
-                             className={cn(
-                                "p-3 rounded-xl border transition-all text-left",
-                                weeklyRate === rate ? "border-primary bg-primary/5" : "border-muted/20"
-                             )}
-                          >
-                             <p className="text-[10px] font-black text-foreground">{rate} kg <span className="text-[8px] text-muted-foreground">/wk</span></p>
-                             <p className="text-[8px] font-bold text-muted-foreground uppercase mt-0.5">
-                                ~{Math.round(rate * 1100)} kcal/day delta
-                             </p>
-                          </button>
-                       ))}
+                    <div className="grid grid-cols-1 gap-2">
+                       {[0.25, 0.5, 0.75, 1.0].map((rate) => {
+                          const weeks = (calculations.weightDiff / rate).toFixed(1);
+                          return (
+                            <button
+                               key={rate}
+                               onClick={() => setWeeklyRate(rate as WeeklyRate)}
+                               className={cn(
+                                  "p-4 rounded-xl border transition-all text-left flex justify-between items-center",
+                                  weeklyRate === rate ? "border-primary bg-primary/5" : "border-muted/20"
+                               )}
+                            >
+                               <div>
+                                  <p className="text-[11px] font-black text-foreground">{rate} kg <span className="text-[8px] text-muted-foreground uppercase tracking-tighter">/ per week</span></p>
+                                  <p className="text-[9px] font-bold text-muted-foreground uppercase mt-0.5">
+                                    ~{Math.round(rate * 1100)} kcal {objective === 'loss' ? 'deficit' : 'surplus'} / day
+                                  </p>
+                               </div>
+                               <div className="text-right">
+                                  <div className="flex items-center gap-1 text-primary">
+                                    <Clock className="w-3 h-3" />
+                                    <span className="text-xs font-black">{weeks}</span>
+                                  </div>
+                                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Weeks to reach</p>
+                               </div>
+                            </button>
+                          );
+                       })}
                     </div>
                  </div>
               )}
@@ -321,43 +337,60 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                 <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Step 3: Fine-Tuning</h2>
               </div>
 
-              <div className="bg-primary/5 p-5 rounded-3xl text-center space-y-1">
-                 <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Calculated Intake</p>
-                 <p className="text-4xl font-black">{calculations.finalCalories} <span className="text-xs text-muted-foreground">KCAL</span></p>
+              <div className="space-y-4">
+                <div className="bg-primary/5 p-5 rounded-3xl text-center space-y-1">
+                  <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Calculated Daily Intake</p>
+                  <p className="text-4xl font-black">{calculations.finalCalories} <span className="text-xs text-muted-foreground">KCAL</span></p>
+                </div>
+
+                <div className="grid grid-cols-3 gap-2">
+                   <div className="bg-muted/10 p-3 rounded-2xl text-center">
+                      <p className="text-sm font-black text-foreground">{calculations.protein}g</p>
+                      <p className="text-[8px] font-black text-muted-foreground uppercase">Protein</p>
+                   </div>
+                   <div className="bg-muted/10 p-3 rounded-2xl text-center">
+                      <p className="text-sm font-black text-foreground">{calculations.carbs}g</p>
+                      <p className="text-[8px] font-black text-muted-foreground uppercase">Carbs</p>
+                   </div>
+                   <div className="bg-muted/10 p-3 rounded-2xl text-center">
+                      <p className="text-sm font-black text-foreground">{calculations.fats}g</p>
+                      <p className="text-[8px] font-black text-muted-foreground uppercase">Fats</p>
+                   </div>
+                </div>
               </div>
 
-              {/* Calories Shifter */}
-              <div className="space-y-4">
-                 <div className="flex justify-between items-center">
-                    <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Calories Adjustment</Label>
-                    <Badge variant="secondary" className="text-[9px] font-black">{calAdj[0] > 0 ? '+' : ''}{calAdj[0]} kcal</Badge>
-                 </div>
-                 <Slider value={calAdj} onValueChange={setCalAdj} min={-500} max={500} step={20} className="py-2" />
-                 <p className="text-[9px] text-muted-foreground font-bold uppercase text-center">Adjust total daily intake manually</p>
-              </div>
+              <div className="space-y-8 pt-4">
+                {/* Calories Shifter */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                      <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Adjust Calories</Label>
+                      <Badge variant="secondary" className="text-[9px] font-black">{calAdj[0] > 0 ? '+' : ''}{calAdj[0]} kcal</Badge>
+                  </div>
+                  <Slider value={calAdj} onValueChange={setCalAdj} min={-500} max={500} step={20} className="py-2" />
+                </div>
 
-              {/* Protein Shifter */}
-              <div className="space-y-4">
-                 <div className="flex justify-between items-center">
-                    <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Protein Intensity</Label>
-                    <Badge variant="secondary" className="text-[9px] font-black">{protAdj[0]}g / kg</Badge>
-                 </div>
-                 <Slider value={protAdj} onValueChange={setProtAdj} min={1.2} max={2.5} step={0.1} className="py-2" />
-                 <p className="text-[9px] text-muted-foreground font-bold uppercase text-center">Current: {calculations.protein}g Daily</p>
-              </div>
+                {/* Protein Shifter */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                      <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Protein Intensity</Label>
+                      <Badge variant="secondary" className="text-[9px] font-black">{protAdj[0]}g / kg</Badge>
+                  </div>
+                  <Slider value={protAdj} onValueChange={setProtAdj} min={1.2} max={2.5} step={0.1} className="py-2" />
+                </div>
 
-              {/* Carbs/Fat Shifter */}
-              <div className="space-y-4">
-                 <div className="flex justify-between items-center">
-                    <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Carbs / Fat Ratio</Label>
-                    <Badge variant="secondary" className="text-[9px] font-black">{carbRatio[0]}% Carbs</Badge>
-                 </div>
-                 <Slider value={carbRatio} onValueChange={setCarbRatio} min={20} max={80} step={5} className="py-2" />
-                 <div className="flex justify-between text-[9px] font-black text-muted-foreground/60 uppercase">
-                    <span>Higher Fat</span>
-                    <span>Balanced</span>
-                    <span>Higher Carbs</span>
-                 </div>
+                {/* Carbs/Fat Shifter */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                      <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Macro Ratio (Carbs/Fat)</Label>
+                      <Badge variant="secondary" className="text-[9px] font-black">{carbRatio[0]}% Carbs</Badge>
+                  </div>
+                  <Slider value={carbRatio} onValueChange={setCarbRatio} min={20} max={80} step={5} className="py-2" />
+                  <div className="flex justify-between text-[9px] font-black text-muted-foreground/40 uppercase">
+                      <span>Low Carb</span>
+                      <span>Balanced</span>
+                      <span>High Carb</span>
+                  </div>
+                </div>
               </div>
             </CardContent>
           </Card>
@@ -411,7 +444,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
           </Card>
         )}
 
-        {/* Navigation Buttons - Attached directly to step cards flow */}
+        {/* Navigation Buttons */}
         <div className="flex gap-4 pt-2">
           {step > 1 && (
             <Button 
