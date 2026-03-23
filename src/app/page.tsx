@@ -26,13 +26,15 @@ export default function PulseFlowApp() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [activeCalculator, setActiveCalculator] = useState<'bmr' | '1rm' | 'bodyfat'>('bmr');
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [hydrationAmount, setHydrationAmount] = useState(1800); // in ml
+  const [hydrationAmount, setHydrationAmount] = useState(1800);
+  const [goalData, setGoalData] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load data from localStorage on mount
   useEffect(() => {
     const savedTasks = localStorage.getItem('pulseflow_tasks');
     const savedHydration = localStorage.getItem('pulseflow_hydration');
+    const savedGoal = localStorage.getItem('pulseflow_goal_data');
     
     if (savedTasks) {
       try {
@@ -44,6 +46,14 @@ export default function PulseFlowApp() {
     
     if (savedHydration) {
       setHydrationAmount(Number(savedHydration));
+    }
+
+    if (savedGoal) {
+      try {
+        setGoalData(JSON.parse(savedGoal));
+      } catch (e) {
+        console.error("Failed to parse saved goal", e);
+      }
     }
     
     setIsLoaded(true);
@@ -61,6 +71,13 @@ export default function PulseFlowApp() {
       localStorage.setItem('pulseflow_hydration', hydrationAmount.toString());
     }
   }, [hydrationAmount, isLoaded]);
+
+  const refreshGoalData = () => {
+    const savedGoal = localStorage.getItem('pulseflow_goal_data');
+    if (savedGoal) {
+      setGoalData(JSON.parse(savedGoal));
+    }
+  };
 
   const toggleTask = (id: string) => {
     setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
@@ -91,6 +108,7 @@ export default function PulseFlowApp() {
             onToggleTask={toggleTask}
             hydrationAmount={hydrationAmount}
             onUpdateHydration={updateHydration}
+            goalData={goalData}
             onViewHydration={() => setActiveTab('hydration')} 
             onViewTasks={() => setActiveTab('tasks')} 
             onViewCalculators={handleOpenCalculator}
@@ -99,7 +117,7 @@ export default function PulseFlowApp() {
         );
       case 'nutrition': return <NutritionView />;
       case 'workout': return <WorkoutView />;
-      case 'rank': return <ProgressView />;
+      case 'rank': return <ProgressView goalData={goalData} />;
       case 'hydration': 
         return (
           <HydrationView 
@@ -127,9 +145,18 @@ export default function PulseFlowApp() {
         return (
           <GoalSettingView 
             onBack={() => setActiveTab('dashboard')}
+            onGoalSaved={refreshGoalData}
           />
         );
-      default: return <DashboardView tasks={tasks} onToggleTask={toggleTask} hydrationAmount={hydrationAmount} onUpdateHydration={updateHydration} />;
+      default: return (
+        <DashboardView 
+          tasks={tasks} 
+          onToggleTask={toggleTask} 
+          hydrationAmount={hydrationAmount} 
+          onUpdateHydration={updateHydration} 
+          goalData={goalData}
+        />
+      );
     }
   };
 
@@ -142,7 +169,6 @@ export default function PulseFlowApp() {
 
   return (
     <div className="min-h-screen max-w-lg mx-auto bg-background flex flex-col relative shadow-xl border-x">
-      {/* Header with Centered Logo */}
       <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b relative">
         <div className="flex items-center">
           <Avatar className="w-10 h-10 border-2 border-primary/20">
@@ -151,7 +177,6 @@ export default function PulseFlowApp() {
           </Avatar>
         </div>
 
-        {/* Center Logo: arcex fit in lowercase */}
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none">
           <span className="font-black text-xl tracking-tighter text-black">arcex</span>
           <span className="font-black text-xl tracking-tighter text-primary">fit</span>
@@ -168,12 +193,10 @@ export default function PulseFlowApp() {
         </div>
       </header>
 
-      {/* Main Content Area */}
       <main className="flex-1 px-4 overflow-y-auto">
         {renderContent()}
       </main>
 
-      {/* Bottom Navigation */}
       <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white/90 backdrop-blur-xl border-t px-6 py-2 flex justify-between items-center z-50">
         {navItems.map((item) => {
           const Icon = item.icon;

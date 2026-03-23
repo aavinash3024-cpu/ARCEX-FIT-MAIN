@@ -1,4 +1,6 @@
 
+"use client";
+
 import { useRef, useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -44,6 +46,7 @@ interface DashboardViewProps {
   onToggleTask: (id: string) => void;
   hydrationAmount: number;
   onUpdateHydration: (amount: number) => void;
+  goalData: any;
   onViewHydration?: () => void;
   onViewTasks?: () => void;
   onViewCalculators?: (type: string) => void;
@@ -55,6 +58,7 @@ export function DashboardView({
   onToggleTask, 
   hydrationAmount, 
   onUpdateHydration, 
+  goalData,
   onViewHydration, 
   onViewTasks,
   onViewCalculators,
@@ -65,16 +69,16 @@ export function DashboardView({
   const [activeMetric, setActiveMetric] = useState(0);
   const [activeTool, setActiveTool] = useState(0);
 
-  const bmr = 1600;
-  const tdee = 2500;
-  const currentCal = 1840;
-  const targetCal = 2200;
+  // Use Goal Data or Fallbacks
+  const bmr = goalData?.bmr || 1600;
+  const tdee = goalData?.tdee || 2500;
+  const currentCal = goalData?.finalCalories ? Math.round(goalData.finalCalories * 0.8) : 1840; // Simulated current intake
+  const targetCal = goalData?.finalCalories || 2200;
 
-  // Goal Weights
-  const startWeight = 81.0;
-  const currentWeight = 78.5;
-  const goalWeight = 77.0;
-  const progressPercent = Math.round(((startWeight - currentWeight) / (startWeight - goalWeight)) * 100);
+  const startWeight = goalData?.weight ? parseFloat(goalData.weight) : 81.0;
+  const targetWeight = goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 77.0;
+  const currentWeight = goalData?.weight ? parseFloat(goalData.weight) : 78.5; // In a real app this would be current logged weight
+  const progressPercent = goalData?.progressPercent || Math.round(((startWeight - currentWeight) / (startWeight - targetWeight)) * 100);
 
   const coachImage = PlaceHolderImages.find(img => img.id === 'gym-coach');
 
@@ -118,9 +122,9 @@ export function DashboardView({
   ];
 
   const nutrients = [
-    { label: "Carbs", current: 185, target: 250, unit: "g" },
-    { label: "Protein", current: 120, target: 150, unit: "g" },
-    { label: "Fat", current: 52, target: 70, unit: "g" },
+    { label: "Protein", current: goalData?.protein ? Math.round(goalData.protein * 0.7) : 120, target: goalData?.protein || 150, unit: "g" },
+    { label: "Carbs", current: goalData?.carbs ? Math.round(goalData.carbs * 0.75) : 185, target: goalData?.carbs || 250, unit: "g" },
+    { label: "Fat", current: goalData?.fats ? Math.round(goalData.fats * 0.6) : 52, target: goalData?.fats || 70, unit: "g" },
     { label: "Fiber", current: 22, target: 35, unit: "g" },
   ];
 
@@ -130,7 +134,6 @@ export function DashboardView({
     { label: "BMR / TDEE", description: "Energy" },
   ];
 
-  // Logic to show today's tasks
   const priorityBgColor = { low: 'bg-green-500', medium: 'bg-amber-500', high: 'bg-destructive' };
   
   const todaysTasks = tasks
@@ -191,7 +194,6 @@ export function DashboardView({
 
   return (
     <div className="space-y-4 pb-24 pt-10">
-      {/* 1. Personal Guide - AI Suggestion Banner */}
       <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
         <CardContent className="p-5 flex items-center gap-4 min-h-[100px]">
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 shrink-0 relative bg-white/10">
@@ -208,12 +210,13 @@ export function DashboardView({
               Your Personal Guide
               <Badge variant="outline" className="text-[9px] h-4 border-white/20 text-white font-normal uppercase tracking-tighter">AI Pulse</Badge>
             </h3>
-            <p className="text-xs opacity-90 leading-relaxed">Increase protein by 15g today to support muscle recovery from yesterday's heavy lifting session.</p>
+            <p className="text-xs opacity-90 leading-relaxed">
+              {goalData ? `You're targeting ${goalData.finalCalories} kcal today. Great pace towards your ${goalData.targetWeight}kg goal!` : "Set a goal to get personalized AI wellness insights."}
+            </p>
           </div>
         </CardContent>
       </Card>
 
-      {/* 2. Daily Overview */}
       <section className="space-y-4">
         <div className="flex items-center justify-between">
           <h2 className="text-lg font-bold font-headline">Daily Overview</h2>
@@ -222,7 +225,6 @@ export function DashboardView({
           </span>
         </div>
 
-        {/* Metrics Belt */}
         <div className="relative group">
           <div 
             ref={metricsRef}
@@ -314,7 +316,6 @@ export function DashboardView({
               );
             })}
           </div>
-          {/* Pagination Dots for Overview */}
           <div className="flex justify-center gap-1.5 mt-2">
             {metrics.map((_, i) => (
               <button 
@@ -327,7 +328,6 @@ export function DashboardView({
         </div>
       </section>
 
-      {/* 3. Today's Macros */}
       <Card className="border-none shadow-sm overflow-hidden bg-white">
         <CardContent className="p-5 space-y-5">
           <div className="flex items-center justify-start">
@@ -358,7 +358,6 @@ export function DashboardView({
         </CardContent>
       </Card>
 
-      {/* 4. Goal Milestone Card */}
       <Card className="border-none shadow-sm bg-white overflow-hidden">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center justify-between">
@@ -366,7 +365,9 @@ export function DashboardView({
               <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
                 <Target className="w-3.5 h-3.5 text-primary" />
                 Goal
-                <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 text-[8px] h-3.5 py-0 uppercase">Loss</Badge>
+                <Badge variant="secondary" className="bg-green-100 text-green-700 hover:bg-green-100 text-[8px] h-3.5 py-0 uppercase">
+                  {goalData?.objective || "Active"}
+                </Badge>
               </h3>
               <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tight">Active Milestone</p>
             </div>
@@ -381,13 +382,13 @@ export function DashboardView({
             <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground">
               <span>{startWeight.toFixed(1)} kg</span>
               <span className="text-primary">{currentWeight.toFixed(1)} kg</span>
-              <span>{goalWeight.toFixed(1)} kg</span>
+              <span>{targetWeight.toFixed(1)} kg</span>
             </div>
           </div>
           
           <div className="flex items-center justify-between pt-1">
             <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest text-left">
-              {(currentWeight - goalWeight).toFixed(1)} kg to go
+              {goalData ? `${Math.abs(currentWeight - targetWeight).toFixed(1)} kg to go` : "Set your target weight"}
             </p>
             <button 
               onClick={onViewGoalSetting}
@@ -399,14 +400,12 @@ export function DashboardView({
         </CardContent>
       </Card>
 
-      {/* 5. Weight & Performance Tools (Swipeable) */}
       <section className="space-y-2">
         <div 
           ref={toolsRef}
           onScroll={() => handleScroll(toolsRef, setActiveTool)}
           className="flex gap-3 overflow-x-auto pb-4 swipe-container snap-x snap-mandatory scroll-smooth"
         >
-          {/* Weight Card with Graph */}
           <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm bg-white overflow-hidden snap-center">
             <CardContent className="p-4 space-y-4">
               <div className="flex justify-between items-start">
@@ -447,7 +446,6 @@ export function DashboardView({
             </CardContent>
           </Card>
 
-          {/* Calculators Card */}
           <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm bg-white snap-center">
             <CardContent className="p-4 space-y-3">
               <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
@@ -468,7 +466,6 @@ export function DashboardView({
             </CardContent>
           </Card>
         </div>
-        {/* Pagination Dots for Tools */}
         <div className="flex justify-center gap-1.5 -mt-2">
           {[0, 1].map((i) => (
             <button 
@@ -480,7 +477,6 @@ export function DashboardView({
         </div>
       </section>
 
-      {/* 6. Today's Tasks */}
       <Card className="border-none shadow-sm overflow-hidden bg-white">
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between">

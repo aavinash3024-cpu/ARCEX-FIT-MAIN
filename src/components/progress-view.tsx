@@ -1,3 +1,6 @@
+
+"use client";
+
 import React from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -25,7 +28,16 @@ const data = [
   { date: 'Oct 22', weight: 78.5 },
 ];
 
-export function ProgressView() {
+interface ProgressViewProps {
+  goalData?: any;
+}
+
+export function ProgressView({ goalData }: ProgressViewProps) {
+  const startWeight = goalData?.weight ? parseFloat(goalData.weight) : 80.5;
+  const targetWeight = goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 75.0;
+  const currentWeight = goalData?.weight ? parseFloat(goalData.weight) : 78.5; // Placeholder
+  const progressPercent = goalData?.progressPercent || Math.round(((startWeight - currentWeight) / (startWeight - targetWeight)) * 100);
+
   return (
     <div className="space-y-4 pb-24 pt-4">
       <div className="flex flex-col gap-4">
@@ -33,14 +45,13 @@ export function ProgressView() {
       </div>
 
       <div className="space-y-4 animate-in fade-in duration-500">
-        {/* 1. Current Status & Insights */}
         <Card className="border-none shadow-sm bg-white overflow-hidden">
           <CardContent className="p-5 space-y-6">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">Current Status</p>
                 <div className="flex items-baseline gap-1">
-                  <h2 className="text-4xl font-black text-foreground">78.5</h2>
+                  <h2 className="text-4xl font-black text-foreground">{currentWeight.toFixed(1)}</h2>
                   <span className="text-sm font-bold text-muted-foreground uppercase">kg</span>
                 </div>
               </div>
@@ -52,26 +63,24 @@ export function ProgressView() {
             <div className="grid grid-cols-3 gap-3">
               <div className="text-center p-3 bg-muted/20 rounded-2xl border border-muted/30">
                  <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1">Start</p>
-                 <p className="font-black text-sm">80.5 <span className="text-[8px] opacity-40">kg</span></p>
+                 <p className="font-black text-sm">{startWeight.toFixed(1)} <span className="text-[8px] opacity-40">kg</span></p>
               </div>
               <div className="text-center p-3 bg-muted/20 rounded-2xl border border-muted/30">
                  <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1">Goal</p>
-                 <p className="font-black text-sm">75.0 <span className="text-[8px] opacity-40">kg</span></p>
+                 <p className="font-black text-sm">{targetWeight.toFixed(1)} <span className="text-[8px] opacity-40">kg</span></p>
               </div>
               <div className="text-center p-3 bg-primary/5 rounded-2xl border border-primary/10">
                  <p className="text-[9px] text-primary uppercase font-black tracking-widest mb-1">Left</p>
-                 <p className="font-black text-sm text-primary">3.5 <span className="text-[8px] opacity-40">kg</span></p>
+                 <p className="font-black text-sm text-primary">{Math.abs(currentWeight - targetWeight).toFixed(1)} <span className="text-[8px] opacity-40">kg</span></p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* 2. Log Entry Action */}
         <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2">
           <Plus className="w-4 h-4" /> Log New Weight Entry
         </Button>
 
-        {/* 3. Weight Trend Graph */}
         <Card className="border-none shadow-sm overflow-hidden bg-white">
           <CardContent className="p-5 space-y-4">
             <div className="flex items-center justify-between">
@@ -123,16 +132,15 @@ export function ProgressView() {
           </CardContent>
         </Card>
 
-        {/* 4. Goal Milestone Insights */}
         <Card className="border-none shadow-sm bg-primary/90 text-primary-foreground overflow-hidden">
            <CardContent className="p-5 flex items-center justify-between">
               <div className="space-y-0.5">
                  <p className="text-[9px] font-black uppercase tracking-[0.2em] opacity-70">Next Milestone</p>
-                 <h4 className="font-black text-sm">Reach 77.0 kg</h4>
+                 <h4 className="font-black text-sm">Reach {targetWeight.toFixed(1)} kg</h4>
               </div>
               <div className="flex items-center gap-3">
                  <div className="text-right">
-                    <span className="text-2xl font-black">45%</span>
+                    <span className="text-2xl font-black">{Math.max(0, Math.min(100, progressPercent))}%</span>
                     <p className="text-[8px] font-bold uppercase opacity-60">Completed</p>
                  </div>
                  <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center">

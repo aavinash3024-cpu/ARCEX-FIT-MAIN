@@ -35,9 +35,10 @@ type WeeklyRate = 0.25 | 0.5 | 0.75 | 1.0;
 
 interface GoalSettingViewProps {
   onBack: () => void;
+  onGoalSaved?: () => void;
 }
 
-export function GoalSettingView({ onBack }: GoalSettingViewProps) {
+export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
   const [step, setStep] = useState(1);
   const [isSaved, setIsSaved] = useState(false);
   const [hasExistingGoal, setHasExistingGoal] = useState(false);
@@ -115,7 +116,10 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
     const weightDiff = Math.abs(tw - w);
     const weeksToGoal = derivedWeeklyRate > 0 ? (weightDiff / derivedWeeklyRate).toFixed(1) : "0";
 
+    const progressPercent = Math.round(((w - tw) / w) * 100); // Simple illustrative calculation
+
     return {
+      bmr,
       tdee,
       finalCalories,
       protein: proteinGrams,
@@ -128,14 +132,14 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
       weeksToGoal,
       weightDiff,
       derivedWeeklyRate,
-      currentDeficitOrSurplus
+      currentDeficitOrSurplus,
+      progressPercent
     };
   }, [weight, height, age, gender, activity, objective, targetWeight, calAdj, protAdj, carbRatio]);
 
   const nextStep = () => {
     if (step === 2 && !calculations.isWeightValid) return;
     if (step === 2) {
-      // Suggest initial calorie adjustment based on chosen weekly rate
       let initialOffset = 0;
       if (objective === 'loss') initialOffset = -(weeklyRate * 1100);
       if (objective === 'gain') initialOffset = (weeklyRate * 1100);
@@ -150,11 +154,13 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
     const dataToSave = {
       gender, age, weight, height, activity,
       objective, targetWeight, weeklyRate,
-      calAdj, protAdj, carbRatio, isSaved: true
+      calAdj, protAdj, carbRatio, isSaved: true,
+      ...calculations
     };
     localStorage.setItem('pulseflow_goal_data', JSON.stringify(dataToSave));
     setIsSaved(true);
     setHasExistingGoal(true);
+    if (onGoalSaved) onGoalSaved();
   };
 
   const handleEdit = () => {
@@ -164,7 +170,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
 
   const handleHeaderBack = () => {
     if (!isSaved && hasExistingGoal) {
-      // If we were editing, go back to the saved report and reload original data
       const saved = localStorage.getItem('pulseflow_goal_data');
       if (saved) {
         const data = JSON.parse(saved);
@@ -200,7 +205,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
 
         <Card className="border-none shadow-xl bg-white overflow-hidden rounded-[1.5rem] border border-muted/20">
           <CardContent className="p-0">
-            {/* Objective Header */}
             <div className="p-6 flex items-center justify-between border-b border-muted/10">
               <div className="space-y-0.5">
                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">Goal Objective</p>
@@ -211,7 +215,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
               <ChevronDown className="w-4 h-4 text-muted-foreground/40" />
             </div>
 
-            {/* Weights Stats Row */}
             <div className="flex bg-muted/5">
               <div className="flex-1 p-5 border-r border-muted/10">
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Current Weight</p>
@@ -227,9 +230,7 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
               </div>
             </div>
 
-            {/* Data Sections Stacked Vertically */}
             <div className="p-6 space-y-8">
-              {/* Energy Budget Section */}
               <div className="space-y-4">
                 <div className="border-l-4 border-primary pl-4 py-0.5">
                   <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Energy Budget</h4>
@@ -246,7 +247,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                 </div>
               </div>
 
-              {/* Journey Pace Section */}
               <div className="space-y-4">
                 <div className="border-l-4 border-orange-400 pl-4 py-0.5">
                   <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Journey Pace</h4>
@@ -263,7 +263,6 @@ export function GoalSettingView({ onBack }: GoalSettingViewProps) {
                 </div>
               </div>
 
-              {/* Macro Section */}
               <div className="space-y-4">
                 <div className="border-l-4 border-sky-400 pl-4 py-0.5 flex items-center gap-2">
                   <PieChart className="w-3 h-3 text-sky-400" />
