@@ -39,6 +39,14 @@ export function DashboardView() {
       color: "bg-sky-50" 
     },
     { 
+      label: "Fiber", 
+      value: "22", 
+      unit: "g", 
+      target: "35", 
+      icon: <Leaf className="w-5 h-5 text-emerald-500" />, 
+      color: "bg-emerald-50" 
+    },
+    { 
       label: "Steps", 
       value: "8,432", 
       unit: "steps", 
@@ -106,29 +114,27 @@ export function DashboardView() {
                       </div>
                     </div>
 
-                    <div className="space-y-4">
-                      <div className="relative h-6 flex items-center">
-                        <Progress value={Math.min(percentage, 100)} className="h-2 w-full" />
-                        
-                        {isCalories && (
-                          <>
-                            {/* BMR Marker */}
-                            <div 
-                              className="absolute top-0 h-6 w-[2px] bg-destructive/50 flex flex-col items-center" 
-                              style={{ left: `${(bmr / targetVal) * 100}%` }}
-                            >
-                              <span className="absolute -top-4 text-[7px] font-bold text-destructive uppercase">BMR</span>
-                            </div>
-                            {/* TDEE Marker */}
-                            <div 
-                              className="absolute top-0 h-6 w-[2px] bg-accent/80 flex flex-col items-center" 
-                              style={{ left: `${Math.min((tdee / targetVal) * 100, 100)}%` }}
-                            >
-                              <span className="absolute -bottom-4 text-[7px] font-bold text-accent uppercase">TDEE</span>
-                            </div>
-                          </>
-                        )}
-                      </div>
+                    <div className="relative h-6 flex items-center">
+                      <Progress value={Math.min(percentage, 100)} className="h-2 w-full" />
+                      
+                      {isCalories && (
+                        <>
+                          {/* BMR Marker */}
+                          <div 
+                            className="absolute top-0 h-6 w-[2px] bg-destructive/50 flex flex-col items-center" 
+                            style={{ left: `${(bmr / targetVal) * 100}%` }}
+                          >
+                            <span className="absolute -top-4 text-[7px] font-bold text-destructive uppercase">BMR</span>
+                          </div>
+                          {/* TDEE Marker */}
+                          <div 
+                            className="absolute top-0 h-6 w-[2px] bg-accent/80 flex flex-col items-center" 
+                            style={{ left: `${Math.min((tdee / targetVal) * 100, 100)}%` }}
+                          >
+                            <span className="absolute -bottom-4 text-[7px] font-bold text-accent uppercase">TDEE</span>
+                          </div>
+                        </>
+                      )}
                     </div>
                   </div>
                 </CardContent>
@@ -137,7 +143,7 @@ export function DashboardView() {
           })}
         </div>
 
-        {/* Macros Breakdown (Integrated into Daily Overview) */}
+        {/* Integrated Macros Breakdown */}
         <Card className="border-none shadow-sm overflow-hidden">
           <CardContent className="p-6 space-y-6">
             <h3 className="font-semibold flex items-center gap-2">
