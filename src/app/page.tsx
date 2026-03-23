@@ -34,7 +34,7 @@ export default function PulseFlowApp() {
     { id: 'dashboard', icon: LayoutDashboard, label: 'Home' },
     { id: 'nutrition', icon: UtensilsCrossed, label: 'Food' },
     { id: 'workout', icon: Dumbbell, label: 'Gym' },
-    { id: 'rank', icon: ChartIcon, label: 'Stats' },
+    { id: 'rank', icon: ChartIcon, label: 'Progress' },
   ];
 
   return (
