@@ -26,8 +26,13 @@ export function WorkoutView() {
 
   return (
     <div className="space-y-6 pb-24">
-      {/* 1. Personal Records Card (Hero Top) */}
-      <Card className="border-none shadow-md bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all mt-2">
+      {/* Page Title */}
+      <div className="pt-2">
+        <h1 className="text-2xl font-bold font-headline">Workouts</h1>
+      </div>
+
+      {/* 1. Sleek Personal Records Card */}
+      <Card className="border-none shadow-md bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
         <CardContent className="p-0 flex items-center">
           <div className="shrink-0 w-28 h-28 relative">
             <Image 
@@ -95,7 +100,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 3. My Split (Shifted Up) */}
+      {/* 3. My Split */}
       <Card className="border-none shadow-md bg-gradient-to-br from-indigo-50 to-white hover:translate-y-[-2px] transition-all cursor-pointer active:scale-[0.99] group border-l-4 border-l-indigo-400">
         <CardContent className="p-5 flex items-center justify-between">
           <div className="flex items-center gap-4">
@@ -112,7 +117,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 4. Grid: History & Library (Shifted to Last) */}
+      {/* 4. Grid: History & Library */}
       <div className="grid grid-cols-2 gap-4">
         <Card className="border-none shadow-sm bg-gradient-to-br from-sky-50 to-white hover:translate-y-[-2px] transition-all cursor-pointer active:scale-95 group">
           <CardContent className="p-5 flex flex-col items-start gap-3">
