@@ -1,4 +1,3 @@
-
 'use client';
 
 import React from 'react';
@@ -32,7 +31,7 @@ export function WorkoutView() {
         <CardContent className="p-0 flex items-center">
           <div className="shrink-0 w-28 h-28 relative">
             <Image 
-              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1634157703702-3c124b455499?q=80&w=600&auto=format&fit=crop"} 
+              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
               alt="Personal Records"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
