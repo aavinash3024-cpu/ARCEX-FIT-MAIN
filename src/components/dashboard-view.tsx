@@ -6,7 +6,6 @@ import {
   Droplets, 
   CheckCircle2, 
   Footprints, 
-  Weight, 
   Target,
   ChevronRight,
   TrendingUp,
@@ -17,10 +16,36 @@ import {
 import { Progress } from "@/components/ui/progress";
 
 export function DashboardView() {
+  const bmr = 1600;
+  const tdee = 2500;
+  const currentCal = 1840;
+  const targetCal = 2200;
+
   const metrics = [
-    { label: "Calories", value: "1,840", unit: "kcal", target: "2,200", icon: <Flame className="w-5 h-5 text-orange-500" />, color: "bg-orange-50" },
-    { label: "Hydration", value: "1.8", unit: "L", target: "3.0", icon: <Droplets className="w-5 h-5 text-sky-500" />, color: "bg-sky-50" },
-    { label: "Steps", value: "8,432", unit: "steps", target: "10,000", icon: <Footprints className="w-5 h-5 text-green-500" />, color: "bg-green-50" },
+    { 
+      label: "Calories", 
+      value: currentCal.toLocaleString(), 
+      unit: "kcal", 
+      target: targetCal.toLocaleString(), 
+      icon: <Flame className="w-5 h-5 text-orange-500" />, 
+      color: "bg-orange-50" 
+    },
+    { 
+      label: "Hydration", 
+      value: "1.8", 
+      unit: "L", 
+      target: "3.0", 
+      icon: <Droplets className="w-5 h-5 text-sky-500" />, 
+      color: "bg-sky-50" 
+    },
+    { 
+      label: "Steps", 
+      value: "8,432", 
+      unit: "steps", 
+      target: "10,000", 
+      icon: <Footprints className="w-5 h-5 text-green-500" />, 
+      color: "bg-green-50" 
+    },
   ];
 
   const nutrients = [
@@ -45,20 +70,24 @@ export function DashboardView() {
         </CardContent>
       </Card>
 
-      {/* Swipeable Metrics Belt */}
-      <section>
-        <div className="flex items-center justify-between mb-4">
+      {/* Daily Overview */}
+      <section className="space-y-6">
+        <div className="flex items-center justify-between">
           <h2 className="text-xl font-bold font-headline">Daily Overview</h2>
-          <span className="text-xs text-muted-foreground flex items-center">Swipe for more <ChevronRight className="w-3 h-3 ml-1" /></span>
+          <span className="text-xs text-muted-foreground flex items-center">Scroll for metrics <ChevronRight className="w-3 h-3 ml-1" /></span>
         </div>
+
+        {/* Metrics Belt */}
         <div className="flex gap-4 overflow-x-auto pb-4 swipe-container">
           {metrics.map((m, idx) => {
-            const current = parseInt(m.value.replace(',', ''));
-            const target = parseInt(m.target.replace(',', ''));
-            const percentage = Math.round((current / target) * 100);
+            const currentVal = parseFloat(m.value.replace(',', ''));
+            const targetVal = parseFloat(m.target.replace(',', ''));
+            const percentage = Math.round((currentVal / targetVal) * 100);
+            const isCalories = m.label === "Calories";
+
             return (
-              <Card key={idx} className="min-w-[170px] flex-shrink-0 border-none shadow-sm glass-card">
-                <CardContent className="p-4 flex flex-col justify-between h-36">
+              <Card key={idx} className="min-w-[200px] flex-shrink-0 border-none shadow-sm glass-card">
+                <CardContent className="p-4 flex flex-col justify-between h-48">
                   <div className="flex justify-between items-start">
                     <div className={`p-2 rounded-xl ${m.color}`}>
                       {m.icon}
@@ -67,7 +96,8 @@ export function DashboardView() {
                       {percentage}%
                     </Badge>
                   </div>
-                  <div className="space-y-2">
+                  
+                  <div className="space-y-4">
                     <div>
                       <p className="text-xs text-muted-foreground mb-1">{m.label}</p>
                       <div className="flex items-baseline gap-1">
@@ -75,79 +105,88 @@ export function DashboardView() {
                         <span className="text-[10px] text-muted-foreground">{m.unit}</span>
                       </div>
                     </div>
-                    <Progress value={percentage} className="h-1.5" />
+
+                    <div className="space-y-4">
+                      <div className="relative h-6 flex items-center">
+                        <Progress value={Math.min(percentage, 100)} className="h-2 w-full" />
+                        
+                        {isCalories && (
+                          <>
+                            {/* BMR Marker */}
+                            <div 
+                              className="absolute top-0 h-6 w-[2px] bg-destructive/50 flex flex-col items-center" 
+                              style={{ left: `${(bmr / targetVal) * 100}%` }}
+                            >
+                              <span className="absolute -top-4 text-[7px] font-bold text-destructive uppercase">BMR</span>
+                            </div>
+                            {/* TDEE Marker */}
+                            <div 
+                              className="absolute top-0 h-6 w-[2px] bg-accent/80 flex flex-col items-center" 
+                              style={{ left: `${Math.min((tdee / targetVal) * 100, 100)}%` }}
+                            >
+                              <span className="absolute -bottom-4 text-[7px] font-bold text-accent uppercase">TDEE</span>
+                            </div>
+                          </>
+                        )}
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
             );
           })}
         </div>
+
+        {/* Macros Breakdown (Integrated into Daily Overview) */}
+        <Card className="border-none shadow-sm overflow-hidden">
+          <CardContent className="p-6 space-y-6">
+            <h3 className="font-semibold flex items-center gap-2">
+              <Target className="w-5 h-5 text-primary" />
+              Nutrient Tracking
+            </h3>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+              {nutrients.map((n, idx) => (
+                <div key={idx} className="space-y-2">
+                  <div className="flex justify-between items-center text-xs">
+                    <div className="flex items-center gap-2">
+                      {n.icon}
+                      <span className="font-medium">{n.label}</span>
+                    </div>
+                    <span className="text-muted-foreground font-mono">
+                      {n.current} / {n.target}{n.unit}
+                    </span>
+                  </div>
+                  <Progress value={(n.current / n.target) * 100} className="h-1.5" />
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </section>
 
-      {/* Nutrient Breakdown Section */}
-      <Card className="border-none shadow-sm overflow-hidden">
-        <CardContent className="p-6 space-y-6">
-          <h3 className="font-semibold flex items-center gap-2">
-            <Target className="w-5 h-5 text-primary" />
-            Nutrient Breakdown
-          </h3>
-          <div className="space-y-5">
-            {nutrients.map((n, idx) => (
-              <div key={idx} className="space-y-2">
-                <div className="flex justify-between items-center text-sm">
-                  <div className="flex items-center gap-2">
-                    {n.icon}
-                    <span className="font-medium">{n.label}</span>
-                  </div>
-                  <span className="text-muted-foreground font-mono">
-                    {n.current} / {n.target}{n.unit}
-                  </span>
-                </div>
-                <Progress value={(n.current / n.target) * 100} className="h-2" />
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Weekly Progress & Goals */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <div className="grid grid-cols-1 gap-4">
         <Card className="border-none shadow-sm">
           <CardContent className="p-6 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="font-semibold flex items-center gap-2">
                 <CheckCircle2 className="w-5 h-5 text-primary" />
-                Active Goals
+                Weight Goal (Loss)
               </h3>
-              <Badge variant="secondary">3 Pending</Badge>
+              <Badge variant="secondary">Active</Badge>
             </div>
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Weight Goal (Loss)</span>
-                  <span className="font-medium">78.5 / 75.0 kg</span>
-                </div>
-                <Progress value={65} className="h-2" />
+            <div className="space-y-2">
+              <div className="flex justify-between text-sm">
+                <span>Journey to 75.0 kg</span>
+                <span className="font-medium">78.5 kg</span>
               </div>
-              <div className="space-y-2">
-                <div className="flex justify-between text-sm">
-                  <span>Workout Consistency</span>
-                  <span className="font-medium">80% reached</span>
-                </div>
-                <Progress value={80} className="h-2" />
-              </div>
+              <Progress value={65} className="h-2" />
             </div>
           </CardContent>
         </Card>
 
         <Card className="border-none shadow-sm">
-          <CardContent className="p-6 space-y-4">
-            <div className="flex items-center justify-between">
-              <h3 className="font-semibold flex items-center gap-2">
-                <TrendingUp className="w-5 h-5 text-accent" />
-                Latest Metric
-              </h3>
-            </div>
+          <CardContent className="p-6">
             <div className="flex items-center justify-between p-4 bg-muted/30 rounded-2xl">
               <div>
                 <p className="text-xs text-muted-foreground">Current Weight</p>
