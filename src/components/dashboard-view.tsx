@@ -257,7 +257,7 @@ export function DashboardView({
   };
 
   return (
-    <div className="space-y-4 pb-24 pt-10">
+    <div className="space-y-4 pb-24 pt-4">
       <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
         <CardContent className="p-5 flex items-center gap-4 min-h-[100px]">
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 shrink-0 relative bg-white/10">
