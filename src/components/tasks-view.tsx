@@ -55,10 +55,10 @@ export function TasksView({ onBack }: TasksViewProps) {
   const [editingTask, setEditingTask] = useState<Task | null>(null);
   const [detailsText, setDetailsText] = useState("");
 
-  const priorityBorderColor = {
-    low: 'border-l-green-500',
-    medium: 'border-l-amber-500',
-    high: 'border-l-destructive'
+  const priorityBgColor = {
+    low: 'bg-green-500',
+    medium: 'bg-amber-500',
+    high: 'bg-destructive'
   };
 
   const dotColor = {
@@ -215,7 +215,7 @@ export function TasksView({ onBack }: TasksViewProps) {
             </div>
           </div>
 
-          <div className="max-h-[220px] overflow-y-auto swipe-container scroll-smooth">
+          <div className="h-[216px] overflow-y-auto swipe-container scroll-smooth">
             {filteredTasks.length === 0 ? (
               <div className="text-center py-12 flex flex-col items-center gap-3 opacity-20">
                 <div className="w-12 h-12 rounded-full border-2 border-dashed border-foreground/30 flex items-center justify-center">
@@ -228,11 +228,11 @@ export function TasksView({ onBack }: TasksViewProps) {
                 {filteredTasks.map((task) => (
                   <div 
                     key={task.id} 
-                    className={cn(
-                      "p-4 flex items-center justify-between group hover:bg-muted/5 transition-colors border-l-[6px]",
-                      priorityBorderColor[task.priority]
-                    )}
+                    className="relative flex items-center justify-between group hover:bg-muted/5 transition-colors p-4 pl-6"
                   >
+                    {/* Reliable Priority Indicator Bar */}
+                    <div className={cn("absolute left-0 top-0 bottom-0 w-1.5", priorityBgColor[task.priority])} />
+                    
                     <div className="flex items-center gap-4 min-w-0">
                       <Checkbox 
                         checked={task.completed} 
