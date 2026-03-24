@@ -25,6 +25,7 @@ import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { parseMeal } from '@/ai/flows/parse-meal-flow';
 import { ScrollArea } from '@/components/ui/scroll-area';
+import { cn } from '@/lib/utils';
 
 interface LoggedMeal {
   id: string;
@@ -90,7 +91,11 @@ export function NutritionView() {
   };
 
   const saveMeal = (meal: LoggedMeal) => {
-    if (savedMeals.find(m => m.id === meal.id)) return;
+    if (savedMeals.find(m => m.id === meal.id)) {
+      // If already saved, maybe the user wants to unsave (optional toggle)
+      // For now, let's keep it simple: just return if exists.
+      return;
+    }
     setSavedMeals(prev => [meal, ...prev].slice(0, 50));
   };
 
@@ -233,37 +238,40 @@ export function NutritionView() {
                   {recentMeals.length === 0 ? (
                     <p className="text-center py-8 text-[10px] font-bold text-muted-foreground uppercase opacity-40">No recent logs</p>
                   ) : (
-                    recentMeals.map((meal) => (
-                      <div key={meal.id} className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-muted/20">
-                        <div className="flex items-center gap-3">
-                          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-                            <Utensils className="w-4 h-4 text-muted-foreground/60" />
+                    recentMeals.map((meal) => {
+                      const isSaved = savedMeals.some(s => s.id === meal.id);
+                      return (
+                        <div key={meal.id} className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-muted/20">
+                          <div className="flex items-center gap-3">
+                            <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                              <Utensils className="w-4 h-4 text-muted-foreground/60" />
+                            </div>
+                            <div>
+                              <p className="text-xs font-semibold">{meal.name}</p>
+                              <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.calories.toFixed(1)} kcal</p>
+                            </div>
                           </div>
-                          <div>
-                            <p className="text-xs font-semibold">{meal.name}</p>
-                            <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.calories} kcal • {meal.protein}g P</p>
+                          <div className="flex items-center gap-1">
+                            <Button 
+                              onClick={() => saveMeal(meal)}
+                              size="icon" 
+                              variant="ghost" 
+                              className={cn("w-7 h-7 rounded-full transition-colors", isSaved ? "text-primary" : "text-muted-foreground")}
+                            >
+                              <Bookmark className={cn("w-3.5 h-3.5", isSaved && "fill-current")} />
+                            </Button>
+                            <Button 
+                              onClick={() => setRecentMeals(prev => [ { ...meal, id: Math.random().toString(36).substr(2, 9), timestamp: Date.now() }, ...prev ].slice(0, 10))}
+                              size="icon" 
+                              variant="ghost" 
+                              className="w-7 h-7 rounded-full bg-primary/10 text-primary"
+                            >
+                              <Plus className="w-3.5 h-3.5" />
+                            </Button>
                           </div>
                         </div>
-                        <div className="flex items-center gap-1">
-                          <Button 
-                            onClick={() => saveMeal(meal)}
-                            size="icon" 
-                            variant="ghost" 
-                            className="w-7 h-7 rounded-full text-muted-foreground hover:text-primary"
-                          >
-                            <Bookmark className="w-3.5 h-3.5" />
-                          </Button>
-                          <Button 
-                            onClick={() => setRecentMeals(prev => [ { ...meal, id: Math.random().toString(36).substr(2, 9), timestamp: Date.now() }, ...prev ].slice(0, 10))}
-                            size="icon" 
-                            variant="ghost" 
-                            className="w-7 h-7 rounded-full bg-primary/10 text-primary"
-                          >
-                            <Plus className="w-3.5 h-3.5" />
-                          </Button>
-                        </div>
-                      </div>
-                    ))
+                      );
+                    })
                   )}
                 </div>
               </ScrollArea>
@@ -286,7 +294,7 @@ export function NutritionView() {
                           </div>
                           <div>
                             <p className="text-xs font-semibold">{meal.name}</p>
-                            <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.calories} kcal</p>
+                            <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.calories.toFixed(1)} kcal</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
@@ -322,42 +330,40 @@ export function NutritionView() {
           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70">Today's Log</h2>
           <span className="text-[9px] font-bold text-primary uppercase flex items-center">View Summary <ChevronRight className="w-3 h-3 ml-0.5" /></span>
         </div>
-        <div className="grid gap-3">
-          {recentMeals.length === 0 ? (
-            <p className="text-center py-6 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No meals logged today</p>
-          ) : (
-            recentMeals.map((meal) => (
-              <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group">
-                <CardContent className="p-0 flex h-20">
-                  <div className="w-20 bg-muted/20 shrink-0 flex items-center justify-center">
-                    <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10 group-hover:scale-110 transition-transform duration-300">
-                      <Utensils className="w-5 h-5 text-muted-foreground/40" />
-                    </div>
-                  </div>
-                  <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
-                    <div className="flex justify-between items-start">
-                      <div className="min-w-0">
-                        <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
-                        <h4 className="font-bold text-sm text-foreground/90 truncate">{meal.name}</h4>
+        
+        <ScrollArea className="h-[260px] pr-2">
+          <div className="grid gap-3">
+            {recentMeals.length === 0 ? (
+              <p className="text-center py-6 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No meals logged today</p>
+            ) : (
+              recentMeals.map((meal) => (
+                <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group">
+                  <CardContent className="p-0 flex h-20">
+                    <div className="w-20 bg-muted/20 shrink-0 flex items-center justify-center">
+                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10 group-hover:scale-110 transition-transform duration-300">
+                        <Utensils className="w-5 h-5 text-muted-foreground/40" />
                       </div>
-                      <span className="text-[9px] font-bold text-muted-foreground/40 shrink-0">{meal.time}</span>
                     </div>
-                    <div className="flex justify-between items-end">
-                      <div className="flex gap-2 text-[9px] font-bold text-muted-foreground/60 uppercase">
-                        <span>P: {meal.protein}g</span>
-                        <span>C: {meal.carbs}g</span>
-                        <span>F: {meal.fat}g</span>
+                    <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
+                      <div className="flex justify-between items-start">
+                        <div className="min-w-0">
+                          <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
+                          <h4 className="font-bold text-sm text-foreground/90 truncate">{meal.name}</h4>
+                        </div>
+                        <span className="text-[9px] font-bold text-muted-foreground/40 shrink-0">{meal.time}</span>
                       </div>
-                      <Badge variant="secondary" className="text-[9px] h-5 px-2 bg-primary/5 text-primary-foreground/80 font-black border-none">
-                        {meal.calories} KCAL
-                      </Badge>
+                      <div className="flex justify-end items-end">
+                        <Badge variant="secondary" className="text-[9px] h-5 px-2 bg-primary/5 text-primary-foreground/80 font-black border-none">
+                          {meal.calories.toFixed(1)} KCAL
+                        </Badge>
+                      </div>
                     </div>
-                  </div>
-                </CardContent>
-              </Card>
-            ))
-          )}
-        </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </ScrollArea>
       </section>
 
       <div className="grid grid-cols-2 gap-4 pb-6">
