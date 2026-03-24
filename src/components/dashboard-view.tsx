@@ -287,7 +287,8 @@ export function DashboardView({
       const label = format(day, 'EEE');
       return {
         label,
-        active: streakData.history.includes(dayStr)
+        active: streakData.history.includes(dayStr),
+        dayNum: format(day, 'd')
       };
     });
   }, [streakData]);
@@ -345,7 +346,11 @@ export function DashboardView({
                       <div className={`p-1.5 rounded-lg ${m.color}`}>
                         {m.icon}
                       </div>
-                      {!isStreak && <span className="text-[10px] font-bold text-muted-foreground">{percentage}%</span>}
+                      {isStreak ? (
+                        <span className="text-[9px] font-black text-primary uppercase tracking-tighter">{streakData.count} DAY STREAK</span>
+                      ) : (
+                        <span className="text-[10px] font-bold text-muted-foreground">{percentage}%</span>
+                      )}
                     </div>
                     
                     <div className="space-y-2">
@@ -388,7 +393,9 @@ export function DashboardView({
                                     ? "bg-[#ff6b6b] border-[#ff6b6b] shadow-sm" 
                                     : "bg-muted/30 border-muted/50"
                                 )}>
-                                  {day.active && <Check className="w-3 h-3 text-white" />}
+                                  <span className={cn("text-[8px] font-black", day.active ? "text-white" : "text-muted-foreground/40")}>
+                                    {day.dayNum}
+                                  </span>
                                 </div>
                                 <span className="text-[7px] font-black text-muted-foreground uppercase">{day.label}</span>
                               </div>
