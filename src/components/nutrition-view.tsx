@@ -18,7 +18,8 @@ import {
   Camera,
   ChevronRight,
   Loader2,
-  Trash2
+  Trash2,
+  TrendingUp
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -43,6 +44,7 @@ export function NutritionView() {
   const [mealInput, setMealInput] = useState("");
   const [isParsing, setIsParsing] = useState(false);
   const [isListening, setIsListening] = useState(false);
+  const [credits, setCredits] = useState(25);
   
   const [recentMeals, setRecentMeals] = useState<LoggedMeal[]>([]);
   const [savedMeals, setSavedMeals] = useState<LoggedMeal[]>([]);
@@ -54,10 +56,12 @@ export function NutritionView() {
     const savedRecent = localStorage.getItem('pulseflow_recent_meals');
     const savedFavorites = localStorage.getItem('pulseflow_saved_meals');
     const savedLogged = localStorage.getItem('pulseflow_today_logged_meals');
+    const savedCredits = localStorage.getItem('pulseflow_meal_credits');
     
     if (savedRecent) setRecentMeals(JSON.parse(savedRecent));
     if (savedFavorites) setSavedMeals(JSON.parse(savedFavorites));
     if (savedLogged) setLoggedMeals(JSON.parse(savedLogged));
+    if (savedCredits !== null) setCredits(Number(savedCredits));
     
     setIsLoaded(true);
   }, []);
@@ -81,6 +85,12 @@ export function NutritionView() {
     }
   }, [loggedMeals, isLoaded]);
 
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('pulseflow_meal_credits', credits.toString());
+    }
+  }, [credits, isLoaded]);
+
   const handleLogMeal = async () => {
     if (!mealInput.trim()) return;
     setIsParsing(true);
@@ -99,6 +109,7 @@ export function NutritionView() {
       };
       
       setLoggedMeals(prev => [newMeal, ...prev]);
+      setCredits(prev => Math.max(0, prev - 1));
       setRecentMeals(prev => {
         const filtered = prev.filter(m => m.name.toLowerCase() !== newMeal.name.toLowerCase());
         return [newMeal, ...filtered].slice(0, 10);
@@ -119,6 +130,7 @@ export function NutritionView() {
       timestamp: Date.now()
     };
     setLoggedMeals(prev => [newEntry, ...prev]);
+    setCredits(prev => Math.max(0, prev - 1));
   };
 
   const saveMeal = (meal: LoggedMeal) => {
@@ -127,6 +139,11 @@ export function NutritionView() {
       return;
     }
     setSavedMeals(prev => [meal, ...prev].slice(0, 50));
+  };
+
+  const deleteLoggedMeal = (id: string) => {
+    setLoggedMeals(prev => prev.filter(m => m.id !== id));
+    // Note: Deleting a log does not restore credits as per user request
   };
 
   const deleteSavedMeal = (id: string) => {
@@ -208,7 +225,7 @@ export function NutritionView() {
             <div className="flex-1 min-w-0">
               <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground/80">Meal Logging</h2>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                TODAY'S CREDITS: <span className="text-primary">25/25</span>
+                TODAY'S CREDITS: <span className={cn("font-black", credits <= 5 ? "text-destructive" : "text-primary")}>{credits}/25</span>
               </p>
             </div>
           </div>
@@ -259,10 +276,10 @@ export function NutritionView() {
 
               <Button 
                 onClick={handleLogMeal}
-                disabled={isParsing || !mealInput.trim()}
+                disabled={isParsing || !mealInput.trim() || credits <= 0}
                 className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
               >
-                {isParsing ? <Loader2 className="w-4 h-4 animate-spin" /> : "Log This Meal Now"}
+                {isParsing ? <Loader2 className="w-4 h-4 animate-spin" /> : credits <= 0 ? "No Credits Remaining" : "Log This Meal Now"}
               </Button>
             </TabsContent>
 
@@ -296,6 +313,7 @@ export function NutritionView() {
                             </Button>
                             <Button 
                               onClick={() => logExistingMeal(meal)}
+                              disabled={credits <= 0}
                               size="icon" 
                               variant="ghost" 
                               className="w-7 h-7 rounded-full bg-primary/10 text-primary"
@@ -342,6 +360,7 @@ export function NutritionView() {
                           </Button>
                           <Button 
                             onClick={() => logExistingMeal(meal)}
+                            disabled={credits <= 0}
                             size="icon" 
                             variant="ghost" 
                             className="w-7 h-7 rounded-full bg-primary/10 text-primary"
@@ -365,20 +384,20 @@ export function NutritionView() {
           <span className="text-[9px] font-bold text-primary uppercase flex items-center">View Summary <ChevronRight className="w-3 h-3 ml-0.5" /></span>
         </div>
         
-        <ScrollArea className="h-[260px] pr-2">
+        <ScrollArea className="h-[240px] pr-2">
           <div className="grid gap-3">
             {!isLoaded || loggedMeals.length === 0 ? (
               <p className="text-center py-8 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No meals logged today</p>
             ) : (
               loggedMeals.map((meal) => (
-                <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group">
+                <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group relative">
                   <CardContent className="p-0 flex h-[72px]">
                     <div className="w-14 bg-muted/20 shrink-0 flex items-center justify-center">
                       <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10">
                         <Utensils className="w-4 h-4 text-muted-foreground/30" />
                       </div>
                     </div>
-                    <div className="flex-1 p-2.5 flex flex-col justify-between min-w-0">
+                    <div className="flex-1 p-2.5 flex flex-col justify-between min-w-0 pr-10">
                       <div className="flex justify-between items-start">
                         <div className="min-w-0">
                           <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
@@ -397,6 +416,14 @@ export function NutritionView() {
                         </Badge>
                       </div>
                     </div>
+                    <Button 
+                      onClick={() => deleteLoggedMeal(meal.id)}
+                      size="icon" 
+                      variant="ghost" 
+                      className="absolute right-2 top-2 w-7 h-7 rounded-full text-muted-foreground/20 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
                   </CardContent>
                 </Card>
               ))
@@ -406,34 +433,30 @@ export function NutritionView() {
       </section>
 
       <div className="grid grid-cols-2 gap-4 pb-6">
-        <Card className="border-none shadow-sm bg-white hover:bg-sky-50 transition-all cursor-pointer active:scale-95 group border border-muted/20">
-          <CardContent className="p-5 flex flex-col items-start gap-3">
-            <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center group-hover:bg-sky-200 transition-colors">
-              <History className="w-5 h-5 text-sky-600" />
-            </div>
-            <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
-              <p className="text-xs font-bold text-foreground/80">{loggedMeals.length} logged</p>
-            </div>
-            <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-sky-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
-              Details <ChevronRight className="w-3 h-3" />
-            </button>
-          </CardContent>
+        <Card className="border-none shadow-sm bg-white border border-muted/20 rounded-[1.5rem] flex flex-col items-center p-6 text-center space-y-4">
+          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+            <History className="w-6 h-6 text-primary" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm font-black uppercase tracking-tight text-foreground">Meal History</h3>
+            <p className="text-[10px] font-medium text-muted-foreground leading-tight">Review your past logged meals.</p>
+          </div>
+          <Button variant="default" className="w-full rounded-2xl bg-primary/80 hover:bg-primary font-black uppercase text-[10px] tracking-widest h-11 shadow-sm">
+            Go to Tool
+          </Button>
         </Card>
         
-        <Card className="border-none shadow-sm bg-white hover:bg-purple-50 transition-all cursor-pointer active:scale-95 group border border-muted/20">
-          <CardContent className="p-5 flex flex-col items-start gap-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-              <PieChart className="w-5 h-5 text-purple-600" />
-            </div>
-            <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Calorie Trends</p>
-              <p className="text-xs font-bold text-foreground/80">Avg. 1,940 kcal</p>
-            </div>
-            <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-purple-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
-              Details <ChevronRight className="w-3 h-3" />
-            </button>
-          </CardContent>
+        <Card className="border-none shadow-sm bg-white border border-muted/20 rounded-[1.5rem] flex flex-col items-center p-6 text-center space-y-4">
+          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
+            <TrendingUp className="w-6 h-6 text-primary" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="text-sm font-black uppercase tracking-tight text-foreground">Trends Analysis</h3>
+            <p className="text-[10px] font-medium text-muted-foreground leading-tight">A dashboard to analyze your intake.</p>
+          </div>
+          <Button variant="default" className="w-full rounded-2xl bg-primary/80 hover:bg-primary font-black uppercase text-[10px] tracking-widest h-11 shadow-sm">
+            Go to Tool
+          </Button>
         </Card>
       </div>
     </div>
