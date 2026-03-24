@@ -143,7 +143,6 @@ export function NutritionView() {
 
   const deleteLoggedMeal = (id: string) => {
     setLoggedMeals(prev => prev.filter(m => m.id !== id));
-    // Note: Deleting a log does not restore credits as per user request
   };
 
   const deleteSavedMeal = (id: string) => {
@@ -407,9 +406,9 @@ export function NutritionView() {
                       </div>
                       <div className="flex justify-between items-end">
                         <div className="flex gap-2.5 text-[10px] font-black text-muted-foreground/80 uppercase">
-                          <span className="flex items-center gap-0.5"><span className="opacity-40">P:</span>{meal.protein}g</span>
-                          <span className="flex items-center gap-0.5"><span className="opacity-40">C:</span>{meal.carbs}g</span>
-                          <span className="flex items-center gap-0.5"><span className="opacity-40">F:</span>{meal.fat}g</span>
+                          <span className="flex items-center gap-0.5"><span className="opacity-40">P:</span>{meal.protein}</span>
+                          <span className="flex items-center gap-0.5"><span className="opacity-40">C:</span>{meal.carbs}</span>
+                          <span className="flex items-center gap-0.5"><span className="opacity-40">F:</span>{meal.fat}</span>
                         </div>
                         <Badge variant="secondary" className="text-[10px] h-5 px-2 bg-primary/10 text-primary font-black border-none shadow-none">
                           {meal.calories} KCAL
@@ -433,28 +432,28 @@ export function NutritionView() {
       </section>
 
       <div className="grid grid-cols-2 gap-4 pb-6">
-        <Card className="border-none shadow-sm bg-white border border-muted/20 rounded-[1.5rem] flex flex-col items-center p-6 text-center space-y-4">
-          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-            <History className="w-6 h-6 text-primary" />
+        <Card className="border-none shadow-sm bg-white border border-muted/20 rounded-[1.5rem] flex flex-col items-center p-4 text-center space-y-3">
+          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+            <History className="w-5 h-5 text-primary" />
           </div>
-          <div className="space-y-1">
-            <h3 className="text-sm font-black uppercase tracking-tight text-foreground">Meal History</h3>
-            <p className="text-[10px] font-medium text-muted-foreground leading-tight">Review your past logged meals.</p>
+          <div className="space-y-0.5">
+            <h3 className="text-[13px] font-black uppercase tracking-tight text-foreground">Meal History</h3>
+            <p className="text-[9px] font-medium text-muted-foreground leading-tight">Review your past logs.</p>
           </div>
-          <Button variant="default" className="w-full rounded-2xl bg-primary/80 hover:bg-primary font-black uppercase text-[10px] tracking-widest h-11 shadow-sm">
+          <Button variant="default" className="w-full rounded-2xl bg-primary/80 hover:bg-primary font-black uppercase text-[9px] tracking-widest h-9 shadow-sm">
             Go to Tool
           </Button>
         </Card>
         
-        <Card className="border-none shadow-sm bg-white border border-muted/20 rounded-[1.5rem] flex flex-col items-center p-6 text-center space-y-4">
-          <div className="w-12 h-12 bg-primary/10 rounded-full flex items-center justify-center">
-            <TrendingUp className="w-6 h-6 text-primary" />
+        <Card className="border-none shadow-sm bg-white border border-muted/20 rounded-[1.5rem] flex flex-col items-center p-4 text-center space-y-3">
+          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
+            <TrendingUp className="w-5 h-5 text-primary" />
           </div>
-          <div className="space-y-1">
-            <h3 className="text-sm font-black uppercase tracking-tight text-foreground">Trends Analysis</h3>
-            <p className="text-[10px] font-medium text-muted-foreground leading-tight">A dashboard to analyze your intake.</p>
+          <div className="space-y-0.5">
+            <h3 className="text-[13px] font-black uppercase tracking-tight text-foreground">Trends</h3>
+            <p className="text-[9px] font-medium text-muted-foreground leading-tight">Analyze your intake.</p>
           </div>
-          <Button variant="default" className="w-full rounded-2xl bg-primary/80 hover:bg-primary font-black uppercase text-[10px] tracking-widest h-11 shadow-sm">
+          <Button variant="default" className="w-full rounded-2xl bg-primary/80 hover:bg-primary font-black uppercase text-[9px] tracking-widest h-9 shadow-sm">
             Go to Tool
           </Button>
         </Card>
