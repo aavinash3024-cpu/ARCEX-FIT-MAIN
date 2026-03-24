@@ -45,14 +45,18 @@ export function NutritionView() {
   const [isParsing, setIsParsing] = useState(false);
   const [recentMeals, setRecentMeals] = useState<LoggedMeal[]>([]);
   const [savedMeals, setSavedMeals] = useState<LoggedMeal[]>([]);
+  const [loggedMeals, setLoggedMeals] = useState<LoggedMeal[]>([]);
   const [isListening, setIsListening] = useState(false);
 
   // Load from localStorage
   useEffect(() => {
     const savedRecent = localStorage.getItem('pulseflow_recent_meals');
     const savedFavorites = localStorage.getItem('pulseflow_saved_meals');
+    const savedLogged = localStorage.getItem('pulseflow_today_logged_meals');
+    
     if (savedRecent) setRecentMeals(JSON.parse(savedRecent));
     if (savedFavorites) setSavedMeals(JSON.parse(savedFavorites));
+    if (savedLogged) setLoggedMeals(JSON.parse(savedLogged));
   }, []);
 
   // Persist to localStorage
@@ -63,6 +67,10 @@ export function NutritionView() {
   useEffect(() => {
     localStorage.setItem('pulseflow_saved_meals', JSON.stringify(savedMeals));
   }, [savedMeals]);
+
+  useEffect(() => {
+    localStorage.setItem('pulseflow_today_logged_meals', JSON.stringify(loggedMeals));
+  }, [loggedMeals]);
 
   const handleLogMeal = async () => {
     if (!mealInput.trim()) return;
@@ -81,7 +89,11 @@ export function NutritionView() {
         timestamp: Date.now()
       };
       
-      setRecentMeals(prev => [newMeal, ...prev].slice(0, 10));
+      setLoggedMeals(prev => [newMeal, ...prev]);
+      setRecentMeals(prev => {
+        const filtered = prev.filter(m => m.name.toLowerCase() !== newMeal.name.toLowerCase());
+        return [newMeal, ...filtered].slice(0, 10);
+      });
       setMealInput("");
     } catch (error) {
       console.error("Failed to parse meal", error);
@@ -90,12 +102,18 @@ export function NutritionView() {
     }
   };
 
+  const logExistingMeal = (meal: LoggedMeal) => {
+    const newEntry: LoggedMeal = {
+      ...meal,
+      id: Math.random().toString(36).substr(2, 9),
+      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: Date.now()
+    };
+    setLoggedMeals(prev => [newEntry, ...prev]);
+  };
+
   const saveMeal = (meal: LoggedMeal) => {
-    if (savedMeals.find(m => m.id === meal.id)) {
-      // If already saved, maybe the user wants to unsave (optional toggle)
-      // For now, let's keep it simple: just return if exists.
-      return;
-    }
+    if (savedMeals.find(m => m.id === meal.id)) return;
     setSavedMeals(prev => [meal, ...prev].slice(0, 50));
   };
 
@@ -239,7 +257,7 @@ export function NutritionView() {
                     <p className="text-center py-8 text-[10px] font-bold text-muted-foreground uppercase opacity-40">No recent logs</p>
                   ) : (
                     recentMeals.map((meal) => {
-                      const isSaved = savedMeals.some(s => s.id === meal.id);
+                      const isSaved = savedMeals.some(s => s.name.toLowerCase() === meal.name.toLowerCase());
                       return (
                         <div key={meal.id} className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-muted/20">
                           <div className="flex items-center gap-3">
@@ -248,7 +266,7 @@ export function NutritionView() {
                             </div>
                             <div>
                               <p className="text-xs font-semibold">{meal.name}</p>
-                              <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.calories.toFixed(1)} kcal</p>
+                              <p className="text-[8px] font-bold text-muted-foreground uppercase">{Math.round(meal.calories)} kcal</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-1">
@@ -261,7 +279,7 @@ export function NutritionView() {
                               <Bookmark className={cn("w-3.5 h-3.5", isSaved && "fill-current")} />
                             </Button>
                             <Button 
-                              onClick={() => setRecentMeals(prev => [ { ...meal, id: Math.random().toString(36).substr(2, 9), timestamp: Date.now() }, ...prev ].slice(0, 10))}
+                              onClick={() => logExistingMeal(meal)}
                               size="icon" 
                               variant="ghost" 
                               className="w-7 h-7 rounded-full bg-primary/10 text-primary"
@@ -294,7 +312,7 @@ export function NutritionView() {
                           </div>
                           <div>
                             <p className="text-xs font-semibold">{meal.name}</p>
-                            <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.calories.toFixed(1)} kcal</p>
+                            <p className="text-[8px] font-bold text-muted-foreground uppercase">{Math.round(meal.calories)} kcal</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
@@ -307,7 +325,7 @@ export function NutritionView() {
                             <Trash2 className="w-3.5 h-3.5" />
                           </Button>
                           <Button 
-                            onClick={() => setRecentMeals(prev => [ { ...meal, id: Math.random().toString(36).substr(2, 9), timestamp: Date.now() }, ...prev ].slice(0, 10))}
+                            onClick={() => logExistingMeal(meal)}
                             size="icon" 
                             variant="ghost" 
                             className="w-7 h-7 rounded-full bg-primary/10 text-primary"
@@ -333,10 +351,10 @@ export function NutritionView() {
         
         <ScrollArea className="h-[260px] pr-2">
           <div className="grid gap-3">
-            {recentMeals.length === 0 ? (
+            {loggedMeals.length === 0 ? (
               <p className="text-center py-6 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No meals logged today</p>
             ) : (
-              recentMeals.map((meal) => (
+              loggedMeals.map((meal) => (
                 <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group">
                   <CardContent className="p-0 flex h-20">
                     <div className="w-20 bg-muted/20 shrink-0 flex items-center justify-center">
@@ -352,9 +370,14 @@ export function NutritionView() {
                         </div>
                         <span className="text-[9px] font-bold text-muted-foreground/40 shrink-0">{meal.time}</span>
                       </div>
-                      <div className="flex justify-end items-end">
+                      <div className="flex justify-between items-end">
+                        <div className="flex gap-2 text-[8px] font-bold text-muted-foreground uppercase opacity-60">
+                          <span>P: {Math.round(meal.protein)}g</span>
+                          <span>C: {Math.round(meal.carbs)}g</span>
+                          <span>F: {Math.round(meal.fat)}g</span>
+                        </div>
                         <Badge variant="secondary" className="text-[9px] h-5 px-2 bg-primary/5 text-primary-foreground/80 font-black border-none">
-                          {meal.calories.toFixed(1)} KCAL
+                          {Math.round(meal.calories)} KCAL
                         </Badge>
                       </div>
                     </div>
@@ -374,7 +397,7 @@ export function NutritionView() {
             </div>
             <div className="space-y-0.5">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
-              <p className="text-xs font-bold text-foreground/80">{recentMeals.length} logged</p>
+              <p className="text-xs font-bold text-foreground/80">{loggedMeals.length} logged</p>
             </div>
             <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-sky-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
               Details <ChevronRight className="w-3 h-3" />
