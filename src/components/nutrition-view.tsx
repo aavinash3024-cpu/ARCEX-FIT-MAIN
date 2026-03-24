@@ -432,30 +432,34 @@ export function NutritionView() {
       </section>
 
       <div className="grid grid-cols-2 gap-4 pb-6">
-        <Card className="border-none shadow-sm bg-white border border-muted/20 rounded-[1.5rem] flex flex-col items-center p-4 text-center space-y-3">
-          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-            <History className="w-5 h-5 text-primary" />
-          </div>
-          <div className="space-y-0.5">
-            <h3 className="text-[13px] font-black uppercase tracking-tight text-foreground">Meal History</h3>
-            <p className="text-[9px] font-medium text-muted-foreground leading-tight">Review your past logs.</p>
-          </div>
-          <Button variant="default" className="w-full rounded-2xl bg-primary/80 hover:bg-primary font-black uppercase text-[9px] tracking-widest h-9 shadow-sm">
-            Go to Tool
-          </Button>
+        <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer active:scale-95 group border border-muted/20">
+          <CardContent className="p-5 flex flex-col items-start gap-3">
+            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <History className="w-5 h-5 text-primary" />
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
+              <p className="text-xs font-bold text-foreground/80">Review logs</p>
+            </div>
+            <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-primary uppercase tracking-widest hover:opacity-70 transition-opacity">
+              Details <ChevronRight className="w-3 h-3" />
+            </button>
+          </CardContent>
         </Card>
         
-        <Card className="border-none shadow-sm bg-white border border-muted/20 rounded-[1.5rem] flex flex-col items-center p-4 text-center space-y-3">
-          <div className="w-10 h-10 bg-primary/10 rounded-full flex items-center justify-center">
-            <TrendingUp className="w-5 h-5 text-primary" />
-          </div>
-          <div className="space-y-0.5">
-            <h3 className="text-[13px] font-black uppercase tracking-tight text-foreground">Trends</h3>
-            <p className="text-[9px] font-medium text-muted-foreground leading-tight">Analyze your intake.</p>
-          </div>
-          <Button variant="default" className="w-full rounded-2xl bg-primary/80 hover:bg-primary font-black uppercase text-[9px] tracking-widest h-9 shadow-sm">
-            Go to Tool
-          </Button>
+        <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer active:scale-95 group border border-muted/20">
+          <CardContent className="p-5 flex flex-col items-start gap-3">
+            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center group-hover:bg-primary/20 transition-colors">
+              <TrendingUp className="w-5 h-5 text-primary" />
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Trends Analysis</p>
+              <p className="text-xs font-bold text-foreground/80">Analyze intake</p>
+            </div>
+            <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-primary uppercase tracking-widest hover:opacity-70 transition-opacity">
+              Details <ChevronRight className="w-3 h-3" />
+            </button>
+          </CardContent>
         </Card>
       </div>
     </div>
