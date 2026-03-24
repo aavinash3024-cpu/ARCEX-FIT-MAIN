@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -382,7 +381,7 @@ export function NutritionView() {
         </div>
         <CardContent className="p-4 space-y-4">
           <div className="flex items-center justify-between px-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">Active Tracker</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">MEALS</p>
             <span className="text-[9px] font-bold text-primary uppercase flex items-center cursor-pointer hover:opacity-70 transition-opacity">
               View Summary <ChevronRight className="w-3 h-3 ml-0.5" />
             </span>
