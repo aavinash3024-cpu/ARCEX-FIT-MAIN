@@ -21,6 +21,7 @@ const ParseMealOutputSchema = z.object({
   protein: z.number().describe('Estimated protein in grams.'),
   carbs: z.number().describe('Estimated carbohydrates in grams.'),
   fat: z.number().describe('Estimated fat in grams.'),
+  fiber: z.number().describe('Estimated fiber in grams.'),
 });
 export type ParseMealOutput = z.infer<typeof ParseMealOutputSchema>;
 

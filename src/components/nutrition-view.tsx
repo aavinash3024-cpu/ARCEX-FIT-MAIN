@@ -36,6 +36,7 @@ interface LoggedMeal {
   carbs: number;
   protein: number;
   fat: number;
+  fiber: number;
   time: string;
   timestamp: number;
 }
@@ -91,6 +92,7 @@ export function NutritionView() {
         carbs: Math.round(result.carbs),
         protein: Math.round(result.protein),
         fat: Math.round(result.fat),
+        fiber: Math.round(result.fiber),
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       };
@@ -121,7 +123,8 @@ export function NutritionView() {
   };
 
   const saveMeal = (meal: LoggedMeal) => {
-    if (savedMeals.find(m => m.name.toLowerCase() === meal.name.toLowerCase())) {
+    const isAlreadySaved = savedMeals.some(m => m.name.toLowerCase() === meal.name.toLowerCase());
+    if (isAlreadySaved) {
       setSavedMeals(prev => prev.filter(m => m.name.toLowerCase() !== meal.name.toLowerCase()));
       return;
     }
@@ -177,8 +180,14 @@ export function NutritionView() {
       calories: acc.calories + meal.calories,
       protein: acc.protein + meal.protein,
       carbs: acc.carbs + meal.carbs,
-      fat: acc.fat + meal.fat
-    }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+      fat: acc.fat + meal.fat,
+      fiber: acc.fiber + meal.fiber
+    }), { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 });
+
+    const totalMacros = totals.protein + totals.carbs + totals.fat;
+    const proteinPct = totalMacros > 0 ? (totals.protein / totalMacros) * 100 : 0;
+    const carbsPct = totalMacros > 0 ? (totals.carbs / totalMacros) * 100 : 0;
+    const fatPct = totalMacros > 0 ? (totals.fat / totalMacros) * 100 : 0;
 
     return (
       <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -189,53 +198,71 @@ export function NutritionView() {
           <h1 className="text-2xl font-bold font-headline">Daily Summary</h1>
         </div>
 
-        <Card className="border-none shadow-md bg-white overflow-hidden">
-          <CardContent className="p-6 space-y-6">
-            <div className="text-center space-y-1">
-              <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Total Intake</p>
-              <div className="flex items-baseline justify-center gap-1">
-                <p className="text-4xl font-black text-foreground">{totals.calories}</p>
-                <span className="text-sm font-bold text-muted-foreground uppercase">Kcal</span>
+        <Card className="border-none shadow-xl bg-white overflow-hidden rounded-[2rem]">
+          <CardContent className="p-8 space-y-8">
+            <div className="text-center space-y-2">
+              <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Total Intake</p>
+              <div className="flex items-baseline justify-center gap-1.5">
+                <p className="text-5xl font-black text-foreground">{totals.calories}</p>
+                <span className="text-sm font-bold text-muted-foreground uppercase tracking-widest">Kcal</span>
               </div>
             </div>
 
-            <div className="grid grid-cols-3 gap-2 pt-6 border-t border-muted/10">
+            <div className="space-y-3">
+              <div className="flex h-3 w-full rounded-full overflow-hidden bg-muted/20 shadow-inner">
+                <div className="bg-sky-500 h-full transition-all duration-1000" style={{ width: `${proteinPct}%` }} />
+                <div className="bg-primary h-full transition-all duration-1000" style={{ width: `${carbsPct}%` }} />
+                <div className="bg-yellow-500 h-full transition-all duration-1000" style={{ width: `${fatPct}%` }} />
+              </div>
+              <div className="flex justify-between text-[8px] font-black text-muted-foreground uppercase tracking-widest px-1">
+                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-sky-500" /> Protein</span>
+                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> Carbs</span>
+                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-yellow-500" /> Fats</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-4 gap-2 pt-6 border-t border-muted/10">
               <div className="text-center space-y-1">
-                <p className="text-lg font-black text-sky-600">{totals.protein}g</p>
+                <p className="text-xl font-black text-sky-600">{totals.protein}g</p>
                 <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Protein</p>
               </div>
               <div className="text-center space-y-1">
-                <p className="text-lg font-black text-primary">{totals.carbs}g</p>
+                <p className="text-xl font-black text-primary">{totals.carbs}g</p>
                 <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Carbs</p>
               </div>
               <div className="text-center space-y-1">
-                <p className="text-lg font-black text-yellow-600">{totals.fat}g</p>
+                <p className="text-xl font-black text-yellow-600">{totals.fat}g</p>
                 <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Fats</p>
+              </div>
+              <div className="text-center space-y-1">
+                <p className="text-xl font-black text-green-600">{totals.fiber}g</p>
+                <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Fiber</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        <section className="space-y-3">
-          <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">Meal Breakdown</h3>
+        <section className="space-y-4">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2">Meal Breakdown</h3>
           <div className="space-y-3">
             {loggedMeals.length === 0 ? (
-              <p className="text-center py-12 opacity-30 text-[10px] font-black uppercase tracking-widest">No entries recorded</p>
+              <p className="text-center py-16 opacity-30 text-[10px] font-black uppercase tracking-widest">No entries recorded</p>
             ) : (
               loggedMeals.map(meal => (
-                <Card key={meal.id} className="border-none shadow-sm bg-white hover:bg-muted/5 transition-colors">
-                  <CardContent className="p-4 flex justify-between items-center">
-                    <div className="space-y-0.5 min-w-0">
-                      <p className="text-[9px] font-black text-primary uppercase tracking-tighter">{meal.type}</p>
+                <Card key={meal.id} className="border-none shadow-sm bg-white hover:bg-muted/5 transition-all">
+                  <CardContent className="p-5 flex justify-between items-center">
+                    <div className="space-y-1 min-w-0">
+                      <p className="text-[9px] font-black text-primary uppercase tracking-[0.15em]">{meal.type}</p>
                       <h4 className="font-bold text-sm text-foreground truncate">{meal.name}</h4>
-                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tight">{meal.time}</p>
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tight opacity-50">{meal.time}</p>
                     </div>
-                    <div className="text-right space-y-1 shrink-0">
-                      <p className="text-sm font-black text-foreground">{meal.calories} KCAL</p>
-                      <div className="flex gap-2 text-[8px] font-bold text-muted-foreground uppercase">
-                        <span>P: {meal.protein}g</span>
-                        <span>C: {meal.carbs}g</span>
-                        <span>F: {meal.fat}g</span>
+                    <div className="text-right space-y-2 shrink-0">
+                      <p className="text-md font-black text-foreground">{meal.calories} KCAL</p>
+                      <div className="flex gap-3 text-[10px] font-black text-muted-foreground uppercase tracking-tight">
+                        <span className="text-sky-600">P {meal.protein}g</span>
+                        <span className="text-primary">C {meal.carbs}g</span>
+                        <span className="text-yellow-600">F {meal.fat}g</span>
+                        <span className="text-green-600">Fi {meal.fiber}g</span>
                       </div>
                     </div>
                   </CardContent>
@@ -273,7 +300,7 @@ export function NutritionView() {
               <Sparkles className="w-3 h-3" /> AI Insight
             </h3>
             <p className="text-[11px] text-muted-foreground font-medium leading-tight mt-0.5 line-clamp-2">
-              Fiber is lower today. Try adding broccoli or chia seeds to dinner to reach your goal.
+              Your fiber intake is looking solid today! High fiber helps with digestion and sustained energy.
             </p>
           </div>
         </CardContent>
@@ -453,13 +480,13 @@ export function NutritionView() {
           <div className="absolute inset-0 bg-black/25" />
           <div className="absolute bottom-3 left-5">
             <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2">
-              Today's Log
+              MEALS
             </h2>
           </div>
         </div>
         <CardContent className="p-4 space-y-4">
           <div className="flex items-center justify-between px-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">MEALS</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">TRACKING</p>
             <span 
               onClick={() => setShowSummary(true)}
               className="text-[9px] font-bold text-primary uppercase flex items-center cursor-pointer hover:opacity-70 transition-opacity"
@@ -468,7 +495,7 @@ export function NutritionView() {
             </span>
           </div>
           
-          <ScrollArea className="h-[240px] pr-2">
+          <ScrollArea className="h-[216px] pr-2">
             <div className="grid gap-3">
               {!isLoaded || loggedMeals.length === 0 ? (
                 <p className="text-center py-12 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No meals logged today</p>
@@ -476,6 +503,7 @@ export function NutritionView() {
                 loggedMeals.map((meal) => (
                   <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-muted/20 hover:bg-muted/30 transition-all group relative">
                     <CardContent className="p-0 flex min-h-[72px]">
+                      <div className="w-1.5 bg-primary/40 shrink-0" />
                       <div className="w-14 bg-white/50 shrink-0 flex items-center justify-center">
                         <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10">
                           <Utensils className="w-4 h-4 text-primary/40" />
@@ -486,8 +514,8 @@ export function NutritionView() {
                           <div className="min-w-0">
                             <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
                             <h4 className="font-bold text-[13px] text-foreground/90 truncate leading-tight">{meal.name}</h4>
-                            <p className="text-[11px] font-black text-muted-foreground/60 uppercase tracking-tighter mt-0.5">
-                              {meal.calories} KCAL
+                            <p className="text-[11px] font-bold text-foreground/60 tracking-tighter mt-0.5">
+                              {meal.calories} kcal
                             </p>
                           </div>
                           <span className="text-[8px] font-bold text-muted-foreground/30 shrink-0">{meal.time}</span>
@@ -521,7 +549,7 @@ export function NutritionView() {
               <p className="text-xs font-bold text-foreground/80">Review logs</p>
             </div>
             <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-primary uppercase tracking-widest hover:opacity-70 transition-opacity">
-              Details <ChevronRight className="w-3 h-3" />
+              Go to Tool <ChevronRight className="w-3 h-3" />
             </button>
           </CardContent>
         </Card>
@@ -536,7 +564,7 @@ export function NutritionView() {
               <p className="text-xs font-bold text-foreground/80">Analyze intake</p>
             </div>
             <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-primary uppercase tracking-widest hover:opacity-70 transition-opacity">
-              Details <ChevronRight className="w-3 h-3" />
+              Go to Tool <ChevronRight className="w-3 h-3" />
             </button>
           </CardContent>
         </Card>
