@@ -66,10 +66,12 @@ export function DashboardView({
   const [activeTool, setActiveTool] = useState(0);
 
   const latestWeightEntry = weightHistory.length > 0 ? weightHistory[weightHistory.length - 1] : null;
-  const previousWeightEntry = weightHistory.length > 1 ? weightHistory[weightHistory.length - 2] : null;
   
   const currentWeight = latestWeightEntry ? latestWeightEntry.weight : (goalData?.weight ? parseFloat(goalData.weight) : 0);
-  const weightChange = latestWeightEntry && previousWeightEntry ? parseFloat((latestWeightEntry.weight - previousWeightEntry.weight).toFixed(1)) : 0;
+  const startWeight = goalData?.weight ? parseFloat(goalData.weight) : (weightHistory.length > 0 ? weightHistory[0].weight : 0);
+  
+  // Update weightChange to be relative to starting weight
+  const weightChange = currentWeight && startWeight ? parseFloat((currentWeight - startWeight).toFixed(1)) : 0;
 
   const chartData = useMemo(() => {
     const initialWeight = goalData?.weight ? parseFloat(goalData.weight) : 0;
@@ -113,7 +115,6 @@ export function DashboardView({
   const calDiff = targetCal - currentCal;
   const calStatus = `${Math.abs(calDiff).toLocaleString()} Kcal ${calDiff >= 0 ? 'left' : 'over'}`;
 
-  const startWeight = goalData?.weight ? parseFloat(goalData.weight) : (weightHistory.length > 0 ? weightHistory[0].weight : 0);
   const targetWeight = goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 0;
   
   const progressPercent = useMemo(() => {
@@ -137,6 +138,7 @@ export function DashboardView({
 
   const coachImage = PlaceHolderImages.find(img => img.id === 'gym-coach');
 
+  // Reordered metrics: Calories, Hydration, Streak, Steps
   const metrics = [
     { 
       id: 'calories',
@@ -150,17 +152,6 @@ export function DashboardView({
       color: "bg-orange-50" 
     },
     { 
-      id: 'streak',
-      label: "Streak", 
-      value: "12", 
-      unit: "days", 
-      target: "15", 
-      current: 12,
-      targetVal: 15,
-      icon: <Zap className="w-4 h-4 text-yellow-500" />, 
-      color: "bg-yellow-50" 
-    },
-    { 
       id: 'hydration',
       label: "Hydration", 
       value: (hydrationAmount / 1000).toFixed(1), 
@@ -170,6 +161,17 @@ export function DashboardView({
       targetVal: goalData?.hydrationTargetLiters || 3.0,
       icon: <Droplets className="w-4 h-4 text-sky-500" />, 
       color: "bg-sky-50" 
+    },
+    { 
+      id: 'streak',
+      label: "Streak", 
+      value: "12", 
+      unit: "days", 
+      target: "15", 
+      current: 12,
+      targetVal: 15,
+      icon: <Zap className="w-4 h-4 text-yellow-500" />, 
+      color: "bg-yellow-50" 
     },
     { 
       id: 'steps',

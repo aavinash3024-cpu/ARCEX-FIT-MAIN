@@ -73,12 +73,11 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
     return Math.min(100, Math.max(0, Math.round(progress)));
   }, [startWeight, targetWeight, currentWeight, goalData]);
 
+  // Updated weightChange to compare currentWeight vs startWeight
   const weightChange = useMemo(() => {
-    if (weightHistory.length < 2) return 0;
-    const latest = weightHistory[weightHistory.length - 1].weight;
-    const previous = weightHistory[weightHistory.length - 2].weight;
-    return parseFloat((latest - previous).toFixed(1));
-  }, [weightHistory]);
+    if (!startWeight || !currentWeight) return 0;
+    return parseFloat((currentWeight - startWeight).toFixed(1));
+  }, [currentWeight, startWeight]);
 
   const chartData = useMemo(() => {
     const history = [...weightHistory];
