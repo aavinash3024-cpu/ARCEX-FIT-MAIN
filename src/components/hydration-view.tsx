@@ -1,7 +1,6 @@
-
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -29,31 +28,39 @@ import {
   DialogFooter
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
-
-const historyData = [
-  { day: 'Mon', amount: 2.4 },
-  { day: 'Tue', amount: 3.1 },
-  { day: 'Wed', amount: 1.8 },
-  { day: 'Thu', amount: 2.8 },
-  { day: 'Fri', amount: 2.2 },
-  { day: 'Sat', amount: 3.2 },
-  { day: 'Sun', amount: 1.8 },
-];
+import { subDays, format } from 'date-fns';
 
 interface HydrationViewProps {
   currentMl: number;
+  history?: Record<string, number>;
   onUpdateMl: (amount: number) => void;
   onBack: () => void;
 }
 
-export function HydrationView({ currentMl, onUpdateMl, onBack }: HydrationViewProps) {
+export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: HydrationViewProps) {
   const [targetMl, setTargetMl] = useState(3000);
   const [isEditing, setIsEditing] = useState(false);
   const [tempTarget, setTempTarget] = useState(targetMl);
 
   const percentage = Math.min(Math.round((currentMl / targetMl) * 100), 100);
-  const avgIntake = (historyData.reduce((acc, curr) => acc + curr.amount, 0) / historyData.length).toFixed(1);
-  const goalsMet = historyData.filter(d => d.amount >= 2.5).length; 
+
+  const chartData = useMemo(() => {
+    // Generate last 7 days including today
+    return [6, 5, 4, 3, 2, 1, 0].map(daysAgo => {
+      const date = subDays(new Date(), daysAgo);
+      const dateKey = format(date, 'yyyy-MM-dd');
+      const dayName = format(date, 'EEE');
+      // If the key is today, use currentMl directly to be reactive
+      const amount = (dateKey === format(new Date(), 'yyyy-MM-dd') ? currentMl : (history[dateKey] || 0)) / 1000;
+      return {
+        day: dayName,
+        amount: amount
+      };
+    });
+  }, [history, currentMl]);
+
+  const avgIntake = (chartData.reduce((acc, curr) => acc + curr.amount, 0) / chartData.length).toFixed(1);
+  const goalsMet = chartData.filter(d => d.amount >= (targetMl / 1000)).length; 
 
   const handleUpdateTarget = () => {
     setTargetMl(tempTarget);
@@ -87,7 +94,6 @@ export function HydrationView({ currentMl, onUpdateMl, onBack }: HydrationViewPr
             
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
               <DialogTrigger asChild>
-                {/* No pencil icon as per user request */}
                 <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-muted/30 text-muted-foreground absolute right-0">
                   <Plus className="w-3.5 h-3.5" />
                 </Button>
@@ -211,7 +217,7 @@ export function HydrationView({ currentMl, onUpdateMl, onBack }: HydrationViewPr
 
           <div className="h-[180px] w-full mt-4">
             <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={historyData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
                 <defs>
                   <linearGradient id="colorHydration" x1="0" y1="0" x2="0" y2="1">
                     <stop offset="5%" stopColor="#3b82f6" stopOpacity={0.15}/>

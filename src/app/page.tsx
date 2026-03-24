@@ -20,12 +20,14 @@ import { CalculatorsView } from '@/components/calculators-view';
 import { GoalSettingView } from '@/components/goal-setting-view';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { format } from 'date-fns';
 
 export default function PulseFlowApp() {
   const [activeTab, setActiveTab] = useState('dashboard');
   const [activeCalculator, setActiveCalculator] = useState<'bmr' | '1rm' | 'bodyfat'>('bmr');
   const [tasks, setTasks] = useState<Task[]>([]);
-  const [hydrationAmount, setHydrationAmount] = useState(1800);
+  const [hydrationAmount, setHydrationAmount] = useState(0);
+  const [hydrationHistory, setHydrationHistory] = useState<Record<string, number>>({});
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
@@ -35,6 +37,7 @@ export default function PulseFlowApp() {
   useEffect(() => {
     const savedTasks = localStorage.getItem('pulseflow_tasks');
     const savedHydration = localStorage.getItem('pulseflow_hydration');
+    const savedHydrationHistory = localStorage.getItem('pulseflow_hydration_history');
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
     const savedWeight = localStorage.getItem('pulseflow_weight_history');
     const savedMeals = localStorage.getItem('pulseflow_today_logged_meals');
@@ -49,6 +52,14 @@ export default function PulseFlowApp() {
     
     if (savedHydration) {
       setHydrationAmount(Number(savedHydration));
+    }
+
+    if (savedHydrationHistory) {
+      try {
+        setHydrationHistory(JSON.parse(savedHydrationHistory));
+      } catch (e) {
+        console.error("Failed to parse hydration history", e);
+      }
     }
 
     if (savedGoal) {
@@ -88,8 +99,21 @@ export default function PulseFlowApp() {
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('pulseflow_hydration', hydrationAmount.toString());
+      
+      // Update history for today
+      const today = format(new Date(), 'yyyy-MM-dd');
+      setHydrationHistory(prev => ({
+        ...prev,
+        [today]: hydrationAmount
+      }));
     }
   }, [hydrationAmount, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('pulseflow_hydration_history', JSON.stringify(hydrationHistory));
+    }
+  }, [hydrationHistory, isLoaded]);
 
   useEffect(() => {
     if (isLoaded) {
@@ -180,6 +204,7 @@ export default function PulseFlowApp() {
         return (
           <HydrationView 
             currentMl={hydrationAmount}
+            history={hydrationHistory}
             onUpdateMl={updateHydration}
             onBack={() => setActiveTab('dashboard')} 
           />
