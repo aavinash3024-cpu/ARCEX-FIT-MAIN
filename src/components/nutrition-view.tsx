@@ -21,7 +21,8 @@ import {
   Loader2,
   Trash2,
   TrendingUp,
-  Dot
+  Dot,
+  BarChart3
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -203,6 +204,9 @@ export function NutritionView() {
     const carbsPct = totalMainMacros > 0 ? (totals.carbs / totalMainMacros) * 100 : 0;
     const fatPct = totalMainMacros > 0 ? (totals.fat / totalMainMacros) * 100 : 0;
 
+    // Collect all unique items from all meals for Top Macro Sources
+    const allItems = loggedMeals.flatMap(m => m.items || []);
+
     return (
       <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
@@ -212,8 +216,9 @@ export function NutritionView() {
           <h1 className="text-2xl font-bold font-headline">Daily Summary</h1>
         </div>
 
+        {/* Compact Summary Card */}
         <Card className="border-none shadow-sm bg-white overflow-hidden rounded-[1.25rem]">
-          <CardContent className="p-4 space-y-4">
+          <CardContent className="p-4 space-y-3">
             <div className="text-center">
               <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Total Intake</p>
               <div className="flex items-baseline justify-center gap-0.5 mt-1">
@@ -222,7 +227,7 @@ export function NutritionView() {
               </div>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1.5 px-2">
               <div className="flex h-2 w-full rounded-full overflow-hidden bg-muted/20">
                 <div className="bg-sky-500 h-full transition-all duration-1000" style={{ width: `${proteinPct}%` }} />
                 <div className="bg-primary h-full transition-all duration-1000" style={{ width: `${carbsPct}%` }} />
@@ -237,27 +242,76 @@ export function NutritionView() {
 
             <div className="grid grid-cols-4 gap-2 pt-2 border-t border-muted/10">
               <div className="text-center">
-                <p className="text-lg font-black text-sky-600 leading-none">{Math.round(totals.protein)}g</p>
+                <p className="text-base font-black text-sky-600 leading-none">{Math.round(totals.protein)}g</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase mt-1">Protein</p>
               </div>
               <div className="text-center">
-                <p className="text-lg font-black text-primary leading-none">{Math.round(totals.carbs)}g</p>
+                <p className="text-base font-black text-primary leading-none">{Math.round(totals.carbs)}g</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase mt-1">Carbs</p>
               </div>
               <div className="text-center">
-                <p className="text-lg font-black text-yellow-600 leading-none">{Math.round(totals.fat)}g</p>
+                <p className="text-base font-black text-yellow-600 leading-none">{Math.round(totals.fat)}g</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase mt-1">Fats</p>
               </div>
               <div className="text-center">
-                <p className="text-lg font-black text-green-600 leading-none">{Math.round(totals.fiber)}g</p>
+                <p className="text-base font-black text-green-600 leading-none">{Math.round(totals.fiber)}g</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase mt-1">Fiber</p>
               </div>
             </div>
           </CardContent>
         </Card>
 
+        {/* Top Macro Sources Section */}
         <section className="space-y-3">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2">Meal Breakdown</h3>
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
+            <BarChart3 className="w-3.5 h-3.5 text-primary" /> Top Macro Sources
+          </h3>
+          <Card className="border-none shadow-sm bg-white overflow-hidden rounded-2xl">
+            <CardContent className="p-0">
+              <Tabs defaultValue="protein" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 h-9 bg-muted/30 p-1 rounded-none">
+                  <TabsTrigger value="protein" className="text-[9px] font-black uppercase tracking-tight">P</TabsTrigger>
+                  <TabsTrigger value="carbs" className="text-[9px] font-black uppercase tracking-tight">C</TabsTrigger>
+                  <TabsTrigger value="fat" className="text-[9px] font-black uppercase tracking-tight">F</TabsTrigger>
+                  <TabsTrigger value="fiber" className="text-[9px] font-black uppercase tracking-tight">FI</TabsTrigger>
+                </TabsList>
+                {(['protein', 'carbs', 'fat', 'fiber'] as const).map(macro => {
+                  const sortedItems = [...allItems]
+                    .sort((a, b) => b[macro] - a[macro])
+                    .filter(item => item[macro] > 0)
+                    .slice(0, 5);
+
+                  return (
+                    <TabsContent key={macro} value={macro} className="p-3 mt-0">
+                      <div className="space-y-2">
+                        {sortedItems.length === 0 ? (
+                          <p className="text-[9px] text-center py-6 text-muted-foreground uppercase font-bold tracking-widest opacity-40">No items found</p>
+                        ) : (
+                          sortedItems.map((item, idx) => (
+                            <div key={idx} className="flex justify-between items-center bg-muted/5 p-2 rounded-lg border border-muted/10">
+                              <span className="text-[10px] font-bold text-foreground/70 uppercase truncate max-w-[180px]">
+                                {item.quantity} {item.name}
+                              </span>
+                              <span className="text-[10px] font-black text-primary uppercase whitespace-nowrap">
+                                {item[macro]}g
+                              </span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </TabsContent>
+                  );
+                })}
+              </Tabs>
+            </CardContent>
+          </Card>
+        </section>
+
+        {/* Individual Breakdown Section */}
+        <section className="space-y-3">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
+             <History className="w-3.5 h-3.5 text-primary" /> Meal Breakdown
+          </h3>
           <div className="space-y-2">
             {loggedMeals.length === 0 ? (
               <p className="text-center py-16 opacity-30 text-[10px] font-black uppercase tracking-widest">No entries recorded</p>
@@ -269,11 +323,11 @@ export function NutritionView() {
                       <h4 className="font-bold text-sm text-foreground">
                         <span className="text-primary uppercase text-[10px] mr-1">{meal.type}:</span> {meal.name}
                       </h4>
-                      <p className="text-xs font-black text-foreground/60">{Math.round(meal.calories)} KCAL</p>
+                      <p className="text-xs font-black text-foreground/60 leading-none mb-2">{Math.round(meal.calories)} KCAL</p>
                       
-                      {/* Item-wise breakdown */}
+                      {/* Item-wise breakdown preserved in summary */}
                       {meal.items && meal.items.length > 0 && (
-                        <div className="pl-2 border-l-2 border-muted/20 my-1 space-y-0.5">
+                        <div className="pl-2 border-l-2 border-primary/20 my-2 space-y-1">
                           {meal.items.map((item, idx) => (
                             <div key={idx} className="flex justify-between text-[9px] font-bold text-muted-foreground">
                               <span>{item.quantity} {item.name}</span>
@@ -283,7 +337,7 @@ export function NutritionView() {
                         </div>
                       )}
 
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-black text-muted-foreground uppercase tracking-tight pt-1">
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-black text-muted-foreground uppercase tracking-tight pt-1">
                         <span className="text-sky-600">P {Math.round(meal.protein)}g</span>
                         <span className="text-primary">C {Math.round(meal.carbs)}g</span>
                         <span className="text-yellow-600">F {Math.round(meal.fat)}g</span>
@@ -474,7 +528,7 @@ export function NutritionView() {
         </CardContent>
       </Card>
 
-      <Card className="border-none shadow-md overflow-hidden bg-white">
+      <Card className="border-none shadow-md overflow-hidden bg-white rounded-2xl">
         <div className="h-14 w-full relative">
           <Image 
             src={logHeaderImage?.imageUrl || "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=600&auto=format&fit=crop"} 
@@ -515,15 +569,6 @@ export function NutritionView() {
                           <p className="text-[11px] font-bold text-foreground/60 tracking-tighter mt-0.5">
                             {meal.calories} kcal
                           </p>
-                          {meal.items && meal.items.length > 0 && (
-                            <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-1.5">
-                              {meal.items.map((item, i) => (
-                                <span key={i} className="text-[8px] font-bold text-muted-foreground/60 uppercase">
-                                  {item.quantity} {item.name}
-                                </span>
-                              ))}
-                            </div>
-                          )}
                         </div>
                       </div>
                       <Button onClick={() => deleteLoggedMeal(meal.id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
@@ -540,9 +585,9 @@ export function NutritionView() {
       </Card>
 
       <div className="grid grid-cols-2 gap-4 pb-6">
-        <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group">
-          <CardContent className="p-5 flex flex-col items-start gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+        <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group rounded-2xl">
+          <CardContent className="p-4 flex flex-col items-start gap-2">
+            <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center">
               <History className="w-5 h-5 text-primary" />
             </div>
             <div className="space-y-0.5">
@@ -555,9 +600,9 @@ export function NutritionView() {
           </CardContent>
         </Card>
         
-        <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group">
-          <CardContent className="p-5 flex flex-col items-start gap-3">
-            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+        <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group rounded-2xl">
+          <CardContent className="p-4 flex flex-col items-start gap-2">
+            <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-primary" />
             </div>
             <div className="space-y-0.5">
@@ -573,3 +618,4 @@ export function NutritionView() {
     </div>
   );
 }
+
