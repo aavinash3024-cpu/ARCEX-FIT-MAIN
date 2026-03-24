@@ -342,9 +342,12 @@ export function DashboardView({
               return (
                 <Card key={idx} className="min-w-[260px] flex-shrink-0 border-none shadow-sm bg-white snap-center">
                   <CardContent className="p-3 flex flex-col justify-between h-32">
-                    <div className="flex justify-between items-center">
-                      <div className={`p-1.5 rounded-lg ${m.color}`}>
-                        {m.icon}
+                    <div className="flex justify-between items-start">
+                      <div className="flex flex-col gap-1">
+                        <div className={`p-1.5 rounded-lg w-fit ${m.color}`}>
+                          {m.icon}
+                        </div>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{m.label}</p>
                       </div>
                       {isStreak ? (
                         <span className="text-[9px] font-black text-primary uppercase tracking-tighter">{streakData.count} DAY STREAK</span>
@@ -353,95 +356,90 @@ export function DashboardView({
                       )}
                     </div>
                     
-                    <div className="space-y-2">
-                      <div>
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight mb-0.5">{m.label}</p>
-                        <div className="flex items-center justify-between">
-                          {!isStreak && (
-                            <div className="flex items-baseline gap-1">
-                              <span className="text-lg font-bold">{m.value}</span>
-                              <span className="text-[9px] text-muted-foreground font-medium">{m.unit}</span>
-                            </div>
-                          )}
-                          
-                          {isHydration && (
-                            <div className="flex items-center bg-muted/50 rounded-full px-2 py-0.5 gap-2 border border-border/50 shadow-sm">
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); onUpdateHydration(-250); }}
-                                className="text-primary hover:text-primary/70 transition-colors"
-                              >
-                                <Minus className="w-3 h-3" />
-                              </button>
-                              <span className="text-[9px] font-black text-foreground uppercase tracking-tighter">250ml</span>
-                              <button 
-                                onClick={(e) => { e.stopPropagation(); onUpdateHydration(250); }}
-                                className="text-primary hover:text-primary/70 transition-colors"
-                              >
-                                <Plus className="w-3 h-3" />
-                              </button>
-                            </div>
-                          )}
+                    <div className="flex items-center justify-between">
+                      {!isStreak && (
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-lg font-bold">{m.value}</span>
+                          <span className="text-[9px] text-muted-foreground font-medium">{m.unit}</span>
                         </div>
-                      </div>
+                      )}
+                      
+                      {isHydration && (
+                        <div className="flex items-center bg-muted/50 rounded-full px-2 py-0.5 gap-2 border border-border/50 shadow-sm">
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); onUpdateHydration(-250); }}
+                            className="text-primary hover:text-primary/70 transition-colors"
+                          >
+                            <Minus className="w-3 h-3" />
+                          </button>
+                          <span className="text-[9px] font-black text-foreground uppercase tracking-tighter">250ml</span>
+                          <button 
+                            onClick={(e) => { e.stopPropagation(); onUpdateHydration(250); }}
+                            className="text-primary hover:text-primary/70 transition-colors"
+                          >
+                            <Plus className="w-3 h-3" />
+                          </button>
+                        </div>
+                      )}
+                    </div>
 
-                      <div className="flex items-center gap-3">
-                        {isStreak ? (
-                          <div className="flex justify-between w-full px-1">
-                            {streakWeekStatus.map((day, i) => (
-                              <div key={i} className="flex flex-col items-center gap-1">
-                                <div className={cn(
-                                  "w-5 h-5 rounded-full flex items-center justify-center transition-all border",
-                                  day.active 
-                                    ? "bg-[#ff6b6b] border-[#ff6b6b] shadow-sm" 
-                                    : "bg-muted/30 border-muted/50"
-                                )}>
-                                  <span className={cn("text-[8px] font-black", day.active ? "text-white" : "text-muted-foreground/40")}>
-                                    {day.dayNum}
-                                  </span>
-                                </div>
-                                <span className="text-[7px] font-black text-muted-foreground uppercase">{day.label}</span>
+                    <div className="flex items-center gap-3">
+                      {isStreak ? (
+                        <div className="flex justify-between w-full px-1">
+                          {streakWeekStatus.map((day, i) => (
+                            <div key={i} className="flex flex-col items-center gap-1">
+                              <div className={cn(
+                                "w-5 h-5 rounded-full flex items-center justify-center transition-all border",
+                                day.active 
+                                  ? "bg-[#ff6b6b] border-[#ff6b6b] shadow-sm" 
+                                  : "bg-muted/30 border-muted/50"
+                              )}>
+                                <span className={cn("text-[8px] font-black", day.active ? "text-white" : "text-muted-foreground/40")}>
+                                  {day.dayNum}
+                                </span>
                               </div>
-                            ))}
-                          </div>
-                        ) : (
-                          <>
-                            <div className="relative flex-1 h-6 flex items-center">
-                              <Progress 
-                                value={Math.min(percentage, 100)} 
-                                className="h-1.5 w-full" 
-                                indicatorClassName={isCalories ? "bg-gradient-to-r from-[#F59202] to-[#FFB84D]" : ""}
-                              />
-                              
-                              {isCalories && (
-                                <>
-                                  <div 
-                                    className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
-                                    style={{ left: `${(bmr / m.targetVal) * 100}%` }}
-                                  >
-                                    <span className="text-[6px] font-bold text-destructive/60">BMR</span>
-                                    <div className="h-2 w-[1px] bg-destructive/40" />
-                                  </div>
-                                  <div 
-                                    className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
-                                    style={{ left: `${Math.min((tdee / m.targetVal) * 100, 98)}%` }}
-                                  >
-                                    <span className="text-[6px] font-bold text-accent">TDEE</span>
-                                    <div className="h-2 w-[1px] bg-accent/60" />
-                                  </div>
-                                </>
-                              )}
+                              <span className="text-[7px] font-black text-muted-foreground uppercase">{day.label}</span>
                             </div>
-                            {showDetails && (
-                              <button 
-                                onClick={() => isHydration && onViewHydration?.()}
-                                className="flex items-center gap-0.5 text-[8px] font-black text-primary uppercase shrink-0 hover:opacity-70 transition-opacity"
-                              >
-                                Details <ChevronRight className="w-2.5 h-2.5" />
-                              </button>
+                          ))}
+                        </div>
+                      ) : (
+                        <>
+                          <div className="relative flex-1 h-6 flex items-center">
+                            <Progress 
+                              value={Math.min(percentage, 100)} 
+                              className="h-1.5 w-full" 
+                              indicatorClassName={isCalories ? "bg-gradient-to-r from-[#F59202] to-[#FFB84D]" : ""}
+                            />
+                            
+                            {isCalories && (
+                              <>
+                                <div 
+                                  className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
+                                  style={{ left: `${(bmr / m.targetVal) * 100}%` }}
+                                >
+                                  <span className="text-[6px] font-bold text-destructive/60">BMR</span>
+                                  <div className="h-2 w-[1px] bg-destructive/40" />
+                                </div>
+                                <div 
+                                  className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
+                                  style={{ left: `${Math.min((tdee / m.targetVal) * 100, 98)}%` }}
+                                >
+                                  <span className="text-[6px] font-bold text-accent">TDEE</span>
+                                  <div className="h-2 w-[1px] bg-accent/60" />
+                                </div>
+                              </>
                             )}
-                          </>
-                        )}
-                      </div>
+                          </div>
+                          {showDetails && (
+                            <button 
+                              onClick={() => isHydration && onViewHydration?.()}
+                              className="flex items-center gap-0.5 text-[8px] font-black text-primary uppercase shrink-0 hover:opacity-70 transition-opacity"
+                            >
+                              Details <ChevronRight className="w-2.5 h-2.5" />
+                            </button>
+                          )}
+                        </>
+                      )}
                     </div>
                   </CardContent>
                 </Card>
