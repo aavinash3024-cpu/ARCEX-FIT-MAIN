@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -16,53 +16,128 @@ import {
   Clock,
   Mic,
   Camera,
-  ChevronRight
+  ChevronRight,
+  Loader2,
+  Trash2,
+  Save
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { parseMeal } from '@/ai/flows/parse-meal-flow';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
+interface LoggedMeal {
+  id: string;
+  type: string;
+  name: string;
+  calories: number;
+  carbs: number;
+  protein: number;
+  fat: number;
+  time: string;
+  timestamp: number;
+}
 
 export function NutritionView() {
   const [logTab, setLogTab] = useState("log");
+  const [mealInput, setMealInput] = useState("");
+  const [isParsing, setIsParsing] = useState(false);
+  const [recentMeals, setRecentMeals] = useState<LoggedMeal[]>([]);
+  const [savedMeals, setSavedMeals] = useState<LoggedMeal[]>([]);
+  const [isListening, setIsListening] = useState(false);
 
-  const meals = [
-    { 
-      type: "Breakfast", 
-      name: "Avocado Toast & Egg", 
-      calories: 420, 
-      carbs: "35g", 
-      protein: "18g", 
-      fat: "22g", 
-      time: "08:30 AM"
-    },
-    { 
-      type: "Lunch", 
-      name: "Chicken Quinoa Bowl", 
-      calories: 650, 
-      carbs: "55g", 
-      protein: "42g", 
-      fat: "15g", 
-      time: "01:15 PM"
-    },
-  ];
+  // Load from localStorage
+  useEffect(() => {
+    const savedRecent = localStorage.getItem('pulseflow_recent_meals');
+    const savedFavorites = localStorage.getItem('pulseflow_saved_meals');
+    if (savedRecent) setRecentMeals(JSON.parse(savedRecent));
+    if (savedFavorites) setSavedMeals(JSON.parse(savedFavorites));
+  }, []);
 
-  const recentMeals = [
-    { name: "Greek Yogurt Parfait", calories: 280 },
-    { name: "Protein Shake", calories: 180 },
-    { name: "Almond Butter Toast", calories: 320 },
-  ];
+  // Persist to localStorage
+  useEffect(() => {
+    localStorage.setItem('pulseflow_recent_meals', JSON.stringify(recentMeals));
+  }, [recentMeals]);
+
+  useEffect(() => {
+    localStorage.setItem('pulseflow_saved_meals', JSON.stringify(savedMeals));
+  }, [savedMeals]);
+
+  const handleLogMeal = async () => {
+    if (!mealInput.trim()) return;
+    setIsParsing(true);
+    try {
+      const result = await parseMeal({ description: mealInput });
+      const newMeal: LoggedMeal = {
+        id: Math.random().toString(36).substr(2, 9),
+        type: getMealTypeByTime(),
+        name: result.name,
+        calories: result.calories,
+        carbs: result.carbs,
+        protein: result.protein,
+        fat: result.fat,
+        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: Date.now()
+      };
+      
+      setRecentMeals(prev => [newMeal, ...prev].slice(0, 10));
+      setMealInput("");
+    } catch (error) {
+      console.error("Failed to parse meal", error);
+    } finally {
+      setIsParsing(false);
+    }
+  };
+
+  const saveMeal = (meal: LoggedMeal) => {
+    if (savedMeals.find(m => m.id === meal.id)) return;
+    setSavedMeals(prev => [meal, ...prev].slice(0, 50));
+  };
+
+  const deleteSavedMeal = (id: string) => {
+    setSavedMeals(prev => prev.filter(m => m.id !== id));
+  };
+
+  const getMealTypeByTime = () => {
+    const hour = new Date().getHours();
+    if (hour < 11) return "Breakfast";
+    if (hour < 16) return "Lunch";
+    if (hour < 21) return "Dinner";
+    return "Snack";
+  };
+
+  const handleSpeech = () => {
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    if (!SpeechRecognition) {
+      alert("Speech recognition not supported in this browser.");
+      return;
+    }
+
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+
+    recognition.onstart = () => setIsListening(true);
+    recognition.onend = () => setIsListening(false);
+    recognition.onresult = (event: any) => {
+      const transcript = event.results[0][0].transcript;
+      setMealInput(prev => prev + (prev ? " " : "") + transcript);
+    };
+
+    recognition.start();
+  };
 
   const analysisImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
 
   return (
-    <div className="space-y-4 pb-24">
-      <div className="flex items-center justify-between pt-2">
+    <div className="space-y-4 pb-24 pt-4">
+      <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold font-headline">Nutrition</h1>
         <Button size="sm" variant="ghost" className="rounded-full w-9 h-9 p-0 bg-muted/50">
           <Search className="w-4 h-4" />
         </Button>
       </div>
 
-      {/* Compact Analysis Card */}
       <Card className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden">
         <CardContent className="p-0 flex items-center">
           <div className="shrink-0 w-20 h-20 relative">
@@ -85,9 +160,7 @@ export function NutritionView() {
         </CardContent>
       </Card>
 
-      {/* AI Meal Log Hub */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
-        {/* Header - Logo on Left */}
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-full shrink-0">
@@ -125,11 +198,18 @@ export function NutritionView() {
                 </div>
                 <input 
                   type="text" 
+                  value={mealInput}
+                  onChange={(e) => setMealInput(e.target.value)}
                   placeholder="What did you eat?" 
                   className="w-full h-12 pl-10 pr-20 bg-white border border-muted-foreground/10 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
                 />
                 <div className="absolute inset-y-0 right-2 flex items-center gap-1">
-                  <Button size="icon" variant="ghost" className="w-8 h-8 rounded-full text-muted-foreground">
+                  <Button 
+                    onClick={handleSpeech}
+                    size="icon" 
+                    variant="ghost" 
+                    className={`w-8 h-8 rounded-full transition-colors ${isListening ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}
+                  >
                     <Mic className="w-4 h-4" />
                   </Button>
                   <Button size="icon" variant="ghost" className="w-8 h-8 rounded-full text-muted-foreground">
@@ -138,52 +218,116 @@ export function NutritionView() {
                 </div>
               </div>
 
-              <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
-                Log This Meal Now
+              <Button 
+                onClick={handleLogMeal}
+                disabled={isParsing || !mealInput.trim()}
+                className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
+              >
+                {isParsing ? <Loader2 className="w-4 h-4 animate-spin" /> : "Log This Meal Now"}
               </Button>
             </TabsContent>
 
-            <TabsContent value="recent" className="p-4 mt-0">
-              <div className="space-y-2">
-                {recentMeals.map((meal, idx) => (
-                  <div key={idx} className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-muted/20">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
-                        <Utensils className="w-4 h-4 text-muted-foreground/60" />
+            <TabsContent value="recent" className="mt-0">
+              <ScrollArea className="h-[210px] px-4 py-2">
+                <div className="space-y-2">
+                  {recentMeals.length === 0 ? (
+                    <p className="text-center py-8 text-[10px] font-bold text-muted-foreground uppercase opacity-40">No recent logs</p>
+                  ) : (
+                    recentMeals.map((meal) => (
+                      <div key={meal.id} className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-muted/20">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                            <Utensils className="w-4 h-4 text-muted-foreground/60" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold">{meal.name}</p>
+                            <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.calories} kcal • {meal.protein}g P</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button 
+                            onClick={() => saveMeal(meal)}
+                            size="icon" 
+                            variant="ghost" 
+                            className="w-7 h-7 rounded-full text-muted-foreground hover:text-primary"
+                          >
+                            <Bookmark className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button 
+                            onClick={() => setRecentMeals(prev => [ { ...meal, id: Math.random().toString(36).substr(2, 9), timestamp: Date.now() }, ...prev ].slice(0, 10))}
+                            size="icon" 
+                            variant="ghost" 
+                            className="w-7 h-7 rounded-full bg-primary/10 text-primary"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
                       </div>
-                      <span className="text-xs font-semibold">{meal.name}</span>
-                    </div>
-                    <div className="flex items-center gap-3">
-                      <span className="text-[10px] font-bold text-muted-foreground">{meal.calories} kcal</span>
-                      <Button size="icon" variant="ghost" className="w-7 h-7 rounded-full bg-primary/10 text-primary">
-                        <Plus className="w-3.5 h-3.5" />
-                      </Button>
-                    </div>
-                  </div>
-                ))}
-              </div>
+                    ))
+                  )}
+                </div>
+              </ScrollArea>
             </TabsContent>
 
-            <TabsContent value="saved" className="p-4 mt-0">
-               <div className="text-center py-8 text-muted-foreground">
-                  <Bookmark className="w-10 h-10 mx-auto opacity-10 mb-2" />
-                  <p className="text-[10px] font-bold uppercase tracking-wider">No saved meals yet</p>
-               </div>
+            <TabsContent value="saved" className="mt-0">
+              <ScrollArea className="h-[210px] px-4 py-2">
+                <div className="space-y-2">
+                  {savedMeals.length === 0 ? (
+                    <div className="text-center py-8 text-muted-foreground">
+                      <Bookmark className="w-10 h-10 mx-auto opacity-10 mb-2" />
+                      <p className="text-[10px] font-bold uppercase tracking-wider">No saved meals yet</p>
+                    </div>
+                  ) : (
+                    savedMeals.map((meal) => (
+                      <div key={meal.id} className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-muted/20">
+                        <div className="flex items-center gap-3">
+                          <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
+                            <Utensils className="w-4 h-4 text-muted-foreground/60" />
+                          </div>
+                          <div>
+                            <p className="text-xs font-semibold">{meal.name}</p>
+                            <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.calories} kcal</p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-1">
+                          <Button 
+                            onClick={() => deleteSavedMeal(meal.id)}
+                            size="icon" 
+                            variant="ghost" 
+                            className="w-7 h-7 rounded-full text-muted-foreground hover:text-destructive"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </Button>
+                          <Button 
+                            onClick={() => setRecentMeals(prev => [ { ...meal, id: Math.random().toString(36).substr(2, 9), timestamp: Date.now() }, ...prev ].slice(0, 10))}
+                            size="icon" 
+                            variant="ghost" 
+                            className="w-7 h-7 rounded-full bg-primary/10 text-primary"
+                          >
+                            <Plus className="w-3.5 h-3.5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </ScrollArea>
             </TabsContent>
           </Tabs>
         </CardContent>
       </Card>
 
-      {/* Today's Log Section */}
       <section className="space-y-3">
         <div className="flex items-center justify-between px-1">
           <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70">Today's Log</h2>
           <span className="text-[9px] font-bold text-primary uppercase flex items-center">View Summary <ChevronRight className="w-3 h-3 ml-0.5" /></span>
         </div>
         <div className="grid gap-3">
-          {meals.map((meal, idx) => {
-            return (
-              <Card key={idx} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group">
+          {recentMeals.length === 0 ? (
+            <p className="text-center py-6 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No meals logged today</p>
+          ) : (
+            recentMeals.map((meal) => (
+              <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group">
                 <CardContent className="p-0 flex h-20">
                   <div className="w-20 bg-muted/20 shrink-0 flex items-center justify-center">
                     <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10 group-hover:scale-110 transition-transform duration-300">
@@ -200,9 +344,9 @@ export function NutritionView() {
                     </div>
                     <div className="flex justify-between items-end">
                       <div className="flex gap-2 text-[9px] font-bold text-muted-foreground/60 uppercase">
-                        <span>P: {meal.protein}</span>
-                        <span>C: {meal.carbs}</span>
-                        <span>F: {meal.fat}</span>
+                        <span>P: {meal.protein}g</span>
+                        <span>C: {meal.carbs}g</span>
+                        <span>F: {meal.fat}g</span>
                       </div>
                       <Badge variant="secondary" className="text-[9px] h-5 px-2 bg-primary/5 text-primary-foreground/80 font-black border-none">
                         {meal.calories} KCAL
@@ -211,12 +355,11 @@ export function NutritionView() {
                   </div>
                 </CardContent>
               </Card>
-            );
-          })}
+            ))
+          )}
         </div>
       </section>
 
-      {/* Improved Meal History & Calorie Trends */}
       <div className="grid grid-cols-2 gap-4 pb-6">
         <Card className="border-none shadow-sm bg-white hover:bg-sky-50 transition-all cursor-pointer active:scale-95 group border border-muted/20">
           <CardContent className="p-5 flex flex-col items-start gap-3">
@@ -225,7 +368,7 @@ export function NutritionView() {
             </div>
             <div className="space-y-0.5">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
-              <p className="text-xs font-bold text-foreground/80">32 logged</p>
+              <p className="text-xs font-bold text-foreground/80">{recentMeals.length} logged</p>
             </div>
             <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-sky-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
               Details <ChevronRight className="w-3 h-3" />
