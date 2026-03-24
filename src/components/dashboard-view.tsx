@@ -357,10 +357,12 @@ export function DashboardView({
                       <div>
                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight mb-0.5">{m.label}</p>
                         <div className="flex items-center justify-between">
-                          <div className="flex items-baseline gap-1">
-                            <span className="text-lg font-bold">{m.value}</span>
-                            <span className="text-[9px] text-muted-foreground font-medium">{m.unit}</span>
-                          </div>
+                          {!isStreak && (
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-lg font-bold">{m.value}</span>
+                              <span className="text-[9px] text-muted-foreground font-medium">{m.unit}</span>
+                            </div>
+                          )}
                           
                           {isHydration && (
                             <div className="flex items-center bg-muted/50 rounded-full px-2 py-0.5 gap-2 border border-border/50 shadow-sm">
