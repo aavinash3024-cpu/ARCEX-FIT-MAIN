@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect } from 'react';
@@ -70,26 +71,11 @@ export function NutritionView() {
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('pulseflow_recent_meals', JSON.stringify(recentMeals));
-    }
-  }, [recentMeals, isLoaded]);
-
-  useEffect(() => {
-    if (isLoaded) {
       localStorage.setItem('pulseflow_saved_meals', JSON.stringify(savedMeals));
-    }
-  }, [savedMeals, isLoaded]);
-
-  useEffect(() => {
-    if (isLoaded) {
       localStorage.setItem('pulseflow_today_logged_meals', JSON.stringify(loggedMeals));
-    }
-  }, [loggedMeals, isLoaded]);
-
-  useEffect(() => {
-    if (isLoaded) {
       localStorage.setItem('pulseflow_meal_credits', credits.toString());
     }
-  }, [credits, isLoaded]);
+  }, [recentMeals, savedMeals, loggedMeals, credits, isLoaded]);
 
   const handleLogMeal = async () => {
     if (!mealInput.trim()) return;
@@ -183,6 +169,7 @@ export function NutritionView() {
   };
 
   const analysisImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
+  const logHeaderImage = PlaceHolderImages.find(img => img.id === 'meal-quinoa-bowl');
 
   return (
     <div className="space-y-4 pb-24 pt-4">
@@ -256,7 +243,7 @@ export function NutritionView() {
                   value={mealInput}
                   onChange={(e) => setMealInput(e.target.value)}
                   placeholder="What did you eat?" 
-                  className="w-full h-12 pl-10 pr-20 bg-white border border-muted-foreground/10 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm"
+                  className="w-full h-12 pl-10 pr-20 bg-white border border-muted-foreground/10 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm font-bold"
                 />
                 <div className="absolute inset-y-0 right-2 flex items-center gap-1">
                   <Button 
@@ -377,59 +364,78 @@ export function NutritionView() {
         </CardContent>
       </Card>
 
-      <section className="space-y-3">
-        <div className="flex items-center justify-between px-1">
-          <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70">Today's Log</h2>
-          <span className="text-[9px] font-bold text-primary uppercase flex items-center">View Summary <ChevronRight className="w-3 h-3 ml-0.5" /></span>
-        </div>
-        
-        <ScrollArea className="h-[240px] pr-2">
-          <div className="grid gap-3">
-            {!isLoaded || loggedMeals.length === 0 ? (
-              <p className="text-center py-8 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No meals logged today</p>
-            ) : (
-              loggedMeals.map((meal) => (
-                <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group relative">
-                  <CardContent className="p-0 flex h-[72px]">
-                    <div className="w-14 bg-muted/20 shrink-0 flex items-center justify-center">
-                      <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10">
-                        <Utensils className="w-4 h-4 text-muted-foreground/30" />
-                      </div>
-                    </div>
-                    <div className="flex-1 p-2.5 flex flex-col justify-between min-w-0 pr-10">
-                      <div className="flex justify-between items-start">
-                        <div className="min-w-0">
-                          <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
-                          <h4 className="font-bold text-[13px] text-foreground/90 truncate leading-tight">{meal.name}</h4>
-                        </div>
-                        <span className="text-[8px] font-bold text-muted-foreground/30 shrink-0">{meal.time}</span>
-                      </div>
-                      <div className="flex justify-between items-end">
-                        <div className="flex gap-2.5 text-[10px] font-black text-muted-foreground/80 uppercase">
-                          <span className="flex items-center gap-0.5"><span className="opacity-40">P:</span>{meal.protein}</span>
-                          <span className="flex items-center gap-0.5"><span className="opacity-40">C:</span>{meal.carbs}</span>
-                          <span className="flex items-center gap-0.5"><span className="opacity-40">F:</span>{meal.fat}</span>
-                        </div>
-                        <Badge variant="secondary" className="text-[10px] h-5 px-2 bg-primary/10 text-primary font-black border-none shadow-none">
-                          {meal.calories} KCAL
-                        </Badge>
-                      </div>
-                    </div>
-                    <Button 
-                      onClick={() => deleteLoggedMeal(meal.id)}
-                      size="icon" 
-                      variant="ghost" 
-                      className="absolute right-2 top-2 w-7 h-7 rounded-full text-muted-foreground/20 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
-                    >
-                      <Trash2 className="w-3.5 h-3.5" />
-                    </Button>
-                  </CardContent>
-                </Card>
-              ))
-            )}
+      <Card className="border-none shadow-md overflow-hidden bg-white">
+        <div className="h-28 w-full relative">
+          <Image 
+            src={logHeaderImage?.imageUrl || "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=600&auto=format&fit=crop"} 
+            alt="Today's Log Header"
+            fill
+            className="object-cover"
+            data-ai-hint="salad bowl"
+          />
+          <div className="absolute inset-0 bg-black/25" />
+          <div className="absolute bottom-4 left-5">
+            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2">
+              Today's Log
+            </h2>
           </div>
-        </ScrollArea>
-      </section>
+        </div>
+        <CardContent className="p-4 space-y-4">
+          <div className="flex items-center justify-between px-1">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">Active Tracker</p>
+            <span className="text-[9px] font-bold text-primary uppercase flex items-center cursor-pointer hover:opacity-70 transition-opacity">
+              View Summary <ChevronRight className="w-3 h-3 ml-0.5" />
+            </span>
+          </div>
+          
+          <ScrollArea className="h-[240px] pr-2">
+            <div className="grid gap-3">
+              {!isLoaded || loggedMeals.length === 0 ? (
+                <p className="text-center py-12 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No meals logged today</p>
+              ) : (
+                loggedMeals.map((meal) => (
+                  <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-muted/20 hover:bg-muted/30 transition-all group relative">
+                    <CardContent className="p-0 flex h-[72px]">
+                      <div className="w-14 bg-white/50 shrink-0 flex items-center justify-center">
+                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10">
+                          <Utensils className="w-4 h-4 text-primary/40" />
+                        </div>
+                      </div>
+                      <div className="flex-1 p-2.5 flex flex-col justify-between min-w-0 pr-10">
+                        <div className="flex justify-between items-start">
+                          <div className="min-w-0">
+                            <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
+                            <h4 className="font-bold text-[13px] text-foreground/90 truncate leading-tight">{meal.name}</h4>
+                          </div>
+                          <span className="text-[8px] font-bold text-muted-foreground/30 shrink-0">{meal.time}</span>
+                        </div>
+                        <div className="flex justify-between items-end">
+                          <div className="flex gap-2.5 text-[10px] font-black text-muted-foreground/80 uppercase">
+                            <span className="flex items-center gap-0.5"><span className="opacity-40">P:</span>{meal.protein}</span>
+                            <span className="flex items-center gap-0.5"><span className="opacity-40">C:</span>{meal.carbs}</span>
+                            <span className="flex items-center gap-0.5"><span className="opacity-40">F:</span>{meal.fat}</span>
+                          </div>
+                          <Badge variant="secondary" className="text-[10px] h-5 px-2 bg-primary/10 text-primary font-black border-none shadow-none">
+                            {meal.calories} KCAL
+                          </Badge>
+                        </div>
+                      </div>
+                      <Button 
+                        onClick={() => deleteLoggedMeal(meal.id)}
+                        size="icon" 
+                        variant="ghost" 
+                        className="absolute right-2 top-2 w-7 h-7 rounded-full text-muted-foreground/20 hover:text-destructive opacity-0 group-hover:opacity-100 transition-opacity"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </Button>
+                    </CardContent>
+                  </Card>
+                ))
+              )}
+            </div>
+          </ScrollArea>
+        </CardContent>
+      </Card>
 
       <div className="grid grid-cols-2 gap-4 pb-6">
         <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer active:scale-95 group border border-muted/20">
