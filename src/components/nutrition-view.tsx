@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -21,14 +21,18 @@ import {
   Loader2,
   Trash2,
   TrendingUp,
-  Dot,
-  BarChart3
+  BarChart3,
+  Calendar,
+  ArrowUpRight,
+  ArrowDownRight,
+  Target
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { parseMeal } from '@/ai/flows/parse-meal-flow';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { format, startOfWeek, endOfWeek, subDays, isWithinInterval, startOfMonth, endOfMonth, isSameDay } from 'date-fns';
 
 interface MealItem {
   name: string;
@@ -51,11 +55,13 @@ interface LoggedMeal {
   fiber: number;
   time: string;
   timestamp: number;
+  dateStr?: string; // YYYY-MM-DD
   items?: MealItem[];
 }
 
 export function NutritionView() {
   const [showSummary, setShowSummary] = useState(false);
+  const [showTrends, setShowTrends] = useState(false);
   const [logTab, setLogTab] = useState("log");
   const [mealInput, setMealInput] = useState("");
   const [isParsing, setIsParsing] = useState(false);
@@ -65,6 +71,8 @@ export function NutritionView() {
   const [recentMeals, setRecentMeals] = useState<LoggedMeal[]>([]);
   const [savedMeals, setSavedMeals] = useState<LoggedMeal[]>([]);
   const [loggedMeals, setLoggedMeals] = useState<LoggedMeal[]>([]);
+  const [allHistory, setAllHistory] = useState<LoggedMeal[]>([]);
+  const [goalData, setGoalData] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load from localStorage
@@ -72,11 +80,15 @@ export function NutritionView() {
     const savedRecent = localStorage.getItem('pulseflow_recent_meals');
     const savedFavorites = localStorage.getItem('pulseflow_saved_meals');
     const savedLogged = localStorage.getItem('pulseflow_today_logged_meals');
+    const savedHistory = localStorage.getItem('pulseflow_all_meals_history');
     const savedCredits = localStorage.getItem('pulseflow_meal_credits');
+    const savedGoal = localStorage.getItem('pulseflow_goal_data');
     
     if (savedRecent) setRecentMeals(JSON.parse(savedRecent));
     if (savedFavorites) setSavedMeals(JSON.parse(savedFavorites));
     if (savedLogged) setLoggedMeals(JSON.parse(savedLogged));
+    if (savedHistory) setAllHistory(JSON.parse(savedHistory));
+    if (savedGoal) setGoalData(JSON.parse(savedGoal));
     if (savedCredits !== null) setCredits(Number(savedCredits));
     
     setIsLoaded(true);
@@ -88,15 +100,19 @@ export function NutritionView() {
       localStorage.setItem('pulseflow_recent_meals', JSON.stringify(recentMeals));
       localStorage.setItem('pulseflow_saved_meals', JSON.stringify(savedMeals));
       localStorage.setItem('pulseflow_today_logged_meals', JSON.stringify(loggedMeals));
+      localStorage.setItem('pulseflow_all_meals_history', JSON.stringify(allHistory));
       localStorage.setItem('pulseflow_meal_credits', credits.toString());
     }
-  }, [recentMeals, savedMeals, loggedMeals, credits, isLoaded]);
+  }, [recentMeals, savedMeals, loggedMeals, allHistory, credits, isLoaded]);
 
   const handleLogMeal = async () => {
     if (!mealInput.trim()) return;
     setIsParsing(true);
     try {
       const result = await parseMeal({ description: mealInput });
+      const today = new Date();
+      const dateStr = format(today, 'yyyy-MM-dd');
+      
       const newMeal: LoggedMeal = {
         id: Math.random().toString(36).substr(2, 9),
         type: getMealTypeByTime(),
@@ -106,8 +122,9 @@ export function NutritionView() {
         protein: Math.round(result.protein),
         fat: Math.round(result.fat),
         fiber: Math.round(result.fiber || 0),
-        time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now(),
+        time: today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        timestamp: today.getTime(),
+        dateStr,
         items: result.items.map(i => ({
           ...i,
           calories: Math.round(i.calories),
@@ -119,6 +136,7 @@ export function NutritionView() {
       };
       
       setLoggedMeals(prev => [newMeal, ...prev]);
+      setAllHistory(prev => [newMeal, ...prev]);
       setCredits(prev => Math.max(0, prev - 1));
       setRecentMeals(prev => {
         const filtered = prev.filter(m => m.name.toLowerCase() !== newMeal.name.toLowerCase());
@@ -133,13 +151,17 @@ export function NutritionView() {
   };
 
   const logExistingMeal = (meal: LoggedMeal) => {
+    const today = new Date();
+    const dateStr = format(today, 'yyyy-MM-dd');
     const newEntry: LoggedMeal = {
       ...meal,
       id: Math.random().toString(36).substr(2, 9),
-      time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-      timestamp: Date.now()
+      time: today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      timestamp: today.getTime(),
+      dateStr
     };
     setLoggedMeals(prev => [newEntry, ...prev]);
+    setAllHistory(prev => [newEntry, ...prev]);
     setCredits(prev => Math.max(0, prev - 1));
   };
 
@@ -154,6 +176,7 @@ export function NutritionView() {
 
   const deleteLoggedMeal = (id: string) => {
     setLoggedMeals(prev => prev.filter(m => m.id !== id));
+    setAllHistory(prev => prev.filter(m => m.id !== id));
   };
 
   const deleteSavedMeal = (id: string) => {
@@ -190,6 +213,35 @@ export function NutritionView() {
   const analysisImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
   const logHeaderImage = PlaceHolderImages.find(img => img.id === 'meal-quinoa-bowl');
 
+  // TRENDS ANALYSIS LOGIC
+  const renderTrendsView = () => {
+    return (
+      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+        <div className="flex items-center gap-4 pt-2">
+          <Button variant="ghost" size="icon" onClick={() => setShowTrends(false)} className="rounded-full bg-muted/50 w-9 h-9">
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-2xl font-bold font-headline">Trends Analysis</h1>
+        </div>
+
+        <Tabs defaultValue="weekly" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 h-11 bg-white/80 backdrop-blur-sm p-1.5 rounded-2xl shadow-sm border border-muted/20">
+            <TabsTrigger value="weekly" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Weekly</TabsTrigger>
+            <TabsTrigger value="monthly" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Monthly</TabsTrigger>
+          </TabsList>
+
+          {['weekly', 'monthly'].map((period) => (
+            <TabsContent key={period} value={period} className="space-y-4 mt-4">
+              <TrendsContent period={period as 'weekly' | 'monthly'} history={allHistory} goalData={goalData} />
+            </TabsContent>
+          ))}
+        </Tabs>
+      </div>
+    );
+  };
+
+  if (showTrends) return renderTrendsView();
+
   if (showSummary) {
     const totals = loggedMeals.reduce((acc, meal) => ({
       calories: acc.calories + meal.calories,
@@ -204,7 +256,6 @@ export function NutritionView() {
     const carbsPct = totalMainMacros > 0 ? (totals.carbs / totalMainMacros) * 100 : 0;
     const fatPct = totalMainMacros > 0 ? (totals.fat / totalMainMacros) * 100 : 0;
 
-    // Collect all unique items from all meals for Top Macro Sources
     const allItems = loggedMeals.flatMap(m => m.items || []);
 
     return (
@@ -216,7 +267,6 @@ export function NutritionView() {
           <h1 className="text-2xl font-bold font-headline">Daily Summary</h1>
         </div>
 
-        {/* Compact Summary Card */}
         <Card className="border-none shadow-sm bg-white overflow-hidden rounded-[1.25rem]">
           <CardContent className="p-4 space-y-3">
             <div className="text-center">
@@ -261,7 +311,6 @@ export function NutritionView() {
           </CardContent>
         </Card>
 
-        {/* Top Macro Sources Section */}
         <section className="space-y-3">
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
             <BarChart3 className="w-3.5 h-3.5 text-primary" /> Top Macro Sources
@@ -307,7 +356,6 @@ export function NutritionView() {
           </Card>
         </section>
 
-        {/* Individual Breakdown Section */}
         <section className="space-y-3">
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
              <History className="w-3.5 h-3.5 text-primary" /> Meal Breakdown
@@ -325,18 +373,6 @@ export function NutritionView() {
                       </h4>
                       <p className="text-xs font-black text-foreground/60 leading-none mb-2">{Math.round(meal.calories)} KCAL</p>
                       
-                      {/* Item-wise breakdown preserved in summary */}
-                      {meal.items && meal.items.length > 0 && (
-                        <div className="pl-2 border-l-2 border-primary/20 my-2 space-y-1">
-                          {meal.items.map((item, idx) => (
-                            <div key={idx} className="flex justify-between text-[9px] font-bold text-muted-foreground">
-                              <span>{item.quantity} {item.name}</span>
-                              <span className="text-foreground/40">{item.calories} kcal</span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
                       <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-black text-muted-foreground uppercase tracking-tight pt-1">
                         <span className="text-sky-600">P {Math.round(meal.protein)}g</span>
                         <span className="text-primary">C {Math.round(meal.carbs)}g</span>
@@ -584,23 +620,11 @@ export function NutritionView() {
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4 pb-6">
-        <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group rounded-2xl">
-          <CardContent className="p-4 flex flex-col items-start gap-2">
-            <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center">
-              <History className="w-5 h-5 text-primary" />
-            </div>
-            <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
-              <p className="text-xs font-bold text-foreground/80">Review logs</p>
-            </div>
-            <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-primary uppercase tracking-widest hover:opacity-70 transition-opacity">
-              Go to Tool <ChevronRight className="w-3 h-3" />
-            </button>
-          </CardContent>
-        </Card>
-        
-        <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group rounded-2xl">
+      <div className="grid grid-cols-1 gap-4 pb-6">
+        <Card 
+          onClick={() => setShowTrends(true)}
+          className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group rounded-2xl"
+        >
           <CardContent className="p-4 flex flex-col items-start gap-2">
             <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-primary" />
@@ -619,3 +643,161 @@ export function NutritionView() {
   );
 }
 
+// Sub-component for Trends Content
+function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'monthly', history: LoggedMeal[], goalData: any }) {
+  const stats = useMemo(() => {
+    const today = new Date();
+    const interval = period === 'weekly' 
+      ? { start: startOfWeek(today), end: endOfWeek(today) }
+      : { start: startOfMonth(today), end: endOfMonth(today) };
+
+    const periodHistory = history.filter(m => {
+      const d = new Date(m.timestamp);
+      return isWithinInterval(d, interval);
+    });
+
+    const daysWithLogs = Array.from(new Set(periodHistory.map(m => m.dateStr)));
+    if (daysWithLogs.length === 0) return null;
+
+    const dailyTotals = daysWithLogs.map(date => {
+      const dayMeals = periodHistory.filter(m => m.dateStr === date);
+      return dayMeals.reduce((acc, m) => ({
+        calories: acc.calories + m.calories,
+        protein: acc.protein + m.protein,
+        carbs: acc.carbs + m.carbs,
+        fat: acc.fat + m.fat,
+        fiber: acc.fiber + m.fiber,
+        date
+      }), { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0, date });
+    });
+
+    const avgCalories = Math.round(dailyTotals.reduce((a, b) => a + b.calories, 0) / daysWithLogs.length);
+    const sortedByCal = [...dailyTotals].sort((a, b) => b.calories - a.calories);
+    const highestCalDay = sortedByCal[0];
+    const lowestCalDay = sortedByCal[sortedByCal.length - 1];
+
+    const totalProtein = periodHistory.reduce((a, b) => a + b.protein, 0);
+    const totalCarbs = periodHistory.reduce((a, b) => a + b.carbs, 0);
+    const totalFat = periodHistory.reduce((a, b) => a + b.fat, 0);
+    const totalFiber = periodHistory.reduce((a, b) => a + b.fiber, 0);
+    const totalMacros = totalProtein + totalCarbs + totalFat;
+
+    const targetCal = goalData?.finalCalories || 2200;
+    const netSurplusDeficit = avgCalories - targetCal;
+
+    const goalAchievements = {
+      protein: Math.min(100, Math.round(((totalProtein / daysWithLogs.length) / (goalData?.protein || 150)) * 100)),
+      carbs: Math.min(100, Math.round(((totalCarbs / daysWithLogs.length) / (goalData?.carbs || 250)) * 100)),
+      fat: Math.min(100, Math.round(((totalFat / daysWithLogs.length) / (goalData?.fats || 70)) * 100)),
+      fiber: Math.min(100, Math.round(((totalFiber / daysWithLogs.length) / (goalData?.fiber || 30)) * 100))
+    };
+
+    return {
+      avgCalories,
+      highestCalDay,
+      lowestCalDay,
+      macroRatios: {
+        protein: Math.round((totalProtein / totalMacros) * 100),
+        carbs: Math.round((totalCarbs / totalMacros) * 100),
+        fat: Math.round((totalFat / totalMacros) * 100)
+      },
+      goalAchievements,
+      netSurplusDeficit,
+      daysTracked: daysWithLogs.length
+    };
+  }, [period, history, goalData]);
+
+  if (!stats) {
+    return (
+      <Card className="border-none shadow-sm bg-white p-12 flex flex-col items-center justify-center opacity-30 gap-4">
+        <Calendar className="w-12 h-12" />
+        <p className="text-[10px] font-black uppercase tracking-widest text-center">No data logged for this {period}</p>
+      </Card>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-3">
+        <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Avg Calories</p>
+          <div className="flex items-baseline gap-1">
+            <span className="text-xl font-black">{stats.avgCalories}</span>
+            <span className="text-[8px] font-bold text-muted-foreground uppercase">Kcal</span>
+          </div>
+        </Card>
+        <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Net {stats.netSurplusDeficit >= 0 ? 'Surplus' : 'Deficit'}</p>
+          <div className={cn("flex items-center gap-1", stats.netSurplusDeficit >= 0 ? "text-orange-500" : "text-green-600")}>
+            {stats.netSurplusDeficit >= 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+            <span className="text-sm font-black">{Math.abs(stats.netSurplusDeficit)} kcal</span>
+          </div>
+        </Card>
+      </div>
+
+      <Card className="border-none shadow-sm bg-white overflow-hidden">
+        <CardContent className="p-4 space-y-4">
+          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+            <History className="w-3.5 h-3.5 text-primary" /> Daily Extremes
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-1">
+              <p className="text-[8px] font-bold text-muted-foreground uppercase">Highest Intake</p>
+              <p className="text-sm font-black">{stats.highestCalDay.calories} kcal</p>
+              <p className="text-[8px] font-bold text-primary uppercase">{format(new Date(stats.highestCalDay.date), 'MMM do')}</p>
+            </div>
+            <div className="space-y-1">
+              <p className="text-[8px] font-bold text-muted-foreground uppercase">Lowest Intake</p>
+              <p className="text-sm font-black">{stats.lowestCalDay.calories} kcal</p>
+              <p className="text-[8px] font-bold text-primary uppercase">{format(new Date(stats.lowestCalDay.date), 'MMM do')}</p>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-none shadow-sm bg-white">
+        <CardContent className="p-4 space-y-4">
+          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+            <PieChart className="w-3.5 h-3.5 text-primary" /> Average Macro Ratio
+          </h3>
+          <div className="space-y-2">
+            <div className="flex h-3 w-full rounded-full overflow-hidden bg-muted/20">
+              <div className="bg-sky-500 h-full" style={{ width: `${stats.macroRatios.protein}%` }} />
+              <div className="bg-primary h-full" style={{ width: `${stats.macroRatios.carbs}%` }} />
+              <div className="bg-yellow-500 h-full" style={{ width: `${stats.macroRatios.fat}%` }} />
+            </div>
+            <div className="flex justify-between text-[7px] font-black text-muted-foreground uppercase tracking-widest">
+              <span>{stats.macroRatios.protein}% Protein</span>
+              <span>{stats.macroRatios.carbs}% Carbs</span>
+              <span>{stats.macroRatios.fat}% Fats</span>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-none shadow-sm bg-white">
+        <CardContent className="p-4 space-y-4">
+          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+            <Target className="w-3.5 h-3.5 text-primary" /> Goal Achievements
+          </h3>
+          <div className="grid grid-cols-2 gap-4">
+            {(['protein', 'carbs', 'fat', 'fiber'] as const).map(macro => (
+              <div key={macro} className="space-y-1.5">
+                <div className="flex justify-between items-baseline">
+                  <p className="text-[8px] font-black uppercase text-muted-foreground">{macro}</p>
+                  <span className="text-[10px] font-black text-primary">{stats.goalAchievements[macro]}%</span>
+                </div>
+                <div className="h-1 w-full bg-muted/30 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-primary transition-all duration-1000" 
+                    style={{ width: `${stats.goalAchievements[macro]}%` }} 
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
