@@ -20,13 +20,24 @@ import {
   ChevronLeft,
   Loader2,
   Trash2,
-  TrendingUp
+  TrendingUp,
+  Dot
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { parseMeal } from '@/ai/flows/parse-meal-flow';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+
+interface MealItem {
+  name: string;
+  quantity: string;
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
+}
 
 interface LoggedMeal {
   id: string;
@@ -39,15 +50,16 @@ interface LoggedMeal {
   fiber: number;
   time: string;
   timestamp: number;
+  items?: MealItem[];
 }
 
 export function NutritionView() {
+  const [showSummary, setShowSummary] = useState(false);
   const [logTab, setLogTab] = useState("log");
   const [mealInput, setMealInput] = useState("");
   const [isParsing, setIsParsing] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [credits, setCredits] = useState(25);
-  const [showSummary, setShowSummary] = useState(false);
   
   const [recentMeals, setRecentMeals] = useState<LoggedMeal[]>([]);
   const [savedMeals, setSavedMeals] = useState<LoggedMeal[]>([]);
@@ -94,7 +106,15 @@ export function NutritionView() {
         fat: Math.round(result.fat),
         fiber: Math.round(result.fiber || 0),
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
-        timestamp: Date.now()
+        timestamp: Date.now(),
+        items: result.items.map(i => ({
+          ...i,
+          calories: Math.round(i.calories),
+          protein: Math.round(i.protein),
+          carbs: Math.round(i.carbs),
+          fat: Math.round(i.fat),
+          fiber: Math.round(i.fiber)
+        }))
       };
       
       setLoggedMeals(prev => [newMeal, ...prev]);
@@ -245,16 +265,29 @@ export function NutritionView() {
               loggedMeals.map(meal => (
                 <Card key={meal.id} className="border-none shadow-sm bg-white hover:bg-muted/5 transition-all">
                   <CardContent className="p-4 relative">
-                    <div className="space-y-1 pr-12">
+                    <div className="space-y-1.5 pr-12">
                       <h4 className="font-bold text-sm text-foreground">
                         <span className="text-primary uppercase text-[10px] mr-1">{meal.type}:</span> {meal.name}
                       </h4>
                       <p className="text-xs font-black text-foreground/60">{Math.round(meal.calories)} KCAL</p>
-                      <div className="flex gap-3 text-[11px] font-black text-muted-foreground uppercase tracking-tight mt-1">
+                      
+                      {/* Item-wise breakdown */}
+                      {meal.items && meal.items.length > 0 && (
+                        <div className="pl-2 border-l-2 border-muted/20 my-1 space-y-0.5">
+                          {meal.items.map((item, idx) => (
+                            <div key={idx} className="flex justify-between text-[9px] font-bold text-muted-foreground">
+                              <span>{item.quantity} {item.name}</span>
+                              <span className="text-foreground/40">{item.calories} kcal</span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[10px] font-black text-muted-foreground uppercase tracking-tight pt-1">
                         <span className="text-sky-600">P {Math.round(meal.protein)}g</span>
                         <span className="text-primary">C {Math.round(meal.carbs)}g</span>
                         <span className="text-yellow-600">F {Math.round(meal.fat)}g</span>
-                        <span className="text-green-600">Fi {Math.round(meal.fiber)}g</span>
+                        <span className="text-green-600">FI {Math.round(meal.fiber)}g</span>
                       </div>
                     </div>
                     <span className="absolute bottom-3 right-4 text-[8px] font-bold text-muted-foreground/30 uppercase">
@@ -295,7 +328,7 @@ export function NutritionView() {
               <Sparkles className="w-3 h-3" /> AI Insight
             </h3>
             <p className="text-[11px] text-muted-foreground font-medium leading-tight mt-0.5 line-clamp-2">
-              Stay focused! Logging consistently is the best way to hit your goals. You've got this!
+              Stay focused! Logging consistently is the best way to hit your goals.
             </p>
           </div>
         </CardContent>
@@ -379,7 +412,7 @@ export function NutritionView() {
                             </div>
                             <div>
                               <p className="text-xs font-semibold">{meal.name}</p>
-                              <p className="text-[8px] font-bold text-muted-foreground uppercase">{Math.round(meal.calories)} kcal</p>
+                              <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.calories} kcal</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-1">
@@ -407,9 +440,9 @@ export function NutritionView() {
               <ScrollArea className="h-[180px] px-4 py-2">
                 <div className="space-y-2">
                   {savedMeals.length === 0 ? (
-                    <div className="text-center py-8 text-muted-foreground">
+                    <div className="text-center py-8 opacity-20">
                       <Bookmark className="w-10 h-10 mx-auto opacity-10 mb-2" />
-                      <p className="text-[10px] font-bold uppercase tracking-wider">No saved meals yet</p>
+                      <p className="text-[10px] font-bold uppercase tracking-wider">No saved meals</p>
                     </div>
                   ) : (
                     savedMeals.map((meal) => (
@@ -420,7 +453,7 @@ export function NutritionView() {
                           </div>
                           <div>
                             <p className="text-xs font-semibold">{meal.name}</p>
-                            <p className="text-[8px] font-bold text-muted-foreground uppercase">{Math.round(meal.calories)} kcal</p>
+                            <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.calories} kcal</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
@@ -466,32 +499,37 @@ export function NutritionView() {
           <ScrollArea className="h-[216px] pr-2">
             <div className="grid gap-3">
               {!isLoaded || loggedMeals.length === 0 ? (
-                <p className="text-center py-12 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No meals logged today</p>
+                <p className="text-center py-12 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No entries today</p>
               ) : (
                 loggedMeals.map((meal) => (
                   <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-muted/20 hover:bg-muted/30 transition-all group relative">
                     <CardContent className="p-0 flex min-h-[72px]">
                       <div className="w-1.5 bg-primary/40 shrink-0" />
-                      <div className="w-14 bg-white/50 shrink-0 flex items-center justify-center">
-                        <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10">
-                          <Utensils className="w-4 h-4 text-primary/40" />
-                        </div>
+                      <div className="w-12 bg-white/50 shrink-0 flex items-center justify-center">
+                        <Utensils className="w-4 h-4 text-primary/30" />
                       </div>
                       <div className="flex-1 p-2.5 flex flex-col justify-center min-w-0 pr-10">
-                        <div className="flex justify-between items-start mb-0.5">
-                          <div className="min-w-0">
-                            <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
-                            <h4 className="font-bold text-[13px] text-foreground/90 truncate leading-tight">{meal.name}</h4>
-                            <p className="text-[11px] font-bold text-foreground/60 tracking-tighter mt-0.5">
-                              {Math.round(meal.calories)} kcal
-                            </p>
-                          </div>
-                          <span className="text-[8px] font-bold text-muted-foreground/30 shrink-0">{meal.time}</span>
+                        <div className="min-w-0">
+                          <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
+                          <h4 className="font-bold text-[13px] text-foreground/90 truncate leading-tight">{meal.name}</h4>
+                          <p className="text-[11px] font-bold text-foreground/60 tracking-tighter mt-0.5">
+                            {meal.calories} kcal
+                          </p>
+                          {meal.items && meal.items.length > 0 && (
+                            <div className="flex flex-wrap gap-x-2 gap-y-0.5 mt-1.5">
+                              {meal.items.map((item, i) => (
+                                <span key={i} className="text-[8px] font-bold text-muted-foreground/60 uppercase">
+                                  {item.quantity} {item.name}
+                                </span>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       </div>
-                      <Button onClick={() => deleteLoggedMeal(meal.id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive opacity-100 transition-colors">
+                      <Button onClick={() => deleteLoggedMeal(meal.id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
+                      <span className="absolute bottom-2 right-2 text-[7px] font-bold text-muted-foreground/30">{meal.time}</span>
                     </CardContent>
                   </Card>
                 ))
@@ -502,7 +540,7 @@ export function NutritionView() {
       </Card>
 
       <div className="grid grid-cols-2 gap-4 pb-6">
-        <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer border border-muted/20">
+        <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group">
           <CardContent className="p-5 flex flex-col items-start gap-3">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
               <History className="w-5 h-5 text-primary" />
@@ -517,7 +555,7 @@ export function NutritionView() {
           </CardContent>
         </Card>
         
-        <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer border border-muted/20">
+        <Card className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group">
           <CardContent className="p-5 flex flex-col items-start gap-3">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
               <TrendingUp className="w-5 h-5 text-primary" />
