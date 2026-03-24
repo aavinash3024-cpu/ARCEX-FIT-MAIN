@@ -19,8 +19,6 @@ import {
   Sparkles,
   Trash2,
   Calendar,
-  AlertCircle,
-  CheckCircle2,
   ChevronDown
 } from "lucide-react";
 import Image from "next/image";
@@ -37,7 +35,6 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
-import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 
 type WeeklySplit = Record<string, Exercise[]>;
 
@@ -360,6 +357,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
   const [activeDay, setActiveDay] = useState(DAYS[0]);
   const [isAdding, setIsAdding] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [activeMuscleReport, setActiveMuscleReport] = useState("CHEST");
 
   useEffect(() => {
     const saved = localStorage.getItem('pulseflow_workout_split');
@@ -403,45 +401,55 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
   }, [searchQuery]);
 
   const report = useMemo(() => {
-    const allExercises = Object.values(split).flat();
-    const muscleStats: Record<string, { zones: Record<string, string[]>, volume: number, coverage: number, gaps: string[], secondary: Record<string, string[]> }> = {};
+    const flatSplit = Object.entries(split).flatMap(([day, exs]) => exs.map(e => ({ ...e, day })));
     
     // Total unique zones across all exercises in the library
-    const totalZones = Array.from(new Set(EXERCISES_DATA.map(e => `${e.muscle}-${e.subMuscle}`)));
-    const coveredZones = new Set(allExercises.map(e => `${e.muscle}-${e.subMuscle}`));
-    const globalCoverage = Math.round((coveredZones.size / totalZones.length) * 100);
+    const totalZonesAcrossLibrary = Array.from(new Set(EXERCISES_DATA.map(e => `${e.muscle}-${e.subMuscle}`)));
+    const coveredZonesAcrossSplit = new Set(flatSplit.map(e => `${e.muscle}-${e.subMuscle}`));
+    const globalCoverage = Math.round((coveredZonesAcrossSplit.size / totalZonesAcrossLibrary.length) * 100);
 
     const muscles = Array.from(new Set(EXERCISES_DATA.map(e => e.muscle)));
+    const muscleStats: Record<string, any> = {};
     
     muscles.forEach(m => {
-      const muscleZones = Array.from(new Set(EXERCISES_DATA.filter(e => e.muscle === m).map(e => e.subMuscle)));
-      const direct = allExercises.filter(e => e.muscle === m);
-      const zonesDone: Record<string, string[]> = {};
-      const secondaryDone: Record<string, string[]> = {};
+      const allSubMusclesForMuscle = Array.from(new Set(EXERCISES_DATA.filter(e => e.muscle === m).map(e => e.subMuscle)));
+      const directExercisesInSplit = flatSplit.filter(e => e.muscle === m);
       
-      muscleZones.forEach(z => {
-        const directExs = direct.filter(e => e.subMuscle === z).map(e => e.name);
-        if (directExs.length > 0) zonesDone[z] = directExs;
-        
-        // Secondary check
-        const secondaryExs = allExercises.filter(e => e.secondaryMuscles.toLowerCase().includes(m.toLowerCase()) || e.secondaryMuscles.toLowerCase().includes(z.toLowerCase())).map(e => e.name);
-        if (secondaryExs.length > 0) secondaryDone[z] = secondaryExs;
+      const zonesDone: Record<string, { name: string, day: string }[]> = {};
+      const secondaryDone: { name: string, day: string }[] = [];
+      
+      allSubMusclesForMuscle.forEach(z => {
+        const matchingDirect = directExercisesInSplit.filter(e => e.subMuscle === z);
+        if (matchingDirect.length > 0) {
+          zonesDone[z] = matchingDirect.map(e => ({ name: e.name, day: e.day }));
+        }
       });
 
-      const coverage = Math.round((Object.keys(zonesDone).length / muscleZones.length) * 100);
-      const gaps = muscleZones.filter(z => !zonesDone[z]);
+      // Find exercises where this muscle/submuscle is listed as secondary
+      flatSplit.forEach(ex => {
+        // If the secondary muscle description contains the primary muscle group name
+        const isSecondaryMovers = ex.secondaryMuscles.toLowerCase().includes(m.toLowerCase());
+        if (isSecondaryMovers && ex.muscle !== m) {
+          secondaryDone.push({ name: ex.name, day: ex.day });
+        }
+      });
+
+      const coverage = Math.round((Object.keys(zonesDone).length / allSubMusclesForMuscle.length) * 100);
+      const gaps = allSubMusclesForMuscle.filter(z => !zonesDone[z]);
 
       muscleStats[m] = {
         zones: zonesDone,
-        secondary: secondaryDone,
-        volume: direct.length,
+        secondary: Array.from(new Set(secondaryDone.map(s => JSON.stringify(s)))).map(s => JSON.parse(s)),
+        volume: directExercisesInSplit.length,
         coverage,
         gaps
       };
     });
 
-    return { globalCoverage, muscleStats };
+    return { globalCoverage, muscleStats, muscles };
   }, [split]);
+
+  const currentMuscleReport = report.muscleStats[activeMuscleReport] || null;
 
   return (
     <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -527,84 +535,117 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
         </div>
 
         <div className="space-y-4">
-          <Accordion type="multiple" className="w-full space-y-3">
-            {Object.entries(report.muscleStats).map(([muscle, stats]) => (
-              <AccordionItem key={muscle} value={muscle} className="border-none bg-white rounded-3xl shadow-sm overflow-hidden px-1">
-                <AccordionTrigger className="hover:no-underline p-5">
-                  <div className="flex-1 flex items-center justify-between pr-4">
-                    <div className="text-left">
-                      <span className="text-xs font-black uppercase tracking-tight text-foreground">{muscle}</span>
-                    </div>
-                    <span className="text-xs font-bold text-muted-foreground">{stats.coverage}%</span>
+          <ScrollArea className="w-full pb-2">
+            <div className="flex gap-2">
+              {report.muscles.map(muscle => (
+                <button
+                  key={muscle}
+                  onClick={() => setActiveMuscleReport(muscle)}
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
+                    activeMuscleReport === muscle 
+                      ? "bg-primary text-white border-primary shadow-md" 
+                      : "bg-white text-muted-foreground border-muted/20"
+                  )}
+                >
+                  {muscle}
+                </button>
+              ))}
+            </div>
+          </ScrollArea>
+
+          {currentMuscleReport && (
+            <div className="space-y-4 animate-in fade-in duration-300">
+              <Card className="border-none bg-white rounded-3xl shadow-sm overflow-hidden p-6 space-y-6">
+                <div className="flex justify-between items-center border-b border-muted/10 pb-4">
+                  <div>
+                    <h3 className="text-lg font-black uppercase tracking-tight text-foreground">{activeMuscleReport}</h3>
+                    <p className="text-[10px] font-black text-muted-foreground uppercase opacity-60">Status Analysis</p>
                   </div>
-                </AccordionTrigger>
-                <AccordionContent className="px-5 pb-5">
-                  <div className="space-y-6">
-                    <div className="grid grid-cols-2 gap-4 pb-4 border-b border-muted/10">
-                      <div>
-                        <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Volume</p>
-                        <p className="text-sm font-black">{stats.volume} Sets/Exercises</p>
-                      </div>
-                      <div className="text-right">
-                        <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Coverage</p>
-                        <p className="text-sm font-black text-primary">{stats.coverage}% Zones</p>
-                      </div>
+                  <div className="text-right">
+                    <p className="text-2xl font-black text-primary">{currentMuscleReport.coverage}%</p>
+                    <p className="text-[8px] font-black text-muted-foreground uppercase">Zones Hit</p>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="bg-muted/5 p-3 rounded-2xl border border-muted/10 text-center">
+                    <p className="text-sm font-black">{currentMuscleReport.volume}</p>
+                    <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Exercises</p>
+                  </div>
+                  <div className="bg-muted/5 p-3 rounded-2xl border border-muted/10 text-center">
+                    <p className="text-sm font-black">{currentMuscleReport.gaps.length}</p>
+                    <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Gaps Found</p>
+                  </div>
+                </div>
+
+                <div className="space-y-6">
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Direct Stimulus</h4>
                     </div>
-
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-1 h-3 bg-primary rounded-full" />
-                          <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Direct Stimulation</h4>
-                        </div>
-                        {Object.keys(stats.zones).length === 0 ? (
-                          <p className="text-[10px] italic text-muted-foreground pl-3">No direct stimulus detected.</p>
-                        ) : (
-                          Object.entries(stats.zones).map(([zone, exs]) => (
-                            <div key={zone} className="pl-3">
-                              <p className="text-[9px] font-black uppercase text-foreground/80 mb-0.5">{zone}</p>
-                              <p className="text-[10px] text-muted-foreground leading-relaxed">{exs.join(", ")}</p>
+                    {Object.keys(currentMuscleReport.zones).length === 0 ? (
+                      <p className="text-[10px] italic text-muted-foreground pl-3">No direct movements assigned.</p>
+                    ) : (
+                      <div className="space-y-3 pl-3">
+                        {Object.entries(currentMuscleReport.zones).map(([zone, data]: [string, any]) => (
+                          <div key={zone}>
+                            <p className="text-[9px] font-black uppercase text-foreground/80 mb-1">{zone}</p>
+                            <div className="flex flex-wrap gap-1.5">
+                              {data.map((ex: any, i: number) => (
+                                <Badge key={i} variant="outline" className="text-[8px] font-bold uppercase border-muted/30">
+                                  {ex.name} ({ex.day.substring(0, 3)})
+                                </Badge>
+                              ))}
                             </div>
-                          ))
-                        )}
-                      </div>
-
-                      <div className="space-y-2">
-                        <div className="flex items-center gap-2">
-                          <div className="w-1 h-3 bg-orange-400 rounded-full" />
-                          <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Secondary Involvement</h4>
-                        </div>
-                        {Object.keys(stats.secondary).length === 0 ? (
-                          <p className="text-[10px] italic text-muted-foreground pl-3">No secondary stimulus detected.</p>
-                        ) : (
-                          Object.entries(stats.secondary).map(([zone, exs]) => (
-                            <div key={zone} className="pl-3">
-                              <p className="text-[9px] font-black uppercase text-foreground/80 mb-0.5">{zone}</p>
-                              <p className="text-[10px] text-muted-foreground leading-relaxed">{exs.join(", ")}</p>
-                            </div>
-                          ))
-                        )}
-                      </div>
-
-                      {stats.gaps.length > 0 && (
-                        <div className="flex items-start gap-2 pt-2 text-destructive">
-                          <div className="w-1.5 h-1.5 rounded-full bg-destructive mt-1.5 shrink-0" />
-                          <div className="flex flex-wrap items-baseline gap-1.5">
-                            <span className="text-[10px] font-black uppercase tracking-widest">Anatomical Gaps:</span>
-                            <span className="text-[10px] font-black uppercase">{stats.gaps.join(", ")}</span>
                           </div>
-                        </div>
-                      )}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
-                </AccordionContent>
-              </AccordionItem>
-            ))}
-          </Accordion>
+
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-1.5 bg-orange-400 rounded-full" />
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Secondary Involvement</h4>
+                    </div>
+                    {currentMuscleReport.secondary.length === 0 ? (
+                      <p className="text-[10px] italic text-muted-foreground pl-3">No secondary stimulation found.</p>
+                    ) : (
+                      <div className="flex flex-wrap gap-1.5 pl-3">
+                        {currentMuscleReport.secondary.map((ex: any, i: number) => (
+                          <Badge key={i} variant="secondary" className="bg-orange-50 text-orange-600 text-[8px] font-bold uppercase hover:bg-orange-50">
+                            {ex.name} ({ex.day.substring(0, 3)})
+                          </Badge>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {currentMuscleReport.gaps.length > 0 && (
+                    <div className="space-y-3 pt-2">
+                      <div className="flex items-center gap-2">
+                        <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-destructive">Anatomical Gaps</h4>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5 pl-3">
+                        {currentMuscleReport.gaps.map((gap: string, i: number) => (
+                          <Badge key={i} className="bg-destructive/10 text-destructive text-[8px] font-black uppercase hover:bg-destructive/10">
+                            {gap}
+                          </Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </Card>
+            </div>
+          )}
         </div>
 
         <p className="text-[9px] text-muted-foreground leading-relaxed text-center px-4 pt-4 opacity-60">
-          Analysis based on clinical primary and secondary recruitment patterns. Maintenance requires at least secondary stimulus; growth requires direct training.
+          Growth requires direct training. Maintenance can be achieved through secondary involvement. Analysis based on refined anatomical maps.
         </p>
       </section>
 
