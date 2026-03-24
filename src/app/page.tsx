@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -20,7 +21,7 @@ import { CalculatorsView } from '@/components/calculators-view';
 import { GoalSettingView } from '@/components/goal-setting-view';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { format } from 'date-fns';
+import { format, subDays, isSameDay, isYesterday } from 'date-fns';
 
 export default function PulseFlowApp() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -31,6 +32,7 @@ export default function PulseFlowApp() {
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
+  const [streakData, setStreakData] = useState({ count: 0, history: [] as string[] });
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load data from localStorage on mount
@@ -41,6 +43,7 @@ export default function PulseFlowApp() {
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
     const savedWeight = localStorage.getItem('pulseflow_weight_history');
     const savedMeals = localStorage.getItem('pulseflow_today_logged_meals');
+    const savedStreak = localStorage.getItem('pulseflow_streak_v3');
     
     if (savedTasks) {
       try {
@@ -85,6 +88,37 @@ export default function PulseFlowApp() {
         console.error("Failed to parse logged meals", e);
       }
     }
+
+    // Streak Logic
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    if (savedStreak) {
+      try {
+        const data = JSON.parse(savedStreak);
+        const lastOpen = data.lastDate;
+        
+        if (lastOpen === todayStr) {
+          setStreakData({ count: data.count, history: data.history });
+        } else {
+          const lastDateObj = new Date(lastOpen);
+          let newCount = 1;
+          
+          if (isYesterday(lastDateObj)) {
+            newCount = data.count + 1;
+          }
+          
+          const newHistory = [...data.history, todayStr].slice(-30);
+          const newData = { count: newCount, history: newHistory, lastDate: todayStr };
+          setStreakData({ count: newCount, history: newHistory });
+          localStorage.setItem('pulseflow_streak_v3', JSON.stringify(newData));
+        }
+      } catch (e) {
+        console.error("Failed to parse streak", e);
+      }
+    } else {
+      const newData = { count: 1, history: [todayStr], lastDate: todayStr };
+      setStreakData({ count: 1, history: [todayStr] });
+      localStorage.setItem('pulseflow_streak_v3', JSON.stringify(newData));
+    }
     
     setIsLoaded(true);
   }, []);
@@ -100,7 +134,6 @@ export default function PulseFlowApp() {
     if (isLoaded) {
       localStorage.setItem('pulseflow_hydration', hydrationAmount.toString());
       
-      // Update history for today
       const today = format(new Date(), 'yyyy-MM-dd');
       setHydrationHistory(prev => ({
         ...prev,
@@ -177,6 +210,7 @@ export default function PulseFlowApp() {
             goalData={goalData}
             weightHistory={weightHistory}
             loggedMeals={loggedMeals}
+            streakData={streakData}
             onViewHydration={() => setActiveTab('hydration')} 
             onViewTasks={() => setActiveTab('tasks')} 
             onViewCalculators={handleOpenCalculator}
@@ -240,6 +274,7 @@ export default function PulseFlowApp() {
           goalData={goalData}
           weightHistory={weightHistory}
           loggedMeals={loggedMeals}
+          streakData={streakData}
         />
       );
     }

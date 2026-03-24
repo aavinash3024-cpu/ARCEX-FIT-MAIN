@@ -1,3 +1,4 @@
+
 "use client";
 
 import { useRef, useState, useMemo } from 'react';
@@ -19,7 +20,8 @@ import {
   PieChart,
   Target,
   ListTodo,
-  ArrowRight
+  ArrowRight,
+  Check
 } from "lucide-react";
 import { Progress } from "@/components/ui/progress";
 import { 
@@ -29,7 +31,7 @@ import {
 } from 'recharts';
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
-import { isSameDay, format } from 'date-fns';
+import { isSameDay, format, startOfWeek, addDays } from 'date-fns';
 import { type Task } from '@/components/tasks-view';
 import { cn } from '@/lib/utils';
 
@@ -41,6 +43,7 @@ interface DashboardViewProps {
   goalData: any;
   weightHistory?: any[];
   loggedMeals?: any[];
+  streakData?: { count: number, history: string[] };
   onViewHydration?: () => void;
   onViewTasks?: () => void;
   onViewCalculators?: (type: string) => void;
@@ -55,6 +58,7 @@ export function DashboardView({
   goalData,
   weightHistory = [],
   loggedMeals = [],
+  streakData = { count: 0, history: [] },
   onViewHydration, 
   onViewTasks,
   onViewCalculators,
@@ -70,7 +74,6 @@ export function DashboardView({
   const currentWeight = latestWeightEntry ? latestWeightEntry.weight : (goalData?.weight ? parseFloat(goalData.weight) : 0);
   const startWeight = goalData?.weight ? parseFloat(goalData.weight) : (weightHistory.length > 0 ? weightHistory[0].weight : 0);
   
-  // Update weightChange to be relative to starting weight
   const weightChange = currentWeight && startWeight ? parseFloat((currentWeight - startWeight).toFixed(1)) : 0;
 
   const chartData = useMemo(() => {
@@ -138,7 +141,7 @@ export function DashboardView({
 
   const coachImage = PlaceHolderImages.find(img => img.id === 'gym-coach');
 
-  // Reordered metrics: Calories, Hydration, Streak, Steps
+  // Metrics Sequence: Calories, Hydration, Streak, Steps
   const metrics = [
     { 
       id: 'calories',
@@ -165,11 +168,11 @@ export function DashboardView({
     { 
       id: 'streak',
       label: "Streak", 
-      value: "12", 
+      value: streakData.count.toString(), 
       unit: "days", 
-      target: "15", 
-      current: 12,
-      targetVal: 15,
+      target: "7", 
+      current: streakData.count,
+      targetVal: 7,
       icon: <Zap className="w-4 h-4 text-yellow-500" />, 
       color: "bg-yellow-50" 
     },
@@ -274,6 +277,21 @@ export function DashboardView({
     }
   };
 
+  // Streak Circle Calculation (Mon-Sun)
+  const streakWeekStatus = useMemo(() => {
+    const today = new Date();
+    const mon = startOfWeek(today, { weekStartsOn: 1 });
+    return [0, 1, 2, 3, 4, 5, 6].map(offset => {
+      const day = addDays(mon, offset);
+      const dayStr = format(day, 'yyyy-MM-dd');
+      const label = format(day, 'EEE');
+      return {
+        label,
+        active: streakData.history.includes(dayStr)
+      };
+    });
+  }, [streakData]);
+
   return (
     <div className="space-y-4 pb-24 pt-4">
       <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
@@ -317,6 +335,7 @@ export function DashboardView({
               const percentage = Math.round((m.current / m.targetVal) * 100);
               const isCalories = m.id === "calories";
               const isHydration = m.id === "hydration";
+              const isStreak = m.id === "streak";
               const showDetails = isHydration || m.id === "steps";
 
               return (
@@ -326,7 +345,7 @@ export function DashboardView({
                       <div className={`p-1.5 rounded-lg ${m.color}`}>
                         {m.icon}
                       </div>
-                      <span className="text-[10px] font-bold text-muted-foreground">{percentage}%</span>
+                      {!isStreak && <span className="text-[10px] font-bold text-muted-foreground">{percentage}%</span>}
                     </div>
                     
                     <div className="space-y-2">
@@ -359,39 +378,59 @@ export function DashboardView({
                       </div>
 
                       <div className="flex items-center gap-3">
-                        <div className="relative flex-1 h-6 flex items-center">
-                          <Progress 
-                            value={Math.min(percentage, 100)} 
-                            className="h-1.5 w-full" 
-                            indicatorClassName={isCalories ? "bg-gradient-to-r from-[#F59202] to-[#FFB84D]" : ""}
-                          />
-                          
-                          {isCalories && (
-                            <>
-                              <div 
-                                className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
-                                style={{ left: `${(bmr / m.targetVal) * 100}%` }}
-                              >
-                                <span className="text-[6px] font-bold text-destructive/60">BMR</span>
-                                <div className="h-2 w-[1px] bg-destructive/40" />
+                        {isStreak ? (
+                          <div className="flex justify-between w-full px-1">
+                            {streakWeekStatus.map((day, i) => (
+                              <div key={i} className="flex flex-col items-center gap-1">
+                                <div className={cn(
+                                  "w-5 h-5 rounded-full flex items-center justify-center transition-all border",
+                                  day.active 
+                                    ? "bg-[#ff6b6b] border-[#ff6b6b] shadow-sm" 
+                                    : "bg-muted/30 border-muted/50"
+                                )}>
+                                  {day.active && <Check className="w-3 h-3 text-white" />}
+                                </div>
+                                <span className="text-[7px] font-black text-muted-foreground uppercase">{day.label}</span>
                               </div>
-                              <div 
-                                className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
-                                style={{ left: `${Math.min((tdee / m.targetVal) * 100, 98)}%` }}
+                            ))}
+                          </div>
+                        ) : (
+                          <>
+                            <div className="relative flex-1 h-6 flex items-center">
+                              <Progress 
+                                value={Math.min(percentage, 100)} 
+                                className="h-1.5 w-full" 
+                                indicatorClassName={isCalories ? "bg-gradient-to-r from-[#F59202] to-[#FFB84D]" : ""}
+                              />
+                              
+                              {isCalories && (
+                                <>
+                                  <div 
+                                    className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
+                                    style={{ left: `${(bmr / m.targetVal) * 100}%` }}
+                                  >
+                                    <span className="text-[6px] font-bold text-destructive/60">BMR</span>
+                                    <div className="h-2 w-[1px] bg-destructive/40" />
+                                  </div>
+                                  <div 
+                                    className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
+                                    style={{ left: `${Math.min((tdee / m.targetVal) * 100, 98)}%` }}
+                                  >
+                                    <span className="text-[6px] font-bold text-accent">TDEE</span>
+                                    <div className="h-2 w-[1px] bg-accent/60" />
+                                  </div>
+                                </>
+                              )}
+                            </div>
+                            {showDetails && (
+                              <button 
+                                onClick={() => isHydration && onViewHydration?.()}
+                                className="flex items-center gap-0.5 text-[8px] font-black text-primary uppercase shrink-0 hover:opacity-70 transition-opacity"
                               >
-                                <span className="text-[6px] font-bold text-accent">TDEE</span>
-                                <div className="h-2 w-[1px] bg-accent/60" />
-                              </div>
-                            </>
-                          )}
-                        </div>
-                        {showDetails && (
-                          <button 
-                            onClick={() => isHydration && onViewHydration?.()}
-                            className="flex items-center gap-0.5 text-[8px] font-black text-primary uppercase shrink-0 hover:opacity-70 transition-opacity"
-                          >
-                            Details <ChevronRight className="w-2.5 h-2.5" />
-                          </button>
+                                Details <ChevronRight className="w-2.5 h-2.5" />
+                              </button>
+                            )}
+                          </>
                         )}
                       </div>
                     </div>
