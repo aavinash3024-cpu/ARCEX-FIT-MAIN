@@ -217,7 +217,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
 
             <div className="flex bg-muted/5">
               <div className="flex-1 p-5 border-r border-muted/10">
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Current Weight</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Starting Weight</p>
                 <div className="bg-white p-3 rounded-xl border border-muted/10 mt-1 shadow-sm">
                   <p className="text-xl font-black text-foreground text-center">{weight}kg</p>
                 </div>
