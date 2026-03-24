@@ -358,7 +358,11 @@ export function DashboardView({
 
                       <div className="flex items-center gap-3">
                         <div className="relative flex-1 h-6 flex items-center">
-                          <Progress value={Math.min(percentage, 100)} className="h-1.5 w-full" />
+                          <Progress 
+                            value={Math.min(percentage, 100)} 
+                            className="h-1.5 w-full" 
+                            indicatorClassName={isCalories ? "bg-gradient-to-r from-[#F59202] to-[#FFB84D]" : ""}
+                          />
                           
                           {isCalories && (
                             <>
