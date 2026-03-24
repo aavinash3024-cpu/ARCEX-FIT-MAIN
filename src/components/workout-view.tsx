@@ -1,6 +1,7 @@
+
 'use client';
 
-import React from 'react';
+import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -11,12 +12,62 @@ import {
   Layout, 
   Plus, 
   RefreshCw,
-  ChevronRight
+  ChevronRight,
+  ChevronLeft,
+  Search,
+  AlertCircle,
+  Sparkles,
+  ArrowRight
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
+import { EXERCISES_DATA, type Exercise } from "@/lib/exercises-data";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { cn } from "@/lib/utils";
 
 export function WorkoutView() {
+  const [showLibrary, setShowLibrary] = useState(false);
+  const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  
+  // Library Filters
+  const [searchQuery, setSearchQuery] = useState("");
+  const [muscleFilter, setMuscleFilter] = useState<string>("ALL");
+  const [subMuscleFilter, setSubMuscleFilter] = useState<string>("ALL");
+
+  const muscleGroups = useMemo(() => {
+    const groups = Array.from(new Set(EXERCISES_DATA.map(e => e.muscle)));
+    return ["ALL", ...groups];
+  }, []);
+
+  const subMuscleGroups = useMemo(() => {
+    const data = muscleFilter === "ALL" 
+      ? EXERCISES_DATA 
+      : EXERCISES_DATA.filter(e => e.muscle === muscleFilter);
+    const groups = Array.from(new Set(data.map(e => e.subMuscle)));
+    return ["ALL", ...groups];
+  }, [muscleFilter]);
+
+  const filteredExercises = useMemo(() => {
+    return EXERCISES_DATA.filter(ex => {
+      const matchesSearch = ex.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesMuscle = muscleFilter === "ALL" || ex.muscle === muscleFilter;
+      const matchesSubMuscle = subMuscleFilter === "ALL" || ex.subMuscle === subMuscleFilter;
+      return matchesSearch && matchesMuscle && matchesSubMuscle;
+    });
+  }, [searchQuery, muscleFilter, subMuscleFilter]);
+
+  const handleMuscleChange = (val: string) => {
+    setMuscleFilter(val);
+    setSubMuscleFilter("ALL"); // Reset sub-muscle when main group changes
+  };
+
   const protocolExercises = [
     { name: "Incline Guillotine Press", category: "CHEST • UPPER CHEST", status: "AWAITING DATA" },
     { name: "Cable Kickback (Triceps)", category: "TRICEPS • LATERAL HEAD", status: "AWAITING DATA" },
@@ -24,6 +75,151 @@ export function WorkoutView() {
 
   const prImage = PlaceHolderImages.find(img => img.id === 'personal-records-illustration');
   const splitImage = PlaceHolderImages.find(img => img.id === 'training-split-tool');
+
+  if (selectedExercise) {
+    return (
+      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+        <div className="flex items-center gap-4 pt-2">
+          <Button variant="ghost" size="icon" onClick={() => setSelectedExercise(null)} className="rounded-full bg-muted/50 w-9 h-9">
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-xl font-bold font-headline truncate">{selectedExercise.name}</h1>
+        </div>
+
+        <Card className="border-none shadow-lg bg-white overflow-hidden rounded-3xl border border-muted/20">
+          <CardContent className="p-6 space-y-8">
+            {/* Secondary Muscles Section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-l-4 border-accent pl-4 py-0.5">
+                <Sparkles className="w-4 h-4 text-accent" />
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Secondary Muscles</h4>
+              </div>
+              <div className="pl-5">
+                <p className="text-sm font-bold text-foreground/80 leading-relaxed italic">
+                  {selectedExercise.secondaryMuscles}
+                </p>
+              </div>
+            </div>
+
+            {/* Instruction Area */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-l-4 border-primary pl-4 py-0.5">
+                <Layout className="w-4 h-4 text-primary" />
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Instructions</h4>
+              </div>
+              <div className="pl-5 space-y-4">
+                <p className="text-xs font-medium text-muted-foreground leading-relaxed">
+                  Focus on smooth, controlled repetitions to maximize muscle engagement and minimize injury risk.
+                </p>
+                <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 flex items-start gap-3">
+                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                  <p className="text-[10px] text-amber-800 font-black leading-tight uppercase tracking-tight">
+                    PREFER A COACH OR TRAINER FOR ACCURATE FORM AND RESULTS
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-2">
+              <div className="flex justify-between items-center bg-muted/10 p-4 rounded-2xl">
+                <div className="space-y-0.5">
+                  <p className="text-[8px] font-black text-muted-foreground uppercase">Target Area</p>
+                  <p className="text-[10px] font-bold text-primary uppercase">{selectedExercise.muscle} • {selectedExercise.subMuscle}</p>
+                </div>
+                <Dumbbell className="w-5 h-5 text-primary/20" />
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  if (showLibrary) {
+    return (
+      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+        <div className="flex items-center gap-4 pt-2">
+          <Button variant="ghost" size="icon" onClick={() => setShowLibrary(false)} className="rounded-full bg-muted/50 w-9 h-9">
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-2xl font-bold font-headline">Exercise Library</h1>
+        </div>
+
+        <div className="space-y-3 px-1">
+          {/* Search Bar */}
+          <div className="relative group">
+            <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
+              <Search className="w-4 h-4 text-primary/40 group-focus-within:text-primary transition-colors" />
+            </div>
+            <input 
+              type="text" 
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search exercise..." 
+              className="w-full h-12 pl-10 pr-4 bg-white border border-muted-foreground/10 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm font-bold"
+            />
+          </div>
+
+          {/* Selectors Row */}
+          <div className="grid grid-cols-2 gap-3">
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest pl-1">MUSCLE</label>
+              <Select value={muscleFilter} onValueChange={handleMuscleChange}>
+                <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-white h-11 text-[10px] font-black uppercase tracking-tighter">
+                  <SelectValue placeholder="Muscle Group" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {muscleGroups.map(m => (
+                    <SelectItem key={m} value={m} className="text-[10px] font-bold uppercase">{m}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            <div className="space-y-1.5">
+              <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest pl-1">SUB-MUSCLE</label>
+              <Select value={subMuscleFilter} onValueChange={setSubMuscleFilter}>
+                <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-white h-11 text-[10px] font-black uppercase tracking-tighter">
+                  <SelectValue placeholder="Sub Muscle" />
+                </SelectTrigger>
+                <SelectContent className="rounded-xl">
+                  {subMuscleGroups.map(sm => (
+                    <SelectItem key={sm} value={sm} className="text-[10px] font-bold uppercase">{sm}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          </div>
+        </div>
+
+        <ScrollArea className="h-[calc(100vh-320px)] mt-4">
+          <div className="grid gap-2 px-1">
+            {filteredExercises.length === 0 ? (
+              <div className="text-center py-12 opacity-30">
+                <Search className="w-10 h-10 mx-auto mb-2 opacity-20" />
+                <p className="text-[10px] font-black uppercase tracking-widest">No moves found</p>
+              </div>
+            ) : (
+              filteredExercises.map((ex, idx) => (
+                <button 
+                  key={idx} 
+                  onClick={() => setSelectedExercise(ex)}
+                  className="flex items-center justify-between p-4 bg-white rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
+                >
+                  <div className="min-w-0 pr-4">
+                    <h4 className="font-bold text-[13px] text-foreground/90 truncate">{ex.name}</h4>
+                    <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-tight mt-0.5">
+                      {ex.muscle} • {ex.subMuscle}
+                    </p>
+                  </div>
+                  <ArrowRight className="w-4 h-4 text-muted-foreground/20 group-hover:text-primary transition-colors shrink-0" />
+                </button>
+              ))
+            )}
+          </div>
+        </ScrollArea>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 pb-24">
@@ -101,13 +297,16 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 3. Compact My Workout Split Card */}
-      <Card className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-indigo-400">
+      {/* 3. Exercise Library Entry Card */}
+      <Card 
+        onClick={() => setShowLibrary(true)}
+        className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-indigo-400"
+      >
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
               src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
-              alt="My Workout Split"
+              alt="Exercise Library"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
               data-ai-hint="gym weights"
@@ -117,17 +316,17 @@ export function WorkoutView() {
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
             <div className="space-y-0.5">
               <h3 className="text-[10px] font-black text-indigo-600 uppercase tracking-tight flex items-center gap-1.5">
-                <Layout className="w-3 h-3" /> My Workout Split
+                <Library className="w-3 h-3" /> Exercise Library
               </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">Create Your Gym Split</p>
-              <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 tracking-tight">Start Discipline</p>
+              <p className="text-xs font-bold text-foreground/90 leading-tight">Browse 350+ Movements</p>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 tracking-tight">Learn Correct Form</p>
             </div>
             <ChevronRight className="w-4 h-4 text-indigo-300/40" />
           </div>
         </CardContent>
       </Card>
 
-      {/* 4. Grid: Workout History & Workout Library */}
+      {/* 4. Grid: Workout History & My Split */}
       <div className="grid grid-cols-2 gap-4 pb-6">
         <Card className="border-none shadow-sm bg-white hover:bg-sky-50 transition-all cursor-pointer active:scale-95 group border border-muted/20">
           <CardContent className="p-5 flex flex-col items-start gap-3">
@@ -147,11 +346,11 @@ export function WorkoutView() {
         <Card className="border-none shadow-sm bg-white hover:bg-purple-50 transition-all cursor-pointer active:scale-95 group border border-muted/20">
           <CardContent className="p-5 flex flex-col items-start gap-3">
             <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-              <Library className="w-5 h-5 text-purple-600" />
+              <Layout className="w-5 h-5 text-purple-600" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Workout Library</p>
-              <p className="text-xs font-bold text-foreground/80">850+ Moves</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">My Split</p>
+              <p className="text-xs font-bold text-foreground/80">Active Routine</p>
             </div>
             <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-purple-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
               Details <ChevronRight className="w-3 h-3" />
