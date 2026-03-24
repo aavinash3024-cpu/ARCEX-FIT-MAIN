@@ -18,8 +18,7 @@ import {
   Camera,
   ChevronRight,
   Loader2,
-  Trash2,
-  Save
+  Trash2
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -43,10 +42,12 @@ export function NutritionView() {
   const [logTab, setLogTab] = useState("log");
   const [mealInput, setMealInput] = useState("");
   const [isParsing, setIsParsing] = useState(false);
+  const [isListening, setIsListening] = useState(false);
+  
   const [recentMeals, setRecentMeals] = useState<LoggedMeal[]>([]);
   const [savedMeals, setSavedMeals] = useState<LoggedMeal[]>([]);
   const [loggedMeals, setLoggedMeals] = useState<LoggedMeal[]>([]);
-  const [isListening, setIsListening] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
 
   // Load from localStorage
   useEffect(() => {
@@ -57,20 +58,28 @@ export function NutritionView() {
     if (savedRecent) setRecentMeals(JSON.parse(savedRecent));
     if (savedFavorites) setSavedMeals(JSON.parse(savedFavorites));
     if (savedLogged) setLoggedMeals(JSON.parse(savedLogged));
+    
+    setIsLoaded(true);
   }, []);
 
-  // Persist to localStorage
+  // Persist to localStorage only after initial load
   useEffect(() => {
-    localStorage.setItem('pulseflow_recent_meals', JSON.stringify(recentMeals));
-  }, [recentMeals]);
+    if (isLoaded) {
+      localStorage.setItem('pulseflow_recent_meals', JSON.stringify(recentMeals));
+    }
+  }, [recentMeals, isLoaded]);
 
   useEffect(() => {
-    localStorage.setItem('pulseflow_saved_meals', JSON.stringify(savedMeals));
-  }, [savedMeals]);
+    if (isLoaded) {
+      localStorage.setItem('pulseflow_saved_meals', JSON.stringify(savedMeals));
+    }
+  }, [savedMeals, isLoaded]);
 
   useEffect(() => {
-    localStorage.setItem('pulseflow_today_logged_meals', JSON.stringify(loggedMeals));
-  }, [loggedMeals]);
+    if (isLoaded) {
+      localStorage.setItem('pulseflow_today_logged_meals', JSON.stringify(loggedMeals));
+    }
+  }, [loggedMeals, isLoaded]);
 
   const handleLogMeal = async () => {
     if (!mealInput.trim()) return;
@@ -113,7 +122,10 @@ export function NutritionView() {
   };
 
   const saveMeal = (meal: LoggedMeal) => {
-    if (savedMeals.find(m => m.id === meal.id)) return;
+    if (savedMeals.find(m => m.name.toLowerCase() === meal.name.toLowerCase())) {
+      setSavedMeals(prev => prev.filter(m => m.name.toLowerCase() !== meal.name.toLowerCase()));
+      return;
+    }
     setSavedMeals(prev => [meal, ...prev].slice(0, 50));
   };
 
@@ -148,6 +160,10 @@ export function NutritionView() {
     };
 
     recognition.start();
+  };
+
+  const isAlreadySaved = (mealName: string) => {
+    return savedMeals.some(s => s.name.toLowerCase() === mealName.toLowerCase());
   };
 
   const analysisImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
@@ -251,13 +267,13 @@ export function NutritionView() {
             </TabsContent>
 
             <TabsContent value="recent" className="mt-0">
-              <ScrollArea className="h-[210px] px-4 py-2">
+              <ScrollArea className="h-[180px] px-4 py-2">
                 <div className="space-y-2">
                   {recentMeals.length === 0 ? (
                     <p className="text-center py-8 text-[10px] font-bold text-muted-foreground uppercase opacity-40">No recent logs</p>
                   ) : (
                     recentMeals.map((meal) => {
-                      const isSaved = savedMeals.some(s => s.name.toLowerCase() === meal.name.toLowerCase());
+                      const saved = isAlreadySaved(meal.name);
                       return (
                         <div key={meal.id} className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-muted/20">
                           <div className="flex items-center gap-3">
@@ -266,7 +282,7 @@ export function NutritionView() {
                             </div>
                             <div>
                               <p className="text-xs font-semibold">{meal.name}</p>
-                              <p className="text-[8px] font-bold text-muted-foreground uppercase">{Math.round(meal.calories)} kcal</p>
+                              <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.calories} kcal</p>
                             </div>
                           </div>
                           <div className="flex items-center gap-1">
@@ -274,9 +290,9 @@ export function NutritionView() {
                               onClick={() => saveMeal(meal)}
                               size="icon" 
                               variant="ghost" 
-                              className={cn("w-7 h-7 rounded-full transition-colors", isSaved ? "text-primary" : "text-muted-foreground")}
+                              className={cn("w-7 h-7 rounded-full transition-colors", saved ? "text-primary bg-primary/5" : "text-muted-foreground")}
                             >
-                              <Bookmark className={cn("w-3.5 h-3.5", isSaved && "fill-current")} />
+                              <Bookmark className={cn("w-3.5 h-3.5", saved && "fill-current")} />
                             </Button>
                             <Button 
                               onClick={() => logExistingMeal(meal)}
@@ -296,7 +312,7 @@ export function NutritionView() {
             </TabsContent>
 
             <TabsContent value="saved" className="mt-0">
-              <ScrollArea className="h-[210px] px-4 py-2">
+              <ScrollArea className="h-[180px] px-4 py-2">
                 <div className="space-y-2">
                   {savedMeals.length === 0 ? (
                     <div className="text-center py-8 text-muted-foreground">
@@ -312,7 +328,7 @@ export function NutritionView() {
                           </div>
                           <div>
                             <p className="text-xs font-semibold">{meal.name}</p>
-                            <p className="text-[8px] font-bold text-muted-foreground uppercase">{Math.round(meal.calories)} kcal</p>
+                            <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.calories} kcal</p>
                           </div>
                         </div>
                         <div className="flex items-center gap-1">
@@ -349,35 +365,35 @@ export function NutritionView() {
           <span className="text-[9px] font-bold text-primary uppercase flex items-center">View Summary <ChevronRight className="w-3 h-3 ml-0.5" /></span>
         </div>
         
-        <ScrollArea className="h-[240px] pr-2">
+        <ScrollArea className="h-[260px] pr-2">
           <div className="grid gap-3">
-            {loggedMeals.length === 0 ? (
-              <p className="text-center py-6 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No meals logged today</p>
+            {!isLoaded || loggedMeals.length === 0 ? (
+              <p className="text-center py-8 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No meals logged today</p>
             ) : (
               loggedMeals.map((meal) => (
                 <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group">
-                  <CardContent className="p-0 flex h-[76px]">
-                    <div className="w-16 bg-muted/20 shrink-0 flex items-center justify-center">
-                      <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10 group-hover:scale-110 transition-transform duration-300">
-                        <Utensils className="w-4 h-4 text-muted-foreground/40" />
+                  <CardContent className="p-0 flex h-[72px]">
+                    <div className="w-14 bg-muted/20 shrink-0 flex items-center justify-center">
+                      <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10">
+                        <Utensils className="w-4 h-4 text-muted-foreground/30" />
                       </div>
                     </div>
                     <div className="flex-1 p-2.5 flex flex-col justify-between min-w-0">
                       <div className="flex justify-between items-start">
                         <div className="min-w-0">
                           <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
-                          <h4 className="font-bold text-xs text-foreground/90 truncate leading-tight">{meal.name}</h4>
+                          <h4 className="font-bold text-[13px] text-foreground/90 truncate leading-tight">{meal.name}</h4>
                         </div>
-                        <span className="text-[8px] font-bold text-muted-foreground/40 shrink-0">{meal.time}</span>
+                        <span className="text-[8px] font-bold text-muted-foreground/30 shrink-0">{meal.time}</span>
                       </div>
                       <div className="flex justify-between items-end">
-                        <div className="flex gap-2 text-[10px] font-bold text-muted-foreground uppercase opacity-70">
-                          <span>P: {Math.round(meal.protein)}G</span>
-                          <span>C: {Math.round(meal.carbs)}G</span>
-                          <span>F: {Math.round(meal.fat)}G</span>
+                        <div className="flex gap-2.5 text-[10px] font-black text-muted-foreground/80 uppercase">
+                          <span className="flex items-center gap-0.5"><span className="opacity-40">P:</span>{meal.protein}g</span>
+                          <span className="flex items-center gap-0.5"><span className="opacity-40">C:</span>{meal.carbs}g</span>
+                          <span className="flex items-center gap-0.5"><span className="opacity-40">F:</span>{meal.fat}g</span>
                         </div>
                         <Badge variant="secondary" className="text-[10px] h-5 px-2 bg-primary/10 text-primary font-black border-none shadow-none">
-                          {Math.round(meal.calories)} KCAL
+                          {meal.calories} KCAL
                         </Badge>
                       </div>
                     </div>
