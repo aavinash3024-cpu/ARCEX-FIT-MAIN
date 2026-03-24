@@ -81,10 +81,10 @@ export function NutritionView() {
         id: Math.random().toString(36).substr(2, 9),
         type: getMealTypeByTime(),
         name: result.name,
-        calories: result.calories,
-        carbs: result.carbs,
-        protein: result.protein,
-        fat: result.fat,
+        calories: Math.round(result.calories),
+        carbs: Math.round(result.carbs),
+        protein: Math.round(result.protein),
+        fat: Math.round(result.fat),
         time: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: Date.now()
       };
@@ -349,34 +349,34 @@ export function NutritionView() {
           <span className="text-[9px] font-bold text-primary uppercase flex items-center">View Summary <ChevronRight className="w-3 h-3 ml-0.5" /></span>
         </div>
         
-        <ScrollArea className="h-[260px] pr-2">
+        <ScrollArea className="h-[240px] pr-2">
           <div className="grid gap-3">
             {loggedMeals.length === 0 ? (
               <p className="text-center py-6 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No meals logged today</p>
             ) : (
               loggedMeals.map((meal) => (
                 <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-white hover:shadow-md transition-shadow group">
-                  <CardContent className="p-0 flex h-20">
-                    <div className="w-20 bg-muted/20 shrink-0 flex items-center justify-center">
-                      <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10 group-hover:scale-110 transition-transform duration-300">
-                        <Utensils className="w-5 h-5 text-muted-foreground/40" />
+                  <CardContent className="p-0 flex h-[76px]">
+                    <div className="w-16 bg-muted/20 shrink-0 flex items-center justify-center">
+                      <div className="w-9 h-9 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10 group-hover:scale-110 transition-transform duration-300">
+                        <Utensils className="w-4 h-4 text-muted-foreground/40" />
                       </div>
                     </div>
-                    <div className="flex-1 p-3 flex flex-col justify-between min-w-0">
+                    <div className="flex-1 p-2.5 flex flex-col justify-between min-w-0">
                       <div className="flex justify-between items-start">
                         <div className="min-w-0">
                           <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
-                          <h4 className="font-bold text-sm text-foreground/90 truncate">{meal.name}</h4>
+                          <h4 className="font-bold text-xs text-foreground/90 truncate leading-tight">{meal.name}</h4>
                         </div>
-                        <span className="text-[9px] font-bold text-muted-foreground/40 shrink-0">{meal.time}</span>
+                        <span className="text-[8px] font-bold text-muted-foreground/40 shrink-0">{meal.time}</span>
                       </div>
                       <div className="flex justify-between items-end">
-                        <div className="flex gap-2 text-[8px] font-bold text-muted-foreground uppercase opacity-60">
-                          <span>P: {Math.round(meal.protein)}g</span>
-                          <span>C: {Math.round(meal.carbs)}g</span>
-                          <span>F: {Math.round(meal.fat)}g</span>
+                        <div className="flex gap-2 text-[10px] font-bold text-muted-foreground uppercase opacity-70">
+                          <span>P: {Math.round(meal.protein)}G</span>
+                          <span>C: {Math.round(meal.carbs)}G</span>
+                          <span>F: {Math.round(meal.fat)}G</span>
                         </div>
-                        <Badge variant="secondary" className="text-[9px] h-5 px-2 bg-primary/5 text-primary-foreground/80 font-black border-none">
+                        <Badge variant="secondary" className="text-[10px] h-5 px-2 bg-primary/10 text-primary font-black border-none shadow-none">
                           {Math.round(meal.calories)} KCAL
                         </Badge>
                       </div>
