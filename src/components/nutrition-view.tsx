@@ -365,7 +365,7 @@ export function NutritionView() {
       </Card>
 
       <Card className="border-none shadow-md overflow-hidden bg-white">
-        <div className="h-28 w-full relative">
+        <div className="h-14 w-full relative">
           <Image 
             src={logHeaderImage?.imageUrl || "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=600&auto=format&fit=crop"} 
             alt="Today's Log Header"
@@ -374,8 +374,8 @@ export function NutritionView() {
             data-ai-hint="salad bowl"
           />
           <div className="absolute inset-0 bg-black/25" />
-          <div className="absolute bottom-4 left-5">
-            <h2 className="text-xs font-black uppercase tracking-[0.2em] text-white flex items-center gap-2">
+          <div className="absolute bottom-3 left-5">
+            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-white flex items-center gap-2">
               Today's Log
             </h2>
           </div>
