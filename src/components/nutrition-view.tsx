@@ -32,7 +32,20 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { parseMeal } from '@/ai/flows/parse-meal-flow';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
-import { format, startOfWeek, endOfWeek, subDays, isWithinInterval, startOfMonth, endOfMonth, isSameDay } from 'date-fns';
+import { 
+  format, 
+  startOfWeek, 
+  endOfWeek, 
+  subDays, 
+  isWithinInterval, 
+  startOfMonth, 
+  endOfMonth, 
+  isSameDay,
+  addWeeks,
+  subWeeks,
+  addMonths,
+  subMonths
+} from 'date-fns';
 
 interface MealItem {
   name: string;
@@ -487,7 +500,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                   value={mealInput}
                   onChange={(e) => setMealInput(e.target.value)}
                   placeholder="What did you eat?" 
-                  className="w-full h-12 pl-10 pr-20 bg-white border border-muted-foreground/10 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm font-bold"
+                  className="w-full h-12 pl-10 pr-4 bg-white border border-muted-foreground/10 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm font-bold"
                 />
                 <div className="absolute inset-y-0 right-2 flex items-center gap-1">
                   <Button onClick={handleSpeech} size="icon" variant="ghost" className={`w-8 h-8 rounded-full transition-colors ${isListening ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}>
@@ -666,12 +679,37 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 }
 
 function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'monthly', history: LoggedMeal[], goalData: any }) {
-  const stats = useMemo(() => {
-    const today = new Date();
-    const interval = period === 'weekly' 
-      ? { start: startOfWeek(today), end: endOfWeek(today) }
-      : { start: startOfMonth(today), end: endOfMonth(today) };
+  const [refDate, setRefDate] = useState(new Date());
 
+  const handlePrev = () => {
+    if (period === 'weekly') setRefDate(prev => subWeeks(prev, 1));
+    else setRefDate(prev => subMonths(prev, 1));
+  };
+
+  const handleNext = () => {
+    if (period === 'weekly') setRefDate(prev => addWeeks(prev, 1));
+    else setRefDate(prev => addMonths(prev, 1));
+  };
+
+  const { interval, label } = useMemo(() => {
+    if (period === 'weekly') {
+      const start = startOfWeek(refDate, { weekStartsOn: 1 });
+      const end = endOfWeek(refDate, { weekStartsOn: 1 });
+      return { 
+        interval: { start, end },
+        label: `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`
+      };
+    } else {
+      const start = startOfMonth(refDate);
+      const end = endOfMonth(refDate);
+      return {
+        interval: { start, end },
+        label: format(refDate, 'MMMM yyyy')
+      };
+    }
+  }, [refDate, period]);
+
+  const stats = useMemo(() => {
     const periodHistory = history.filter(m => {
       const d = new Date(m.timestamp);
       return isWithinInterval(d, interval);
@@ -726,99 +764,117 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
       netSurplusDeficit,
       daysTracked: daysWithLogs.length
     };
-  }, [period, history, goalData]);
-
-  if (!stats) {
-    return (
-      <Card className="border-none shadow-sm bg-white p-12 flex flex-col items-center justify-center opacity-30 gap-4">
-        <Calendar className="w-12 h-12" />
-        <p className="text-[10px] font-black uppercase tracking-widest text-center">No data logged for this {period}</p>
-      </Card>
-    );
-  }
+  }, [interval, history, goalData]);
 
   return (
     <div className="space-y-4">
-      <div className="grid grid-cols-2 gap-3">
-        <Card className="border-none shadow-sm bg-white p-4 space-y-1">
-          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Avg Calories</p>
-          <div className="flex items-baseline gap-1">
-            <span className="text-xl font-black">{stats.avgCalories}</span>
-            <span className="text-[8px] font-bold text-muted-foreground uppercase">Kcal</span>
-          </div>
-        </Card>
-        <Card className="border-none shadow-sm bg-white p-4 space-y-1">
-          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Net {stats.netSurplusDeficit >= 0 ? 'Surplus' : 'Deficit'}</p>
-          <div className={cn("flex items-center gap-1", stats.netSurplusDeficit >= 0 ? "text-orange-500" : "text-green-600")}>
-            {stats.netSurplusDeficit >= 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
-            <span className="text-sm font-black">{Math.abs(stats.netSurplusDeficit)} kcal</span>
-          </div>
-        </Card>
+      {/* Date Shifter */}
+      <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20">
+        <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full hover:bg-muted">
+          <ChevronLeft className="w-5 h-5 text-primary" />
+        </Button>
+        <div className="flex flex-col items-center">
+          <span className="text-sm font-black text-foreground uppercase tracking-tight">
+            {label}
+          </span>
+          <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none mt-1">
+            {period === 'weekly' ? 'WEEK' : 'MONTH'}
+          </span>
+        </div>
+        <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full hover:bg-muted">
+          <ChevronRight className="w-5 h-5 text-primary" />
+        </Button>
       </div>
 
-      <Card className="border-none shadow-sm bg-white overflow-hidden">
-        <CardContent className="p-4 space-y-4">
-          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-            <History className="w-3.5 h-3.5 text-primary" /> Daily Extremes
-          </h3>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="space-y-1">
-              <p className="text-[8px] font-bold text-muted-foreground uppercase">Highest Intake</p>
-              <p className="text-sm font-black">{stats.highestCalDay.calories} kcal</p>
-              <p className="text-[8px] font-bold text-primary uppercase">{format(new Date(stats.highestCalDay.date), 'MMM do')}</p>
-            </div>
-            <div className="space-y-1">
-              <p className="text-[8px] font-bold text-muted-foreground uppercase">Lowest Intake</p>
-              <p className="text-sm font-black">{stats.lowestCalDay.calories} kcal</p>
-              <p className="text-[8px] font-bold text-primary uppercase">{format(new Date(stats.lowestCalDay.date), 'MMM do')}</p>
-            </div>
+      {!stats ? (
+        <Card className="border-none shadow-sm bg-white p-12 flex flex-col items-center justify-center opacity-30 gap-4">
+          <Calendar className="w-12 h-12" />
+          <p className="text-[10px] font-black uppercase tracking-widest text-center">No data logged for this period</p>
+        </Card>
+      ) : (
+        <>
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Avg Calories</p>
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl font-black">{stats.avgCalories}</span>
+                <span className="text-[8px] font-bold text-muted-foreground uppercase">Kcal</span>
+              </div>
+            </Card>
+            <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Net {stats.netSurplusDeficit >= 0 ? 'Surplus' : 'Deficit'}</p>
+              <div className={cn("flex items-center gap-1", stats.netSurplusDeficit >= 0 ? "text-orange-500" : "text-green-600")}>
+                {stats.netSurplusDeficit >= 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
+                <span className="text-sm font-black">{Math.abs(stats.netSurplusDeficit)} kcal</span>
+              </div>
+            </Card>
           </div>
-        </CardContent>
-      </Card>
 
-      <Card className="border-none shadow-sm bg-white">
-        <CardContent className="p-4 space-y-4">
-          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-            <PieChart className="w-3.5 h-3.5 text-primary" /> Average Macro Ratio
-          </h3>
-          <div className="space-y-2">
-            <div className="flex h-3 w-full rounded-full overflow-hidden bg-muted/20">
-              <div style={{ width: `${stats.macroRatios.protein}%`, backgroundColor: MACRO_COLORS.protein }} className="h-full" />
-              <div style={{ width: `${stats.macroRatios.carbs}%`, backgroundColor: MACRO_COLORS.carbs }} className="h-full" />
-              <div style={{ width: `${stats.macroRatios.fat}%`, backgroundColor: MACRO_COLORS.fat }} className="h-full" />
-            </div>
-            <div className="flex justify-between text-[7px] font-black text-muted-foreground uppercase tracking-widest">
-              <span>{stats.macroRatios.protein}% Protein</span>
-              <span>{stats.macroRatios.carbs}% Carbs</span>
-              <span>{stats.macroRatios.fat}% Fats</span>
-            </div>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="border-none shadow-sm bg-white">
-        <CardContent className="p-4 space-y-4">
-          <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-            <Target className="w-3.5 h-3.5 text-primary" /> Goal Achievements
-          </h3>
-          <div className="grid grid-cols-2 gap-4">
-            {(['protein', 'carbs', 'fat', 'fiber'] as const).map(macro => (
-              <div key={macro} className="space-y-1.5">
-                <div className="flex justify-between items-baseline">
-                  <p className="text-[8px] font-black uppercase text-muted-foreground">{macro}</p>
-                  <span className="text-[10px] font-black" style={{ color: MACRO_COLORS[macro] }}>{stats.goalAchievements[macro]}%</span>
+          <Card className="border-none shadow-sm bg-white overflow-hidden">
+            <CardContent className="p-4 space-y-4">
+              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                <History className="w-3.5 h-3.5 text-primary" /> Daily Extremes
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                <div className="space-y-1">
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Highest Intake</p>
+                  <p className="text-sm font-black">{stats.highestCalDay.calories} kcal</p>
+                  <p className="text-[8px] font-bold text-primary uppercase">{format(new Date(stats.highestCalDay.date), 'MMM do')}</p>
                 </div>
-                <div className="h-1 w-full bg-muted/30 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full transition-all duration-1000" 
-                    style={{ width: `${stats.goalAchievements[macro]}%`, backgroundColor: MACRO_COLORS[macro] }} 
-                  />
+                <div className="space-y-1">
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Lowest Intake</p>
+                  <p className="text-sm font-black">{stats.lowestCalDay.calories} kcal</p>
+                  <p className="text-[8px] font-bold text-primary uppercase">{format(new Date(stats.lowestCalDay.date), 'MMM do')}</p>
                 </div>
               </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-sm bg-white">
+            <CardContent className="p-4 space-y-4">
+              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                <PieChart className="w-3.5 h-3.5 text-primary" /> Average Macro Ratio
+              </h3>
+              <div className="space-y-2">
+                <div className="flex h-3 w-full rounded-full overflow-hidden bg-muted/20">
+                  <div style={{ width: `${stats.macroRatios.protein}%`, backgroundColor: MACRO_COLORS.protein }} className="h-full" />
+                  <div style={{ width: `${stats.macroRatios.carbs}%`, backgroundColor: MACRO_COLORS.carbs }} className="h-full" />
+                  <div style={{ width: `${stats.macroRatios.fat}%`, backgroundColor: MACRO_COLORS.fat }} className="h-full" />
+                </div>
+                <div className="flex justify-between text-[7px] font-black text-muted-foreground uppercase tracking-widest">
+                  <span>{stats.macroRatios.protein}% Protein</span>
+                  <span>{stats.macroRatios.carbs}% Carbs</span>
+                  <span>{stats.macroRatios.fat}% Fats</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-sm bg-white">
+            <CardContent className="p-4 space-y-4">
+              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                <Target className="w-3.5 h-3.5 text-primary" /> Goal Achievements
+              </h3>
+              <div className="grid grid-cols-2 gap-4">
+                {(['protein', 'carbs', 'fat', 'fiber'] as const).map(macro => (
+                  <div key={macro} className="space-y-1.5">
+                    <div className="flex justify-between items-baseline">
+                      <p className="text-[8px] font-black uppercase text-muted-foreground">{macro}</p>
+                      <span className="text-[10px] font-black" style={{ color: MACRO_COLORS[macro] }}>{stats.goalAchievements[macro]}%</span>
+                    </div>
+                    <div className="h-1 w-full bg-muted/30 rounded-full overflow-hidden">
+                      <div 
+                        className="h-full transition-all duration-1000" 
+                        style={{ width: `${stats.goalAchievements[macro]}%`, backgroundColor: MACRO_COLORS[macro] }} 
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </>
+      )}
     </div>
   );
 }
