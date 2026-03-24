@@ -453,13 +453,13 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                                   weeklyRate === rate ? "border-primary bg-primary/5" : "border-muted/20"
                                )}
                             >
-                               <div>
+                               <div className="flex-1">
                                   <p className="text-[11px] font-bold">{rate} kg / week</p>
                                   <p className="text-[9px] font-semibold text-muted-foreground uppercase">~{Math.round(rate * 1100)} kcal {objective === 'loss' ? 'deficit' : 'surplus'}</p>
                                   {rate === 1.0 && (
-                                    <div className="mt-1 flex items-center gap-1 text-destructive">
-                                      <AlertTriangle className="w-3 h-3" />
-                                      <span className="text-[8px] font-bold uppercase">Consult doctor</span>
+                                    <div className="mt-2 flex items-center gap-2 bg-destructive/10 p-2 rounded-lg border border-destructive/20 max-w-fit">
+                                      <AlertTriangle className="w-3 h-3 text-destructive" />
+                                      <span className="text-[9px] font-black uppercase text-destructive tracking-tighter">Consult doctor before losing 1kg / week</span>
                                     </div>
                                   )}
                                </div>
@@ -485,10 +485,31 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                 <h2 className="text-xs font-bold uppercase tracking-widest text-foreground/80">Fine-Tuning</h2>
               </div>
 
-              <div className="space-y-4">
-                <div className="bg-primary/5 p-5 rounded-3xl text-center space-y-1">
-                  <p className="text-[9px] font-semibold text-primary uppercase tracking-[0.2em]">Calculated Daily Intake</p>
-                  <p className="text-3xl font-bold">{calculations.finalCalories} <span className="text-xs text-muted-foreground">KCAL</span></p>
+              <div className="space-y-6">
+                <div className="bg-primary/5 p-6 rounded-3xl text-center space-y-1 border border-primary/10 shadow-inner">
+                  <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Calculated Daily Intake</p>
+                  <p className="text-4xl font-black">{calculations.finalCalories} <span className="text-xs text-muted-foreground">KCAL</span></p>
+                </div>
+
+                <div className="bg-muted/10 p-5 rounded-2xl space-y-4">
+                  <p className="text-[10px] font-black text-center text-muted-foreground uppercase tracking-widest">Real-time Macro Breakdown</p>
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="text-center space-y-0.5">
+                      <p className="text-lg font-black text-sky-600">{calculations.protein}g</p>
+                      <p className="text-[8px] font-bold text-muted-foreground uppercase">Protein</p>
+                      <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black">{calculations.proteinPct}%</Badge>
+                    </div>
+                    <div className="text-center space-y-0.5">
+                      <p className="text-lg font-black text-primary">{calculations.carbs}g</p>
+                      <p className="text-[8px] font-bold text-muted-foreground uppercase">Carbs</p>
+                      <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black">{calculations.carbPct}%</Badge>
+                    </div>
+                    <div className="text-center space-y-0.5">
+                      <p className="text-lg font-black text-yellow-600">{calculations.fats}g</p>
+                      <p className="text-[8px] font-bold text-muted-foreground uppercase">Fats</p>
+                      <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black">{calculations.fatPct}%</Badge>
+                    </div>
+                  </div>
                 </div>
               </div>
 
@@ -496,7 +517,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                 <div className="space-y-4">
                   <div className="flex justify-between items-center">
                       <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Adjust Calories</Label>
-                      <Badge variant="secondary" className="text-[9px] font-bold">{calAdj[0]} kcal</Badge>
+                      <Badge variant="secondary" className="text-[9px] font-bold">{calAdj[0] > 0 ? `+${calAdj[0]}` : calAdj[0]} kcal</Badge>
                   </div>
                   <Slider 
                     value={calAdj} 
