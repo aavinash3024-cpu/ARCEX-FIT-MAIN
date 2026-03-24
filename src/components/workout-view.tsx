@@ -15,9 +15,8 @@ import {
   ChevronRight,
   ChevronLeft,
   Search,
-  AlertCircle,
-  Sparkles,
-  ArrowRight
+  ArrowRight,
+  Sparkles
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -65,7 +64,7 @@ export function WorkoutView() {
 
   const handleMuscleChange = (val: string) => {
     setMuscleFilter(val);
-    setSubMuscleFilter("ALL"); // Reset sub-muscle when main group changes
+    setSubMuscleFilter("ALL"); 
   };
 
   const protocolExercises = [
@@ -88,45 +87,29 @@ export function WorkoutView() {
 
         <Card className="border-none shadow-lg bg-white overflow-hidden rounded-3xl border border-muted/20">
           <CardContent className="p-6 space-y-8">
+            {/* Main Muscle Section */}
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-l-4 border-primary pl-4 py-0.5">
+                <Dumbbell className="w-4 h-4 text-primary" />
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Main Muscle getting trained</h4>
+              </div>
+              <div className="pl-5">
+                <p className="text-sm font-bold text-foreground/80 uppercase">
+                  {selectedExercise.muscle} • {selectedExercise.subMuscle}
+                </p>
+              </div>
+            </div>
+
             {/* Secondary Muscles Section */}
             <div className="space-y-4">
               <div className="flex items-center gap-2 border-l-4 border-accent pl-4 py-0.5">
                 <Sparkles className="w-4 h-4 text-accent" />
-                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Secondary Muscles</h4>
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Secondary Muscles getting trained</h4>
               </div>
               <div className="pl-5">
                 <p className="text-sm font-bold text-foreground/80 leading-relaxed italic">
                   {selectedExercise.secondaryMuscles}
                 </p>
-              </div>
-            </div>
-
-            {/* Instruction Area */}
-            <div className="space-y-4">
-              <div className="flex items-center gap-2 border-l-4 border-primary pl-4 py-0.5">
-                <Layout className="w-4 h-4 text-primary" />
-                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Instructions</h4>
-              </div>
-              <div className="pl-5 space-y-4">
-                <p className="text-xs font-medium text-muted-foreground leading-relaxed">
-                  Focus on smooth, controlled repetitions to maximize muscle engagement and minimize injury risk.
-                </p>
-                <div className="bg-amber-50 p-4 rounded-2xl border border-amber-200 flex items-start gap-3">
-                  <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                  <p className="text-[10px] text-amber-800 font-black leading-tight uppercase tracking-tight">
-                    PREFER A COACH OR TRAINER FOR ACCURATE FORM AND RESULTS
-                  </p>
-                </div>
-              </div>
-            </div>
-
-            <div className="pt-2">
-              <div className="flex justify-between items-center bg-muted/10 p-4 rounded-2xl">
-                <div className="space-y-0.5">
-                  <p className="text-[8px] font-black text-muted-foreground uppercase">Target Area</p>
-                  <p className="text-[10px] font-bold text-primary uppercase">{selectedExercise.muscle} • {selectedExercise.subMuscle}</p>
-                </div>
-                <Dumbbell className="w-5 h-5 text-primary/20" />
               </div>
             </div>
           </CardContent>
@@ -228,7 +211,7 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      {/* 1. Sleek Personal Records Card */}
+      {/* 1. Personal Records Card (Wide) */}
       <Card className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
@@ -253,7 +236,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 2. Today's Workout Card */}
+      {/* 2. Today's Workout Card (Wide) */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -297,36 +280,35 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* 3. Exercise Library Entry Card */}
+      {/* 3. My Split Card (Wide - Promoted here) */}
       <Card 
-        onClick={() => setShowLibrary(true)}
-        className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-indigo-400"
+        className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
       >
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
               src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
-              alt="Exercise Library"
+              alt="My Split"
               fill
               className="object-cover group-hover:scale-105 transition-transform duration-500"
               data-ai-hint="gym weights"
             />
-            <div className="absolute inset-0 bg-indigo-900/10" />
+            <div className="absolute inset-0 bg-purple-900/10" />
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
             <div className="space-y-0.5">
-              <h3 className="text-[10px] font-black text-indigo-600 uppercase tracking-tight flex items-center gap-1.5">
-                <Library className="w-3 h-3" /> Exercise Library
+              <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
+                <Layout className="w-3 h-3" /> My Split
               </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">Browse 350+ Movements</p>
-              <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 tracking-tight">Learn Correct Form</p>
+              <p className="text-xs font-bold text-foreground/90 leading-tight">Active Training Routine</p>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 tracking-tight">Structured Progress</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-indigo-300/40" />
+            <ChevronRight className="w-4 h-4 text-purple-300/40" />
           </div>
         </CardContent>
       </Card>
 
-      {/* 4. Grid: Workout History & My Split */}
+      {/* 4. Grid: Workout History & Exercise Library (Library shifted here) */}
       <div className="grid grid-cols-2 gap-4 pb-6">
         <Card className="border-none shadow-sm bg-white hover:bg-sky-50 transition-all cursor-pointer active:scale-95 group border border-muted/20">
           <CardContent className="p-5 flex flex-col items-start gap-3">
@@ -334,7 +316,7 @@ export function WorkoutView() {
               <History className="w-5 h-5 text-sky-600" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Workout History</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">History</p>
               <p className="text-xs font-bold text-foreground/80">14 sessions</p>
             </div>
             <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-sky-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
@@ -343,17 +325,20 @@ export function WorkoutView() {
           </CardContent>
         </Card>
         
-        <Card className="border-none shadow-sm bg-white hover:bg-purple-50 transition-all cursor-pointer active:scale-95 group border border-muted/20">
+        <Card 
+          onClick={() => setShowLibrary(true)}
+          className="border-none shadow-sm bg-white hover:bg-indigo-50 transition-all cursor-pointer active:scale-95 group border border-muted/20"
+        >
           <CardContent className="p-5 flex flex-col items-start gap-3">
-            <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center group-hover:bg-purple-200 transition-colors">
-              <Layout className="w-5 h-5 text-purple-600" />
+            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
+              <Library className="w-5 h-5 text-indigo-600" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">My Split</p>
-              <p className="text-xs font-bold text-foreground/80">Active Routine</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Library</p>
+              <p className="text-xs font-bold text-foreground/80">350+ Moves</p>
             </div>
-            <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-purple-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
-              Details <ChevronRight className="w-3 h-3" />
+            <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-indigo-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
+              Open <ChevronRight className="w-3 h-3" />
             </button>
           </CardContent>
         </Card>
