@@ -28,6 +28,7 @@ export default function PulseFlowApp() {
   const [hydrationAmount, setHydrationAmount] = useState(1800);
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
+  const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load data from localStorage on mount
@@ -36,6 +37,7 @@ export default function PulseFlowApp() {
     const savedHydration = localStorage.getItem('pulseflow_hydration');
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
     const savedWeight = localStorage.getItem('pulseflow_weight_history');
+    const savedMeals = localStorage.getItem('pulseflow_today_logged_meals');
     
     if (savedTasks) {
       try {
@@ -64,6 +66,14 @@ export default function PulseFlowApp() {
         console.error("Failed to parse weight history", e);
       }
     }
+
+    if (savedMeals) {
+      try {
+        setLoggedMeals(JSON.parse(savedMeals));
+      } catch (e) {
+        console.error("Failed to parse logged meals", e);
+      }
+    }
     
     setIsLoaded(true);
   }, []);
@@ -86,6 +96,12 @@ export default function PulseFlowApp() {
       localStorage.setItem('pulseflow_weight_history', JSON.stringify(weightHistory));
     }
   }, [weightHistory, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) {
+      localStorage.setItem('pulseflow_today_logged_meals', JSON.stringify(loggedMeals));
+    }
+  }, [loggedMeals, isLoaded]);
 
   const refreshGoalData = () => {
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
@@ -136,13 +152,20 @@ export default function PulseFlowApp() {
             onUpdateHydration={updateHydration}
             goalData={goalData}
             weightHistory={weightHistory}
+            loggedMeals={loggedMeals}
             onViewHydration={() => setActiveTab('hydration')} 
             onViewTasks={() => setActiveTab('tasks')} 
             onViewCalculators={handleOpenCalculator}
             onViewGoalSetting={() => setActiveTab('goal-setting')}
           />
         );
-      case 'nutrition': return <NutritionView />;
+      case 'nutrition': 
+        return (
+          <NutritionView 
+            loggedMeals={loggedMeals}
+            setLoggedMeals={setLoggedMeals}
+          />
+        );
       case 'workout': return <WorkoutView />;
       case 'rank': 
         return (
@@ -191,6 +214,7 @@ export default function PulseFlowApp() {
           onUpdateHydration={updateHydration} 
           goalData={goalData}
           weightHistory={weightHistory}
+          loggedMeals={loggedMeals}
         />
       );
     }

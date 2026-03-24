@@ -59,7 +59,12 @@ interface LoggedMeal {
   items?: MealItem[];
 }
 
-export function NutritionView() {
+interface NutritionViewProps {
+  loggedMeals: LoggedMeal[];
+  setLoggedMeals: React.Dispatch<React.SetStateAction<LoggedMeal[]>>;
+}
+
+export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProps) {
   const [showSummary, setShowSummary] = useState(false);
   const [showTrends, setShowTrends] = useState(false);
   const [logTab, setLogTab] = useState("log");
@@ -70,7 +75,6 @@ export function NutritionView() {
   
   const [recentMeals, setRecentMeals] = useState<LoggedMeal[]>([]);
   const [savedMeals, setSavedMeals] = useState<LoggedMeal[]>([]);
-  const [loggedMeals, setLoggedMeals] = useState<LoggedMeal[]>([]);
   const [allHistory, setAllHistory] = useState<LoggedMeal[]>([]);
   const [goalData, setGoalData] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -79,14 +83,12 @@ export function NutritionView() {
   useEffect(() => {
     const savedRecent = localStorage.getItem('pulseflow_recent_meals');
     const savedFavorites = localStorage.getItem('pulseflow_saved_meals');
-    const savedLogged = localStorage.getItem('pulseflow_today_logged_meals');
     const savedHistory = localStorage.getItem('pulseflow_all_meals_history');
     const savedCredits = localStorage.getItem('pulseflow_meal_credits');
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
     
     if (savedRecent) setRecentMeals(JSON.parse(savedRecent));
     if (savedFavorites) setSavedMeals(JSON.parse(savedFavorites));
-    if (savedLogged) setLoggedMeals(JSON.parse(savedLogged));
     if (savedHistory) setAllHistory(JSON.parse(savedHistory));
     if (savedGoal) setGoalData(JSON.parse(savedGoal));
     if (savedCredits !== null) setCredits(Number(savedCredits));
@@ -99,11 +101,10 @@ export function NutritionView() {
     if (isLoaded) {
       localStorage.setItem('pulseflow_recent_meals', JSON.stringify(recentMeals));
       localStorage.setItem('pulseflow_saved_meals', JSON.stringify(savedMeals));
-      localStorage.setItem('pulseflow_today_logged_meals', JSON.stringify(loggedMeals));
       localStorage.setItem('pulseflow_all_meals_history', JSON.stringify(allHistory));
       localStorage.setItem('pulseflow_meal_credits', credits.toString());
     }
-  }, [recentMeals, savedMeals, loggedMeals, allHistory, credits, isLoaded]);
+  }, [recentMeals, savedMeals, allHistory, credits, isLoaded]);
 
   const handleLogMeal = async () => {
     if (!mealInput.trim()) return;

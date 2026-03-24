@@ -40,6 +40,7 @@ interface DashboardViewProps {
   onUpdateHydration: (amount: number) => void;
   goalData: any;
   weightHistory?: any[];
+  loggedMeals?: any[];
   onViewHydration?: () => void;
   onViewTasks?: () => void;
   onViewCalculators?: (type: string) => void;
@@ -53,6 +54,7 @@ export function DashboardView({
   onUpdateHydration, 
   goalData,
   weightHistory = [],
+  loggedMeals = [],
   onViewHydration, 
   onViewTasks,
   onViewCalculators,
@@ -93,11 +95,22 @@ export function DashboardView({
     return history;
   }, [weightHistory, goalData]);
 
+  // Calculate current intake from logged meals
+  const currentIntake = useMemo(() => {
+    return loggedMeals.reduce((acc, meal) => ({
+      calories: acc.calories + (meal.calories || 0),
+      protein: acc.protein + (meal.protein || 0),
+      carbs: acc.carbs + (meal.carbs || 0),
+      fat: acc.fat + (meal.fat || 0),
+      fiber: acc.fiber + (meal.fiber || 0),
+    }), { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 });
+  }, [loggedMeals]);
+
   const targetCal = goalData?.finalCalories || 2200;
   const bmr = goalData?.bmr || 1600;
   const tdee = goalData?.tdee || 2500;
   
-  const currentCal = Math.round(targetCal * 0.84);
+  const currentCal = Math.round(currentIntake.calories);
   const calDiff = targetCal - currentCal;
   const calStatus = `${Math.abs(calDiff).toLocaleString()} Kcal ${calDiff >= 0 ? 'left' : 'over'}`;
 
@@ -175,25 +188,25 @@ export function DashboardView({
   const nutrients = [
     { 
       label: "Carbs", 
-      current: goalData?.carbs ? Math.round(goalData.carbs * 0.65) : 162, 
+      current: Math.round(currentIntake.carbs), 
       target: goalData?.carbs || 250, 
       unit: "g" 
     },
     { 
       label: "Protein", 
-      current: goalData?.protein ? Math.round(goalData.protein * 0.72) : 108, 
+      current: Math.round(currentIntake.protein), 
       target: goalData?.protein || 150, 
       unit: "g" 
     },
     { 
       label: "Fat", 
-      current: goalData?.fats ? Math.round(goalData.fats * 0.58) : 41, 
+      current: Math.round(currentIntake.fat), 
       target: goalData?.fats || 70, 
       unit: "g" 
     },
     { 
       label: "Fiber", 
-      current: goalData?.fiber ? Math.round(goalData.fiber * 0.45) : 14, 
+      current: Math.round(currentIntake.fiber), 
       target: goalData?.fiber || 30, 
       unit: "g" 
     },
