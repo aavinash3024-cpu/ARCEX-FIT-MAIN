@@ -4,8 +4,9 @@ import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
-  Plus, 
+  Pencil, 
   Minus, 
+  Plus,
   ChevronLeft, 
   Calendar,
   CheckCircle2
@@ -51,10 +52,10 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
       const dateKey = format(date, 'yyyy-MM-dd');
       const dayName = format(date, 'EEE');
       // If the key is today, use currentMl directly to be reactive
-      const amount = (dateKey === format(new Date(), 'yyyy-MM-dd') ? currentMl : (history[dateKey] || 0)) / 1000;
+      const val = (dateKey === format(new Date(), 'yyyy-MM-dd') ? currentMl : (history[dateKey] || 0)) / 1000;
       return {
         day: dayName,
-        amount: amount
+        amount: parseFloat(val.toFixed(2))
       };
     });
   }, [history, currentMl]);
@@ -95,7 +96,7 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
               <DialogTrigger asChild>
                 <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-muted/30 text-muted-foreground absolute right-0">
-                  <Plus className="w-3.5 h-3.5" />
+                  <Pencil className="w-3.5 h-3.5" />
                 </Button>
               </DialogTrigger>
               <DialogContent className="rounded-2xl w-[90%] max-w-sm">
@@ -240,6 +241,7 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
                 <Tooltip 
                   cursor={{ stroke: '#3b82f6', strokeWidth: 1 }}
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', fontSize: '10px', fontWeight: 'bold' }}
+                  formatter={(value: number) => [`${value} liter`, "Intake"]}
                 />
                 <Area 
                   type="monotone" 
