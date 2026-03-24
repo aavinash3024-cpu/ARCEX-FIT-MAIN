@@ -95,7 +95,6 @@ export function DashboardView({
     return history;
   }, [weightHistory, goalData]);
 
-  // Calculate current intake from logged meals
   const currentIntake = useMemo(() => {
     return loggedMeals.reduce((acc, meal) => ({
       calories: acc.calories + (meal.calories || 0),
@@ -187,28 +186,32 @@ export function DashboardView({
 
   const nutrients = [
     { 
-      label: "Carbs", 
-      current: Math.round(currentIntake.carbs), 
-      target: goalData?.carbs || 250, 
-      unit: "g" 
-    },
-    { 
       label: "Protein", 
       current: Math.round(currentIntake.protein), 
       target: goalData?.protein || 150, 
-      unit: "g" 
+      unit: "g",
+      color: "#FFC107"
+    },
+    { 
+      label: "Carbs", 
+      current: Math.round(currentIntake.carbs), 
+      target: goalData?.carbs || 250, 
+      unit: "g",
+      color: "#42A5F5"
     },
     { 
       label: "Fat", 
       current: Math.round(currentIntake.fat), 
       target: goalData?.fats || 70, 
-      unit: "g" 
+      unit: "g",
+      color: "#FF7043"
     },
     { 
       label: "Fiber", 
       current: Math.round(currentIntake.fiber), 
       target: goalData?.fiber || 30, 
-      unit: "g" 
+      unit: "g",
+      color: "#10b981"
     },
   ];
 
@@ -429,8 +432,11 @@ export function DashboardView({
                   </div>
                   <div className="h-1 w-full bg-muted/30 rounded-full overflow-hidden">
                     <div 
-                      className={cn("h-full transition-all duration-700 ease-out rounded-full", isOver ? "bg-destructive" : "bg-primary")} 
-                      style={{ width: `${Math.min((n.current / n.target) * 100, 100)}%` }}
+                      className={cn("h-full transition-all duration-700 ease-out rounded-full")} 
+                      style={{ 
+                        width: `${Math.min((n.current / n.target) * 100, 100)}%`,
+                        backgroundColor: isOver ? 'hsl(var(--destructive))' : n.color
+                      }}
                     />
                   </div>
                 </div>

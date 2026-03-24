@@ -64,6 +64,13 @@ interface NutritionViewProps {
   setLoggedMeals: React.Dispatch<React.SetStateAction<LoggedMeal[]>>;
 }
 
+const MACRO_COLORS = {
+  protein: "#FFC107",
+  carbs: "#42A5F5",
+  fat: "#FF7043",
+  fiber: "#10b981"
+};
+
 export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProps) {
   const [showSummary, setShowSummary] = useState(false);
   const [showTrends, setShowTrends] = useState(false);
@@ -79,7 +86,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   const [goalData, setGoalData] = useState<any>(null);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load from localStorage
   useEffect(() => {
     const savedRecent = localStorage.getItem('pulseflow_recent_meals');
     const savedFavorites = localStorage.getItem('pulseflow_saved_meals');
@@ -96,7 +102,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
     setIsLoaded(true);
   }, []);
 
-  // Persist to localStorage
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('pulseflow_recent_meals', JSON.stringify(recentMeals));
@@ -214,7 +219,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   const analysisImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
   const logHeaderImage = PlaceHolderImages.find(img => img.id === 'meal-quinoa-bowl');
 
-  // TRENDS ANALYSIS LOGIC
   const renderTrendsView = () => {
     return (
       <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -280,32 +284,32 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
             <div className="space-y-1.5 px-2">
               <div className="flex h-2 w-full rounded-full overflow-hidden bg-muted/20">
-                <div className="bg-sky-500 h-full transition-all duration-1000" style={{ width: `${proteinPct}%` }} />
-                <div className="bg-primary h-full transition-all duration-1000" style={{ width: `${carbsPct}%` }} />
-                <div className="bg-yellow-500 h-full transition-all duration-1000" style={{ width: `${fatPct}%` }} />
+                <div style={{ width: `${proteinPct}%`, backgroundColor: MACRO_COLORS.protein }} className="h-full transition-all duration-1000" />
+                <div style={{ width: `${carbsPct}%`, backgroundColor: MACRO_COLORS.carbs }} className="h-full transition-all duration-1000" />
+                <div style={{ width: `${fatPct}%`, backgroundColor: MACRO_COLORS.fat }} className="h-full transition-all duration-1000" />
               </div>
               <div className="flex justify-between text-[7px] font-black text-muted-foreground uppercase tracking-widest px-0.5">
-                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-sky-500" /> PROTEIN</span>
-                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-primary" /> CARBS</span>
-                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full bg-yellow-500" /> FATS</span>
+                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: MACRO_COLORS.protein }} /> PROTEIN</span>
+                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: MACRO_COLORS.carbs }} /> CARBS</span>
+                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: MACRO_COLORS.fat }} /> FATS</span>
               </div>
             </div>
 
             <div className="grid grid-cols-4 gap-2 pt-2 border-t border-muted/10">
               <div className="text-center">
-                <p className="text-base font-black text-sky-600 leading-none">{Math.round(totals.protein)}g</p>
+                <p className="text-base font-black leading-none" style={{ color: MACRO_COLORS.protein }}>{Math.round(totals.protein)}g</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase mt-1">Protein</p>
               </div>
               <div className="text-center">
-                <p className="text-base font-black text-primary leading-none">{Math.round(totals.carbs)}g</p>
+                <p className="text-base font-black leading-none" style={{ color: MACRO_COLORS.carbs }}>{Math.round(totals.carbs)}g</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase mt-1">Carbs</p>
               </div>
               <div className="text-center">
-                <p className="text-base font-black text-yellow-600 leading-none">{Math.round(totals.fat)}g</p>
+                <p className="text-base font-black leading-none" style={{ color: MACRO_COLORS.fat }}>{Math.round(totals.fat)}g</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase mt-1">Fats</p>
               </div>
               <div className="text-center">
-                <p className="text-base font-black text-green-600 leading-none">{Math.round(totals.fiber)}g</p>
+                <p className="text-base font-black leading-none" style={{ color: MACRO_COLORS.fiber }}>{Math.round(totals.fiber)}g</p>
                 <p className="text-[7px] font-bold text-muted-foreground uppercase mt-1">Fiber</p>
               </div>
             </div>
@@ -342,7 +346,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                               <span className="text-[10px] font-bold text-foreground/70 uppercase truncate max-w-[180px]">
                                 {item.quantity} {item.name}
                               </span>
-                              <span className="text-[10px] font-black text-primary uppercase whitespace-nowrap">
+                              <span className="text-[10px] font-black uppercase whitespace-nowrap" style={{ color: MACRO_COLORS[macro] }}>
                                 {item[macro]}g
                               </span>
                             </div>
@@ -374,11 +378,11 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                       </h4>
                       <p className="text-xs font-black text-foreground/60 leading-none mb-2">{Math.round(meal.calories)} KCAL</p>
                       
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-black text-muted-foreground uppercase tracking-tight pt-1">
-                        <span className="text-sky-600">P {Math.round(meal.protein)}g</span>
-                        <span className="text-primary">C {Math.round(meal.carbs)}g</span>
-                        <span className="text-yellow-600">F {Math.round(meal.fat)}g</span>
-                        <span className="text-green-600">FI {Math.round(meal.fiber)}g</span>
+                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-black uppercase tracking-tight pt-1">
+                        <span style={{ color: MACRO_COLORS.protein }}>P {Math.round(meal.protein)}g</span>
+                        <span style={{ color: MACRO_COLORS.carbs }}>C {Math.round(meal.carbs)}g</span>
+                        <span style={{ color: MACRO_COLORS.fat }}>F {Math.round(meal.fat)}g</span>
+                        <span style={{ color: MACRO_COLORS.fiber }}>FI {Math.round(meal.fiber)}g</span>
                       </div>
                     </div>
                     <span className="absolute bottom-3 right-4 text-[8px] font-bold text-muted-foreground/30 uppercase">
@@ -644,7 +648,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   );
 }
 
-// Sub-component for Trends Content
 function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'monthly', history: LoggedMeal[], goalData: any }) {
   const stats = useMemo(() => {
     const today = new Date();
@@ -763,9 +766,9 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
           </h3>
           <div className="space-y-2">
             <div className="flex h-3 w-full rounded-full overflow-hidden bg-muted/20">
-              <div className="bg-sky-500 h-full" style={{ width: `${stats.macroRatios.protein}%` }} />
-              <div className="bg-primary h-full" style={{ width: `${stats.macroRatios.carbs}%` }} />
-              <div className="bg-yellow-500 h-full" style={{ width: `${stats.macroRatios.fat}%` }} />
+              <div style={{ width: `${stats.macroRatios.protein}%`, backgroundColor: MACRO_COLORS.protein }} className="h-full" />
+              <div style={{ width: `${stats.macroRatios.carbs}%`, backgroundColor: MACRO_COLORS.carbs }} className="h-full" />
+              <div style={{ width: `${stats.macroRatios.fat}%`, backgroundColor: MACRO_COLORS.fat }} className="h-full" />
             </div>
             <div className="flex justify-between text-[7px] font-black text-muted-foreground uppercase tracking-widest">
               <span>{stats.macroRatios.protein}% Protein</span>
@@ -786,12 +789,12 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
               <div key={macro} className="space-y-1.5">
                 <div className="flex justify-between items-baseline">
                   <p className="text-[8px] font-black uppercase text-muted-foreground">{macro}</p>
-                  <span className="text-[10px] font-black text-primary">{stats.goalAchievements[macro]}%</span>
+                  <span className="text-[10px] font-black" style={{ color: MACRO_COLORS[macro] }}>{stats.goalAchievements[macro]}%</span>
                 </div>
                 <div className="h-1 w-full bg-muted/30 rounded-full overflow-hidden">
                   <div 
-                    className="h-full bg-primary transition-all duration-1000" 
-                    style={{ width: `${stats.goalAchievements[macro]}%` }} 
+                    className="h-full transition-all duration-1000" 
+                    style={{ width: `${stats.goalAchievements[macro]}%`, backgroundColor: MACRO_COLORS[macro] }} 
                   />
                 </div>
               </div>

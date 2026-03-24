@@ -37,13 +37,19 @@ interface GoalSettingViewProps {
   onGoalSaved?: () => void;
 }
 
+const MACRO_COLORS = {
+  protein: "#FFC107",
+  carbs: "#42A5F5",
+  fat: "#FF7043",
+  fiber: "#10b981"
+};
+
 export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
   const [step, setStep] = useState(1);
   const [isSaved, setIsSaved] = useState(false);
   const [hasExistingGoal, setHasExistingGoal] = useState(false);
   const [isInitialized, setIsInitialized] = useState(false);
 
-  // Setup/Draft States
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [age, setAge] = useState<string>("25");
   const [weight, setWeight] = useState<string>("75");
@@ -56,7 +62,6 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
   const [protAdj, setProtAdj] = useState([1.8]);
   const [carbRatio, setCarbRatio] = useState([50]);
 
-  // Load from localStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('pulseflow_goal_data');
     if (saved) {
@@ -82,7 +87,6 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
     setIsInitialized(true);
   }, []);
 
-  // Calculations for current draft or saved data
   const calculations = useMemo(() => {
     const w = parseFloat(weight) || 75;
     const h = parseFloat(height) || 175;
@@ -101,7 +105,6 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
     const proteinGrams = Math.round(w * protAdj[0]);
     const proteinKcal = proteinGrams * 4;
     
-    // Fiber calculation: ~14g per 1000kcal
     const fiberGrams = Math.round((finalCalories / 1000) * 14);
     
     const remainingKcal = Math.max(0, finalCalories - proteinKcal);
@@ -264,35 +267,35 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
               </div>
 
               <div className="space-y-4">
-                <div className="border-l-4 border-sky-400 pl-4 py-0.5 flex items-center gap-2">
-                  <PieChart className="w-3 h-3 text-sky-400" />
+                <div className="border-l-4 border-muted/30 pl-4 py-0.5 flex items-center gap-2">
+                  <PieChart className="w-3 h-3 text-primary" />
                   <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Nutritional Split</h4>
                 </div>
                 <div className="pl-1 space-y-6">
                   <div className="grid grid-cols-2 gap-y-4">
                     <div>
                       <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Protein</p>
-                      <p className="text-md font-black text-sky-600">{calculations.protein}g</p>
+                      <p className="text-md font-black" style={{ color: MACRO_COLORS.protein }}>{calculations.protein}g</p>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Carbs</p>
-                      <p className="text-md font-black text-primary">{calculations.carbs}g</p>
+                      <p className="text-md font-black" style={{ color: MACRO_COLORS.carbs }}>{calculations.carbs}g</p>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Fats</p>
-                      <p className="text-md font-black text-yellow-600">{calculations.fats}g</p>
+                      <p className="text-md font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
                     </div>
                     <div>
                       <p className="text-xs font-bold text-foreground/40 uppercase tracking-tight">Fiber</p>
-                      <p className="text-md font-black text-green-600">{calculations.fiber}g</p>
+                      <p className="text-md font-black" style={{ color: MACRO_COLORS.fiber }}>{calculations.fiber}g</p>
                     </div>
                   </div>
 
                   <div className="space-y-2 pt-2">
                     <div className="flex h-3 w-full rounded-full overflow-hidden shadow-inner bg-muted/20">
-                      <div className="bg-sky-400 h-full transition-all" style={{ width: `${calculations.proteinPct}%` }} />
-                      <div className="bg-primary h-full transition-all" style={{ width: `${calculations.carbPct}%` }} />
-                      <div className="bg-yellow-400 h-full transition-all" style={{ width: `${calculations.fatPct}%` }} />
+                      <div className="h-full transition-all" style={{ width: `${calculations.proteinPct}%`, backgroundColor: MACRO_COLORS.protein }} />
+                      <div className="h-full transition-all" style={{ width: `${calculations.carbPct}%`, backgroundColor: MACRO_COLORS.carbs }} />
+                      <div className="h-full transition-all" style={{ width: `${calculations.fatPct}%`, backgroundColor: MACRO_COLORS.fat }} />
                     </div>
                     <div className="flex justify-between text-[8px] font-black text-muted-foreground uppercase tracking-widest">
                       <span>{calculations.proteinPct}% Protein</span>
@@ -495,17 +498,17 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                   <p className="text-[10px] font-black text-center text-muted-foreground uppercase tracking-widest">Real-time Macro Breakdown</p>
                   <div className="grid grid-cols-3 gap-2">
                     <div className="text-center space-y-0.5">
-                      <p className="text-lg font-black text-sky-600">{calculations.protein}g</p>
+                      <p className="text-lg font-black" style={{ color: MACRO_COLORS.protein }}>{calculations.protein}g</p>
                       <p className="text-[8px] font-bold text-muted-foreground uppercase">Protein</p>
                       <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black">{calculations.proteinPct}%</Badge>
                     </div>
                     <div className="text-center space-y-0.5">
-                      <p className="text-lg font-black text-primary">{calculations.carbs}g</p>
+                      <p className="text-lg font-black" style={{ color: MACRO_COLORS.carbs }}>{calculations.carbs}g</p>
                       <p className="text-[8px] font-bold text-muted-foreground uppercase">Carbs</p>
                       <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black">{calculations.carbPct}%</Badge>
                     </div>
                     <div className="text-center space-y-0.5">
-                      <p className="text-lg font-black text-yellow-600">{calculations.fats}g</p>
+                      <p className="text-lg font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
                       <p className="text-[8px] font-bold text-muted-foreground uppercase">Fats</p>
                       <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black">{calculations.fatPct}%</Badge>
                     </div>
@@ -585,28 +588,28 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                     <p className="text-[10px] font-black uppercase text-center tracking-widest text-foreground/80">MACROS BREAKDOWN</p>
                     <div className="grid grid-cols-4 gap-2">
                        <div className="text-center">
-                          <p className="text-sm font-black text-sky-600">{calculations.protein}g</p>
+                          <p className="text-sm font-black" style={{ color: MACRO_COLORS.protein }}>{calculations.protein}g</p>
                           <p className="text-[7px] font-bold text-muted-foreground uppercase">Protein</p>
                        </div>
                        <div className="text-center">
-                          <p className="text-sm font-black text-primary">{calculations.carbs}g</p>
+                          <p className="text-sm font-black" style={{ color: MACRO_COLORS.carbs }}>{calculations.carbs}g</p>
                           <p className="text-[7px] font-bold text-muted-foreground uppercase">Carbs</p>
                        </div>
                        <div className="text-center">
-                          <p className="text-sm font-black text-yellow-600">{calculations.fats}g</p>
+                          <p className="text-sm font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
                           <p className="text-[7px] font-bold text-muted-foreground uppercase">Fats</p>
                        </div>
                        <div className="text-center">
-                          <p className="text-sm font-black text-green-600">{calculations.fiber}g</p>
+                          <p className="text-sm font-black" style={{ color: MACRO_COLORS.fiber }}>{calculations.fiber}g</p>
                           <p className="text-[7px] font-bold text-muted-foreground uppercase">Fiber</p>
                        </div>
                     </div>
                     
                     <div className="space-y-2">
                       <div className="flex h-2 w-full rounded-full overflow-hidden">
-                         <div className="bg-sky-400" style={{ width: `${calculations.proteinPct}%` }} />
-                         <div className="bg-primary" style={{ width: `${calculations.carbPct}%` }} />
-                         <div className="bg-yellow-400" style={{ width: `${calculations.fatPct}%` }} />
+                         <div style={{ width: `${calculations.proteinPct}%`, backgroundColor: MACRO_COLORS.protein }} />
+                         <div style={{ width: `${calculations.carbPct}%`, backgroundColor: MACRO_COLORS.carbs }} />
+                         <div style={{ width: `${calculations.fatPct}%`, backgroundColor: MACRO_COLORS.fat }} />
                       </div>
                       <div className="flex justify-between text-[7px] font-semibold uppercase text-muted-foreground/40">
                          <span>{calculations.proteinPct}% Protein</span>
