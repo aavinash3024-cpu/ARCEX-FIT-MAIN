@@ -372,20 +372,37 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               loggedMeals.map(meal => (
                 <Card key={meal.id} className="border-none shadow-sm bg-white hover:bg-muted/5 transition-all">
                   <CardContent className="p-4 relative">
-                    <div className="space-y-1.5 pr-12">
-                      <h4 className="font-bold text-sm text-foreground">
+                    <div className="space-y-2 pr-4">
+                      <h4 className="font-bold text-sm text-foreground leading-tight">
                         <span className="text-primary uppercase text-[10px] mr-1">{meal.type}:</span> {meal.name}
                       </h4>
-                      <p className="text-xs font-black text-foreground/60 leading-none mb-2">{Math.round(meal.calories)} KCAL</p>
+                      <p className="text-[10px] font-black text-foreground/60 leading-none uppercase tracking-tight">
+                        {Math.round(meal.calories)} KCAL
+                      </p>
                       
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-[11px] font-black uppercase tracking-tight pt-1">
-                        <span style={{ color: MACRO_COLORS.protein }}>P {Math.round(meal.protein)}g</span>
-                        <span style={{ color: MACRO_COLORS.carbs }}>C {Math.round(meal.carbs)}g</span>
-                        <span style={{ color: MACRO_COLORS.fat }}>F {Math.round(meal.fat)}g</span>
-                        <span style={{ color: MACRO_COLORS.fiber }}>FI {Math.round(meal.fiber)}g</span>
+                      {meal.items && meal.items.length > 0 && (
+                        <div className="border-l-2 border-muted/20 pl-3 py-1 space-y-1.5 my-2">
+                          {meal.items.map((item, i) => (
+                            <div key={i} className="flex justify-between items-center">
+                              <span className="text-[10px] font-bold text-muted-foreground/80 uppercase tracking-tight truncate max-w-[200px]">
+                                {item.quantity} {item.name}
+                              </span>
+                              <span className="text-[9px] font-black text-muted-foreground/40 uppercase whitespace-nowrap">
+                                {Math.round(item.calories)} kcal
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="flex flex-wrap gap-x-5 gap-y-1 text-[11px] font-black uppercase tracking-tight pt-1">
+                        <span style={{ color: MACRO_COLORS.protein }}>P {Math.round(meal.protein)}G</span>
+                        <span style={{ color: MACRO_COLORS.carbs }}>C {Math.round(meal.carbs)}G</span>
+                        <span style={{ color: MACRO_COLORS.fat }}>F {Math.round(meal.fat)}G</span>
+                        <span style={{ color: MACRO_COLORS.fiber }}>FI {Math.round(meal.fiber)}G</span>
                       </div>
                     </div>
-                    <span className="absolute bottom-3 right-4 text-[8px] font-bold text-muted-foreground/30 uppercase">
+                    <span className="absolute bottom-2 right-4 text-[8px] font-bold text-muted-foreground/20 uppercase">
                       {meal.time}
                     </span>
                   </CardContent>
