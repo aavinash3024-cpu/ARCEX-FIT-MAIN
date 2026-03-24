@@ -17,6 +17,7 @@ import {
   Mic,
   Camera,
   ChevronRight,
+  ChevronLeft,
   Loader2,
   Trash2,
   TrendingUp
@@ -45,6 +46,7 @@ export function NutritionView() {
   const [isParsing, setIsParsing] = useState(false);
   const [isListening, setIsListening] = useState(false);
   const [credits, setCredits] = useState(25);
+  const [showSummary, setShowSummary] = useState(false);
   
   const [recentMeals, setRecentMeals] = useState<LoggedMeal[]>([]);
   const [savedMeals, setSavedMeals] = useState<LoggedMeal[]>([]);
@@ -169,6 +171,82 @@ export function NutritionView() {
 
   const analysisImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
   const logHeaderImage = PlaceHolderImages.find(img => img.id === 'meal-quinoa-bowl');
+
+  if (showSummary) {
+    const totals = loggedMeals.reduce((acc, meal) => ({
+      calories: acc.calories + meal.calories,
+      protein: acc.protein + meal.protein,
+      carbs: acc.carbs + meal.carbs,
+      fat: acc.fat + meal.fat
+    }), { calories: 0, protein: 0, carbs: 0, fat: 0 });
+
+    return (
+      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+        <div className="flex items-center gap-4 pt-2">
+          <Button variant="ghost" size="icon" onClick={() => setShowSummary(false)} className="rounded-full bg-muted/50 w-9 h-9">
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-2xl font-bold font-headline">Daily Summary</h1>
+        </div>
+
+        <Card className="border-none shadow-md bg-white overflow-hidden">
+          <CardContent className="p-6 space-y-6">
+            <div className="text-center space-y-1">
+              <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Total Intake</p>
+              <div className="flex items-baseline justify-center gap-1">
+                <p className="text-4xl font-black text-foreground">{totals.calories}</p>
+                <span className="text-sm font-bold text-muted-foreground uppercase">Kcal</span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-3 gap-2 pt-6 border-t border-muted/10">
+              <div className="text-center space-y-1">
+                <p className="text-lg font-black text-sky-600">{totals.protein}g</p>
+                <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Protein</p>
+              </div>
+              <div className="text-center space-y-1">
+                <p className="text-lg font-black text-primary">{totals.carbs}g</p>
+                <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Carbs</p>
+              </div>
+              <div className="text-center space-y-1">
+                <p className="text-lg font-black text-yellow-600">{totals.fat}g</p>
+                <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest">Fats</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <section className="space-y-3">
+          <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground px-1">Meal Breakdown</h3>
+          <div className="space-y-3">
+            {loggedMeals.length === 0 ? (
+              <p className="text-center py-12 opacity-30 text-[10px] font-black uppercase tracking-widest">No entries recorded</p>
+            ) : (
+              loggedMeals.map(meal => (
+                <Card key={meal.id} className="border-none shadow-sm bg-white hover:bg-muted/5 transition-colors">
+                  <CardContent className="p-4 flex justify-between items-center">
+                    <div className="space-y-0.5 min-w-0">
+                      <p className="text-[9px] font-black text-primary uppercase tracking-tighter">{meal.type}</p>
+                      <h4 className="font-bold text-sm text-foreground truncate">{meal.name}</h4>
+                      <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tight">{meal.time}</p>
+                    </div>
+                    <div className="text-right space-y-1 shrink-0">
+                      <p className="text-sm font-black text-foreground">{meal.calories} KCAL</p>
+                      <div className="flex gap-2 text-[8px] font-bold text-muted-foreground uppercase">
+                        <span>P: {meal.protein}g</span>
+                        <span>C: {meal.carbs}g</span>
+                        <span>F: {meal.fat}g</span>
+                      </div>
+                    </div>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </section>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-4 pb-24 pt-4">
@@ -382,7 +460,10 @@ export function NutritionView() {
         <CardContent className="p-4 space-y-4">
           <div className="flex items-center justify-between px-1">
             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">MEALS</p>
-            <span className="text-[9px] font-bold text-primary uppercase flex items-center cursor-pointer hover:opacity-70 transition-opacity">
+            <span 
+              onClick={() => setShowSummary(true)}
+              className="text-[9px] font-bold text-primary uppercase flex items-center cursor-pointer hover:opacity-70 transition-opacity"
+            >
               View Summary <ChevronRight className="w-3 h-3 ml-0.5" />
             </span>
           </div>
@@ -394,29 +475,22 @@ export function NutritionView() {
               ) : (
                 loggedMeals.map((meal) => (
                   <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-muted/20 hover:bg-muted/30 transition-all group relative">
-                    <CardContent className="p-0 flex h-[72px]">
+                    <CardContent className="p-0 flex min-h-[72px]">
                       <div className="w-14 bg-white/50 shrink-0 flex items-center justify-center">
                         <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm border border-muted/10">
                           <Utensils className="w-4 h-4 text-primary/40" />
                         </div>
                       </div>
-                      <div className="flex-1 p-2.5 flex flex-col justify-between min-w-0 pr-10">
-                        <div className="flex justify-between items-start">
+                      <div className="flex-1 p-2.5 flex flex-col justify-center min-w-0 pr-10">
+                        <div className="flex justify-between items-start mb-0.5">
                           <div className="min-w-0">
                             <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
                             <h4 className="font-bold text-[13px] text-foreground/90 truncate leading-tight">{meal.name}</h4>
+                            <p className="text-[11px] font-black text-muted-foreground/60 uppercase tracking-tighter mt-0.5">
+                              {meal.calories} KCAL
+                            </p>
                           </div>
                           <span className="text-[8px] font-bold text-muted-foreground/30 shrink-0">{meal.time}</span>
-                        </div>
-                        <div className="flex justify-between items-end">
-                          <div className="flex gap-2.5 text-[10px] font-black text-muted-foreground/80 uppercase">
-                            <span className="flex items-center gap-0.5"><span className="opacity-40">P:</span>{meal.protein}</span>
-                            <span className="flex items-center gap-0.5"><span className="opacity-40">C:</span>{meal.carbs}</span>
-                            <span className="flex items-center gap-0.5"><span className="opacity-40">F:</span>{meal.fat}</span>
-                          </div>
-                          <Badge variant="secondary" className="text-[10px] h-5 px-2 bg-primary/10 text-primary font-black border-none shadow-none">
-                            {meal.calories} KCAL
-                          </Badge>
                         </div>
                       </div>
                       <Button 
