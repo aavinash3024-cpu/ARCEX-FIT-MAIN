@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -565,9 +564,9 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
 
       <section className="space-y-6 pt-4">
         <div className="px-2">
-          <h2 className="text-xl font-black uppercase tracking-tighter text-foreground">Optimization Report</h2>
+          <h2 className="text-xl font-black uppercase tracking-tighter text-foreground">WORKOUT SPLIT ANALYSIS</h2>
           <div className="flex justify-between items-baseline mt-4 mb-2">
-            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Global Anatomical Coverage</p>
+            <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">MUSCLE COVERAGE</p>
             <span className="text-xs font-black text-primary">{report.globalCoverage}%</span>
           </div>
           <Progress value={report.globalCoverage} className="h-2 bg-muted rounded-full" />
@@ -620,7 +619,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Direct Stimulus</h4>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">DIRECTLY GETTING TRAINED</h4>
                     </div>
                     {Object.keys(currentMuscleReport.zones).length === 0 ? (
                       <p className="text-[10px] italic text-muted-foreground pl-3">No direct movements assigned.</p>
@@ -645,7 +644,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-1.5 bg-orange-400 rounded-full" />
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Secondary Involvement</h4>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">INDIRECTLY GETTING TRAINED</h4>
                     </div>
                     {currentMuscleReport.secondary.length === 0 ? (
                       <p className="text-[10px] italic text-muted-foreground pl-3">No secondary stimulation found.</p>
@@ -664,7 +663,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
                     <div className="space-y-3 pt-2">
                       <div className="flex items-center gap-2">
                         <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-destructive">Anatomical Gaps</h4>
+                        <h4 className="text-[10px] font-black uppercase tracking-widest text-destructive">MUSCLE STATUS</h4>
                       </div>
                       <div className="flex flex-wrap gap-1.5 pl-3">
                         {currentMuscleReport.gaps.map((gap: string, i: number) => (
