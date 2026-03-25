@@ -19,7 +19,8 @@ import {
   Sparkles,
   Trash2,
   Calendar,
-  ChevronDown
+  ChevronDown,
+  Info
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -77,8 +78,8 @@ export function WorkoutView() {
   };
 
   const protocolExercises = [
-    { name: "Incline Guillotine Press", category: "CHEST • UPPER CHEST", status: "AWAITING DATA" },
-    { name: "Cable Kickback (Triceps)", category: "TRICEPS • LATERAL HEAD", status: "AWAITING DATA" },
+    { name: "Incline Barbell Press", category: "CHEST • UPPER CHEST", status: "AWAITING DATA" },
+    { name: "Skull Crushers", category: "TRICEPS • LONG HEAD", status: "AWAITING DATA" },
   ];
 
   const prImage = PlaceHolderImages.find(img => img.id === 'personal-records-illustration');
@@ -115,9 +116,32 @@ export function WorkoutView() {
               </div>
               <div className="pl-5">
                 <p className="text-sm font-bold text-foreground/80 leading-relaxed italic">
-                  {selectedExercise.secondaryMuscles}
+                  {selectedExercise.secondaryMuscles || "None"}
                 </p>
               </div>
+            </div>
+
+            <div className="space-y-4">
+              <div className="flex items-center gap-2 border-l-4 border-muted pl-4 py-0.5">
+                <Info className="w-4 h-4 text-muted-foreground" />
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Instructions</h4>
+              </div>
+              <div className="pl-5 space-y-4">
+                <div>
+                  <p className="text-[9px] font-black uppercase text-primary mb-1">Setup</p>
+                  <p className="text-xs font-medium text-foreground/70 leading-relaxed">{selectedExercise.setup}</p>
+                </div>
+                <div>
+                  <p className="text-[9px] font-black uppercase text-primary mb-1">Execution</p>
+                  <p className="text-xs font-medium text-foreground/70 leading-relaxed">{selectedExercise.execution}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-4 border-t border-muted/10">
+              <p className="text-[10px] font-black text-center text-muted-foreground uppercase tracking-widest opacity-60">
+                PREFER A COACH OR TRAINER FOR ACCURATE FORM AND RESULTS
+              </p>
             </div>
           </CardContent>
         </Card>
@@ -306,8 +330,8 @@ export function WorkoutView() {
               <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
                 <Layout className="w-3 h-3" /> My Workout Split
               </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">Active Training Routine</p>
-              <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 tracking-tight">Create Routine</p>
+              <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 tracking-tight">Structured Progress</p>
             </div>
             <ChevronRight className="w-4 h-4 text-purple-300/40" />
           </div>
@@ -403,12 +427,14 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
   const report = useMemo(() => {
     const flatSplit = Object.entries(split).flatMap(([day, exs]) => exs.map(e => ({ ...e, day })));
     
-    // Total unique zones across all exercises in the library
+    // Muscle groups
+    const muscles = Array.from(new Set(EXERCISES_DATA.map(e => e.muscle)));
+    
+    // Total unique zones across library
     const totalZonesAcrossLibrary = Array.from(new Set(EXERCISES_DATA.map(e => `${e.muscle}-${e.subMuscle}`)));
     const coveredZonesAcrossSplit = new Set(flatSplit.map(e => `${e.muscle}-${e.subMuscle}`));
     const globalCoverage = Math.round((coveredZonesAcrossSplit.size / totalZonesAcrossLibrary.length) * 100);
 
-    const muscles = Array.from(new Set(EXERCISES_DATA.map(e => e.muscle)));
     const muscleStats: Record<string, any> = {};
     
     muscles.forEach(m => {
@@ -425,10 +451,9 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
         }
       });
 
-      // Find exercises where this muscle/submuscle is listed as secondary
+      // Find exercises where this muscle group is listed as secondary
       flatSplit.forEach(ex => {
-        // If the secondary muscle description contains the primary muscle group name
-        const isSecondaryMovers = ex.secondaryMuscles.toLowerCase().includes(m.toLowerCase());
+        const isSecondaryMovers = (ex.secondaryMuscles || "").toUpperCase().includes(m.toUpperCase());
         if (isSecondaryMovers && ex.muscle !== m) {
           secondaryDone.push({ name: ex.name, day: ex.day });
         }
