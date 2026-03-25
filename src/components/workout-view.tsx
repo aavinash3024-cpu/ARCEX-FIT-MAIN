@@ -384,6 +384,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
   const [activeDay, setActiveDay] = useState(DAYS[0]);
   const [isAdding, setIsAdding] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [muscleFilter, setMuscleFilter] = useState("ALL");
   const [activeMuscleReport, setActiveMuscleReport] = useState("CHEST");
 
   useEffect(() => {
@@ -401,6 +402,10 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
     localStorage.setItem('pulseflow_workout_split', JSON.stringify(split));
   }, [split]);
 
+  const handleMuscleChange = (m: string) => {
+    setMuscleFilter(m);
+  };
+
   const addExercise = (ex: Exercise) => {
     setSplit(prev => {
       const dayExercises = prev[activeDay] || [];
@@ -412,6 +417,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
     });
     setIsAdding(false);
     setSearchQuery("");
+    setMuscleFilter("ALL");
   };
 
   const removeExercise = (day: string, name: string) => {
@@ -422,14 +428,17 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
   };
 
   const muscleGroups = useMemo(() => {
-    return Array.from(new Set(EXERCISES_DATA.map(e => e.muscle)));
+    const groups = Array.from(new Set(EXERCISES_DATA.map(e => e.muscle)));
+    return ["ALL", ...groups];
   }, []);
 
   const filteredLibrary = useMemo(() => {
-    return EXERCISES_DATA.filter(ex => 
-      ex.name.toLowerCase().includes(searchQuery.toLowerCase())
-    ).slice(0, 50);
-  }, [searchQuery]);
+    return EXERCISES_DATA.filter(ex => {
+      const matchesSearch = ex.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesMuscle = muscleFilter === "ALL" || ex.muscle === muscleFilter;
+      return matchesSearch && matchesMuscle;
+    }).slice(0, 50);
+  }, [searchQuery, muscleFilter]);
 
   const report = useMemo(() => {
     const flatSplit = Object.entries(split).flatMap(([day, exs]) => exs.map(e => ({ ...e, day })));
