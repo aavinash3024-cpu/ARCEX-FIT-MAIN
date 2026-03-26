@@ -19,7 +19,11 @@ import {
   Trash2,
   Calendar,
   ChevronDown,
-  Info
+  Info,
+  Clock,
+  Weight,
+  CheckCircle2,
+  X
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -35,6 +39,8 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { format } from "date-fns";
 
 type WeeklySplit = Record<string, Exercise[]>;
 
@@ -44,10 +50,48 @@ export function WorkoutView() {
   const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split'>('main');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   
+  // Today's State
+  const [split, setSplit] = useState<WeeklySplit>({});
+  const [extraMoves, setExtraMoves] = useState<Exercise[]>([]);
+  const [loggingExercise, setLoggingExercise] = useState<Exercise | null>(null);
+  const [loggedSets, setLoggedSets] = useState<Record<string, any[]>>({});
+  const [isAddingExtra, setIsAddingExtra] = useState(false);
+  
   // Library Filters
   const [searchQuery, setSearchQuery] = useState("");
   const [muscleFilter, setMuscleFilter] = useState<string>("ALL");
   const [subMuscleFilter, setSubMuscleFilter] = useState<string>("ALL");
+
+  const todayName = format(new Date(), 'EEEE');
+
+  // Persistence Logic
+  useEffect(() => {
+    const savedSplit = localStorage.getItem('pulseflow_workout_split');
+    if (savedSplit) setSplit(JSON.parse(savedSplit));
+
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const savedExtra = localStorage.getItem('pulseflow_extra_moves');
+    if (savedExtra) {
+      const { date, moves } = JSON.parse(savedExtra);
+      if (date === todayStr) setExtraMoves(moves);
+    }
+
+    const savedLogs = localStorage.getItem('pulseflow_workout_logs');
+    if (savedLogs) {
+      const { date, data } = JSON.parse(savedLogs);
+      if (date === todayStr) setLoggedSets(data);
+    }
+  }, []);
+
+  useEffect(() => {
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    localStorage.setItem('pulseflow_extra_moves', JSON.stringify({ date: todayStr, moves: extraMoves }));
+  }, [extraMoves]);
+
+  useEffect(() => {
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    localStorage.setItem('pulseflow_workout_logs', JSON.stringify({ date: todayStr, data: loggedSets }));
+  }, [loggedSets]);
 
   const muscleGroups = useMemo(() => {
     const groups = Array.from(new Set(EXERCISES_DATA.map(e => e.muscle)));
@@ -71,15 +115,31 @@ export function WorkoutView() {
     });
   }, [searchQuery, muscleFilter, subMuscleFilter]);
 
-  const handleMuscleChange = (val: string) => {
-    setMuscleFilter(val);
-    setSubMuscleFilter("ALL"); 
+  const todaysExercises = useMemo(() => {
+    const fromSplit = split[todayName] || [];
+    return [...fromSplit, ...extraMoves];
+  }, [split, todayName, extraMoves]);
+
+  const handleLogSet = (exerciseName: string, setData: any) => {
+    setLoggedSets(prev => {
+      const current = prev[exerciseName] || [];
+      return { ...prev, [exerciseName]: [...current, setData] };
+    });
   };
 
-  const protocolExercises = [
-    { name: "Incline Barbell Press", category: "CHEST • UPPER CHEST", status: "AWAITING DATA" },
-    { name: "Skull Crushers", category: "TRICEPS • LONG HEAD", status: "AWAITING DATA" },
-  ];
+  const handleAddExtraMove = (ex: Exercise) => {
+    if (todaysExercises.some(e => e.name === ex.name)) return;
+    setExtraMoves(prev => [...prev, ex]);
+    setIsAddingExtra(false);
+  };
+
+  const removeSet = (exerciseName: string, index: number) => {
+    setLoggedSets(prev => {
+      const current = [...(prev[exerciseName] || [])];
+      current.splice(index, 1);
+      return { ...prev, [exerciseName]: current };
+    });
+  };
 
   const prImage = PlaceHolderImages.find(img => img.id === 'personal-records-illustration');
   const splitImage = PlaceHolderImages.find(img => img.id === 'training-split-tool');
@@ -136,12 +196,6 @@ export function WorkoutView() {
                 </div>
               </div>
             </div>
-
-            <div className="pt-4 border-t border-muted/10 text-center">
-              <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest opacity-60">
-                PREFER A COACH OR TRAINER FOR ACCURATE FORM AND RESULTS
-              </p>
-            </div>
           </CardContent>
         </Card>
       </div>
@@ -173,12 +227,11 @@ export function WorkoutView() {
           </div>
 
           <div className="flex flex-col gap-2">
-            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest pl-1">MUSCLE GROUPS</p>
             <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-1">
               {muscleGroups.map(m => (
                 <button
                   key={m}
-                  onClick={() => handleMuscleChange(m)}
+                  onClick={() => setMuscleFilter(m)}
                   className={cn(
                     "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
                     muscleFilter === m 
@@ -192,8 +245,7 @@ export function WorkoutView() {
             </div>
           </div>
 
-          <div className="space-y-1.5">
-            <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest pl-1">SUB-MUSCLE FOCUS</label>
+          <div className="grid grid-cols-1 gap-2">
             <Select value={subMuscleFilter} onValueChange={setSubMuscleFilter}>
               <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-white h-11 text-[10px] font-black uppercase tracking-tighter">
                 <SelectValue placeholder="Select Sub-Muscle" />
@@ -210,7 +262,6 @@ export function WorkoutView() {
         <div className="grid gap-2 px-1 mt-2">
           {filteredExercises.length === 0 ? (
             <div className="text-center py-12 opacity-30">
-              <Search className="w-10 h-10 mx-auto mb-2 opacity-20" />
               <p className="text-[10px] font-black uppercase tracking-widest">No moves found</p>
             </div>
           ) : (
@@ -245,14 +296,14 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      <Card className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
+      <Card className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group">
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
               src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
               alt="Personal Records"
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover"
               data-ai-hint="barbell illustration"
             />
           </div>
@@ -261,14 +312,14 @@ export function WorkoutView() {
               <h3 className="text-[10px] font-black text-primary uppercase tracking-tight flex items-center gap-1.5">
                 <Trophy className="w-3 h-3" /> Personal Records
               </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">8 New milestones reached</p>
-              <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 tracking-tight">Pushing limits</p>
+              <p className="text-xs font-bold text-foreground/90 leading-tight">Your recent milestones</p>
             </div>
             <ChevronRight className="w-4 h-4 text-primary/30" />
           </div>
         </CardContent>
       </Card>
 
+      {/* Today's Workout Agenda */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -278,7 +329,7 @@ export function WorkoutView() {
             <div className="flex-1 min-w-0">
               <h2 className="text-xs font-black uppercase tracking-tight text-foreground/80">Today's Workout</h2>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                COMPLETION: <span className="text-primary font-black">0/2 DONE</span>
+                {todayName.toUpperCase()}: <span className="text-primary font-black">{todaysExercises.length} EXERCISES</span>
               </p>
             </div>
           </div>
@@ -286,28 +337,48 @@ export function WorkoutView() {
 
         <CardContent className="p-4 space-y-4">
           <div className="space-y-2.5">
-            {protocolExercises.map((ex, idx) => (
-              <div key={idx} className="bg-white p-3 rounded-xl border border-muted/20 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20">
-                <div className="flex justify-between items-start">
-                  <div className="space-y-1">
-                    <p className="text-[8px] font-black text-primary uppercase tracking-widest leading-none">Targeted</p>
-                    <h4 className="font-bold text-[13px] text-foreground/90">{ex.name}</h4>
-                    <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-wider">{ex.category}</p>
-                  </div>
-                  <Button size="icon" variant="ghost" className="w-7 h-7 rounded-full bg-primary/5 text-primary">
-                    <RefreshCw className="w-3.5 h-3.5" />
-                  </Button>
-                </div>
-                <div className="mt-3 flex items-center justify-between">
-                  <span className="text-[9px] font-black text-primary/30 uppercase tracking-[0.2em]">{ex.status}</span>
-                  <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
-                </div>
+            {todaysExercises.length === 0 ? (
+              <div className="text-center py-8 opacity-30 border-2 border-dashed rounded-xl">
+                <p className="text-[10px] font-black uppercase tracking-widest">No moves planned for today</p>
               </div>
-            ))}
+            ) : (
+              todaysExercises.map((ex, idx) => {
+                const logs = loggedSets[ex.name] || [];
+                return (
+                  <div 
+                    key={idx} 
+                    onClick={() => setLoggingExercise(ex)}
+                    className="bg-white p-3 rounded-xl border border-muted/20 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
+                  >
+                    <div className="flex justify-between items-start">
+                      <div className="space-y-1">
+                        <h4 className="font-bold text-[13px] text-foreground/90">{ex.name}</h4>
+                        <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-wider">{ex.muscle} • {ex.subMuscle}</p>
+                      </div>
+                      <Badge variant="secondary" className="bg-primary/5 text-primary text-[9px] h-5 px-2">
+                        {logs.length} SETS
+                      </Badge>
+                    </div>
+                    {logs.length > 0 && (
+                      <div className="mt-2 flex flex-wrap gap-1.5">
+                        {logs.map((set, i) => (
+                          <div key={i} className="text-[8px] font-black bg-muted/30 px-1.5 py-0.5 rounded uppercase">
+                            {set.type === 'time' ? `${set.time}s` : `${set.weight}kg x ${set.reps}`}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                );
+              })
+            )}
           </div>
 
-          <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2">
-            <Plus className="w-4 h-4" /> Add Extra Movement
+          <Button 
+            onClick={() => setIsAddingExtra(true)}
+            className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
+          >
+            <Plus className="w-4 h-4" /> ADD EXTRA MOVEMENT
           </Button>
         </CardContent>
       </Card>
@@ -322,10 +393,9 @@ export function WorkoutView() {
               src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
               alt="My Split"
               fill
-              className="object-cover group-hover:scale-105 transition-transform duration-500"
+              className="object-cover"
               data-ai-hint="gym weights"
             />
-            <div className="absolute inset-0 bg-purple-900/10" />
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
             <div className="space-y-0.5">
@@ -333,7 +403,6 @@ export function WorkoutView() {
                 <Layout className="w-3 h-3" /> My Workout Split
               </h3>
               <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
-              <p className="text-[9px] font-bold text-muted-foreground uppercase opacity-60 tracking-tight">Structured Progress</p>
             </div>
             <ChevronRight className="w-4 h-4 text-purple-300/40" />
           </div>
@@ -341,39 +410,184 @@ export function WorkoutView() {
       </Card>
 
       <div className="grid grid-cols-2 gap-4 pb-6">
-        <Card className="border-none shadow-sm bg-white hover:bg-sky-50 transition-all cursor-pointer active:scale-95 group border border-muted/20">
+        <Card className="border-none shadow-sm bg-white border border-muted/20">
           <CardContent className="p-5 flex flex-col items-start gap-3">
-            <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center group-hover:bg-sky-200 transition-colors">
+            <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
               <History className="w-5 h-5 text-sky-600" />
             </div>
             <div className="space-y-0.5">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">History</p>
-              <p className="text-xs font-bold text-foreground/80">14 sessions</p>
+              <p className="text-xs font-bold text-foreground/80">Logs</p>
             </div>
-            <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-sky-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
-              Details <ChevronRight className="w-3 h-3" />
-            </button>
           </CardContent>
         </Card>
         
         <Card 
           onClick={() => setActiveSubView('library')}
-          className="border-none shadow-sm bg-white hover:bg-indigo-50 transition-all cursor-pointer active:scale-95 group border border-muted/20"
+          className="border-none shadow-sm bg-white hover:bg-indigo-50 transition-all cursor-pointer border border-muted/20"
         >
           <CardContent className="p-5 flex flex-col items-start gap-3">
-            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center group-hover:bg-indigo-200 transition-colors">
+            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
               <Library className="w-5 h-5 text-indigo-600" />
             </div>
             <div className="space-y-0.5">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Library</p>
               <p className="text-xs font-bold text-foreground/80">350+ Moves</p>
             </div>
-            <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-indigo-600 uppercase tracking-widest hover:opacity-70 transition-opacity">
-              Open <ChevronRight className="w-3 h-3" />
-            </button>
           </CardContent>
         </Card>
       </div>
+
+      {/* Logging Dialog Overlay */}
+      {loggingExercise && (
+        <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
+          <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[70vh]">
+            <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setLoggingExercise(null)} />
+            
+            <div className="flex items-center justify-between mb-6">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-xl font-black uppercase tracking-tighter truncate">{loggingExercise.name}</h3>
+                <p className="text-[10px] font-black text-primary uppercase tracking-widest">{loggingExercise.muscle} • {loggingExercise.subMuscle}</p>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => setLoggingExercise(null)} className="rounded-full shrink-0">
+                <X className="w-6 h-6" />
+              </Button>
+            </div>
+
+            <ScrollArea className="flex-1 -mx-2 px-2">
+              <div className="space-y-6 pb-12">
+                {/* Form based on type */}
+                <Card className="border-none shadow-sm bg-muted/10 p-4">
+                  <div className="space-y-4">
+                    {loggingExercise.type === 'time' ? (
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Log Duration</label>
+                        <div className="flex gap-2">
+                          <Input id="time-input" type="number" placeholder="Seconds" className="h-12 text-lg font-bold rounded-xl" />
+                          <Button 
+                            onClick={() => {
+                              const input = document.getElementById('time-input') as HTMLInputElement;
+                              if (input.value) {
+                                handleLogSet(loggingExercise.name, { type: 'time', time: input.value });
+                                input.value = "";
+                              }
+                            }}
+                            className="h-12 w-12 rounded-xl bg-primary"
+                          >
+                            <Plus className="w-5 h-5" />
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Add New Set</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <label className="text-[8px] font-bold text-muted-foreground pl-1">WEIGHT (KG)</label>
+                            <Input id="weight-input" type="number" placeholder="0.0" className="h-12 text-lg font-bold rounded-xl" />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[8px] font-bold text-muted-foreground pl-1">REPS</label>
+                            <Input id="reps-input" type="number" placeholder="0" className="h-12 text-lg font-bold rounded-xl" />
+                          </div>
+                        </div>
+                        <Button 
+                          onClick={() => {
+                            const wInput = document.getElementById('weight-input') as HTMLInputElement;
+                            const rInput = document.getElementById('reps-input') as HTMLInputElement;
+                            if (wInput.value && rInput.value) {
+                              handleLogSet(loggingExercise.name, { type: 'strength', weight: wInput.value, reps: rInput.value });
+                              wInput.value = "";
+                              rInput.value = "";
+                            }
+                          }}
+                          className="w-full h-12 rounded-xl bg-primary mt-2 font-black uppercase tracking-widest"
+                        >
+                          Log Set
+                        </Button>
+                      </div>
+                    )}
+                  </div>
+                </Card>
+
+                {/* History of logged sets for today */}
+                <div className="space-y-2">
+                  <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
+                    <History className="w-3 h-3" /> Today's Sets
+                  </h4>
+                  <div className="grid gap-2">
+                    {(loggedSets[loggingExercise.name] || []).length === 0 ? (
+                      <p className="text-[10px] italic text-muted-foreground py-4">No sets logged yet</p>
+                    ) : (
+                      (loggedSets[loggingExercise.name] || []).map((set, i) => (
+                        <div key={i} className="flex items-center justify-between p-3 bg-white border rounded-xl shadow-sm">
+                          <div className="flex items-center gap-3">
+                            <Badge variant="outline" className="h-6 w-6 rounded-full flex items-center justify-center p-0 font-bold">
+                              {i + 1}
+                            </Badge>
+                            <p className="text-sm font-bold">
+                              {set.type === 'time' ? `${set.time} Seconds` : `${set.weight} kg x ${set.reps} reps`}
+                            </p>
+                          </div>
+                          <Button variant="ghost" size="icon" onClick={() => removeSet(loggingExercise.name, i)} className="h-8 w-8 text-destructive/40 hover:text-destructive rounded-full">
+                            <Trash2 className="w-4 h-4" />
+                          </Button>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+              </div>
+            </ScrollArea>
+          </div>
+        </div>
+      )}
+
+      {/* Add Extra Movement Overlay */}
+      {isAddingExtra && (
+        <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
+          <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 flex flex-col h-[80vh]">
+            <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setIsAddingExtra(false)} />
+            
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-xl font-black uppercase tracking-tighter">Add Extra Move</h3>
+              <Button variant="ghost" size="icon" onClick={() => setIsAddingExtra(false)} className="rounded-full">
+                <ChevronDown className="w-6 h-6" />
+              </Button>
+            </div>
+
+            <div className="relative mb-4">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input 
+                autoFocus
+                type="text" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search..." 
+                className="w-full h-12 pl-10 pr-4 bg-muted/10 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20"
+              />
+            </div>
+
+            <ScrollArea className="flex-1 -mx-2 px-2">
+              <div className="grid gap-2 pb-8">
+                {EXERCISES_DATA.filter(e => e.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 50).map((ex, idx) => (
+                  <button 
+                    key={idx} 
+                    onClick={() => handleAddExtraMove(ex)}
+                    className="flex items-center justify-between p-4 bg-muted/5 hover:bg-primary/5 rounded-2xl text-left transition-all"
+                  >
+                    <div>
+                      <p className="text-xs font-bold text-foreground">{ex.name}</p>
+                      <p className="text-[8px] font-black text-muted-foreground uppercase">{ex.muscle} • {ex.subMuscle}</p>
+                    </div>
+                    <Plus className="w-4 h-4 text-primary/40" />
+                  </button>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
@@ -400,10 +614,6 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     localStorage.setItem('pulseflow_workout_split', JSON.stringify(split));
   }, [split]);
-
-  const handleMuscleChange = (m: string) => {
-    setMuscleFilter(m);
-  };
 
   const addExercise = (ex: Exercise) => {
     setSplit(prev => {
@@ -441,11 +651,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
 
   const report = useMemo(() => {
     const flatSplit = Object.entries(split).flatMap(([day, exs]) => exs.map(e => ({ ...e, day })));
-    
-    // Muscle groups
     const muscles = Array.from(new Set(EXERCISES_DATA.map(e => e.muscle)));
-    
-    // Total unique zones across library
     const totalZonesAcrossLibrary = Array.from(new Set(EXERCISES_DATA.map(e => `${e.muscle}-${e.subMuscle}`)));
     const coveredZonesAcrossSplit = new Set(flatSplit.map(e => `${e.muscle}-${e.subMuscle}`));
     const globalCoverage = Math.round((coveredZonesAcrossSplit.size / totalZonesAcrossLibrary.length) * 100);
@@ -455,7 +661,6 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
     muscles.forEach(m => {
       const allSubMusclesForMuscle = Array.from(new Set(EXERCISES_DATA.filter(e => e.muscle === m).map(e => e.subMuscle)));
       const directExercisesInSplit = flatSplit.filter(e => e.muscle === m);
-      
       const zonesDone: Record<string, { name: string, day: string }[]> = {};
       const secondaryDone: { name: string, day: string }[] = [];
       
@@ -466,7 +671,6 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
         }
       });
 
-      // Find exercises where this muscle group is listed as secondary
       flatSplit.forEach(ex => {
         const isSecondaryMovers = (ex.secondaryMuscles || "").toUpperCase().includes(m.toUpperCase());
         if (isSecondaryMovers && ex.muscle !== m) {
@@ -477,13 +681,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
       const coverage = Math.round((Object.keys(zonesDone).length / allSubMusclesForMuscle.length) * 100);
       const gaps = allSubMusclesForMuscle.filter(z => !zonesDone[z]);
 
-      muscleStats[m] = {
-        zones: zonesDone,
-        secondary: Array.from(new Set(secondaryDone.map(s => JSON.stringify(s)))).map(s => JSON.parse(s)),
-        volume: directExercisesInSplit.length,
-        coverage,
-        gaps
-      };
+      muscleStats[m] = { zones: zonesDone, secondary: Array.from(new Set(secondaryDone.map(s => JSON.stringify(s)))).map(s => JSON.parse(s)), volume: directExercisesInSplit.length, coverage, gaps };
     });
 
     return { globalCoverage, muscleStats, muscles };
@@ -507,9 +705,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
             onClick={() => setActiveDay(day)}
             className={cn(
               "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-              activeDay === day 
-                ? "bg-primary text-white border-primary shadow-lg shadow-primary/20" 
-                : "bg-white text-muted-foreground border-muted/20 hover:border-primary/40"
+              activeDay === day ? "bg-primary text-white border-primary shadow-lg" : "bg-white text-muted-foreground border-muted/20"
             )}
           >
             {day.substring(0, 3)}
@@ -535,17 +731,12 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
               </div>
             ) : (
               (split[activeDay] || []).map((ex, idx) => (
-                <div key={idx} className="flex items-center justify-between p-3 bg-muted/5 rounded-xl border border-muted/10 group">
+                <div key={idx} className="flex items-center justify-between p-3 bg-muted/5 rounded-xl border border-muted/10">
                   <div className="min-w-0">
                     <p className="text-xs font-bold text-foreground truncate">{ex.name}</p>
                     <p className="text-[8px] font-black text-muted-foreground uppercase">{ex.muscle} • {ex.subMuscle}</p>
                   </div>
-                  <Button 
-                    variant="ghost" 
-                    size="icon" 
-                    onClick={() => removeExercise(activeDay, ex.name)}
-                    className="h-8 w-8 text-destructive/40 hover:text-destructive hover:bg-destructive/5 rounded-full"
-                  >
+                  <Button variant="ghost" size="icon" onClick={() => removeExercise(activeDay, ex.name)} className="h-8 w-8 text-destructive/40 hover:text-destructive">
                     <Trash2 className="w-3.5 h-3.5" />
                   </Button>
                 </div>
@@ -553,10 +744,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
             )}
           </div>
 
-          <Button 
-            onClick={() => setIsAdding(true)}
-            className="w-full h-12 rounded-xl border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest gap-2 shadow-none"
-          >
+          <Button onClick={() => setIsAdding(true)} className="w-full h-12 rounded-xl border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest gap-2">
             <Plus className="w-4 h-4" /> Add Exercise
           </Button>
         </CardContent>
@@ -580,9 +768,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
                 onClick={() => setActiveMuscleReport(muscle)}
                 className={cn(
                   "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-                  activeMuscleReport === muscle 
-                    ? "bg-primary text-white border-primary shadow-md" 
-                    : "bg-white text-muted-foreground border-muted/20"
+                  activeMuscleReport === muscle ? "bg-primary text-white border-primary shadow-md" : "bg-white text-muted-foreground border-muted/20"
                 )}
               >
                 {muscle}
@@ -591,8 +777,8 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
           </div>
 
           {currentMuscleReport && (
-            <div className="space-y-4 animate-in fade-in duration-300 px-1">
-              <Card className="border-none bg-white rounded-3xl shadow-sm overflow-hidden p-6 space-y-6">
+            <div className="px-1">
+              <Card className="border-none bg-white rounded-3xl shadow-sm p-6 space-y-6">
                 <div className="flex justify-between items-center border-b border-muted/10 pb-4">
                   <div>
                     <h3 className="text-lg font-black uppercase tracking-tight text-foreground">{activeMuscleReport}</h3>
@@ -604,23 +790,9 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
                   </div>
                 </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-muted/5 p-3 rounded-2xl border border-muted/10 text-center">
-                    <p className="text-sm font-black">{currentMuscleReport.volume}</p>
-                    <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Exercises</p>
-                  </div>
-                  <div className="bg-muted/5 p-3 rounded-2xl border border-muted/10 text-center">
-                    <p className="text-sm font-black">{currentMuscleReport.gaps.length}</p>
-                    <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Gaps Found</p>
-                  </div>
-                </div>
-
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">DIRECTLY GETTING TRAINED</h4>
-                    </div>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">DIRECTLY GETTING TRAINED</h4>
                     {Object.keys(currentMuscleReport.zones).length === 0 ? (
                       <p className="text-[10px] italic text-muted-foreground pl-3">No direct movements assigned.</p>
                     ) : (
@@ -642,16 +814,13 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
                   </div>
 
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <div className="w-1.5 h-1.5 bg-orange-400 rounded-full" />
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">INDIRECTLY GETTING TRAINED</h4>
-                    </div>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">INDIRECTLY GETTING TRAINED</h4>
                     {currentMuscleReport.secondary.length === 0 ? (
                       <p className="text-[10px] italic text-muted-foreground pl-3">No secondary stimulation found.</p>
                     ) : (
                       <div className="flex flex-wrap gap-1.5 pl-3">
                         {currentMuscleReport.secondary.map((ex: any, i: number) => (
-                          <Badge key={i} variant="secondary" className="bg-orange-50 text-orange-600 text-[8px] font-bold uppercase hover:bg-orange-50">
+                          <Badge key={i} variant="secondary" className="bg-orange-50 text-orange-600 text-[8px] font-bold uppercase">
                             {ex.name} ({ex.day.substring(0, 3)})
                           </Badge>
                         ))}
@@ -661,13 +830,10 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
 
                   {currentMuscleReport.gaps.length > 0 && (
                     <div className="space-y-3 pt-2">
-                      <div className="flex items-center gap-2">
-                        <div className="w-1.5 h-1.5 bg-destructive rounded-full" />
-                        <h4 className="text-[10px] font-black uppercase tracking-widest text-destructive">MUSCLE STATUS</h4>
-                      </div>
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-destructive">MUSCLE STATUS</h4>
                       <div className="flex flex-wrap gap-1.5 pl-3">
                         {currentMuscleReport.gaps.map((gap: string, i: number) => (
-                          <Badge key={i} className="bg-destructive/10 text-destructive text-[8px] font-black uppercase hover:bg-destructive/10">
+                          <Badge key={i} className="bg-destructive/10 text-destructive text-[8px] font-black uppercase">
                             {gap}
                           </Badge>
                         ))}
@@ -679,61 +845,31 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
             </div>
           )}
         </div>
-
-        <p className="text-[9px] text-muted-foreground leading-relaxed text-center px-4 pt-4 opacity-60">
-          Growth requires direct training. Maintenance can be achieved through secondary involvement. Analysis based on refined anatomical maps.
-        </p>
       </section>
 
       {isAdding && (
-        <div className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm animate-in fade-in flex items-end">
+        <div className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
           <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] shadow-2xl p-6 h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-500">
             <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setIsAdding(false)} />
-            
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-xl font-black uppercase tracking-tighter">Choose Move</h3>
               <Button variant="ghost" size="icon" onClick={() => setIsAdding(false)} className="rounded-full">
                 <ChevronDown className="w-6 h-6" />
               </Button>
             </div>
-
             <div className="relative mb-4">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input 
-                autoFocus
-                type="text" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search..." 
-                className="w-full h-12 pl-10 pr-4 bg-muted/10 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20"
-              />
+              <input autoFocus type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search..." className="w-full h-12 pl-10 pr-4 bg-muted/10 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20" />
             </div>
-
             <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4">
               {muscleGroups.map(m => (
-                <button
-                  key={m}
-                  onClick={() => handleMuscleChange(m)}
-                  className={cn(
-                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-                    muscleFilter === m 
-                      ? "bg-primary text-white border-primary" 
-                      : "bg-muted/5 text-muted-foreground border-muted/20"
-                  )}
-                >
-                  {m}
-                </button>
+                <button key={m} onClick={() => setMuscleFilter(m)} className={cn("px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all", muscleFilter === m ? "bg-primary text-white border-primary" : "bg-muted/5 text-muted-foreground border-muted/20")}>{m}</button>
               ))}
             </div>
-
             <ScrollArea className="flex-1 -mx-2 px-2">
               <div className="grid gap-2 pb-8">
                 {filteredLibrary.map((ex, idx) => (
-                  <button 
-                    key={idx} 
-                    onClick={() => addExercise(ex)}
-                    className="flex items-center justify-between p-4 bg-muted/5 hover:bg-primary/5 rounded-2xl text-left transition-all border border-transparent hover:border-primary/10"
-                  >
+                  <button key={idx} onClick={() => addExercise(ex)} className="flex items-center justify-between p-4 bg-muted/5 hover:bg-primary/5 rounded-2xl text-left border border-transparent hover:border-primary/10 transition-all">
                     <div>
                       <p className="text-xs font-bold text-foreground">{ex.name}</p>
                       <p className="text-[8px] font-black text-muted-foreground uppercase">{ex.muscle} • {ex.subMuscle}</p>
