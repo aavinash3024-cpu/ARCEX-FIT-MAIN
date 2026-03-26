@@ -23,7 +23,9 @@ import {
   Clock,
   Weight,
   CheckCircle2,
-  X
+  X,
+  Target,
+  BarChart3
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -40,14 +42,29 @@ import { cn } from "@/lib/utils";
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
-import { format } from "date-fns";
+import { 
+  format, 
+  startOfWeek, 
+  endOfWeek, 
+  addWeeks, 
+  subWeeks, 
+  isSameDay, 
+  addDays,
+  isWithinInterval
+} from "date-fns";
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion";
 
 type WeeklySplit = Record<string, Exercise[]>;
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 export function WorkoutView() {
-  const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split'>('main');
+  const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split' | 'history'>('main');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   
   // Today's State
@@ -91,6 +108,12 @@ export function WorkoutView() {
   useEffect(() => {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     localStorage.setItem('pulseflow_workout_logs', JSON.stringify({ date: todayStr, data: loggedSets }));
+    
+    // Sync to persistent history
+    const savedHistory = localStorage.getItem('pulseflow_workout_history');
+    const historyObj = savedHistory ? JSON.parse(savedHistory) : {};
+    historyObj[todayStr] = loggedSets;
+    localStorage.setItem('pulseflow_workout_history', JSON.stringify(historyObj));
   }, [loggedSets]);
 
   const muscleGroups = useMemo(() => {
@@ -196,6 +219,12 @@ export function WorkoutView() {
                 </div>
               </div>
             </div>
+
+            <div className="pt-4 border-t border-muted/10">
+              <p className="text-[10px] font-black uppercase text-muted-foreground text-center tracking-widest opacity-60">
+                PREFER A COACH OR TRAINER FOR ACCURATE FORM AND RESULTS
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
@@ -288,6 +317,10 @@ export function WorkoutView() {
 
   if (activeSubView === 'split') {
     return <SplitBuilderView onBack={() => setActiveSubView('main')} />;
+  }
+
+  if (activeSubView === 'history') {
+    return <WorkoutHistoryView onBack={() => setActiveSubView('main')} />;
   }
 
   return (
@@ -410,7 +443,10 @@ export function WorkoutView() {
       </Card>
 
       <div className="grid grid-cols-2 gap-4 pb-6">
-        <Card className="border-none shadow-sm bg-white border border-muted/20">
+        <Card 
+          onClick={() => setActiveSubView('history')}
+          className="border-none shadow-sm bg-white border border-muted/20 cursor-pointer hover:bg-muted/5 transition-all"
+        >
           <CardContent className="p-5 flex flex-col items-start gap-3">
             <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
               <History className="w-5 h-5 text-sky-600" />
@@ -456,7 +492,6 @@ export function WorkoutView() {
 
             <ScrollArea className="flex-1 -mx-2 px-2">
               <div className="space-y-6 pb-12">
-                {/* Form based on type */}
                 <Card className="border-none shadow-sm bg-muted/10 p-4">
                   <div className="space-y-4">
                     {loggingExercise.type === 'time' ? (
@@ -510,7 +545,6 @@ export function WorkoutView() {
                   </div>
                 </Card>
 
-                {/* History of logged sets for today */}
                 <div className="space-y-2">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                     <History className="w-3 h-3" /> Today's Sets
@@ -568,9 +602,26 @@ export function WorkoutView() {
               />
             </div>
 
+            <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4 mb-2">
+              {muscleGroups.map(m => (
+                <button
+                  key={m}
+                  onClick={() => setMuscleFilter(m)}
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
+                    muscleFilter === m 
+                      ? "bg-primary text-white border-primary shadow-md" 
+                      : "bg-white text-muted-foreground border-muted/20"
+                  )}
+                >
+                  {m}
+                </button>
+              ))}
+            </div>
+
             <ScrollArea className="flex-1 -mx-2 px-2">
               <div className="grid gap-2 pb-8">
-                {EXERCISES_DATA.filter(e => e.name.toLowerCase().includes(searchQuery.toLowerCase())).slice(0, 50).map((ex, idx) => (
+                {filteredExercises.slice(0, 50).map((ex, idx) => (
                   <button 
                     key={idx} 
                     onClick={() => handleAddExtraMove(ex)}
@@ -861,9 +912,18 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input autoFocus type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search..." className="w-full h-12 pl-10 pr-4 bg-muted/10 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20" />
             </div>
-            <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4">
+            <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4 mb-2">
               {muscleGroups.map(m => (
-                <button key={m} onClick={() => setMuscleFilter(m)} className={cn("px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all", muscleFilter === m ? "bg-primary text-white border-primary" : "bg-muted/5 text-muted-foreground border-muted/20")}>{m}</button>
+                <button 
+                  key={m} 
+                  onClick={() => setMuscleFilter(m)} 
+                  className={cn(
+                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all", 
+                    muscleFilter === m ? "bg-primary text-white border-primary" : "bg-muted/5 text-muted-foreground border-muted/20"
+                  )}
+                >
+                  {m}
+                </button>
               ))}
             </div>
             <ScrollArea className="flex-1 -mx-2 px-2">
@@ -882,6 +942,184 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
+  const [refDate, setRefDate] = useState(new Date());
+  const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
+
+  useEffect(() => {
+    const saved = localStorage.getItem('pulseflow_workout_history');
+    if (saved) {
+      try {
+        setHistory(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to load history", e);
+      }
+    }
+  }, []);
+
+  const weekInterval = useMemo(() => {
+    const start = startOfWeek(refDate, { weekStartsOn: 1 });
+    const end = endOfWeek(refDate, { weekStartsOn: 1 });
+    return { start, end };
+  }, [refDate]);
+
+  const weekDays = useMemo(() => {
+    return [0, 1, 2, 3, 4, 5, 6].map(i => addDays(weekInterval.start, i));
+  }, [weekInterval]);
+
+  const handlePrevWeek = () => setRefDate(prev => subWeeks(prev, 1));
+  const handleNextWeek = () => setRefDate(prev => addWeeks(prev, 1));
+
+  return (
+    <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="flex items-center gap-4 pt-2">
+        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
+          <ChevronLeft className="w-5 h-5" />
+        </Button>
+        <h1 className="text-2xl font-bold font-headline">Workout History</h1>
+      </div>
+
+      <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20">
+        <Button variant="ghost" size="icon" onClick={handlePrevWeek} className="rounded-full hover:bg-muted">
+          <ChevronLeft className="w-5 h-5 text-primary" />
+        </Button>
+        <div className="flex flex-col items-center">
+          <span className="text-xs font-black text-foreground uppercase tracking-tight">
+            {format(weekInterval.start, 'MMM d')} - {format(weekInterval.end, 'MMM d, yyyy')}
+          </span>
+          <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none mt-1">
+            WEEKLY TIMELINE
+          </span>
+        </div>
+        <Button variant="ghost" size="icon" onClick={handleNextWeek} className="rounded-full hover:bg-muted">
+          <ChevronRight className="w-5 h-5 text-primary" />
+        </Button>
+      </div>
+
+      <div className="space-y-4">
+        {weekDays.map((day, i) => {
+          const dateStr = format(day, 'yyyy-MM-dd');
+          const dayLogs = history[dateStr] || {};
+          const exerciseNames = Object.keys(dayLogs);
+          
+          let dailyVolume = 0;
+          let primaryMuscle = "No Data";
+          
+          if (exerciseNames.length > 0) {
+            exerciseNames.forEach(name => {
+              const sets = dayLogs[name];
+              sets.forEach(s => {
+                if (s.type === 'strength') {
+                  dailyVolume += (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
+                }
+              });
+            });
+            
+            const firstEx = EXERCISES_DATA.find(e => e.name === exerciseNames[0]);
+            if (firstEx) primaryMuscle = firstEx.muscle;
+          }
+
+          return (
+            <Accordion key={dateStr} type="single" collapsible className="w-full">
+              <AccordionItem value={dateStr} className="border-none">
+                <Card className={cn(
+                  "border-none shadow-md overflow-hidden bg-white rounded-3xl transition-all",
+                  exerciseNames.length === 0 ? "opacity-40" : ""
+                )}>
+                  <AccordionTrigger className="p-0 hover:no-underline">
+                    <div className="flex-1 text-left p-5">
+                      <h3 className="text-sm font-black text-foreground">
+                        {format(day, 'EEEE, MMM d')}
+                      </h3>
+                      <p className={cn(
+                        "text-[10px] font-black uppercase mt-0.5",
+                        exerciseNames.length > 0 ? "text-primary" : "text-muted-foreground"
+                      )}>
+                        {primaryMuscle}
+                      </p>
+                      <p className="text-[9px] font-bold text-muted-foreground/60 uppercase mt-1">
+                        Total Volume: {dailyVolume.toLocaleString()} kg
+                      </p>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="p-0">
+                    <div className="p-4 space-y-4 bg-muted/5 border-t border-muted/10">
+                      {exerciseNames.length === 0 ? (
+                        <p className="text-center py-4 text-[10px] font-bold text-muted-foreground uppercase">No logs recorded</p>
+                      ) : (
+                        exerciseNames.map(name => {
+                          const sets = dayLogs[name];
+                          let exVolume = 0;
+                          let exReps = 0;
+                          sets.forEach(s => {
+                            if (s.type === 'strength') {
+                              exVolume += (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
+                              exReps += (parseFloat(s.reps) || 0);
+                            } else {
+                              exReps += (parseFloat(s.time) || 0);
+                            }
+                          });
+
+                          return (
+                            <Card key={name} className="border border-muted/20 bg-white rounded-2xl overflow-hidden shadow-sm">
+                              <CardContent className="p-0">
+                                <div className="p-3 bg-muted/10 border-b border-muted/10 flex items-center gap-2">
+                                  <RefreshCw className="w-3.5 h-3.5 text-primary" />
+                                  <h4 className="text-xs font-black uppercase text-foreground/80 truncate">{name}</h4>
+                                </div>
+                                <div className="flex">
+                                  <div className="flex-1 p-3">
+                                    <table className="w-full text-left">
+                                      <thead>
+                                        <tr className="border-b border-muted/10">
+                                          <th className="text-[8px] font-black text-muted-foreground uppercase pb-2">Set</th>
+                                          <th className="text-[8px] font-black text-muted-foreground uppercase pb-2 text-center">Reps</th>
+                                          <th className="text-[8px] font-black text-muted-foreground uppercase pb-2 text-right">WGT</th>
+                                        </tr>
+                                      </thead>
+                                      <tbody className="divide-y divide-muted/5">
+                                        {sets.map((s, idx) => (
+                                          <tr key={idx}>
+                                            <td className="py-2 text-[10px] font-black text-foreground/40">{idx + 1}</td>
+                                            <td className="py-2 text-[10px] font-bold text-center">{s.type === 'time' ? s.time : s.reps}</td>
+                                            <td className="py-2 text-[10px] font-bold text-right">{s.type === 'time' ? '---' : `${s.weight}kg`}</td>
+                                          </tr>
+                                        ))}
+                                      </tbody>
+                                    </table>
+                                  </div>
+                                  <div className="w-24 bg-muted/5 border-l border-muted/10 p-3 flex flex-col justify-between items-center text-center gap-4">
+                                    <div>
+                                      <p className="text-[7px] font-black text-muted-foreground uppercase">Sets</p>
+                                      <p className="text-xs font-black">{sets.length}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-[7px] font-black text-muted-foreground uppercase">Reps</p>
+                                      <p className="text-xs font-black">{exReps}</p>
+                                    </div>
+                                    <div>
+                                      <p className="text-[7px] font-black text-muted-foreground uppercase">Vol</p>
+                                      <p className="text-xs font-black">{exVolume.toLocaleString()} <span className="text-[7px]">kg</span></p>
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          );
+                        })
+                      )}
+                    </div>
+                  </AccordionContent>
+                </Card>
+              </AccordionItem>
+            </Accordion>
+          );
+        })}
+      </div>
     </div>
   );
 }
