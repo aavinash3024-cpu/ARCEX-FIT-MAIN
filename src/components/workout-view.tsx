@@ -1047,7 +1047,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
       <Card className="border-none shadow-md bg-white rounded-[1.5rem] p-4 space-y-3 mx-1">
         <div className="flex items-center gap-2 border-b pb-2 border-muted/10">
           <TrendingUp className="w-3.5 h-3.5 text-primary" />
-          <h3 className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">MUSCLE VOLUME GROWTH</h3>
+          <h3 className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">STRENGTH GROWTH FROM LAST WEEK</h3>
         </div>
         
         {growthStats.length === 0 ? (
@@ -1056,9 +1056,12 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
           <div className="grid gap-3">
             {growthStats.map((stat, i) => (
               <div key={i} className="flex items-center justify-between bg-muted/5 p-2.5 rounded-xl border border-muted/10">
-                <div className="space-y-0.5">
+                <div className="space-y-1">
                   <p className="text-[9px] font-black text-foreground uppercase">{stat.muscle}</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">{stat.current.toLocaleString()} kg (vs {stat.previous.toLocaleString()} kg)</p>
+                  <div className="space-y-0.5">
+                    <p className="text-[8px] font-bold text-primary uppercase">THIS WEEK: {stat.current.toLocaleString()} kg</p>
+                    <p className="text-[8px] font-bold text-muted-foreground uppercase">LAST WEEK: {stat.previous.toLocaleString()} kg</p>
+                  </div>
                 </div>
                 <div className={cn("flex items-center gap-1", stat.change >= 0 ? "text-green-600" : "text-destructive")}>
                   <span className="text-[10px] font-black">{stat.change >= 0 ? '+' : ''}{stat.change.toFixed(1)}%</span>
@@ -1101,7 +1104,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                   "border-none shadow-sm overflow-hidden bg-white rounded-[1.25rem] transition-all",
                   exerciseNames.length === 0 ? "opacity-40" : ""
                 )}>
-                  <AccordionTrigger className="p-0 hover:no-underline [&[data-state=open]]:bg-muted/5 group">
+                  <AccordionTrigger className="p-0 hover:no-underline [&[data-state=open]]:bg-muted/5 group [&>svg]:hidden">
                     <div className="flex-1 text-left py-3 px-6">
                       <h3 className="text-[13px] font-black text-foreground leading-tight">
                         {format(day, 'EEEE, MMM d')}
@@ -1115,9 +1118,6 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                       <p className="text-[8px] font-bold text-muted-foreground/60 uppercase mt-0.5">
                         TOTAL VOLUME: {dailyVolume.toLocaleString()} KG
                       </p>
-                    </div>
-                    <div className="pr-6">
-                      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground/40 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="p-0">
@@ -1165,16 +1165,6 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                                         ))}
                                       </tbody>
                                     </table>
-                                  </div>
-                                  <div className="w-20 bg-muted/5 border-l border-muted/10 p-2.5 flex flex-col justify-center items-center text-center gap-3">
-                                    <div>
-                                      <p className="text-[6px] font-black text-muted-foreground uppercase">Sets</p>
-                                      <p className="text-[11px] font-black">{sets.length}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-[6px] font-black text-muted-foreground uppercase">Vol</p>
-                                      <p className="text-[11px] font-black">{exVolume.toLocaleString()} <span className="text-[6px]">kg</span></p>
-                                    </div>
                                   </div>
                                 </div>
                               </CardContent>
