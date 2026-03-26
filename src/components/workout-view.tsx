@@ -363,7 +363,7 @@ export function WorkoutView() {
             <div className="flex-1 min-w-0">
               <h2 className="text-xs font-black uppercase tracking-tight text-foreground/80">Today's Workout</h2>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                {todayName.toUpperCase()}: <span className="text-primary font-black">{todaysExercises.length} EXERCISES</span>
+                {todayName.toUpperCase()}: <span className="text-primary font-black">{(split[todayName] || []).length + extraMoves.length} EXERCISES</span>
               </p>
             </div>
           </div>
@@ -979,33 +979,40 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
   }, [weekInterval]);
 
   const growthStats = useMemo(() => {
-    const getWeekStats = (start: Date, end: Date) => {
-      let totalVolume = 0;
-      let totalReps = 0;
+    const getWeekMuscleVolume = (start: Date) => {
+      const muscleVolume: Record<string, number> = {};
       
       for (let i = 0; i < 7; i++) {
         const day = addDays(start, i);
         const dateStr = format(day, 'yyyy-MM-dd');
         const dayLogs = history[dateStr] || {};
         Object.keys(dayLogs).forEach(name => {
+          const exercise = EXERCISES_DATA.find(e => e.name === name);
+          if (!exercise) return;
+          const muscle = exercise.muscle;
+          
           dayLogs[name].forEach(s => {
             if (s.type === 'strength') {
-              totalVolume += (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
-              totalReps += (parseFloat(s.reps) || 0);
+              const vol = (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
+              muscleVolume[muscle] = (muscleVolume[muscle] || 0) + vol;
             }
           });
         });
       }
-      return { totalVolume, avgReps: totalReps / 7 };
+      return muscleVolume;
     };
 
-    const current = getWeekStats(weekInterval.start, weekInterval.end);
-    const previous = getWeekStats(subWeeks(weekInterval.start, 1), subWeeks(weekInterval.end, 1));
+    const currentVolMap = getWeekMuscleVolume(weekInterval.start);
+    const previousVolMap = getWeekMuscleVolume(subWeeks(weekInterval.start, 1));
 
-    const volChange = previous.totalVolume > 0 ? ((current.totalVolume - previous.totalVolume) / previous.totalVolume) * 100 : (current.totalVolume > 0 ? 100 : 0);
-    const repsChange = previous.avgReps > 0 ? ((current.avgReps - previous.avgReps) / previous.avgReps) * 100 : (current.avgReps > 0 ? 100 : 0);
-
-    return { current, previous, volChange, repsChange };
+    const muscles = Array.from(new Set([...Object.keys(currentVolMap), ...Object.keys(previousVolMap)]));
+    
+    return muscles.map(muscle => {
+      const current = currentVolMap[muscle] || 0;
+      const previous = previousVolMap[muscle] || 0;
+      const change = previous > 0 ? ((current - previous) / previous) * 100 : (current > 0 ? 100 : 0);
+      return { muscle, current, previous, change };
+    }).filter(m => m.current > 0 || m.previous > 0);
   }, [history, weekInterval]);
 
   const handlePrevWeek = () => setRefDate(prev => subWeeks(prev, 1));
@@ -1020,7 +1027,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
         <h1 className="text-2xl font-bold font-headline">Workout History</h1>
       </div>
 
-      <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20">
+      <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
         <Button variant="ghost" size="icon" onClick={handlePrevWeek} className="rounded-full hover:bg-muted">
           <ChevronLeft className="w-5 h-5 text-primary" />
         </Button>
@@ -1037,67 +1044,40 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
         </Button>
       </div>
 
-      <Card className="border-none shadow-md bg-white rounded-3xl p-5 space-y-4">
+      <Card className="border-none shadow-md bg-white rounded-[1.5rem] p-4 space-y-3 mx-1">
         <div className="flex items-center gap-2 border-b pb-2 border-muted/10">
-          <TrendingUp className="w-4 h-4 text-primary" />
-          <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Growth from last week</h3>
+          <TrendingUp className="w-3.5 h-3.5 text-primary" />
+          <h3 className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">MUSCLE VOLUME GROWTH</h3>
         </div>
         
-        <div className="grid grid-cols-2 gap-6">
-          <div className="space-y-3">
-            <div>
-              <p className="text-[9px] font-black text-muted-foreground uppercase">Volume Growth</p>
-              <div className="flex items-center gap-2">
-                <span className={cn("text-lg font-black", growthStats.volChange >= 0 ? "text-green-600" : "text-destructive")}>
-                  {growthStats.volChange >= 0 ? '+' : ''}{growthStats.volChange.toFixed(1)}%
-                </span>
-                {growthStats.volChange >= 0 ? <ArrowUpRight className="w-4 h-4 text-green-600" /> : <ArrowDownRight className="w-4 h-4 text-destructive" />}
+        {growthStats.length === 0 ? (
+          <p className="text-center py-4 text-[9px] font-bold text-muted-foreground uppercase opacity-40">No growth data for this week</p>
+        ) : (
+          <div className="grid gap-3">
+            {growthStats.map((stat, i) => (
+              <div key={i} className="flex items-center justify-between bg-muted/5 p-2.5 rounded-xl border border-muted/10">
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-black text-foreground uppercase">{stat.muscle}</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase">{stat.current.toLocaleString()} kg (vs {stat.previous.toLocaleString()} kg)</p>
+                </div>
+                <div className={cn("flex items-center gap-1", stat.change >= 0 ? "text-green-600" : "text-destructive")}>
+                  <span className="text-[10px] font-black">{stat.change >= 0 ? '+' : ''}{stat.change.toFixed(1)}%</span>
+                  {stat.change >= 0 ? <ArrowUpRight className="w-3 h-3" /> : <ArrowDownRight className="w-3 h-3" />}
+                </div>
               </div>
-            </div>
-            <div className="space-y-1">
-              <div className="flex justify-between text-[8px] font-bold uppercase text-muted-foreground">
-                <span>Current</span>
-                <span className="text-foreground">{growthStats.current.totalVolume.toLocaleString()} kg</span>
-              </div>
-              <div className="flex justify-between text-[8px] font-bold uppercase text-muted-foreground">
-                <span>Previous</span>
-                <span>{growthStats.previous.totalVolume.toLocaleString()} kg</span>
-              </div>
-            </div>
+            ))}
           </div>
-
-          <div className="space-y-3">
-            <div>
-              <p className="text-[9px] font-black text-muted-foreground uppercase">Avg Reps/Day</p>
-              <div className="flex items-center gap-2">
-                <span className={cn("text-lg font-black", growthStats.repsChange >= 0 ? "text-blue-600" : "text-destructive")}>
-                  {growthStats.repsChange >= 0 ? '+' : ''}{growthStats.repsChange.toFixed(1)}%
-                </span>
-                {growthStats.repsChange >= 0 ? <ArrowUpRight className="w-4 h-4 text-blue-600" /> : <ArrowDownRight className="w-4 h-4 text-destructive" />}
-              </div>
-            </div>
-            <div className="space-y-1">
-              <div className="flex justify-between text-[8px] font-bold uppercase text-muted-foreground">
-                <span>Current</span>
-                <span className="text-foreground">{growthStats.current.avgReps.toFixed(1)} reps</span>
-              </div>
-              <div className="flex justify-between text-[8px] font-bold uppercase text-muted-foreground">
-                <span>Previous</span>
-                <span>{growthStats.previous.avgReps.toFixed(1)} reps</span>
-              </div>
-            </div>
-          </div>
-        </div>
+        )}
       </Card>
 
-      <div className="space-y-4">
+      <div className="space-y-3 px-1">
         {weekDays.map((day, i) => {
           const dateStr = format(day, 'yyyy-MM-dd');
           const dayLogs = history[dateStr] || {};
           const exerciseNames = Object.keys(dayLogs);
           
           let dailyVolume = 0;
-          let primaryMuscle = "No Data";
+          let primaryMusclesSet = new Set<string>();
           
           if (exerciseNames.length > 0) {
             exerciseNames.forEach(name => {
@@ -1107,39 +1087,43 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                   dailyVolume += (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
                 }
               });
+              const ex = EXERCISES_DATA.find(e => e.name === name);
+              if (ex) primaryMusclesSet.add(ex.muscle);
             });
-            
-            const firstEx = EXERCISES_DATA.find(e => e.name === exerciseNames[0]);
-            if (firstEx) primaryMuscle = firstEx.muscle;
           }
+
+          const primaryMuscles = Array.from(primaryMusclesSet).join(", ");
 
           return (
             <Accordion key={dateStr} type="single" collapsible className="w-full">
               <AccordionItem value={dateStr} className="border-none">
                 <Card className={cn(
-                  "border-none shadow-md overflow-hidden bg-white rounded-3xl transition-all",
+                  "border-none shadow-sm overflow-hidden bg-white rounded-[1.25rem] transition-all",
                   exerciseNames.length === 0 ? "opacity-40" : ""
                 )}>
-                  <AccordionTrigger className="pr-6 hover:no-underline">
-                    <div className="flex-1 text-left p-5">
-                      <h3 className="text-sm font-black text-foreground">
+                  <AccordionTrigger className="p-0 hover:no-underline [&[data-state=open]]:bg-muted/5 group">
+                    <div className="flex-1 text-left py-3 px-6">
+                      <h3 className="text-[13px] font-black text-foreground leading-tight">
                         {format(day, 'EEEE, MMM d')}
                       </h3>
                       <p className={cn(
-                        "text-[10px] font-black uppercase mt-0.5",
+                        "text-[9px] font-black uppercase mt-0.5",
                         exerciseNames.length > 0 ? "text-primary" : "text-muted-foreground"
                       )}>
-                        {primaryMuscle}
+                        {exerciseNames.length > 0 ? primaryMuscles : "NO DATA"}
                       </p>
-                      <p className="text-[9px] font-bold text-muted-foreground/60 uppercase mt-1">
-                        Total Volume: {dailyVolume.toLocaleString()} kg
+                      <p className="text-[8px] font-bold text-muted-foreground/60 uppercase mt-0.5">
+                        TOTAL VOLUME: {dailyVolume.toLocaleString()} KG
                       </p>
+                    </div>
+                    <div className="pr-6">
+                      <ChevronDown className="h-4 w-4 shrink-0 text-muted-foreground/40 transition-transform duration-200 group-data-[state=open]:rotate-180" />
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="p-0">
-                    <div className="p-4 space-y-4 bg-muted/5 border-t border-muted/10">
+                    <div className="p-3 space-y-3 bg-muted/5 border-t border-muted/10">
                       {exerciseNames.length === 0 ? (
-                        <p className="text-center py-4 text-[10px] font-bold text-muted-foreground uppercase">No logs recorded</p>
+                        <p className="text-center py-4 text-[9px] font-bold text-muted-foreground uppercase">No logs recorded</p>
                       ) : (
                         exerciseNames.map(name => {
                           const sets = dayLogs[name];
@@ -1155,45 +1139,41 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                           });
 
                           return (
-                            <Card key={name} className="border border-muted/20 bg-white rounded-2xl overflow-hidden shadow-sm">
+                            <Card key={name} className="border border-muted/20 bg-white rounded-xl overflow-hidden shadow-sm">
                               <CardContent className="p-0">
-                                <div className="p-3 bg-muted/10 border-b border-muted/10 flex items-center gap-2">
-                                  <RefreshCw className="w-3.5 h-3.5 text-primary" />
-                                  <h4 className="text-xs font-black uppercase text-foreground/80 truncate">{name}</h4>
+                                <div className="p-2.5 bg-muted/10 border-b border-muted/10 flex items-center gap-2">
+                                  <RefreshCw className="w-3 h-3 text-primary" />
+                                  <h4 className="text-[11px] font-black uppercase text-foreground/80 truncate">{name}</h4>
                                 </div>
                                 <div className="flex">
-                                  <div className="flex-1 p-3">
+                                  <div className="flex-1 p-2.5">
                                     <table className="w-full text-left">
                                       <thead>
                                         <tr className="border-b border-muted/10">
-                                          <th className="text-[8px] font-black text-muted-foreground uppercase pb-2">Set</th>
-                                          <th className="text-[8px] font-black text-muted-foreground uppercase pb-2 text-center">Reps</th>
-                                          <th className="text-[8px] font-black text-muted-foreground uppercase pb-2 text-right">WGT</th>
+                                          <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5">Set</th>
+                                          <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5 text-center">Reps</th>
+                                          <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5 text-right">WGT</th>
                                         </tr>
                                       </thead>
                                       <tbody className="divide-y divide-muted/5">
                                         {sets.map((s, idx) => (
                                           <tr key={idx}>
-                                            <td className="py-2 text-[10px] font-black text-foreground/40">{idx + 1}</td>
-                                            <td className="py-2 text-[10px] font-bold text-center">{s.type === 'time' ? s.time : s.reps}</td>
-                                            <td className="py-2 text-[10px] font-bold text-right">{s.type === 'time' ? '---' : `${s.weight}kg`}</td>
+                                            <td className="py-1.5 text-[9px] font-black text-foreground/40">{idx + 1}</td>
+                                            <td className="py-1.5 text-[9px] font-bold text-center">{s.type === 'time' ? s.time : s.reps}</td>
+                                            <td className="py-1.5 text-[9px] font-bold text-right">{s.type === 'time' ? '---' : `${s.weight}kg`}</td>
                                           </tr>
                                         ))}
                                       </tbody>
                                     </table>
                                   </div>
-                                  <div className="w-24 bg-muted/5 border-l border-muted/10 p-3 flex flex-col justify-between items-center text-center gap-4">
+                                  <div className="w-20 bg-muted/5 border-l border-muted/10 p-2.5 flex flex-col justify-center items-center text-center gap-3">
                                     <div>
-                                      <p className="text-[7px] font-black text-muted-foreground uppercase">Sets</p>
-                                      <p className="text-xs font-black">{sets.length}</p>
+                                      <p className="text-[6px] font-black text-muted-foreground uppercase">Sets</p>
+                                      <p className="text-[11px] font-black">{sets.length}</p>
                                     </div>
                                     <div>
-                                      <p className="text-[7px] font-black text-muted-foreground uppercase">Reps</p>
-                                      <p className="text-xs font-black">{exReps}</p>
-                                    </div>
-                                    <div>
-                                      <p className="text-[7px] font-black text-muted-foreground uppercase">Vol</p>
-                                      <p className="text-xs font-black">{exVolume.toLocaleString()} <span className="text-[7px]">kg</span></p>
+                                      <p className="text-[6px] font-black text-muted-foreground uppercase">Vol</p>
+                                      <p className="text-[11px] font-black">{exVolume.toLocaleString()} <span className="text-[6px]">kg</span></p>
                                     </div>
                                   </div>
                                 </div>
