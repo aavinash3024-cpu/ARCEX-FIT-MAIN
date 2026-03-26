@@ -7,7 +7,6 @@ import {
   UtensilsCrossed, 
   Dumbbell, 
   LineChart as ChartIcon,
-  Settings,
   Bell,
   Search
 } from 'lucide-react';
@@ -21,7 +20,7 @@ import { CalculatorsView } from '@/components/calculators-view';
 import { GoalSettingView } from '@/components/goal-setting-view';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { format, subDays, isSameDay, isYesterday } from 'date-fns';
+import { format, isYesterday } from 'date-fns';
 
 export default function PulseFlowApp() {
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -336,15 +335,6 @@ export default function PulseFlowApp() {
             </button>
           );
         })}
-        <button 
-          onClick={() => setActiveTab('calculators')}
-          className={`flex flex-col items-center transition-colors flex-1 ${activeTab === 'calculators' ? 'text-primary' : 'text-muted-foreground hover:text-primary/60'}`}
-        >
-          <div className={`p-1.5 rounded-xl ${activeTab === 'calculators' ? 'bg-primary/10' : 'hover:bg-muted'}`}>
-            <Settings className="w-5 h-5" />
-          </div>
-          <span className="text-[9px] font-bold uppercase tracking-tight opacity-0 h-0">More</span>
-        </button>
       </nav>
     </div>
   );

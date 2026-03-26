@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -20,12 +21,8 @@ import {
   Calendar,
   ChevronDown,
   Info,
-  Clock,
-  Weight,
   CheckCircle2,
   X,
-  Target,
-  BarChart3,
   Check,
   TrendingUp,
   ArrowUpRight,
@@ -68,14 +65,13 @@ type WeeklySplit = Record<string, Exercise[]>;
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 
 export function WorkoutView() {
-  const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split' | 'history'>('main');
+  const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split' | 'history' | 'pr'>('main');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   
   const [split, setSplit] = useState<WeeklySplit>({});
   const [extraMoves, setExtraMoves] = useState<Exercise[]>([]);
   const [loggingExercise, setLoggingExercise] = useState<Exercise | null>(null);
   const [loggedSets, setLoggedSets] = useState<Record<string, any[]>>({});
-  const [isAddingExtra, setIsAddingExtra] = useState(false);
   
   const [searchQuery, setSearchQuery] = useState("");
   const [muscleFilter, setMuscleFilter] = useState<string>("ALL");
@@ -165,7 +161,6 @@ export function WorkoutView() {
   const handleAddExtraMove = (ex: Exercise) => {
     if (todaysExercises.some(e => e.name === ex.name)) return;
     setExtraMoves(prev => [...prev, ex]);
-    setIsAddingExtra(false);
   };
 
   const removeSet = (exerciseName: string, index: number) => {
@@ -325,21 +320,25 @@ export function WorkoutView() {
     return <WorkoutHistoryView onBack={() => setActiveSubView('main')} />;
   }
 
+  if (activeSubView === 'pr') {
+    return <PersonalRecordsView onBack={() => setActiveSubView('main')} />;
+  }
+
   return (
     <div className="space-y-4 pb-24">
       <div className="pt-2">
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      <Card className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group">
+      <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
+              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
               alt="Personal Records"
               fill
               className="object-cover"
-              data-ai-hint="barbell illustration"
+              data-ai-hint="gym weights"
             />
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
@@ -411,7 +410,11 @@ export function WorkoutView() {
           </ScrollArea>
 
           <Button 
-            onClick={() => setIsAddingExtra(true)}
+            onClick={() => {
+              setSearchQuery("");
+              setMuscleFilter("ALL");
+              document.dispatchEvent(new CustomEvent('open-extra-moves'));
+            }}
             className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
           >
             <Plus className="w-4 h-4" /> ADD EXTRA MOVEMENT
@@ -426,11 +429,11 @@ export function WorkoutView() {
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
+              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
               alt="My Split"
               fill
               className="object-cover"
-              data-ai-hint="gym weights"
+              data-ai-hint="barbell illustration"
             />
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
@@ -477,6 +480,8 @@ export function WorkoutView() {
         </Card>
       </div>
 
+      <ExtraMovesModal muscleGroups={muscleGroups} filteredLibrary={filteredLibrary} onAdd={handleAddExtraMove} searchQuery={searchQuery} setSearchQuery={setSearchQuery} muscleFilter={muscleFilter} setMuscleFilter={setMuscleFilter} />
+
       {loggingExercise && (
         <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
           <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[70vh]">
@@ -496,7 +501,7 @@ export function WorkoutView() {
               <div className="space-y-6 pb-12">
                 <Card className="border-none shadow-sm bg-muted/10 p-4">
                   <div className="space-y-4">
-                    {loggingExercise.type === 'time' ? (
+                    {loggingExercise.name.toLowerCase().includes('running') || loggingExercise.name.toLowerCase().includes('cycling') || loggingExercise.name.toLowerCase().includes('plank') ? (
                       <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Log Duration</label>
                         <div className="flex gap-2">
@@ -578,67 +583,179 @@ export function WorkoutView() {
           </div>
         </div>
       )}
+    </div>
+  );
+}
 
-      {isAddingExtra && (
-        <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
-          <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 flex flex-col h-[80vh]">
-            <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setIsAddingExtra(false)} />
-            
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-black uppercase tracking-tighter">Add Extra Move</h3>
-              <Button variant="ghost" size="icon" onClick={() => setIsAddingExtra(false)} className="rounded-full">
-                <ChevronDown className="w-6 h-6" />
-              </Button>
-            </div>
+function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, setSearchQuery, muscleFilter, setMuscleFilter }: any) {
+  const [isOpen, setIsOpen] = useState(false);
 
-            <div className="relative mb-4">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-              <input 
-                autoFocus
-                type="text" 
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                placeholder="Search..." 
-                className="w-full h-12 pl-10 pr-4 bg-muted/10 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20"
-              />
-            </div>
+  useEffect(() => {
+    const handleOpen = () => setIsOpen(true);
+    document.addEventListener('open-extra-moves', handleOpen);
+    return () => document.removeEventListener('open-extra-moves', handleOpen);
+  }, []);
 
-            <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4 mb-2">
-              {muscleGroups.map(m => (
-                <button
-                  key={m}
-                  onClick={() => setMuscleFilter(m)}
-                  className={cn(
-                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-                    muscleFilter === m 
-                      ? "bg-primary text-white border-primary shadow-md" 
-                      : "bg-white text-muted-foreground border-muted/20"
-                  )}
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
+  if (!isOpen) return null;
 
-            <ScrollArea className="flex-1 -mx-2 px-2">
-              <div className="grid gap-2 pb-8">
-                {filteredExercises.slice(0, 50).map((ex, idx) => (
-                  <button 
-                    key={idx} 
-                    onClick={() => handleAddExtraMove(ex)}
-                    className="flex items-center justify-between p-4 bg-muted/5 hover:bg-primary/5 rounded-2xl text-left transition-all"
-                  >
-                    <div>
-                      <p className="text-xs font-bold text-foreground">{ex.name}</p>
-                      <p className="text-[8px] font-black text-muted-foreground uppercase">{ex.muscle} • {ex.subMuscle}</p>
-                    </div>
-                    <Plus className="w-4 h-4 text-primary/40" />
-                  </button>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
+  return (
+    <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
+      <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 flex flex-col h-[80vh]">
+        <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setIsOpen(false)} />
+        
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xl font-black uppercase tracking-tighter">Add Extra Move</h3>
+          <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="rounded-full">
+            <ChevronDown className="w-6 h-6" />
+          </Button>
         </div>
+
+        <div className="relative mb-4">
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <input 
+            autoFocus
+            type="text" 
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            placeholder="Search..." 
+            className="w-full h-12 pl-10 pr-4 bg-muted/10 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20"
+          />
+        </div>
+
+        <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4 mb-2">
+          {muscleGroups.map((m: any) => (
+            <button
+              key={m}
+              onClick={() => setMuscleFilter(m)}
+              className={cn(
+                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
+                muscleFilter === m 
+                  ? "bg-primary text-white border-primary shadow-md" 
+                  : "bg-white text-muted-foreground border-muted/20"
+              )}
+            >
+              {m}
+            </button>
+          ))}
+        </div>
+
+        <ScrollArea className="flex-1 -mx-2 px-2">
+          <div className="grid gap-2 pb-8">
+            {filteredLibrary.slice(0, 50).map((ex: any, idx: number) => (
+              <button 
+                key={idx} 
+                onClick={() => { onAdd(ex); setIsOpen(false); }}
+                className="flex items-center justify-between p-4 bg-muted/5 hover:bg-primary/5 rounded-2xl text-left transition-all"
+              >
+                <div>
+                  <p className="text-xs font-bold text-foreground">{ex.name}</p>
+                  <p className="text-[8px] font-black text-muted-foreground uppercase">{ex.muscle} • {ex.subMuscle}</p>
+                </div>
+                <Plus className="w-4 h-4 text-primary/40" />
+              </button>
+            ))}
+          </div>
+        </ScrollArea>
+      </div>
+    </div>
+  );
+}
+
+function PersonalRecordsView({ onBack }: { onBack: () => void }) {
+  const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
+
+  useEffect(() => {
+    const saved = localStorage.getItem('pulseflow_workout_history');
+    if (saved) {
+      try {
+        setHistory(JSON.parse(saved));
+      } catch (e) {
+        console.error("Failed to load history", e);
+      }
+    }
+  }, []);
+
+  const topLifts = useMemo(() => {
+    const lifts: Record<string, any[]> = {};
+    
+    // Extract all lifts
+    Object.values(history).forEach(dayLogs => {
+      Object.entries(dayLogs).forEach(([exName, sets]) => {
+        if (!lifts[exName]) lifts[exName] = [];
+        sets.forEach(s => {
+          if (s.type === 'strength') {
+            lifts[exName].push({
+              weight: parseFloat(s.weight),
+              reps: parseFloat(s.reps)
+            });
+          }
+        });
+      });
+    });
+
+    // Sort and take top 10
+    const top10PerEx: Record<string, any[]> = {};
+    Object.entries(lifts).forEach(([exName, allSets]) => {
+      top10PerEx[exName] = allSets
+        .sort((a, b) => b.weight - a.weight || b.reps - a.reps)
+        .slice(0, 10);
+    });
+
+    // Group by muscle
+    const grouped: Record<string, { name: string, lifts: any[] }[]> = {};
+    Object.entries(top10PerEx).forEach(([exName, sets]) => {
+      const exData = EXERCISES_DATA.find(e => e.name === exName);
+      const muscle = exData ? exData.muscle : 'OTHER';
+      if (!grouped[muscle]) grouped[muscle] = [];
+      grouped[muscle].push({ name: exName, lifts: sets });
+    });
+
+    return grouped;
+  }, [history]);
+
+  return (
+    <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="flex items-center gap-4 pt-2">
+        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
+          <ChevronLeft className="w-5 h-5" />
+        </Button>
+        <h1 className="text-2xl font-bold font-headline">Personal Records</h1>
+      </div>
+
+      {Object.keys(topLifts).length === 0 ? (
+        <div className="text-center py-20 opacity-30">
+          <Trophy className="w-12 h-12 mx-auto mb-4" />
+          <p className="text-sm font-black uppercase tracking-widest">No PR data recorded yet</p>
+        </div>
+      ) : (
+        <ScrollArea className="h-[calc(100vh-200px)]">
+          <div className="space-y-6 px-1">
+            {Object.entries(topLifts).map(([muscle, exercises]) => (
+              <section key={muscle} className="space-y-3">
+                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] border-b pb-1 border-primary/10">
+                  {muscle}
+                </h3>
+                <div className="space-y-3">
+                  {exercises.map((ex, i) => (
+                    <Card key={i} className="border-none shadow-sm bg-white overflow-hidden rounded-2xl">
+                      <CardContent className="p-4 space-y-3">
+                        <h4 className="text-xs font-bold text-foreground/80">{ex.name}</h4>
+                        <div className="grid grid-cols-2 gap-2">
+                          {ex.lifts.map((lift, idx) => (
+                            <div key={idx} className="flex items-center justify-between bg-muted/5 p-2 rounded-lg border border-muted/10">
+                              <span className="text-[9px] font-black text-primary/40">#{idx + 1}</span>
+                              <span className="text-[10px] font-black">{lift.weight}kg <span className="text-muted-foreground">x {lift.reps}</span></span>
+                            </div>
+                          ))}
+                        </div>
+                      </CardContent>
+                    </Card>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+        </ScrollArea>
       )}
     </div>
   );
@@ -1127,17 +1244,6 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                       ) : (
                         exerciseNames.map(name => {
                           const sets = dayLogs[name];
-                          let exVolume = 0;
-                          let exReps = 0;
-                          sets.forEach(s => {
-                            if (s.type === 'strength') {
-                              exVolume += (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
-                              exReps += (parseFloat(s.reps) || 0);
-                            } else {
-                              exReps += (parseFloat(s.time) || 0);
-                            }
-                          });
-
                           return (
                             <Card key={name} className="border border-muted/20 bg-white rounded-xl overflow-hidden shadow-sm">
                               <CardContent className="p-0">
@@ -1145,27 +1251,25 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                                   <RefreshCw className="w-3 h-3 text-primary" />
                                   <h4 className="text-[11px] font-black uppercase text-foreground/80 truncate">{name}</h4>
                                 </div>
-                                <div className="flex">
-                                  <div className="flex-1 p-2.5">
-                                    <table className="w-full text-left">
-                                      <thead>
-                                        <tr className="border-b border-muted/10">
-                                          <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5">Set</th>
-                                          <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5 text-center">Reps</th>
-                                          <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5 text-right">WGT</th>
+                                <div className="p-2.5">
+                                  <table className="w-full text-left">
+                                    <thead>
+                                      <tr className="border-b border-muted/10">
+                                        <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5">Set</th>
+                                        <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5 text-center">Reps</th>
+                                        <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5 text-right">WGT</th>
+                                      </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-muted/5">
+                                      {sets.map((s, idx) => (
+                                        <tr key={idx}>
+                                          <td className="py-1.5 text-[9px] font-black text-foreground/40">{idx + 1}</td>
+                                          <td className="py-1.5 text-[9px] font-bold text-center">{s.type === 'time' ? s.time : s.reps}</td>
+                                          <td className="py-1.5 text-[9px] font-bold text-right">{s.type === 'time' ? '---' : `${s.weight}kg`}</td>
                                         </tr>
-                                      </thead>
-                                      <tbody className="divide-y divide-muted/5">
-                                        {sets.map((s, idx) => (
-                                          <tr key={idx}>
-                                            <td className="py-1.5 text-[9px] font-black text-foreground/40">{idx + 1}</td>
-                                            <td className="py-1.5 text-[9px] font-bold text-center">{s.type === 'time' ? s.time : s.reps}</td>
-                                            <td className="py-1.5 text-[9px] font-bold text-right">{s.type === 'time' ? '---' : `${s.weight}kg`}</td>
-                                          </tr>
-                                        ))}
-                                      </tbody>
-                                    </table>
-                                  </div>
+                                      ))}
+                                    </tbody>
+                                  </table>
                                 </div>
                               </CardContent>
                             </Card>
