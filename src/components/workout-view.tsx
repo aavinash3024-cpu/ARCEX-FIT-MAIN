@@ -26,7 +26,10 @@ import {
   X,
   Target,
   BarChart3,
-  Check
+  Check,
+  TrendingUp,
+  ArrowUpRight,
+  ArrowDownRight
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -68,21 +71,18 @@ export function WorkoutView() {
   const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split' | 'history'>('main');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   
-  // Lifted State for consistent persistence
   const [split, setSplit] = useState<WeeklySplit>({});
   const [extraMoves, setExtraMoves] = useState<Exercise[]>([]);
   const [loggingExercise, setLoggingExercise] = useState<Exercise | null>(null);
   const [loggedSets, setLoggedSets] = useState<Record<string, any[]>>({});
   const [isAddingExtra, setIsAddingExtra] = useState(false);
   
-  // Library Filters
   const [searchQuery, setSearchQuery] = useState("");
   const [muscleFilter, setMuscleFilter] = useState<string>("ALL");
   const [subMuscleFilter, setSubMuscleFilter] = useState<string>("ALL");
 
   const todayName = format(new Date(), 'EEEE');
 
-  // Persistence Logic
   useEffect(() => {
     const savedSplit = localStorage.getItem('pulseflow_workout_split');
     if (savedSplit) {
@@ -107,7 +107,6 @@ export function WorkoutView() {
     }
   }, []);
 
-  // Save Split whenever it changes
   useEffect(() => {
     if (Object.keys(split).length > 0) {
       localStorage.setItem('pulseflow_workout_split', JSON.stringify(split));
@@ -123,7 +122,6 @@ export function WorkoutView() {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     localStorage.setItem('pulseflow_workout_logs', JSON.stringify({ date: todayStr, data: loggedSets }));
     
-    // Sync to persistent history
     const savedHistory = localStorage.getItem('pulseflow_workout_history');
     const historyObj = savedHistory ? JSON.parse(savedHistory) : {};
     historyObj[todayStr] = loggedSets;
@@ -220,7 +218,7 @@ export function WorkoutView() {
             <div className="space-y-4">
               <div className="flex items-center gap-2 border-l-4 border-muted pl-4 py-0.5">
                 <Info className="w-4 h-4 text-muted-foreground" />
-                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Instructions</h4>
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Description</h4>
               </div>
               <div className="pl-5 space-y-4">
                 <div>
@@ -232,12 +230,6 @@ export function WorkoutView() {
                   <p className="text-xs font-medium text-foreground/70 leading-relaxed">{selectedExercise.execution}</p>
                 </div>
               </div>
-            </div>
-
-            <div className="pt-4 border-t border-muted/10">
-              <p className="text-[10px] font-black uppercase text-muted-foreground text-center tracking-widest opacity-60">
-                PREFER A COACH OR TRAINER FOR ACCURATE FORM AND RESULTS
-              </p>
             </div>
           </CardContent>
         </Card>
@@ -269,37 +261,33 @@ export function WorkoutView() {
             />
           </div>
 
-          <div className="flex flex-col gap-2">
-            <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-1">
-              {muscleGroups.map(m => (
-                <button
-                  key={m}
-                  onClick={() => setMuscleFilter(m)}
-                  className={cn(
-                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-                    muscleFilter === m 
-                      ? "bg-primary text-white border-primary shadow-md" 
-                      : "bg-white text-muted-foreground border-muted/20"
-                  )}
-                >
-                  {m}
-                </button>
-              ))}
-            </div>
+          <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-1">
+            {muscleGroups.map(m => (
+              <button
+                key={m}
+                onClick={() => setMuscleFilter(m)}
+                className={cn(
+                  "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
+                  muscleFilter === m 
+                    ? "bg-primary text-white border-primary shadow-md" 
+                    : "bg-white text-muted-foreground border-muted/20"
+                )}
+              >
+                {m}
+              </button>
+            ))}
           </div>
 
-          <div className="grid grid-cols-1 gap-2">
-            <Select value={subMuscleFilter} onValueChange={setSubMuscleFilter}>
-              <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-white h-11 text-[10px] font-black uppercase tracking-tighter">
-                <SelectValue placeholder="Select Sub-Muscle" />
-              </SelectTrigger>
-              <SelectContent className="rounded-xl">
-                {subMuscleGroups.map(sm => (
-                  <SelectItem key={sm} value={sm} className="text-[10px] font-bold uppercase">{sm}</SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
-          </div>
+          <Select value={subMuscleFilter} onValueChange={setSubMuscleFilter}>
+            <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-white h-11 text-[10px] font-black uppercase tracking-tighter">
+              <SelectValue placeholder="Select Sub-Muscle" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl">
+              {subMuscleGroups.map(sm => (
+                <SelectItem key={sm} value={sm} className="text-[10px] font-bold uppercase">{sm}</SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
         <div className="grid gap-2 px-1 mt-2">
@@ -366,7 +354,6 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* Today's Workout Agenda with ScrollArea */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -490,7 +477,6 @@ export function WorkoutView() {
         </Card>
       </div>
 
-      {/* Logging Dialog Overlay */}
       {loggingExercise && (
         <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
           <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[70vh]">
@@ -593,7 +579,6 @@ export function WorkoutView() {
         </div>
       )}
 
-      {/* Add Extra Movement Overlay */}
       {isAddingExtra && (
         <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
           <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 flex flex-col h-[80vh]">
@@ -993,6 +978,36 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
     return [0, 1, 2, 3, 4, 5, 6].map(i => addDays(weekInterval.start, i));
   }, [weekInterval]);
 
+  const growthStats = useMemo(() => {
+    const getWeekStats = (start: Date, end: Date) => {
+      let totalVolume = 0;
+      let totalReps = 0;
+      
+      for (let i = 0; i < 7; i++) {
+        const day = addDays(start, i);
+        const dateStr = format(day, 'yyyy-MM-dd');
+        const dayLogs = history[dateStr] || {};
+        Object.keys(dayLogs).forEach(name => {
+          dayLogs[name].forEach(s => {
+            if (s.type === 'strength') {
+              totalVolume += (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
+              totalReps += (parseFloat(s.reps) || 0);
+            }
+          });
+        });
+      }
+      return { totalVolume, avgReps: totalReps / 7 };
+    };
+
+    const current = getWeekStats(weekInterval.start, weekInterval.end);
+    const previous = getWeekStats(subWeeks(weekInterval.start, 1), subWeeks(weekInterval.end, 1));
+
+    const volChange = previous.totalVolume > 0 ? ((current.totalVolume - previous.totalVolume) / previous.totalVolume) * 100 : (current.totalVolume > 0 ? 100 : 0);
+    const repsChange = previous.avgReps > 0 ? ((current.avgReps - previous.avgReps) / previous.avgReps) * 100 : (current.avgReps > 0 ? 100 : 0);
+
+    return { current, previous, volChange, repsChange };
+  }, [history, weekInterval]);
+
   const handlePrevWeek = () => setRefDate(prev => subWeeks(prev, 1));
   const handleNextWeek = () => setRefDate(prev => addWeeks(prev, 1));
 
@@ -1021,6 +1036,59 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
           <ChevronRight className="w-5 h-5 text-primary" />
         </Button>
       </div>
+
+      <Card className="border-none shadow-md bg-white rounded-3xl p-5 space-y-4">
+        <div className="flex items-center gap-2 border-b pb-2 border-muted/10">
+          <TrendingUp className="w-4 h-4 text-primary" />
+          <h3 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Growth from last week</h3>
+        </div>
+        
+        <div className="grid grid-cols-2 gap-6">
+          <div className="space-y-3">
+            <div>
+              <p className="text-[9px] font-black text-muted-foreground uppercase">Volume Growth</p>
+              <div className="flex items-center gap-2">
+                <span className={cn("text-lg font-black", growthStats.volChange >= 0 ? "text-green-600" : "text-destructive")}>
+                  {growthStats.volChange >= 0 ? '+' : ''}{growthStats.volChange.toFixed(1)}%
+                </span>
+                {growthStats.volChange >= 0 ? <ArrowUpRight className="w-4 h-4 text-green-600" /> : <ArrowDownRight className="w-4 h-4 text-destructive" />}
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="flex justify-between text-[8px] font-bold uppercase text-muted-foreground">
+                <span>Current</span>
+                <span className="text-foreground">{growthStats.current.totalVolume.toLocaleString()} kg</span>
+              </div>
+              <div className="flex justify-between text-[8px] font-bold uppercase text-muted-foreground">
+                <span>Previous</span>
+                <span>{growthStats.previous.totalVolume.toLocaleString()} kg</span>
+              </div>
+            </div>
+          </div>
+
+          <div className="space-y-3">
+            <div>
+              <p className="text-[9px] font-black text-muted-foreground uppercase">Avg Reps/Day</p>
+              <div className="flex items-center gap-2">
+                <span className={cn("text-lg font-black", growthStats.repsChange >= 0 ? "text-blue-600" : "text-destructive")}>
+                  {growthStats.repsChange >= 0 ? '+' : ''}{growthStats.repsChange.toFixed(1)}%
+                </span>
+                {growthStats.repsChange >= 0 ? <ArrowUpRight className="w-4 h-4 text-blue-600" /> : <ArrowDownRight className="w-4 h-4 text-destructive" />}
+              </div>
+            </div>
+            <div className="space-y-1">
+              <div className="flex justify-between text-[8px] font-bold uppercase text-muted-foreground">
+                <span>Current</span>
+                <span className="text-foreground">{growthStats.current.avgReps.toFixed(1)} reps</span>
+              </div>
+              <div className="flex justify-between text-[8px] font-bold uppercase text-muted-foreground">
+                <span>Previous</span>
+                <span>{growthStats.previous.avgReps.toFixed(1)} reps</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Card>
 
       <div className="space-y-4">
         {weekDays.map((day, i) => {
@@ -1052,7 +1120,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                   "border-none shadow-md overflow-hidden bg-white rounded-3xl transition-all",
                   exerciseNames.length === 0 ? "opacity-40" : ""
                 )}>
-                  <AccordionTrigger className="p-0 hover:no-underline">
+                  <AccordionTrigger className="pr-6 hover:no-underline">
                     <div className="flex-1 text-left p-5">
                       <h3 className="text-sm font-black text-foreground">
                         {format(day, 'EEEE, MMM d')}
