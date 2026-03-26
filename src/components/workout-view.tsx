@@ -146,6 +146,14 @@ export function WorkoutView() {
     });
   }, [searchQuery, muscleFilter, subMuscleFilter]);
 
+  const filteredLibrary = useMemo(() => {
+    return EXERCISES_DATA.filter(ex => {
+      const matchesSearch = ex.name.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesMuscle = muscleFilter === "ALL" || ex.muscle === muscleFilter;
+      return matchesSearch && matchesMuscle;
+    });
+  }, [searchQuery, muscleFilter]);
+
   const todaysExercises = useMemo(() => {
     const fromSplit = split[todayName] || [];
     return [...fromSplit, ...extraMoves];
@@ -334,11 +342,11 @@ export function WorkoutView() {
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
+              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
               alt="Personal Records"
               fill
               className="object-cover"
-              data-ai-hint="gym weights"
+              data-ai-hint="barbell illustration"
             />
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
@@ -429,11 +437,11 @@ export function WorkoutView() {
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
+              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
               alt="My Split"
               fill
               className="object-cover"
-              data-ai-hint="barbell illustration"
+              data-ai-hint="gym weights"
             />
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
