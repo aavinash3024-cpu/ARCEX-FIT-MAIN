@@ -68,7 +68,7 @@ export function WorkoutView() {
   const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split' | 'history'>('main');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   
-  // Today's State
+  // Lifted State for consistent persistence
   const [split, setSplit] = useState<WeeklySplit>({});
   const [extraMoves, setExtraMoves] = useState<Exercise[]>([]);
   const [loggingExercise, setLoggingExercise] = useState<Exercise | null>(null);
@@ -85,21 +85,34 @@ export function WorkoutView() {
   // Persistence Logic
   useEffect(() => {
     const savedSplit = localStorage.getItem('pulseflow_workout_split');
-    if (savedSplit) setSplit(JSON.parse(savedSplit));
+    if (savedSplit) {
+      try {
+        setSplit(JSON.parse(savedSplit));
+      } catch (e) {
+        console.error("Failed to load split", e);
+      }
+    }
 
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const savedExtra = localStorage.getItem('pulseflow_extra_moves');
     if (savedExtra) {
-      const { date, moves } = JSON.parse(savedExtra);
-      if (date === todayStr) setExtraMoves(moves);
+      const parsed = JSON.parse(savedExtra);
+      if (parsed.date === todayStr) setExtraMoves(parsed.moves);
     }
 
     const savedLogs = localStorage.getItem('pulseflow_workout_logs');
     if (savedLogs) {
-      const { date, data } = JSON.parse(savedLogs);
-      if (date === todayStr) setLoggedSets(data);
+      const parsed = JSON.parse(savedLogs);
+      if (parsed.date === todayStr) setLoggedSets(parsed.data);
     }
   }, []);
+
+  // Save Split whenever it changes
+  useEffect(() => {
+    if (Object.keys(split).length > 0) {
+      localStorage.setItem('pulseflow_workout_split', JSON.stringify(split));
+    }
+  }, [split]);
 
   useEffect(() => {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -317,7 +330,7 @@ export function WorkoutView() {
   }
 
   if (activeSubView === 'split') {
-    return <SplitBuilderView onBack={() => setActiveSubView('main')} />;
+    return <SplitBuilderView split={split} setSplit={setSplit} onBack={() => setActiveSubView('main')} />;
   }
 
   if (activeSubView === 'history') {
@@ -353,7 +366,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* Today's Workout Agenda */}
+      {/* Today's Workout Agenda with ScrollArea */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -370,43 +383,45 @@ export function WorkoutView() {
         </div>
 
         <CardContent className="p-4 space-y-4">
-          <div className="space-y-2.5">
-            {todaysExercises.length === 0 ? (
-              <div className="text-center py-8 opacity-30 border-2 border-dashed rounded-xl">
-                <p className="text-[10px] font-black uppercase tracking-widest">No moves planned for today</p>
-              </div>
-            ) : (
-              todaysExercises.map((ex, idx) => {
-                const logs = loggedSets[ex.name] || [];
-                return (
-                  <div 
-                    key={idx} 
-                    onClick={() => setLoggingExercise(ex)}
-                    className="bg-white p-3 rounded-xl border border-muted/20 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
-                  >
-                    <div className="flex justify-between items-start">
-                      <div className="space-y-1">
-                        <h4 className="font-bold text-[13px] text-foreground/90">{ex.name}</h4>
-                        <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-wider">{ex.muscle} • {ex.subMuscle}</p>
+          <ScrollArea className="h-[160px] pr-2">
+            <div className="space-y-2.5 pb-2">
+              {todaysExercises.length === 0 ? (
+                <div className="text-center py-8 opacity-30 border-2 border-dashed rounded-xl">
+                  <p className="text-[10px] font-black uppercase tracking-widest">No moves planned for today</p>
+                </div>
+              ) : (
+                todaysExercises.map((ex, idx) => {
+                  const logs = loggedSets[ex.name] || [];
+                  return (
+                    <div 
+                      key={idx} 
+                      onClick={() => setLoggingExercise(ex)}
+                      className="bg-white p-3 rounded-xl border border-muted/20 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
+                    >
+                      <div className="flex justify-between items-start">
+                        <div className="space-y-1">
+                          <h4 className="font-bold text-[13px] text-foreground/90">{ex.name}</h4>
+                          <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-wider">{ex.muscle} • {ex.subMuscle}</p>
+                        </div>
+                        <Badge variant="secondary" className="bg-primary/5 text-primary text-[9px] h-5 px-2">
+                          {logs.length} SETS
+                        </Badge>
                       </div>
-                      <Badge variant="secondary" className="bg-primary/5 text-primary text-[9px] h-5 px-2">
-                        {logs.length} SETS
-                      </Badge>
+                      {logs.length > 0 && (
+                        <div className="mt-2 flex flex-wrap gap-1.5">
+                          {logs.map((set, i) => (
+                            <div key={i} className="text-[8px] font-black bg-muted/30 px-1.5 py-0.5 rounded uppercase">
+                              {set.type === 'time' ? `${set.time}s` : `${set.weight}kg x ${set.reps}`}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                     </div>
-                    {logs.length > 0 && (
-                      <div className="mt-2 flex flex-wrap gap-1.5">
-                        {logs.map((set, i) => (
-                          <div key={i} className="text-[8px] font-black bg-muted/30 px-1.5 py-0.5 rounded uppercase">
-                            {set.type === 'time' ? `${set.time}s` : `${set.weight}kg x ${set.reps}`}
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                );
-              })
-            )}
-          </div>
+                  );
+                })
+              )}
+            </div>
+          </ScrollArea>
 
           <Button 
             onClick={() => setIsAddingExtra(true)}
@@ -644,39 +659,21 @@ export function WorkoutView() {
   );
 }
 
-function SplitBuilderView({ onBack }: { onBack: () => void }) {
-  const [split, setSplit] = useState<WeeklySplit>({});
+function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, setSplit: React.Dispatch<React.SetStateAction<WeeklySplit>>, onBack: () => void }) {
   const [activeDay, setActiveDay] = useState(DAYS[0]);
   const [isAdding, setIsAdding] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [muscleFilter, setMuscleFilter] = useState("ALL");
   const [activeMuscleReport, setActiveMuscleReport] = useState("CHEST");
 
-  useEffect(() => {
-    const saved = localStorage.getItem('pulseflow_workout_split');
-    if (saved) {
-      try {
-        setSplit(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to load split", e);
-      }
-    }
-  }, []);
-
-  useEffect(() => {
-    localStorage.setItem('pulseflow_workout_split', JSON.stringify(split));
-  }, [split]);
-
   const addExercise = (ex: Exercise) => {
     setSplit(prev => {
       const dayExercises = prev[activeDay] || [];
       if (dayExercises.find(e => e.name === ex.name)) return prev;
-      const newSplit = {
+      return {
         ...prev,
         [activeDay]: [...dayExercises, ex]
       };
-      localStorage.setItem('pulseflow_workout_split', JSON.stringify(newSplit));
-      return newSplit;
     });
     setIsAdding(false);
     setSearchQuery("");
@@ -684,14 +681,10 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
   };
 
   const removeExercise = (day: string, name: string) => {
-    setSplit(prev => {
-      const newSplit = {
-        ...prev,
-        [day]: (prev[day] || []).filter(e => e.name !== name)
-      };
-      localStorage.setItem('pulseflow_workout_split', JSON.stringify(newSplit));
-      return newSplit;
-    });
+    setSplit(prev => ({
+      ...prev,
+      [day]: (prev[day] || []).filter(e => e.name !== name)
+    }));
   };
 
   const muscleGroups = useMemo(() => {
@@ -789,25 +782,27 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
             </Badge>
           </div>
 
-          <div className="space-y-2">
-            {(split[activeDay] || []).length === 0 ? (
-              <div className="text-center py-12 border-2 border-dashed border-muted/20 rounded-2xl opacity-30">
-                <p className="text-[10px] font-black uppercase tracking-widest">No moves planned</p>
-              </div>
-            ) : (
-              (split[activeDay] || []).map((ex, idx) => (
-                <div key={idx} className="flex items-center justify-between p-3 bg-muted/5 rounded-xl border border-muted/10">
-                  <div className="min-w-0">
-                    <p className="text-xs font-bold text-foreground truncate">{ex.name}</p>
-                    <p className="text-[8px] font-black text-muted-foreground uppercase">{ex.muscle} • {ex.subMuscle}</p>
-                  </div>
-                  <Button variant="ghost" size="icon" onClick={() => removeExercise(activeDay, ex.name)} className="h-8 w-8 text-destructive/40 hover:text-destructive">
-                    <Trash2 className="w-3.5 h-3.5" />
-                  </Button>
+          <ScrollArea className="h-[160px] pr-2">
+            <div className="space-y-2 pb-2">
+              {(split[activeDay] || []).length === 0 ? (
+                <div className="text-center py-12 border-2 border-dashed border-muted/20 rounded-2xl opacity-30">
+                  <p className="text-[10px] font-black uppercase tracking-widest">No moves planned</p>
                 </div>
-              ))
-            )}
-          </div>
+              ) : (
+                (split[activeDay] || []).map((ex, idx) => (
+                  <div key={idx} className="flex items-center justify-between p-3 bg-muted/5 rounded-xl border border-muted/10">
+                    <div className="min-w-0">
+                      <p className="text-xs font-bold text-foreground truncate">{ex.name}</p>
+                      <p className="text-[8px] font-black text-muted-foreground uppercase">{ex.muscle} • {ex.subMuscle}</p>
+                    </div>
+                    <Button variant="ghost" size="icon" onClick={() => removeExercise(activeDay, ex.name)} className="h-8 w-8 text-destructive/40 hover:text-destructive">
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  </div>
+                ))
+              )}
+            </div>
+          </ScrollArea>
 
           <Button onClick={() => setIsAdding(true)} className="w-full h-12 rounded-xl border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest gap-2">
             <Plus className="w-4 h-4" /> Add Exercise
