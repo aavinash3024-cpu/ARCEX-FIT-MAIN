@@ -25,7 +25,8 @@ import {
   CheckCircle2,
   X,
   Target,
-  BarChart3
+  BarChart3,
+  Check
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -670,10 +671,12 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
     setSplit(prev => {
       const dayExercises = prev[activeDay] || [];
       if (dayExercises.find(e => e.name === ex.name)) return prev;
-      return {
+      const newSplit = {
         ...prev,
         [activeDay]: [...dayExercises, ex]
       };
+      localStorage.setItem('pulseflow_workout_split', JSON.stringify(newSplit));
+      return newSplit;
     });
     setIsAdding(false);
     setSearchQuery("");
@@ -681,10 +684,14 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
   };
 
   const removeExercise = (day: string, name: string) => {
-    setSplit(prev => ({
-      ...prev,
-      [day]: (prev[day] || []).filter(e => e.name !== name)
-    }));
+    setSplit(prev => {
+      const newSplit = {
+        ...prev,
+        [day]: (prev[day] || []).filter(e => e.name !== name)
+      };
+      localStorage.setItem('pulseflow_workout_split', JSON.stringify(newSplit));
+      return newSplit;
+    });
   };
 
   const muscleGroups = useMemo(() => {
@@ -732,7 +739,14 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
       const coverage = Math.round((Object.keys(zonesDone).length / allSubMusclesForMuscle.length) * 100);
       const gaps = allSubMusclesForMuscle.filter(z => !zonesDone[z]);
 
-      muscleStats[m] = { zones: zonesDone, secondary: Array.from(new Set(secondaryDone.map(s => JSON.stringify(s)))).map(s => JSON.parse(s)), volume: directExercisesInSplit.length, coverage, gaps };
+      muscleStats[m] = { 
+        zones: zonesDone, 
+        secondary: Array.from(new Set(secondaryDone.map(s => JSON.stringify(s)))).map(s => JSON.parse(s)), 
+        volume: directExercisesInSplit.length, 
+        coverage, 
+        gaps,
+        allZones: allSubMusclesForMuscle
+      };
     });
 
     return { globalCoverage, muscleStats, muscles };
@@ -843,7 +857,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
 
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">DIRECTLY GETTING TRAINED</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">DIRECTLY GETTING TRAINED BY</h4>
                     {Object.keys(currentMuscleReport.zones).length === 0 ? (
                       <p className="text-[10px] italic text-muted-foreground pl-3">No direct movements assigned.</p>
                     ) : (
@@ -865,7 +879,7 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
                   </div>
 
                   <div className="space-y-3">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">INDIRECTLY GETTING TRAINED</h4>
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">INDIRECTLY GETTING TRAINED BY</h4>
                     {currentMuscleReport.secondary.length === 0 ? (
                       <p className="text-[10px] italic text-muted-foreground pl-3">No secondary stimulation found.</p>
                     ) : (
@@ -879,18 +893,31 @@ function SplitBuilderView({ onBack }: { onBack: () => void }) {
                     )}
                   </div>
 
-                  {currentMuscleReport.gaps.length > 0 && (
-                    <div className="space-y-3 pt-2">
-                      <h4 className="text-[10px] font-black uppercase tracking-widest text-destructive">MUSCLE STATUS</h4>
-                      <div className="flex flex-wrap gap-1.5 pl-3">
-                        {currentMuscleReport.gaps.map((gap: string, i: number) => (
-                          <Badge key={i} className="bg-destructive/10 text-destructive text-[8px] font-black uppercase">
-                            {gap}
-                          </Badge>
-                        ))}
-                      </div>
+                  <div className="space-y-3 pt-2">
+                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">MUSCLE STATUS</h4>
+                    <div className="grid gap-2 pl-3">
+                      {currentMuscleReport.allZones.map((zone: string, i: number) => {
+                        const isTrained = !!currentMuscleReport.zones[zone];
+                        return (
+                          <div key={i} className="flex items-center justify-between">
+                            <Badge className={cn(
+                              "text-[8px] font-black uppercase h-6 px-2 flex items-center gap-1.5",
+                              isTrained ? "bg-green-100 text-green-700 hover:bg-green-100" : "bg-destructive/10 text-destructive hover:bg-destructive/10"
+                            )}>
+                              {isTrained ? <Check className="w-2.5 h-2.5" /> : <X className="w-2.5 h-2.5" />}
+                              {zone}
+                            </Badge>
+                            <span className={cn(
+                              "text-[8px] font-black uppercase tracking-widest",
+                              isTrained ? "text-green-600" : "text-destructive/40"
+                            )}>
+                              {isTrained ? "OPTIMIZED" : "NEGLECTED"}
+                            </span>
+                          </div>
+                        );
+                      })}
                     </div>
-                  )}
+                  </div>
                 </div>
               </Card>
             </div>
