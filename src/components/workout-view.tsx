@@ -179,8 +179,8 @@ export function WorkoutView() {
     });
   };
 
-  const prImage = PlaceHolderImages.find(img => img.id === 'personal-records-illustration');
-  const splitImage = PlaceHolderImages.find(img => img.id === 'training-split-tool');
+  const prImage = PlaceHolderImages.find(img => img.id === 'training-split-tool');
+  const splitImage = PlaceHolderImages.find(img => img.id === 'personal-records-illustration');
 
   if (selectedExercise) {
     return (
@@ -671,6 +671,8 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
 
 function PersonalRecordsView({ onBack }: { onBack: () => void }) {
   const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
+  const [activeMuscleIdx, setActiveMuscleIdx] = useState(0);
+  const [viewingPRs, setViewingPRs] = useState<any | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('pulseflow_workout_history');
@@ -721,6 +723,13 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
     return grouped;
   }, [history]);
 
+  const muscleKeys = Object.keys(topLifts);
+  const activeMuscle = muscleKeys[activeMuscleIdx];
+  const exercisesForMuscle = activeMuscle ? topLifts[activeMuscle] : [];
+
+  const handleNextMuscle = () => setActiveMuscleIdx(prev => (prev + 1) % muscleKeys.length);
+  const handlePrevMuscle = () => setActiveMuscleIdx(prev => (prev - 1 + muscleKeys.length) % muscleKeys.length);
+
   return (
     <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2">
@@ -730,40 +739,80 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
         <h1 className="text-2xl font-bold font-headline">Personal Records</h1>
       </div>
 
-      {Object.keys(topLifts).length === 0 ? (
+      {muscleKeys.length === 0 ? (
         <div className="text-center py-20 opacity-30">
           <Trophy className="w-12 h-12 mx-auto mb-4" />
           <p className="text-sm font-black uppercase tracking-widest">No PR data recorded yet</p>
         </div>
       ) : (
-        <ScrollArea className="h-[calc(100vh-200px)]">
-          <div className="space-y-6 px-1">
-            {Object.entries(topLifts).map(([muscle, exercises]) => (
-              <section key={muscle} className="space-y-3">
-                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em] border-b pb-1 border-primary/10">
-                  {muscle}
-                </h3>
-                <div className="space-y-3">
-                  {exercises.map((ex, i) => (
-                    <Card key={i} className="border-none shadow-sm bg-white overflow-hidden rounded-2xl">
-                      <CardContent className="p-4 space-y-3">
-                        <h4 className="text-xs font-bold text-foreground/80">{ex.name}</h4>
-                        <div className="grid grid-cols-2 gap-2">
-                          {ex.lifts.map((lift, idx) => (
-                            <div key={idx} className="flex items-center justify-between bg-muted/5 p-2 rounded-lg border border-muted/10">
-                              <span className="text-[9px] font-black text-primary/40">#{idx + 1}</span>
-                              <span className="text-[10px] font-black">{lift.weight}kg <span className="text-muted-foreground">x {lift.reps}</span></span>
-                            </div>
-                          ))}
-                        </div>
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </section>
+        <div className="space-y-6">
+          {/* Shifter */}
+          <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
+            <Button variant="ghost" size="icon" onClick={handlePrevMuscle} className="rounded-full hover:bg-muted">
+              <ChevronLeft className="w-5 h-5 text-primary" />
+            </Button>
+            <div className="flex flex-col items-center">
+              <span className="text-sm font-black text-foreground uppercase tracking-tight">
+                {activeMuscle}
+              </span>
+              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none mt-1">
+                MUSCLE GROUP
+              </span>
+            </div>
+            <Button variant="ghost" size="icon" onClick={handleNextMuscle} className="rounded-full hover:bg-muted">
+              <ChevronRight className="w-5 h-5 text-primary" />
+            </Button>
+          </div>
+
+          {/* Exercise List */}
+          <div className="grid gap-2 px-1">
+            {exercisesForMuscle.map((ex, idx) => (
+              <button 
+                key={idx} 
+                onClick={() => setViewingPRs(ex)}
+                className="flex items-center justify-between p-4 bg-white rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
+              >
+                <span className="font-bold text-[13px] text-foreground/90 truncate">{ex.name}</span>
+                <ChevronRight className="w-4 h-4 text-muted-foreground/20 group-hover:text-primary transition-colors shrink-0" />
+              </button>
             ))}
           </div>
-        </ScrollArea>
+        </div>
+      )}
+
+      {/* PR Card Modal */}
+      {viewingPRs && (
+        <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
+          <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[60vh]">
+            <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setViewingPRs(null)} />
+            
+            <div className="flex items-center justify-between mb-6">
+              <div className="min-w-0 flex-1">
+                <h3 className="text-xl font-black uppercase tracking-tighter truncate">{viewingPRs.name}</h3>
+                <p className="text-[10px] font-black text-primary uppercase tracking-widest">TOP 10 LIFTS</p>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => setViewingPRs(null)} className="rounded-full shrink-0">
+                <X className="w-6 h-6" />
+              </Button>
+            </div>
+
+            <ScrollArea className="flex-1 -mx-2 px-2">
+              <div className="grid gap-2 pb-8">
+                {viewingPRs.lifts.map((lift: any, idx: number) => (
+                  <div key={idx} className="flex items-center justify-between bg-muted/5 p-3 rounded-xl border border-muted/10">
+                    <div className="flex items-center gap-3">
+                      <Badge variant="outline" className="h-6 w-6 rounded-full flex items-center justify-center p-0 font-bold border-primary/20 text-primary">
+                        {idx + 1}
+                      </Badge>
+                      <p className="text-sm font-black">{lift.weight} <span className="text-[10px] text-muted-foreground uppercase">kg</span></p>
+                    </div>
+                    <p className="text-xs font-bold text-muted-foreground uppercase">{lift.reps} reps</p>
+                  </div>
+                ))}
+              </div>
+            </ScrollArea>
+          </div>
+        </div>
       )}
     </div>
   );
@@ -835,7 +884,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
       flatSplit.forEach(ex => {
         const isSecondaryMovers = (ex.secondaryMuscles || "").toUpperCase().includes(m.toUpperCase());
         if (isSecondaryMovers && ex.muscle !== m) {
-          secondaryDone.push({ name: ex.name, day: ex.day });
+          secondaryDone.push({ name: e.name, day: e.day });
         }
       });
 
