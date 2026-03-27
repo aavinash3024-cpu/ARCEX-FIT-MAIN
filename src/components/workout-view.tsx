@@ -25,7 +25,8 @@ import {
   Check,
   TrendingUp,
   ArrowUpRight,
-  ArrowDownRight
+  ArrowDownRight,
+  Medal
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -341,11 +342,11 @@ export function WorkoutView() {
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
+              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
               alt="Personal Records"
               fill
               className="object-cover"
-              data-ai-hint="barbell illustration"
+              data-ai-hint="gym weights"
             />
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
@@ -436,11 +437,11 @@ export function WorkoutView() {
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
+              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
               alt="My Split"
               fill
               className="object-cover"
-              data-ai-hint="gym weights"
+              data-ai-hint="barbell illustration"
             />
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
@@ -719,64 +720,68 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
     return grouped;
   }, [history]);
 
-  const muscleKeys = Object.keys(topLifts).sort();
+  const allMuscles = useMemo(() => Array.from(new Set(EXERCISES_DATA.map(e => e.muscle))).sort(), []);
+  const muscleKeys = allMuscles;
   const activeMuscle = muscleKeys[activeMuscleIdx];
-  const exercisesForMuscle = activeMuscle ? topLifts[activeMuscle] : [];
+  const exercisesForMuscle = activeMuscle ? (topLifts[activeMuscle] || []) : [];
 
   const handleNextMuscle = () => setActiveMuscleIdx(prev => (prev + 1) % muscleKeys.length);
   const handlePrevMuscle = () => setActiveMuscleIdx(prev => (prev - 1 + muscleKeys.length) % muscleKeys.length);
 
   return (
     <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
-      <div className="flex items-center gap-4 pt-2">
+      <div className="flex items-center gap-4 pt-2 px-1">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
         </Button>
         <h1 className="text-2xl font-bold font-headline">Personal Records</h1>
       </div>
 
-      {muscleKeys.length === 0 ? (
-        <div className="text-center py-20 opacity-30">
-          <Trophy className="w-12 h-12 mx-auto mb-4" />
-          <p className="text-sm font-black uppercase tracking-widest">No PR data recorded yet</p>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
-            <Button variant="ghost" size="icon" onClick={handlePrevMuscle} className="rounded-full hover:bg-muted">
-              <ChevronLeft className="w-5 h-5 text-primary" />
-            </Button>
-            <div className="flex flex-col items-center">
-              <span className="text-sm font-black text-foreground uppercase tracking-tight">
-                {activeMuscle}
-              </span>
-              <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none mt-1">
-                MUSCLE GROUP
-              </span>
-            </div>
-            <Button variant="ghost" size="icon" onClick={handleNextMuscle} className="rounded-full hover:bg-muted">
-              <ChevronRight className="w-5 h-5 text-primary" />
-            </Button>
+      <div className="space-y-6">
+        <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
+          <Button variant="ghost" size="icon" onClick={handlePrevMuscle} className="rounded-full hover:bg-muted">
+            <ChevronLeft className="w-5 h-5 text-primary" />
+          </Button>
+          <div className="flex flex-col items-center">
+            <span className="text-sm font-black text-foreground uppercase tracking-tight">
+              {activeMuscle}
+            </span>
+            <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none mt-1">
+              MUSCLE GROUP
+            </span>
           </div>
+          <Button variant="ghost" size="icon" onClick={handleNextMuscle} className="rounded-full hover:bg-muted">
+            <ChevronRight className="w-5 h-5 text-primary" />
+          </Button>
+        </div>
 
-          <div className="grid gap-2 px-1">
-            {exercisesForMuscle.map((ex, idx) => (
+        <div className="grid gap-2 px-1">
+          {exercisesForMuscle.length === 0 ? (
+            <div className="text-center py-20 opacity-30">
+              <Trophy className="w-12 h-12 mx-auto mb-4" />
+              <p className="text-sm font-black uppercase tracking-widest">No PR data recorded yet</p>
+            </div>
+          ) : (
+            exercisesForMuscle.map((ex, idx) => (
               <button 
                 key={idx} 
                 onClick={() => setViewingPRs(ex)}
                 className="flex items-center justify-between p-4 bg-white rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
               >
                 <span className="font-bold text-[13px] text-foreground/90 truncate">{ex.name}</span>
-                <ChevronRight className="w-4 h-4 text-muted-foreground/20 group-hover:text-primary transition-colors shrink-0" />
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="text-[9px] font-black uppercase border-primary/20 text-primary">{ex.lifts[0].weight}KG</Badge>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground/20 group-hover:text-primary transition-colors shrink-0" />
+                </div>
               </button>
-            ))}
-          </div>
+            ))
+          )}
         </div>
-      )}
+      </div>
 
       {viewingPRs && (
         <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
-          <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[60vh]">
+          <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[75vh]">
             <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setViewingPRs(null)} />
             
             <div className="flex items-center justify-between mb-6">
@@ -789,17 +794,45 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
               </Button>
             </div>
 
-            <ScrollArea className="flex-1 -mx-2 px-2">
-              <div className="grid gap-2 pb-8">
-                {viewingPRs.lifts.map((lift: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between bg-muted/5 p-3 rounded-xl border border-muted/10">
-                    <div className="flex items-center gap-3">
-                      <Badge variant="outline" className="h-6 w-6 rounded-full flex items-center justify-center p-0 font-bold border-primary/20 text-primary">
-                        {idx + 1}
-                      </Badge>
-                      <p className="text-sm font-black">{lift.weight} <span className="text-[10px] text-muted-foreground uppercase">kg</span></p>
+            {/* Rank 1 Highlight */}
+            <Card className="border-none shadow-lg bg-gradient-to-br from-amber-50 to-amber-100/50 border border-amber-200/50 p-5 rounded-3xl mb-6 relative overflow-hidden shrink-0">
+              <div className="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl" />
+              <div className="flex justify-between items-center relative z-10">
+                <div className="flex items-center gap-4">
+                  <div className="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
+                    <Medal className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest">All-Time Best</p>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-3xl font-black text-foreground">{viewingPRs.lifts[0].weight}</span>
+                      <span className="text-sm font-bold text-muted-foreground uppercase">kg</span>
                     </div>
-                    <p className="text-xs font-bold text-muted-foreground uppercase">{lift.reps} reps</p>
+                  </div>
+                </div>
+                <div className="text-right">
+                  <p className="text-lg font-black text-amber-600">{viewingPRs.lifts[0].reps}</p>
+                  <p className="text-[8px] font-black text-muted-foreground uppercase">REPS</p>
+                </div>
+              </div>
+            </Card>
+
+            <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3 px-1">Other Personal Records</h4>
+            
+            <ScrollArea className="flex-1 -mx-2 px-2">
+              <div className="grid gap-2 pb-12">
+                {viewingPRs.lifts.slice(1).map((lift: any, idx: number) => (
+                  <div key={idx} className="flex items-center justify-between bg-muted/5 p-4 rounded-2xl border border-muted/10 group">
+                    <div className="flex items-center gap-4">
+                      <span className="text-[11px] font-black text-muted-foreground/40 w-4">#{idx + 2}</span>
+                      <div className="flex items-baseline gap-1">
+                        <p className="text-base font-black text-foreground">{lift.weight}</p>
+                        <span className="text-[9px] font-bold text-muted-foreground uppercase">kg</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-bold text-foreground/70 uppercase">{lift.reps} Reps</span>
+                    </div>
                   </div>
                 ))}
               </div>
