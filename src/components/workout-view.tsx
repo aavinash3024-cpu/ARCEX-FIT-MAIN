@@ -1384,19 +1384,22 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                   exerciseNames.length === 0 ? "opacity-40" : ""
                 )}>
                   <AccordionTrigger className="p-0 hover:no-underline [&[data-state=open]]:bg-muted/5 group [&>svg]:hidden">
-                    <div className="flex-1 text-left py-3 px-6">
-                      <h3 className="text-[13px] font-black text-foreground leading-tight">
-                        {format(day, 'EEEE, MMM d')}
-                      </h3>
-                      <p className={cn(
-                        "text-[9px] font-black uppercase mt-0.5",
-                        exerciseNames.length > 0 ? "text-primary" : "text-muted-foreground"
-                      )}>
-                        {exerciseNames.length > 0 ? primaryMuscles : "NO DATA"}
-                      </p>
-                      <p className="text-[8px] font-bold text-muted-foreground/60 uppercase mt-0.5">
-                        TOTAL VOLUME: {dailyVolume.toLocaleString()} KG
-                      </p>
+                    <div className="flex items-center justify-between w-full py-3 px-6">
+                      <div className="text-left">
+                        <h3 className="text-[13px] font-black text-foreground leading-tight">
+                          {format(day, 'EEEE, MMM d')}
+                        </h3>
+                        <p className={cn(
+                          "text-[9px] font-black uppercase mt-0.5",
+                          exerciseNames.length > 0 ? "text-primary" : "text-muted-foreground"
+                        )}>
+                          {exerciseNames.length > 0 ? primaryMuscles : "NO DATA"}
+                        </p>
+                        <p className="text-[8px] font-bold text-muted-foreground/60 uppercase mt-0.5">
+                          TOTAL VOLUME: {dailyVolume.toLocaleString()} KG
+                        </p>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/30 group-data-[state=open]:rotate-90 transition-transform" />
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="p-0">
