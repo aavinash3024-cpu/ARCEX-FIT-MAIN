@@ -723,7 +723,7 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
 
 function PersonalRecordsView({ onBack }: { onBack: () => void }) {
   const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
-  const [activeMuscleIdx, setActiveMuscleIdx] = useState(0);
+  const [activeMuscle, setActiveMuscle] = useState<string>("CHEST");
   const [activeType, setActiveType] = useState<'strength' | 'time'>('strength');
   const [viewingPRs, setViewingPRs] = useState<any | null>(null);
 
@@ -741,8 +741,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
   const allMuscles = useMemo(() => {
     return Array.from(new Set(EXERCISES_DATA.map(e => e.muscle))).sort();
   }, []);
-
-  const activeMuscle = allMuscles[activeMuscleIdx];
 
   const topLiftsForSelectedMuscle = useMemo(() => {
     if (!activeMuscle) return [];
@@ -787,9 +785,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
     }).filter(ex => ex.records.length > 0);
   }, [history, activeMuscle, activeType]);
 
-  const handleNextMuscle = () => setActiveMuscleIdx(prev => (prev + 1) % allMuscles.length);
-  const handlePrevMuscle = () => setActiveMuscleIdx(prev => (prev - 1 + allMuscles.length) % allMuscles.length);
-
   return (
     <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2 px-1">
@@ -800,25 +795,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
       </div>
 
       <div className="space-y-4">
-        {/* Muscle Shifter */}
-        <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
-          <Button variant="ghost" size="icon" onClick={handlePrevMuscle} className="rounded-full hover:bg-muted">
-            <ChevronLeft className="w-5 h-5 text-primary" />
-          </Button>
-          <div className="flex flex-col items-center">
-            <span className="text-sm font-black text-foreground uppercase tracking-tight">
-              {activeMuscle}
-            </span>
-            <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none mt-1">
-              MUSCLE GROUP
-            </span>
-          </div>
-          <Button variant="ghost" size="icon" onClick={handleNextMuscle} className="rounded-full hover:bg-muted">
-            <ChevronRight className="w-5 h-5 text-primary" />
-          </Button>
-        </div>
-
-        {/* Type Shifter */}
+        {/* Type Shifter (Moved Above Muscle Shifter) */}
         <div className="flex items-center justify-between bg-white p-2 rounded-2xl shadow-sm border border-muted/20 mx-1">
           <button 
             onClick={() => setActiveType('strength')}
@@ -827,7 +804,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
               activeType === 'strength' ? "bg-primary text-white shadow-lg" : "text-muted-foreground hover:bg-muted/5"
             )}
           >
-            Strength Based
+            Rep Based
           </button>
           <button 
             onClick={() => setActiveType('time')}
@@ -840,11 +817,27 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
           </button>
         </div>
 
+        {/* Swipable Muscle List (Pills style) */}
+        <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-1">
+          {allMuscles.map(muscle => (
+            <button
+              key={muscle}
+              onClick={() => setActiveMuscle(muscle)}
+              className={cn(
+                "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
+                activeMuscle === muscle ? "bg-primary text-white border-primary shadow-lg" : "bg-white text-muted-foreground border-muted/20"
+              )}
+            >
+              {muscle}
+            </button>
+          ))}
+        </div>
+
         <div className="grid gap-2 px-1">
           {topLiftsForSelectedMuscle.length === 0 ? (
             <div className="text-center py-20 opacity-30">
               <Trophy className="w-12 h-12 mx-auto mb-4" />
-              <p className="text-sm font-black uppercase tracking-widest">No {activeType} records yet</p>
+              <p className="text-sm font-black uppercase tracking-widest">No {activeType === 'strength' ? 'rep' : 'time'} records yet</p>
             </div>
           ) : (
             topLiftsForSelectedMuscle.map((ex, idx) => (
@@ -853,20 +846,22 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
                 onClick={() => setViewingPRs(ex)}
                 className="flex items-center justify-between p-4 bg-white rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
               >
-                <div className="flex items-center gap-3 overflow-hidden">
-                  <div className="shrink-0 w-8 h-8 rounded-lg bg-muted/30 flex items-center justify-center">
+                <div className="flex items-center gap-4 overflow-hidden">
+                  <div className="shrink-0 w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center">
                     {activeType === 'strength' ? (
-                      <Trophy className="w-4 h-4 text-primary" />
+                      <Trophy className="w-5 h-5 text-yellow-500 fill-yellow-500/20" />
                     ) : (
-                      <Timer className="w-4 h-4 text-primary" />
+                      <Timer className="w-5 h-5 text-sky-500" />
                     )}
                   </div>
-                  <span className="font-bold text-[13px] text-foreground/90 truncate">{ex.name}</span>
+                  <div className="min-w-0">
+                    <span className="font-bold text-[14px] text-foreground/90 truncate block">{ex.name}</span>
+                    <span className="text-[11px] font-black text-muted-foreground/60 uppercase">
+                      {activeType === 'strength' ? `${ex.records[0].weight}KG` : `${ex.records[0].time}S`}
+                    </span>
+                  </div>
                 </div>
                 <div className="flex items-center gap-2 shrink-0">
-                  <Badge variant="outline" className="text-[9px] font-black uppercase border-primary/20 text-primary">
-                    {activeType === 'strength' ? `${ex.records[0].weight}KG` : `${ex.records[0].time}S`}
-                  </Badge>
                   <ChevronRight className="w-4 h-4 text-muted-foreground/20 group-hover:text-primary transition-colors shrink-0" />
                 </div>
               </button>
@@ -883,7 +878,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
             <div className="flex items-center justify-between mb-6">
               <div className="min-w-0 flex-1">
                 <h3 className="text-xl font-black uppercase tracking-tighter truncate">{viewingPRs.name}</h3>
-                <p className="text-[10px] font-black text-primary uppercase tracking-widest">TOP 10 {activeType.toUpperCase()} RECORDS</p>
+                <p className="text-[10px] font-black text-primary uppercase tracking-widest">TOP 10 {activeType === 'strength' ? 'REP' : 'TIME'} RECORDS</p>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setViewingPRs(null)} className="rounded-full shrink-0">
                 <X className="w-6 h-6" />
@@ -1462,6 +1457,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                           TOTAL VOLUME: {dailyVolume.toLocaleString()} KG
                         </p>
                       </div>
+                      <ChevronRight className="w-4 h-4 text-muted-foreground/30 transition-transform duration-200 group-data-[state=open]:rotate-90" />
                     </div>
                   </AccordionTrigger>
                   <AccordionContent className="p-0">
