@@ -342,7 +342,7 @@ export function WorkoutView() {
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
+              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
               alt="Personal Records"
               fill
               className="object-cover"
@@ -437,7 +437,7 @@ export function WorkoutView() {
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
+              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
               alt="My Split"
               fill
               className="object-cover"
@@ -685,45 +685,39 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
     }
   }, []);
 
-  const topLifts = useMemo(() => {
+  const allMuscles = useMemo(() => Array.from(new Set(EXERCISES_DATA.map(e => e.muscle))).sort(), []);
+  const muscleKeys = allMuscles;
+  const activeMuscle = muscleKeys[activeMuscleIdx];
+
+  const topLiftsForSelectedMuscle = useMemo(() => {
+    if (!activeMuscle) return [];
+    
     const lifts: Record<string, any[]> = {};
     
     Object.values(history).forEach(dayLogs => {
       Object.entries(dayLogs).forEach(([exName, sets]) => {
-        if (!lifts[exName]) lifts[exName] = [];
-        sets.forEach(s => {
-          if (s.type === 'strength') {
-            lifts[exName].push({
-              weight: parseFloat(s.weight),
-              reps: parseFloat(s.reps)
-            });
-          }
-        });
+        const exData = EXERCISES_DATA.find(e => e.name === exName);
+        if (exData && exData.muscle === activeMuscle) {
+          if (!lifts[exName]) lifts[exName] = [];
+          sets.forEach(s => {
+            if (s.type === 'strength') {
+              lifts[exName].push({
+                weight: parseFloat(s.weight),
+                reps: parseFloat(s.reps)
+              });
+            }
+          });
+        }
       });
     });
 
-    const top10PerEx: Record<string, any[]> = {};
-    Object.entries(lifts).forEach(([exName, allSets]) => {
-      top10PerEx[exName] = allSets
+    return Object.entries(lifts).map(([name, allSets]) => ({
+      name,
+      lifts: allSets
         .sort((a, b) => b.weight - a.weight || b.reps - a.reps)
-        .slice(0, 10);
-    });
-
-    const grouped: Record<string, { name: string, lifts: any[] }[]> = {};
-    Object.entries(top10PerEx).forEach(([exName, sets]) => {
-      const exData = EXERCISES_DATA.find(e => e.name === exName);
-      const muscle = exData ? exData.muscle : 'OTHER';
-      if (!grouped[muscle]) grouped[muscle] = [];
-      grouped[muscle].push({ name: exName, lifts: sets });
-    });
-
-    return grouped;
-  }, [history]);
-
-  const allMuscles = useMemo(() => Array.from(new Set(EXERCISES_DATA.map(e => e.muscle))).sort(), []);
-  const muscleKeys = allMuscles;
-  const activeMuscle = muscleKeys[activeMuscleIdx];
-  const exercisesForMuscle = activeMuscle ? (topLifts[activeMuscle] || []) : [];
+        .slice(0, 10)
+    })).filter(ex => ex.lifts.length > 0);
+  }, [history, activeMuscle]);
 
   const handleNextMuscle = () => setActiveMuscleIdx(prev => (prev + 1) % muscleKeys.length);
   const handlePrevMuscle = () => setActiveMuscleIdx(prev => (prev - 1 + muscleKeys.length) % muscleKeys.length);
@@ -756,13 +750,13 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
         </div>
 
         <div className="grid gap-2 px-1">
-          {exercisesForMuscle.length === 0 ? (
+          {topLiftsForSelectedMuscle.length === 0 ? (
             <div className="text-center py-20 opacity-30">
               <Trophy className="w-12 h-12 mx-auto mb-4" />
               <p className="text-sm font-black uppercase tracking-widest">No PR data recorded yet</p>
             </div>
           ) : (
-            exercisesForMuscle.map((ex, idx) => (
+            topLiftsForSelectedMuscle.map((ex, idx) => (
               <button 
                 key={idx} 
                 onClick={() => setViewingPRs(ex)}
