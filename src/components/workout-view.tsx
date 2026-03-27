@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -55,9 +54,9 @@ import {
 } from "date-fns";
 import {
   Accordion,
-  AccordionContent,
   AccordionItem,
   AccordionTrigger,
+  AccordionContent
 } from "@/components/ui/accordion";
 
 type WeeklySplit = Record<string, Exercise[]>;
@@ -179,8 +178,8 @@ export function WorkoutView() {
     });
   };
 
-  const prImage = PlaceHolderImages.find(img => img.id === 'training-split-tool');
-  const splitImage = PlaceHolderImages.find(img => img.id === 'personal-records-illustration');
+  const splitImage = PlaceHolderImages.find(img => img.id === 'training-split-tool');
+  const prImage = PlaceHolderImages.find(img => img.id === 'personal-records-illustration');
 
   if (selectedExercise) {
     return (
@@ -370,7 +369,7 @@ export function WorkoutView() {
             <div className="flex-1 min-w-0">
               <h2 className="text-xs font-black uppercase tracking-tight text-foreground/80">Today's Workout</h2>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                {todayName.toUpperCase()}: <span className="text-primary font-black">{(split[todayName] || []).length + extraMoves.length} EXERCISES</span>
+                {todayName.toUpperCase()}: <span className="text-primary font-black">{todaysExercises.length} EXERCISES</span>
               </p>
             </div>
           </div>
@@ -688,7 +687,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
   const topLifts = useMemo(() => {
     const lifts: Record<string, any[]> = {};
     
-    // Extract all lifts
     Object.values(history).forEach(dayLogs => {
       Object.entries(dayLogs).forEach(([exName, sets]) => {
         if (!lifts[exName]) lifts[exName] = [];
@@ -703,7 +701,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
       });
     });
 
-    // Sort and take top 10
     const top10PerEx: Record<string, any[]> = {};
     Object.entries(lifts).forEach(([exName, allSets]) => {
       top10PerEx[exName] = allSets
@@ -711,7 +708,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
         .slice(0, 10);
     });
 
-    // Group by muscle
     const grouped: Record<string, { name: string, lifts: any[] }[]> = {};
     Object.entries(top10PerEx).forEach(([exName, sets]) => {
       const exData = EXERCISES_DATA.find(e => e.name === exName);
@@ -723,7 +719,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
     return grouped;
   }, [history]);
 
-  const muscleKeys = Object.keys(topLifts);
+  const muscleKeys = Object.keys(topLifts).sort();
   const activeMuscle = muscleKeys[activeMuscleIdx];
   const exercisesForMuscle = activeMuscle ? topLifts[activeMuscle] : [];
 
@@ -746,7 +742,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
         </div>
       ) : (
         <div className="space-y-6">
-          {/* Shifter */}
           <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
             <Button variant="ghost" size="icon" onClick={handlePrevMuscle} className="rounded-full hover:bg-muted">
               <ChevronLeft className="w-5 h-5 text-primary" />
@@ -764,7 +759,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
             </Button>
           </div>
 
-          {/* Exercise List */}
           <div className="grid gap-2 px-1">
             {exercisesForMuscle.map((ex, idx) => (
               <button 
@@ -780,7 +774,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
         </div>
       )}
 
-      {/* PR Card Modal */}
       {viewingPRs && (
         <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
           <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[60vh]">
@@ -884,7 +877,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
       flatSplit.forEach(ex => {
         const isSecondaryMovers = (ex.secondaryMuscles || "").toUpperCase().includes(m.toUpperCase());
         if (isSecondaryMovers && ex.muscle !== m) {
-          secondaryDone.push({ name: e.name, day: e.day });
+          secondaryDone.push({ name: ex.name, day: ex.day });
         }
       });
 
@@ -1099,7 +1092,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
                   key={m} 
                   onClick={() => setMuscleFilter(m)} 
                   className={cn(
-                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all", 
+                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all shrink-0", 
                     muscleFilter === m ? "bg-primary text-white border-primary" : "bg-muted/5 text-muted-foreground border-muted/20"
                   )}
                 >
