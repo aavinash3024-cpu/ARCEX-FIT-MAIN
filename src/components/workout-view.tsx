@@ -347,25 +347,28 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
+      <Card 
+        onClick={() => setActiveSubView('split')}
+        className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
+      >
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
-              alt="Personal Records"
+              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
+              alt="My Split"
               fill
               className="object-cover"
-              data-ai-hint="gym weights"
+              data-ai-hint="barbell illustration"
             />
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
             <div className="space-y-0.5">
-              <h3 className="text-[10px] font-black text-primary uppercase tracking-tight flex items-center gap-1.5">
-                <Trophy className="w-3 h-3" /> Personal Records
+              <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
+                <Layout className="w-3 h-3" /> My Workout Split
               </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">Your recent milestones</p>
+              <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-primary/30" />
+            <ChevronRight className="w-4 h-4 text-purple-300/40" />
           </div>
         </CardContent>
       </Card>
@@ -439,28 +442,25 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      <Card 
-        onClick={() => setActiveSubView('split')}
-        className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
-      >
+      <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
-              alt="My Split"
+              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
+              alt="Personal Records"
               fill
               className="object-cover"
-              data-ai-hint="barbell illustration"
+              data-ai-hint="gym weights"
             />
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
             <div className="space-y-0.5">
-              <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
-                <Layout className="w-3 h-3" /> My Workout Split
+              <h3 className="text-[10px] font-black text-primary uppercase tracking-tight flex items-center gap-1.5">
+                <Trophy className="w-3 h-3" /> Personal Records
               </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
+              <p className="text-xs font-bold text-foreground/90 leading-tight">Your recent milestones</p>
             </div>
-            <ChevronRight className="w-4 h-4 text-purple-300/40" />
+            <ChevronRight className="w-4 h-4 text-primary/30" />
           </div>
         </CardContent>
       </Card>
@@ -763,37 +763,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
     }
   }, [activeType, filteredMuscles, activeMuscle]);
 
-  const recentPRs = useMemo(() => {
-    const exerciseToBest: Record<string, { val: number, date: string, type: string, extra?: string }> = {};
-    
-    // Sort dates to ensure we process chronologically if needed, but here we just find overall best
-    const sortedDates = Object.keys(history).sort((a, b) => b.localeCompare(a));
-
-    Object.entries(history).forEach(([date, dayLogs]) => {
-      Object.entries(dayLogs).forEach(([name, sets]) => {
-        const type = getExerciseType(name);
-        sets.forEach(s => {
-          const val = type === 'strength' ? parseFloat(s.weight) : parseFloat(s.time);
-          const reps = type === 'strength' ? parseFloat(s.reps) : 0;
-          
-          if (!exerciseToBest[name] || val > exerciseToBest[name].val) {
-            exerciseToBest[name] = { 
-              val, 
-              date, 
-              type,
-              extra: type === 'strength' ? `${reps} reps` : undefined
-            };
-          }
-        });
-      });
-    });
-
-    return Object.entries(exerciseToBest)
-      .map(([name, data]) => ({ name, ...data }))
-      .sort((a, b) => b.date.localeCompare(a.date))
-      .slice(0, 5);
-  }, [history]);
-
   const topLiftsForSelectedMuscle = useMemo(() => {
     if (!activeMuscle) return [];
     
@@ -869,30 +838,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
           </button>
         </div>
 
-        {/* Recent Achievements Card */}
-        {recentPRs.length > 0 && (
-          <Card className="border-none shadow-sm bg-primary/5 mx-1 overflow-hidden">
-            <CardContent className="p-4 space-y-3">
-              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
-                <Zap className="w-3.5 h-3.5" /> Recent Achievements
-              </h3>
-              <div className="space-y-2">
-                {recentPRs.map((pr, i) => (
-                  <div key={i} className="flex items-center justify-between bg-white/60 p-2 rounded-xl border border-primary/5">
-                    <div className="flex items-center gap-2 min-w-0">
-                      {pr.type === 'strength' ? <Trophy className="w-3 h-3 text-yellow-500 shrink-0" /> : <Timer className="w-3 h-3 text-sky-500 shrink-0" />}
-                      <span className="text-[11px] font-bold text-foreground/80 truncate">{pr.name}</span>
-                    </div>
-                    <span className="text-[10px] font-black text-primary uppercase whitespace-nowrap">
-                      {pr.val}{pr.type === 'strength' ? 'kg' : 's'}
-                    </span>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-        )}
-
         {/* Dynamic Swipable Muscle List */}
         <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-1">
           {filteredMuscles.map(muscle => (
@@ -920,7 +865,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
               <button 
                 key={idx} 
                 onClick={() => setViewingPRs(ex)}
-                className="flex items-center justify-between p-4 bg-white rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
+                className="flex items-center justify-between p-3 bg-white rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-4 overflow-hidden">
                   <div className="shrink-0 w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center">
