@@ -36,6 +36,12 @@ export default function PulseFlowApp() {
 
   // Load data from localStorage on mount
   useEffect(() => {
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const lastResetDate = localStorage.getItem('pulseflow_last_reset_date');
+    
+    // Check if we need to reset daily trackers for a new day
+    const isNewDay = lastResetDate !== todayStr;
+
     const savedTasks = localStorage.getItem('pulseflow_tasks');
     const savedHydration = localStorage.getItem('pulseflow_hydration');
     const savedHydrationHistory = localStorage.getItem('pulseflow_hydration_history');
@@ -52,7 +58,11 @@ export default function PulseFlowApp() {
       }
     }
     
-    if (savedHydration) {
+    // Reset hydration if it's a new day
+    if (isNewDay) {
+      setHydrationAmount(0);
+      localStorage.setItem('pulseflow_hydration', '0');
+    } else if (savedHydration) {
       setHydrationAmount(Number(savedHydration));
     }
 
@@ -80,7 +90,11 @@ export default function PulseFlowApp() {
       }
     }
 
-    if (savedMeals) {
+    // Reset logged meals if it's a new day
+    if (isNewDay) {
+      setLoggedMeals([]);
+      localStorage.setItem('pulseflow_today_logged_meals', '[]');
+    } else if (savedMeals) {
       try {
         setLoggedMeals(JSON.parse(savedMeals));
       } catch (e) {
@@ -88,8 +102,10 @@ export default function PulseFlowApp() {
       }
     }
 
+    // Mark today as the last reset date
+    localStorage.setItem('pulseflow_last_reset_date', todayStr);
+
     // Streak Logic
-    const todayStr = format(new Date(), 'yyyy-MM-dd');
     if (savedStreak) {
       try {
         const data = JSON.parse(savedStreak);
@@ -134,18 +150,16 @@ export default function PulseFlowApp() {
       localStorage.setItem('pulseflow_hydration', hydrationAmount.toString());
       
       const today = format(new Date(), 'yyyy-MM-dd');
-      setHydrationHistory(prev => ({
-        ...prev,
-        [today]: hydrationAmount
-      }));
+      setHydrationHistory(prev => {
+        const newHistory = {
+          ...prev,
+          [today]: hydrationAmount
+        };
+        localStorage.setItem('pulseflow_hydration_history', JSON.stringify(newHistory));
+        return newHistory;
+      });
     }
   }, [hydrationAmount, isLoaded]);
-
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('pulseflow_hydration_history', JSON.stringify(hydrationHistory));
-    }
-  }, [hydrationHistory, isLoaded]);
 
   useEffect(() => {
     if (isLoaded) {
