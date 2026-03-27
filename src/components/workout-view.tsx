@@ -354,11 +354,11 @@ export function WorkoutView() {
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
+              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
               alt="My Split"
               fill
               className="object-cover"
-              data-ai-hint="barbell illustration"
+              data-ai-hint="gym weights"
             />
           </div>
           <div className="flex-1 px-4 flex items-center justify-between min-w-0">
@@ -446,7 +446,7 @@ export function WorkoutView() {
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
-              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
+              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
               alt="Personal Records"
               fill
               className="object-cover"
@@ -510,9 +510,7 @@ export function WorkoutView() {
       {loggingExercise && (
         <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
           <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[70vh]">
-            <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setLoggingExercise(null)} />
-            
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 pt-2">
               <div className="min-w-0 flex-1">
                 <h3 className="text-xl font-black uppercase tracking-tighter truncate">{loggingExercise.name}</h3>
                 <p className="text-[10px] font-black text-primary uppercase tracking-widest">{loggingExercise.muscle} • {loggingExercise.subMuscle}</p>
@@ -645,15 +643,13 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
   return (
     <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
       <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 flex flex-col h-[80vh]">
-        <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setIsOpen(false)} />
-        
-        <div className="flex items-center justify-between mb-2">
+        <div className="flex items-center justify-between mb-2 pt-2">
           <div className="space-y-0.5">
             <h3 className="text-xl font-black uppercase tracking-tighter">Add Extra Exercise</h3>
             <p className="text-[10px] font-bold text-muted-foreground uppercase">Added moves are temporary for today</p>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="rounded-full">
-            <ChevronDown className="w-6 h-6" />
+            <X className="w-6 h-6" />
           </Button>
         </div>
 
@@ -894,9 +890,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
       {viewingPRs && (
         <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
           <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[75vh]">
-            <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setViewingPRs(null)} />
-            
-            <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center justify-between mb-6 pt-2">
               <div className="min-w-0 flex-1">
                 <h3 className="text-xl font-black uppercase tracking-tighter truncate">{viewingPRs.name}</h3>
                 <p className="text-[10px] font-black text-primary uppercase tracking-widest">TOP 10 {activeType === 'strength' ? 'REP' : 'TIME'} RECORDS</p>
@@ -1242,11 +1236,10 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
       {isAdding && (
         <div className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
           <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] shadow-2xl p-6 h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-500">
-            <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setIsAdding(false)} />
-            <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center justify-between mb-4 pt-2">
               <h3 className="text-xl font-black uppercase tracking-tighter">Choose Moves</h3>
               <Button variant="ghost" size="icon" onClick={() => setIsAdding(false)} className="rounded-full">
-                <ChevronDown className="w-6 h-6" />
+                <X className="w-6 h-6" />
               </Button>
             </div>
             <div className="relative mb-4">
