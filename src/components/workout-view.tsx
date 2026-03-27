@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -27,7 +28,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Medal,
-  Timer
+  Timer,
+  Zap
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -64,6 +66,12 @@ import {
 type WeeklySplit = Record<string, Exercise[]>;
 
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+const getExerciseType = (name: string): 'strength' | 'time' => {
+  const n = name.toLowerCase();
+  if (n.includes('running') || n.includes('cycling') || n.includes('plank')) return 'time';
+  return 'strength';
+};
 
 export function WorkoutView() {
   const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split' | 'history' | 'pr'>('main');
@@ -518,7 +526,7 @@ export function WorkoutView() {
               <div className="space-y-6 pb-12">
                 <Card className="border-none shadow-sm bg-muted/10 p-4">
                   <div className="space-y-4">
-                    {loggingExercise.name.toLowerCase().includes('running') || loggingExercise.name.toLowerCase().includes('cycling') || loggingExercise.name.toLowerCase().includes('plank') ? (
+                    {getExerciseType(loggingExercise.name) === 'time' ? (
                       <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Log Duration</label>
                         <div className="flex gap-2">
@@ -723,8 +731,8 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
 
 function PersonalRecordsView({ onBack }: { onBack: () => void }) {
   const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
-  const [activeMuscle, setActiveMuscle] = useState<string>("CHEST");
   const [activeType, setActiveType] = useState<'strength' | 'time'>('strength');
+  const [activeMuscle, setActiveMuscle] = useState<string>("CHEST");
   const [viewingPRs, setViewingPRs] = useState<any | null>(null);
 
   useEffect(() => {
@@ -738,9 +746,53 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
     }
   }, []);
 
-  const allMuscles = useMemo(() => {
-    return Array.from(new Set(EXERCISES_DATA.map(e => e.muscle))).sort();
-  }, []);
+  const filteredMuscles = useMemo(() => {
+    const muscles = new Set<string>();
+    EXERCISES_DATA.forEach(ex => {
+      const type = getExerciseType(ex.name);
+      if (type === activeType) {
+        muscles.add(ex.muscle);
+      }
+    });
+    return Array.from(muscles).sort();
+  }, [activeType]);
+
+  useEffect(() => {
+    if (filteredMuscles.length > 0 && !filteredMuscles.includes(activeMuscle)) {
+      setActiveMuscle(filteredMuscles[0]);
+    }
+  }, [activeType, filteredMuscles, activeMuscle]);
+
+  const recentPRs = useMemo(() => {
+    const exerciseToBest: Record<string, { val: number, date: string, type: string, extra?: string }> = {};
+    
+    // Sort dates to ensure we process chronologically if needed, but here we just find overall best
+    const sortedDates = Object.keys(history).sort((a, b) => b.localeCompare(a));
+
+    Object.entries(history).forEach(([date, dayLogs]) => {
+      Object.entries(dayLogs).forEach(([name, sets]) => {
+        const type = getExerciseType(name);
+        sets.forEach(s => {
+          const val = type === 'strength' ? parseFloat(s.weight) : parseFloat(s.time);
+          const reps = type === 'strength' ? parseFloat(s.reps) : 0;
+          
+          if (!exerciseToBest[name] || val > exerciseToBest[name].val) {
+            exerciseToBest[name] = { 
+              val, 
+              date, 
+              type,
+              extra: type === 'strength' ? `${reps} reps` : undefined
+            };
+          }
+        });
+      });
+    });
+
+    return Object.entries(exerciseToBest)
+      .map(([name, data]) => ({ name, ...data }))
+      .sort((a, b) => b.date.localeCompare(a.date))
+      .slice(0, 5);
+  }, [history]);
 
   const topLiftsForSelectedMuscle = useMemo(() => {
     if (!activeMuscle) return [];
@@ -795,7 +847,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
       </div>
 
       <div className="space-y-4">
-        {/* Type Shifter (Moved Above Muscle Shifter) */}
+        {/* Type Shifter */}
         <div className="flex items-center justify-between bg-white p-2 rounded-2xl shadow-sm border border-muted/20 mx-1">
           <button 
             onClick={() => setActiveType('strength')}
@@ -817,9 +869,33 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
           </button>
         </div>
 
-        {/* Swipable Muscle List (Pills style) */}
+        {/* Recent Achievements Card */}
+        {recentPRs.length > 0 && (
+          <Card className="border-none shadow-sm bg-primary/5 mx-1 overflow-hidden">
+            <CardContent className="p-4 space-y-3">
+              <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-primary flex items-center gap-2">
+                <Zap className="w-3.5 h-3.5" /> Recent Achievements
+              </h3>
+              <div className="space-y-2">
+                {recentPRs.map((pr, i) => (
+                  <div key={i} className="flex items-center justify-between bg-white/60 p-2 rounded-xl border border-primary/5">
+                    <div className="flex items-center gap-2 min-w-0">
+                      {pr.type === 'strength' ? <Trophy className="w-3 h-3 text-yellow-500 shrink-0" /> : <Timer className="w-3 h-3 text-sky-500 shrink-0" />}
+                      <span className="text-[11px] font-bold text-foreground/80 truncate">{pr.name}</span>
+                    </div>
+                    <span className="text-[10px] font-black text-primary uppercase whitespace-nowrap">
+                      {pr.val}{pr.type === 'strength' ? 'kg' : 's'}
+                    </span>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
+
+        {/* Dynamic Swipable Muscle List */}
         <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-1">
-          {allMuscles.map(muscle => (
+          {filteredMuscles.map(muscle => (
             <button
               key={muscle}
               onClick={() => setActiveMuscle(muscle)}
@@ -837,7 +913,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
           {topLiftsForSelectedMuscle.length === 0 ? (
             <div className="text-center py-20 opacity-30">
               <Trophy className="w-12 h-12 mx-auto mb-4" />
-              <p className="text-sm font-black uppercase tracking-widest">No {activeType === 'strength' ? 'rep' : 'time'} records yet</p>
+              <p className="text-sm font-black uppercase tracking-widest">No {activeType === 'strength' ? 'rep' : 'time'} records for this muscle</p>
             </div>
           ) : (
             topLiftsForSelectedMuscle.map((ex, idx) => (
