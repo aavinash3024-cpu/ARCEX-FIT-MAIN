@@ -166,9 +166,9 @@ export function WorkoutView() {
     });
   };
 
-  const handleAddExtraMove = (ex: Exercise) => {
-    if (todaysExercises.some(e => e.name === ex.name)) return;
-    setExtraMoves(prev => [...prev, ex]);
+  const handleAddExtraMoves = (exercises: Exercise[]) => {
+    const newMoves = exercises.filter(ex => !todaysExercises.some(e => e.name === ex.name));
+    setExtraMoves(prev => [...prev, ...newMoves]);
   };
 
   const removeSet = (exerciseName: string, index: number) => {
@@ -425,7 +425,7 @@ export function WorkoutView() {
             }}
             className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
           >
-            <Plus className="w-4 h-4" /> ADD EXTRA MOVEMENT
+            <Plus className="w-4 h-4" /> ADD EXTRA EXERCISE
           </Button>
         </CardContent>
       </Card>
@@ -488,7 +488,15 @@ export function WorkoutView() {
         </Card>
       </div>
 
-      <ExtraMovesModal muscleGroups={muscleGroups} filteredLibrary={filteredLibrary} onAdd={handleAddExtraMove} searchQuery={searchQuery} setSearchQuery={setSearchQuery} muscleFilter={muscleFilter} setMuscleFilter={setMuscleFilter} />
+      <ExtraMovesModal 
+        muscleGroups={muscleGroups} 
+        filteredLibrary={filteredLibrary} 
+        onAdd={handleAddExtraMoves} 
+        searchQuery={searchQuery} 
+        setSearchQuery={setSearchQuery} 
+        muscleFilter={muscleFilter} 
+        setMuscleFilter={setMuscleFilter} 
+      />
 
       {loggingExercise && (
         <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
@@ -597,35 +605,57 @@ export function WorkoutView() {
 
 function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, setSearchQuery, muscleFilter, setMuscleFilter }: any) {
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Exercise[]>([]);
 
   useEffect(() => {
-    const handleOpen = () => setIsOpen(true);
+    const handleOpen = () => {
+      setIsOpen(true);
+      setSelectedItems([]);
+    };
     document.addEventListener('open-extra-moves', handleOpen);
     return () => document.removeEventListener('open-extra-moves', handleOpen);
   }, []);
 
   if (!isOpen) return null;
 
+  const toggleSelection = (ex: Exercise) => {
+    const isSelected = selectedItems.some(i => i.name === ex.name);
+    if (isSelected) {
+      setSelectedItems(prev => prev.filter(i => i.name !== ex.name));
+    } else {
+      setSelectedItems(prev => [...prev, ex]);
+    }
+  };
+
+  const handleConfirm = () => {
+    onAdd(selectedItems);
+    setIsOpen(false);
+    setSelectedItems([]);
+  };
+
   return (
     <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
       <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 flex flex-col h-[80vh]">
         <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setIsOpen(false)} />
         
-        <div className="flex items-center justify-between mb-4">
-          <h3 className="text-xl font-black uppercase tracking-tighter">Add Extra Move</h3>
+        <div className="flex items-center justify-between mb-2">
+          <div className="space-y-0.5">
+            <h3 className="text-xl font-black uppercase tracking-tighter">Add Extra Exercise</h3>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase">Added moves are temporary for today</p>
+          </div>
           <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="rounded-full">
             <ChevronDown className="w-6 h-6" />
           </Button>
         </div>
 
-        <div className="relative mb-4">
+        <div className="relative mb-4 mt-2">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <input 
             autoFocus
             type="text" 
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search..." 
+            placeholder="Search exercises..." 
             className="w-full h-12 pl-10 pr-4 bg-muted/10 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20"
           />
         </div>
@@ -648,22 +678,43 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
         </div>
 
         <ScrollArea className="flex-1 -mx-2 px-2">
-          <div className="grid gap-2 pb-8">
-            {filteredLibrary.slice(0, 50).map((ex: any, idx: number) => (
-              <button 
-                key={idx} 
-                onClick={() => { onAdd(ex); setIsOpen(false); }}
-                className="flex items-center justify-between p-4 bg-muted/5 hover:bg-primary/5 rounded-2xl text-left transition-all"
-              >
-                <div>
-                  <p className="text-xs font-bold text-foreground">{ex.name}</p>
-                  <p className="text-[8px] font-black text-muted-foreground uppercase">{ex.muscle} • {ex.subMuscle}</p>
-                </div>
-                <Plus className="w-4 h-4 text-primary/40" />
-              </button>
-            ))}
+          <div className="grid gap-2 pb-24">
+            {filteredLibrary.slice(0, 50).map((ex: any, idx: number) => {
+              const isSelected = selectedItems.some(i => i.name === ex.name);
+              return (
+                <button 
+                  key={idx} 
+                  onClick={() => toggleSelection(ex)}
+                  className={cn(
+                    "flex items-center justify-between p-4 rounded-2xl text-left transition-all border",
+                    isSelected ? "bg-primary/5 border-primary/20" : "bg-muted/5 border-transparent"
+                  )}
+                >
+                  <div className="min-w-0 pr-4">
+                    <p className="text-xs font-bold text-foreground truncate">{ex.name}</p>
+                    <p className="text-[8px] font-black text-muted-foreground uppercase">{ex.muscle} • {ex.subMuscle}</p>
+                  </div>
+                  <div className={cn(
+                    "w-6 h-6 rounded-full flex items-center justify-center border transition-all",
+                    isSelected ? "bg-primary border-primary text-white" : "border-muted-foreground/20"
+                  )}>
+                    {isSelected ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3 text-muted-foreground/40" />}
+                  </div>
+                </button>
+              );
+            })}
           </div>
         </ScrollArea>
+
+        <div className="absolute bottom-6 left-6 right-6">
+          <Button 
+            onClick={handleConfirm}
+            disabled={selectedItems.length === 0}
+            className="w-full h-14 rounded-2xl bg-primary text-white font-black uppercase tracking-widest shadow-xl shadow-primary/20 gap-2 text-xs"
+          >
+            Add {selectedItems.length} Exercises <CheckCircle2 className="w-4 h-4" />
+          </Button>
+        </div>
       </div>
     </div>
   );
@@ -788,7 +839,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
               </Button>
             </div>
 
-            {/* Rank 1 Highlight */}
             <Card className="border-none shadow-lg bg-gradient-to-br from-amber-50 to-amber-100/50 border border-amber-200/50 p-5 rounded-3xl mb-6 relative overflow-hidden shrink-0">
               <div className="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl" />
               <div className="flex justify-between items-center relative z-10">
@@ -841,20 +891,31 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
 function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, setSplit: React.Dispatch<React.SetStateAction<WeeklySplit>>, onBack: () => void }) {
   const [activeDay, setActiveDay] = useState(DAYS[0]);
   const [isAdding, setIsAdding] = useState(false);
+  const [selectedItems, setSelectedItems] = useState<Exercise[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [muscleFilter, setMuscleFilter] = useState("ALL");
   const [activeMuscleReport, setActiveMuscleReport] = useState("CHEST");
 
-  const addExercise = (ex: Exercise) => {
+  const toggleSelection = (ex: Exercise) => {
+    const isSelected = selectedItems.some(i => i.name === ex.name);
+    if (isSelected) {
+      setSelectedItems(prev => prev.filter(i => i.name !== ex.name));
+    } else {
+      setSelectedItems(prev => [...prev, ex]);
+    }
+  };
+
+  const handleConfirmAdd = () => {
     setSplit(prev => {
       const dayExercises = prev[activeDay] || [];
-      if (dayExercises.find(e => e.name === ex.name)) return prev;
+      const newItems = selectedItems.filter(s => !dayExercises.some(e => e.name === s.name));
       return {
         ...prev,
-        [activeDay]: [...dayExercises, ex]
+        [activeDay]: [...dayExercises, ...newItems]
       };
     });
     setIsAdding(false);
+    setSelectedItems([]);
     setSearchQuery("");
     setMuscleFilter("ALL");
   };
@@ -983,8 +1044,8 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
             </div>
           </ScrollArea>
 
-          <Button onClick={() => setIsAdding(true)} className="w-full h-12 rounded-xl border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest gap-2">
-            <Plus className="w-4 h-4" /> Add Exercise
+          <Button onClick={() => { setIsAdding(true); setSelectedItems([]); }} className="w-full h-12 rounded-xl border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest gap-2">
+            <Plus className="w-4 h-4" /> Add Exercises
           </Button>
         </CardContent>
       </Card>
@@ -1104,7 +1165,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
           <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] shadow-2xl p-6 h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-500">
             <div className="w-12 h-1.5 bg-muted rounded-full mx-auto mb-6" onClick={() => setIsAdding(false)} />
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-xl font-black uppercase tracking-tighter">Choose Move</h3>
+              <h3 className="text-xl font-black uppercase tracking-tighter">Choose Moves</h3>
               <Button variant="ghost" size="icon" onClick={() => setIsAdding(false)} className="rounded-full">
                 <ChevronDown className="w-6 h-6" />
               </Button>
@@ -1128,18 +1189,42 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
               ))}
             </div>
             <ScrollArea className="flex-1 -mx-2 px-2">
-              <div className="grid gap-2 pb-8">
-                {filteredLibrary.map((ex, idx) => (
-                  <button key={idx} onClick={() => addExercise(ex)} className="flex items-center justify-between p-4 bg-muted/5 hover:bg-primary/5 rounded-2xl text-left border border-transparent hover:border-primary/10 transition-all">
-                    <div>
-                      <p className="text-xs font-bold text-foreground">{ex.name}</p>
-                      <p className="text-[8px] font-black text-muted-foreground uppercase">{ex.muscle} • {ex.subMuscle}</p>
-                    </div>
-                    <Plus className="w-4 h-4 text-primary/40" />
-                  </button>
-                ))}
+              <div className="grid gap-2 pb-24">
+                {filteredLibrary.map((ex, idx) => {
+                  const isSelected = selectedItems.some(i => i.name === ex.name);
+                  return (
+                    <button 
+                      key={idx} 
+                      onClick={() => toggleSelection(ex)} 
+                      className={cn(
+                        "flex items-center justify-between p-4 rounded-2xl text-left border transition-all",
+                        isSelected ? "bg-primary/5 border-primary/20" : "bg-muted/5 border-transparent"
+                      )}
+                    >
+                      <div>
+                        <p className="text-xs font-bold text-foreground">{ex.name}</p>
+                        <p className="text-[8px] font-black text-muted-foreground uppercase">{ex.muscle} • {ex.subMuscle}</p>
+                      </div>
+                      <div className={cn(
+                        "w-6 h-6 rounded-full flex items-center justify-center border",
+                        isSelected ? "bg-primary border-primary text-white" : "border-muted-foreground/20"
+                      )}>
+                        {isSelected ? <Check className="w-3 h-3" /> : <Plus className="w-3 h-3 text-muted-foreground/40" />}
+                      </div>
+                    </button>
+                  );
+                })}
               </div>
             </ScrollArea>
+            <div className="absolute bottom-6 left-6 right-6">
+              <Button 
+                onClick={handleConfirmAdd}
+                disabled={selectedItems.length === 0}
+                className="w-full h-14 rounded-2xl bg-primary text-white font-black uppercase tracking-widest shadow-xl shadow-primary/20 gap-2 text-xs"
+              >
+                Save {selectedItems.length} Moves <CheckCircle2 className="w-4 h-4" />
+              </Button>
+            </div>
           </div>
         </div>
       )}
