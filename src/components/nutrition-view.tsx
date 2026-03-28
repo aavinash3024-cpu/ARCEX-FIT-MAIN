@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -140,11 +141,9 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
   const tryLocalParse = (input: string) => {
     const normalized = input.toLowerCase();
-    // Regex to find the first number in the string
     const numMatch = normalized.match(/(\d+(?:\.\d+)?)/);
     const quantity = numMatch ? parseFloat(numMatch[0]) : 1;
     
-    // Scan cache for matching item names within the input
     for (const [foodName, data] of Object.entries(foodCache)) {
       if (normalized.includes(foodName)) {
         const today = new Date();
@@ -181,7 +180,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   const handleLogMeal = async () => {
     if (!mealInput.trim()) return;
 
-    // 1. Try Local Atomic Cache first
     const cachedMatch = tryLocalParse(mealInput);
     if (cachedMatch) {
       setLoggedMeals(prev => [cachedMatch, ...prev]);
@@ -194,7 +192,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       return;
     }
 
-    // 2. If no cache hit, use AI
     setIsParsing(true);
     try {
       const result = await parseMeal({ description: mealInput });
@@ -223,7 +220,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         }))
       };
       
-      // Update Atomic Cache with new items
       const newCacheItems: Record<string, CachedFoodItem> = {};
       result.items.forEach(item => {
         const qtyMatch = item.quantity.match(/(\d+(?:\.\d+)?)/);
@@ -527,11 +523,11 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         <CardContent className="p-0 flex items-center">
           <div className="shrink-0 w-20 h-20 relative">
             <Image 
-              src={analysisImage?.imageUrl || "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=400&auto=format&fit=crop"} 
+              src={analysisImage?.imageUrl || "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop"} 
               alt="AI Analysis"
               fill
               className="object-cover"
-              data-ai-hint="noodle bowl"
+              data-ai-hint="gourmet salad"
             />
           </div>
           <div className="flex-1 p-3 min-w-0">
@@ -695,11 +691,11 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       <Card className="border-none shadow-md overflow-hidden bg-white rounded-2xl">
         <div className="h-14 w-full relative">
           <Image 
-            src={logHeaderImage?.imageUrl || "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=600&auto=format&fit=crop"} 
+            src={logHeaderImage?.imageUrl || "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=800&auto=format&fit=crop"} 
             alt="Log Header"
             fill
             className="object-cover"
-            data-ai-hint="salad bowl"
+            data-ai-hint="premium salad"
           />
           <div className="absolute inset-0 bg-black/25" />
           <div className="absolute bottom-3 left-5">
@@ -735,7 +731,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                           </p>
                         </div>
                       </div>
-                      <Button onClick={() => deleteLoggedMeal(id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
+                      <Button onClick={() => deleteLoggedMeal(meal.id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                       <span className="absolute bottom-2 right-2 text-[7px] font-bold text-muted-foreground/30">{meal.time}</span>

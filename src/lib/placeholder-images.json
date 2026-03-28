@@ -26,9 +26,9 @@
     },
     {
       "id": "ai-analysis-meal",
-      "description": "A bowl of noodles, carrots, mushrooms, and eggs",
-      "imageUrl": "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?q=80&w=400&auto=format&fit=crop",
-      "imageHint": "noodle bowl"
+      "description": "Gourmet vegetarian Buddha bowl with fresh ingredients",
+      "imageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop",
+      "imageHint": "gourmet salad"
     },
     {
       "id": "logged-meal-utensils",
@@ -56,15 +56,15 @@
     },
     {
       "id": "meal-avocado-toast",
-      "description": "Healthy avocado toast with egg",
-      "imageUrl": "https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=400&auto=format&fit=crop",
+      "description": "Premium gourmet avocado toast",
+      "imageUrl": "https://images.unsplash.com/photo-1525351484163-7529414344d8?q=80&w=800&auto=format&fit=crop",
       "imageHint": "avocado toast"
     },
     {
       "id": "meal-quinoa-bowl",
-      "description": "Chicken and quinoa salad bowl",
-      "imageUrl": "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=400&auto=format&fit=crop",
-      "imageHint": "salad bowl"
+      "description": "Premium Mediterranean vegetarian superfood salad",
+      "imageUrl": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=800&auto=format&fit=crop",
+      "imageHint": "premium salad"
     }
   ]
 }
