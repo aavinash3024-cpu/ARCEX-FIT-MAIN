@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -471,9 +470,9 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                       <h4 className="font-bold text-sm text-foreground leading-tight">
                         <span className="text-primary uppercase text-[10px] mr-1">{meal.type}:</span> {meal.name}
                       </h4>
-                      <p className="text-[10px] font-black text-foreground/60 leading-none uppercase tracking-tight">
+                      <div className="text-[10px] font-black text-foreground/60 leading-none uppercase tracking-tight">
                         {Math.round(meal.calories)} KCAL {meal.isCached && <Badge variant="secondary" className="h-3 py-0 px-1 bg-green-50 text-green-600 border-none font-bold uppercase text-[6px] ml-1">Cached</Badge>}
-                      </p>
+                      </div>
                       
                       {meal.items && meal.items.length > 0 && (
                         <div className="border-l-2 border-muted/20 pl-3 py-1 space-y-1.5 my-2">
