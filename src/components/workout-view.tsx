@@ -77,8 +77,9 @@ const getExerciseType = (name: string): 'strength' | 'time' => {
 };
 
 export function WorkoutView() {
-  const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split' | 'history' | 'pr'>('main');
+  const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split' | 'history' | 'pr' | 'pr-detail'>('main');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
+  const [selectedPR, setSelectedPR] = useState<any | null>(null);
   
   const [split, setSplit] = useState<WeeklySplit>({});
   const [extraMoves, setExtraMoves] = useState<Exercise[]>([]);
@@ -353,7 +354,24 @@ export function WorkoutView() {
   }
 
   if (activeSubView === 'pr') {
-    return <PersonalRecordsView onBack={() => setActiveSubView('main')} />;
+    return (
+      <PersonalRecordsView 
+        onBack={() => setActiveSubView('main')} 
+        onViewDetail={(pr) => {
+          setSelectedPR(pr);
+          setActiveSubView('pr-detail');
+        }}
+      />
+    );
+  }
+
+  if (activeSubView === 'pr-detail') {
+    return (
+      <PRDetailView 
+        viewingPRs={selectedPR} 
+        onBack={() => setActiveSubView('pr')}
+      />
+    );
   }
 
   return (
@@ -362,7 +380,29 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      {/* Exchanged locations: Split card first, PR card later */}
+      <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
+        <CardContent className="p-0 flex items-center h-20">
+          <div className="shrink-0 w-20 h-full relative">
+            <Image 
+              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
+              alt="Personal Records"
+              fill
+              className="object-cover"
+              data-ai-hint="gym weights"
+            />
+          </div>
+          <div className="flex-1 px-4 flex items-center justify-between min-w-0">
+            <div className="space-y-0.5">
+              <h3 className="text-[10px] font-black text-primary uppercase tracking-tight flex items-center gap-1.5">
+                <Trophy className="w-3 h-3" /> Personal Records
+              </h3>
+              <p className="text-xs font-bold text-foreground/90 leading-tight">Your recent milestones</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-primary/30" />
+          </div>
+        </CardContent>
+      </Card>
+
       <Card 
         onClick={() => setActiveSubView('split')}
         className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
@@ -455,29 +495,6 @@ export function WorkoutView() {
           >
             <Plus className="w-4 h-4" /> ADD EXTRA EXERCISE
           </Button>
-        </CardContent>
-      </Card>
-
-      <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
-        <CardContent className="p-0 flex items-center h-20">
-          <div className="shrink-0 w-20 h-full relative">
-            <Image 
-              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
-              alt="Personal Records"
-              fill
-              className="object-cover"
-              data-ai-hint="gym weights"
-            />
-          </div>
-          <div className="flex-1 px-4 flex items-center justify-between min-w-0">
-            <div className="space-y-0.5">
-              <h3 className="text-[10px] font-black text-primary uppercase tracking-tight flex items-center gap-1.5">
-                <Trophy className="w-3 h-3" /> Personal Records
-              </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">Your recent milestones</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-primary/30" />
-          </div>
         </CardContent>
       </Card>
 
@@ -741,11 +758,10 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
   );
 }
 
-function PersonalRecordsView({ onBack }: { onBack: () => void }) {
+function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onViewDetail: (pr: any) => void }) {
   const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
   const [activeType, setActiveType] = useState<'strength' | 'time' | 'rep'>('strength');
   const [activeMuscle, setActiveMuscle] = useState<string>("CHEST");
-  const [viewingPRs, setViewingPRs] = useState<any | null>(null);
 
   useEffect(() => {
     const saved = localStorage.getItem('pulseflow_workout_history');
@@ -878,7 +894,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
             topLiftsForSelectedMuscle.map((ex, idx) => (
               <button 
                 key={idx} 
-                onClick={() => setViewingPRs(ex)}
+                onClick={() => onViewDetail(ex)}
                 className="flex items-center justify-between p-3 bg-white rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-4 overflow-hidden">
@@ -904,90 +920,138 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
           )}
         </div>
       </div>
+    </div>
+  );
+}
 
-      {viewingPRs && (
-        <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
-          <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[75vh]">
-            <div className="flex items-center justify-between mb-6 pt-2">
-              <div className="min-w-0 flex-1">
-                <h3 className="text-xl font-black uppercase tracking-tighter truncate leading-tight">{viewingPRs.name}</h3>
-                <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">TOP 10 {activeType !== 'time' ? 'REP' : 'TIME'} RECORDS</p>
-              </div>
-              <Button variant="ghost" size="icon" onClick={() => setViewingPRs(null)} className="rounded-full shrink-0">
-                <X className="w-6 h-6" />
-              </Button>
+function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => void }) {
+  if (!viewingPRs) return null;
+
+  const isTimeBased = !viewingPRs.records[0].weight;
+  const bestRecord = viewingPRs.records[0];
+  const daysHeld = bestRecord.date ? differenceInDays(new Date(), parseISO(bestRecord.date)) : 0;
+
+  return (
+    <div className="space-y-6 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="flex items-center gap-4 pt-2 px-1">
+        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
+          <ChevronLeft className="w-5 h-5" />
+        </Button>
+        <div className="min-w-0 flex-1">
+          <h1 className="text-xl font-black uppercase tracking-tighter truncate leading-tight">{viewingPRs.name}</h1>
+          <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">PERSONAL PERFORMANCE DASHBOARD</p>
+        </div>
+      </div>
+
+      <Card className={cn(
+        "border-none shadow-2xl p-8 rounded-[2.5rem] relative overflow-hidden shrink-0 mx-1",
+        isTimeBased ? "bg-gradient-to-br from-sky-500 to-indigo-600 text-white" : "bg-gradient-to-br from-[#f59e0b] to-[#d97706] text-white"
+      )}>
+        <div className="absolute -right-8 -top-8 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-black/10 rounded-full blur-2xl" />
+
+        <div className="flex justify-between items-center relative z-10">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner border border-white/30 rotate-3">
+              {isTimeBased ? (
+                <Timer className="w-8 h-8 text-white drop-shadow-md" />
+              ) : (
+                <Trophy className="w-8 h-8 text-white drop-shadow-md" />
+              )}
             </div>
-
-            <Card className={cn(
-              "border-none shadow-xl p-6 rounded-[2rem] mb-8 relative overflow-hidden shrink-0 bg-[#fff9e6]",
-            )}>
-              <div className="flex justify-between items-center relative z-10">
-                <div className="flex items-center gap-5">
-                  <div className="w-14 h-14 rounded-full bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
-                    <Trophy className="w-7 h-7 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">ALL-TIME BEST</p>
-                    <div className="flex items-baseline gap-1.5">
-                      <span className="text-4xl font-black tracking-tighter text-foreground">
-                        {activeType !== 'time' ? viewingPRs.records[0].weight : viewingPRs.records[0].time}
-                      </span>
-                      <span className="text-sm font-bold uppercase text-muted-foreground">
-                        {activeType !== 'time' ? 'kg' : 's'}
-                      </span>
-                    </div>
-                    {viewingPRs.records[0].date && (
-                      <p className="text-[9px] font-bold text-orange-600/60 uppercase mt-1">
-                        Achieved {differenceInDays(new Date(), parseISO(viewingPRs.records[0].date)) === 0 ? 'Today' : `${differenceInDays(new Date(), parseISO(viewingPRs.records[0].date))} days ago`}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                {activeType !== 'time' && (
-                  <div className="text-right">
-                    <p className="text-2xl font-black text-orange-600">{viewingPRs.records[0].reps}</p>
-                    <p className="text-[8px] font-black uppercase text-orange-600/40">REPS</p>
-                  </div>
-                )}
+            <div>
+              <div className="flex items-center gap-2 mb-1">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">All-Time Best</p>
+                <Badge className="bg-white/20 hover:bg-white/20 text-white text-[7px] font-black uppercase border-none h-4 px-1.5">
+                  Personal Legend
+                </Badge>
               </div>
-            </Card>
+              <div className="flex items-baseline gap-1.5">
+                <span className="text-5xl font-black tracking-tighter">
+                  {isTimeBased ? bestRecord.time : bestRecord.weight}
+                </span>
+                <span className="text-lg font-bold uppercase opacity-60">
+                  {isTimeBased ? 's' : 'kg'}
+                </span>
+              </div>
+              <p className="text-[9px] font-bold uppercase mt-2 bg-black/10 w-fit px-2 py-0.5 rounded-full">
+                Achieved {daysHeld === 0 ? 'Today' : `${daysHeld} days ago`}
+              </p>
+            </div>
+          </div>
+          {!isTimeBased && (
+            <div className="text-right glass-card p-3 rounded-2xl border-white/20">
+              <p className="text-3xl font-black">{bestRecord.reps}</p>
+              <p className="text-[8px] font-black uppercase opacity-60">MAX REPS</p>
+            </div>
+          )}
+        </div>
+      </Card>
 
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-4 px-1">
-              OTHER PERSONAL RECORDS
-            </h4>
+      <div className="px-1 space-y-4">
+        <div className="flex items-center justify-between">
+          <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 flex items-center gap-2">
+            <History className="w-3 h-3" /> Top 10 Ranking History
+          </h4>
+          <span className="text-[8px] font-black text-muted-foreground/40 uppercase">Performance Timeline</span>
+        </div>
+        
+        <div className="grid gap-3">
+          {viewingPRs.records.map((record: any, idx: number) => {
+            const isTop3 = idx < 3;
+            const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
             
-            <ScrollArea className="flex-1 -mx-2 px-2">
-              <div className="grid gap-2.5 pb-12">
-                {viewingPRs.records.slice(1).map((record: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between bg-muted/5 p-4 rounded-2xl border border-muted/10 group transition-all">
+            return (
+              <Card key={idx} className="border-none shadow-sm bg-white hover:bg-muted/5 group transition-all rounded-[1.25rem] overflow-hidden border border-muted/10">
+                <CardContent className="p-0 flex items-stretch">
+                  <div className={cn(
+                    "w-1 shrink-0",
+                    isTop3 ? "" : "bg-muted/20"
+                  )} style={{ backgroundColor: isTop3 ? rankColors[idx] : undefined }} />
+                  
+                  <div className="flex-1 p-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
-                      <span className="text-[11px] font-black text-muted-foreground/40">#{idx + 2}</span>
-                      <div className="flex items-baseline gap-1">
-                        <p className="text-base font-black text-foreground/80">
-                          {activeType !== 'time' ? record.weight : record.time}
+                      <div className={cn(
+                        "w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-black transition-all",
+                        isTop3 ? "bg-primary/5 text-primary scale-110 border border-primary/10" : "bg-muted/30 text-muted-foreground/40 border border-muted/10"
+                      )}>
+                        {idx + 1}
+                      </div>
+                      <div className="space-y-0.5">
+                        <div className="flex items-baseline gap-1">
+                          <p className="text-lg font-black text-foreground/80 leading-none">
+                            {isTimeBased ? record.time : record.weight}
+                          </p>
+                          <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                            {isTimeBased ? 'sec' : 'kg'}
+                          </span>
+                        </div>
+                        <p className="text-[8px] font-bold text-muted-foreground/40 uppercase">
+                          {format(parseISO(record.date), 'MMMM do, yyyy')}
                         </p>
-                        <span className="text-[9px] font-bold text-muted-foreground uppercase">
-                          {activeType !== 'time' ? 'kg' : 's'}
-                        </span>
                       </div>
                     </div>
+                    
                     <div className="flex items-center gap-4">
-                      {activeType !== 'time' && (
-                        <span className="text-[10px] font-black text-foreground/40 uppercase">{record.reps} Reps</span>
+                      {!isTimeBased && (
+                        <div className="text-right">
+                          <p className="text-[11px] font-black text-foreground/60">{record.reps}</p>
+                          <p className="text-[7px] font-bold text-muted-foreground/40 uppercase">Reps</p>
+                        </div>
                       )}
-                      {record.date && (
-                        <span className="text-[8px] font-bold text-muted-foreground/30 uppercase">
-                          {differenceInDays(new Date(), parseISO(record.date)) === 0 ? 'Today' : `${differenceInDays(new Date(), parseISO(record.date))}d ago`}
-                        </span>
+                      {idx === 0 && (
+                        <div className="w-8 h-8 rounded-full bg-yellow-50 flex items-center justify-center border border-yellow-100">
+                          <Medal className="w-4 h-4 text-yellow-500" />
+                        </div>
                       )}
                     </div>
                   </div>
-                ))}
-              </div>
-            </ScrollArea>
-          </div>
+                </CardContent>
+              </Card>
+            );
+          })}
         </div>
-      )}
+      </div>
     </div>
   );
 }
