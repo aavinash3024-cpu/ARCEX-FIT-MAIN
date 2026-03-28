@@ -29,7 +29,8 @@ import {
   ArrowDownRight,
   Medal,
   Timer,
-  Zap
+  Zap,
+  AlertTriangle
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -240,6 +241,18 @@ export function WorkoutView() {
                 <div>
                   <p className="text-[9px] font-black uppercase text-primary mb-1">Execution</p>
                   <p className="text-xs font-medium text-foreground/70 leading-relaxed">{selectedExercise.execution}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="pt-6 border-t border-muted/10">
+              <div className="bg-amber-50/50 p-4 rounded-2xl border border-amber-100 flex gap-3 items-start shadow-sm">
+                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
+                <div className="space-y-1">
+                  <p className="text-[10px] font-black text-amber-800 uppercase tracking-widest">Safety Disclaimer</p>
+                  <p className="text-[10px] leading-relaxed text-amber-700/80 font-medium italic">
+                    Instructions provided are for informational purposes only. To ensure safety and prevent injury, we strongly recommend consulting a certified fitness professional or using a spotter for heavy lifts. By utilizing these guides, you acknowledge that you are performing activities at your own risk and are solely accountable for your physical safety and technique.
+                  </p>
                 </div>
               </div>
             </div>
@@ -768,7 +781,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
     
     Object.values(history).forEach(dayLogs => {
       Object.entries(dayLogs).forEach(([exName, sets]) => {
-        const exData = EXERCISES_DATA.find(e => e.name === exName);
+        const exData = EXERCISES_DATA.find(e => e.name === name);
         if (exData && exData.muscle === activeMuscle) {
           if (!records[exName]) records[exName] = [];
           sets.forEach(s => {
