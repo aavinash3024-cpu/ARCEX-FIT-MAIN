@@ -380,55 +380,7 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
-        <CardContent className="p-0 flex items-center h-20">
-          <div className="shrink-0 w-20 h-full relative">
-            <Image 
-              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
-              alt="Personal Records"
-              fill
-              className="object-cover"
-              data-ai-hint="gym weights"
-            />
-          </div>
-          <div className="flex-1 px-4 flex items-center justify-between min-w-0">
-            <div className="space-y-0.5">
-              <h3 className="text-[10px] font-black text-primary uppercase tracking-tight flex items-center gap-1.5">
-                <Trophy className="w-3 h-3" /> Personal Records
-              </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">Your recent milestones</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-primary/30" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card 
-        onClick={() => setActiveSubView('split')}
-        className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
-      >
-        <CardContent className="p-0 flex items-center h-20">
-          <div className="shrink-0 w-20 h-full relative">
-            <Image 
-              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
-              alt="My Split"
-              fill
-              className="object-cover"
-              data-ai-hint="gym weights"
-            />
-          </div>
-          <div className="flex-1 px-4 flex items-center justify-between min-w-0">
-            <div className="space-y-0.5">
-              <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
-                <Layout className="w-3 h-3" /> My Workout Split
-              </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-purple-300/40" />
-          </div>
-        </CardContent>
-      </Card>
-
+      {/* TODAY'S WORKOUT - Top Priority */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -495,6 +447,57 @@ export function WorkoutView() {
           >
             <Plus className="w-4 h-4" /> ADD EXTRA EXERCISE
           </Button>
+        </CardContent>
+      </Card>
+
+      {/* PERSONAL RECORDS - Shifted Below Today's Workout */}
+      <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
+        <CardContent className="p-0 flex items-center h-20">
+          <div className="shrink-0 w-20 h-full relative">
+            <Image 
+              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
+              alt="Personal Records"
+              fill
+              className="object-cover"
+              data-ai-hint="gym weights"
+            />
+          </div>
+          <div className="flex-1 px-4 flex items-center justify-between min-w-0">
+            <div className="space-y-0.5">
+              <h3 className="text-[10px] font-black text-primary uppercase tracking-tight flex items-center gap-1.5">
+                <Trophy className="w-3 h-3" /> Personal Records
+              </h3>
+              <p className="text-xs font-bold text-foreground/90 leading-tight">Your recent milestones</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-primary/30" />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* WORKOUT SPLIT */}
+      <Card 
+        onClick={() => setActiveSubView('split')}
+        className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
+      >
+        <CardContent className="p-0 flex items-center h-20">
+          <div className="shrink-0 w-20 h-full relative">
+            <Image 
+              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
+              alt="My Split"
+              fill
+              className="object-cover"
+              data-ai-hint="gym weights"
+            />
+          </div>
+          <div className="flex-1 px-4 flex items-center justify-between min-w-0">
+            <div className="space-y-0.5">
+              <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
+                <Layout className="w-3 h-3" /> My Workout Split
+              </h3>
+              <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-purple-300/40" />
+          </div>
         </CardContent>
       </Card>
 
@@ -944,89 +947,85 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
       </div>
 
       <Card className={cn(
-        "border-none shadow-2xl p-8 rounded-[2.5rem] relative overflow-hidden shrink-0 mx-1",
-        isTimeBased ? "bg-gradient-to-br from-sky-500 to-indigo-600 text-white" : "bg-gradient-to-br from-[#f59e0b] to-[#d97706] text-white"
+        "border-none shadow-2xl p-8 rounded-[2rem] relative overflow-hidden mx-1",
+        isTimeBased ? "bg-gradient-to-br from-[#0ea5e9] to-[#2563eb] text-white" : "bg-gradient-to-br from-[#f59e0b] to-[#ea580c] text-white"
       )}>
-        <div className="absolute -right-8 -top-8 w-40 h-40 bg-white/10 rounded-full blur-3xl" />
-        <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-black/10 rounded-full blur-2xl" />
-
-        <div className="flex justify-between items-center relative z-10">
-          <div className="flex items-center gap-6">
-            <div className="w-16 h-16 rounded-3xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner border border-white/30 rotate-3">
-              {isTimeBased ? (
-                <Timer className="w-8 h-8 text-white drop-shadow-md" />
-              ) : (
-                <Trophy className="w-8 h-8 text-white drop-shadow-md" />
-              )}
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-1">
-                <p className="text-[10px] font-black uppercase tracking-[0.2em] opacity-80">All-Time Best</p>
-                <Badge className="bg-white/20 hover:bg-white/20 text-white text-[7px] font-black uppercase border-none h-4 px-1.5">
-                  Personal Legend
-                </Badge>
-              </div>
-              <div className="flex items-baseline gap-1.5">
-                <span className="text-5xl font-black tracking-tighter">
-                  {isTimeBased ? bestRecord.time : bestRecord.weight}
-                </span>
-                <span className="text-lg font-bold uppercase opacity-60">
-                  {isTimeBased ? 's' : 'kg'}
-                </span>
-              </div>
-              <p className="text-[9px] font-bold uppercase mt-2 bg-black/10 w-fit px-2 py-0.5 rounded-full">
-                Achieved {daysHeld === 0 ? 'Today' : `${daysHeld} days ago`}
-              </p>
-            </div>
+        <div className="absolute -right-10 -top-10 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+        
+        <div className="relative z-10 flex flex-col items-center text-center space-y-6">
+          <div className="space-y-1">
+            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-80">ALL-TIME BEST</p>
+            <Badge className="bg-white/20 hover:bg-white/20 text-white text-[8px] font-black uppercase border-none px-2 h-5">
+              PERSONAL LEGEND
+            </Badge>
           </div>
-          {!isTimeBased && (
-            <div className="text-right glass-card p-3 rounded-2xl border-white/20">
-              <p className="text-3xl font-black">{bestRecord.reps}</p>
-              <p className="text-[8px] font-black uppercase opacity-60">MAX REPS</p>
+
+          <div className="flex items-center justify-center gap-6 w-full">
+            <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner shrink-0">
+              {isTimeBased ? <Timer className="w-7 h-7 text-white" /> : <Trophy className="w-7 h-7 text-white" />}
             </div>
-          )}
+            
+            <div className="flex items-baseline gap-1.5">
+              <span className="text-6xl font-black tracking-tighter">
+                {isTimeBased ? bestRecord.time : bestRecord.weight}
+              </span>
+              <span className="text-xl font-bold uppercase opacity-60">
+                {isTimeBased ? 'SEC' : 'KG'}
+              </span>
+            </div>
+
+            {!isTimeBased && (
+              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-2 min-w-[64px] shrink-0">
+                <p className="text-2xl font-black">{bestRecord.reps}</p>
+                <p className="text-[7px] font-black uppercase opacity-60 tracking-widest">MAX REPS</p>
+              </div>
+            )}
+          </div>
+
+          <div className="bg-black/10 px-4 py-1.5 rounded-full border border-white/5">
+            <p className="text-[10px] font-black uppercase tracking-widest">
+              ACHIEVED {daysHeld === 0 ? 'TODAY' : `${daysHeld} DAYS AGO`}
+            </p>
+          </div>
         </div>
       </Card>
 
       <div className="px-1 space-y-4">
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between px-1">
           <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 flex items-center gap-2">
-            <History className="w-3 h-3" /> Top 10 Ranking History
+            <History className="w-3.5 h-3.5" /> TOP 10 RANKING HISTORY
           </h4>
-          <span className="text-[8px] font-black text-muted-foreground/40 uppercase">Performance Timeline</span>
+          <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">PERFORMANCE TIMELINE</span>
         </div>
         
-        <div className="grid gap-3">
+        <div className="grid gap-2.5">
           {viewingPRs.records.map((record: any, idx: number) => {
             const isTop3 = idx < 3;
-            const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
+            const rankColors = ['#f59e0b', '#94a3b8', '#92400e'];
             
             return (
-              <Card key={idx} className="border-none shadow-sm bg-white hover:bg-muted/5 group transition-all rounded-[1.25rem] overflow-hidden border border-muted/10">
+              <Card key={idx} className="border-none shadow-sm bg-white hover:bg-muted/5 group transition-all rounded-2xl overflow-hidden border border-muted/10">
                 <CardContent className="p-0 flex items-stretch">
-                  <div className={cn(
-                    "w-1 shrink-0",
-                    isTop3 ? "" : "bg-muted/20"
-                  )} style={{ backgroundColor: isTop3 ? rankColors[idx] : undefined }} />
+                  <div className={cn("w-1.5 shrink-0", !isTop3 && "bg-muted/20")} style={{ backgroundColor: isTop3 ? rankColors[idx] : undefined }} />
                   
                   <div className="flex-1 p-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className={cn(
-                        "w-8 h-8 rounded-full flex items-center justify-center text-[11px] font-black transition-all",
-                        isTop3 ? "bg-primary/5 text-primary scale-110 border border-primary/10" : "bg-muted/30 text-muted-foreground/40 border border-muted/10"
+                        "w-9 h-9 rounded-full flex items-center justify-center text-[12px] font-black transition-all",
+                        isTop3 ? "bg-primary/5 text-primary border border-primary/10" : "bg-muted/30 text-muted-foreground/40 border border-muted/10"
                       )}>
                         {idx + 1}
                       </div>
                       <div className="space-y-0.5">
                         <div className="flex items-baseline gap-1">
-                          <p className="text-lg font-black text-foreground/80 leading-none">
+                          <p className="text-xl font-black text-foreground/80 leading-none">
                             {isTimeBased ? record.time : record.weight}
                           </p>
                           <span className="text-[10px] font-bold text-muted-foreground uppercase">
-                            {isTimeBased ? 'sec' : 'kg'}
+                            {isTimeBased ? 'SEC' : 'KG'}
                           </span>
                         </div>
-                        <p className="text-[8px] font-bold text-muted-foreground/40 uppercase">
+                        <p className="text-[9px] font-bold text-muted-foreground/40 uppercase">
                           {format(parseISO(record.date), 'MMMM do, yyyy')}
                         </p>
                       </div>
@@ -1035,13 +1034,13 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
                     <div className="flex items-center gap-4">
                       {!isTimeBased && (
                         <div className="text-right">
-                          <p className="text-[11px] font-black text-foreground/60">{record.reps}</p>
-                          <p className="text-[7px] font-bold text-muted-foreground/40 uppercase">Reps</p>
+                          <p className="text-[12px] font-black text-foreground/60">{record.reps}</p>
+                          <p className="text-[8px] font-bold text-muted-foreground/40 uppercase tracking-widest">REPS</p>
                         </div>
                       )}
                       {idx === 0 && (
-                        <div className="w-8 h-8 rounded-full bg-yellow-50 flex items-center justify-center border border-yellow-100">
-                          <Medal className="w-4 h-4 text-yellow-500" />
+                        <div className="w-9 h-9 rounded-xl bg-yellow-50 flex items-center justify-center border border-yellow-100/50 shadow-sm">
+                          <Medal className="w-5 h-5 text-yellow-500" />
                         </div>
                       )}
                     </div>
