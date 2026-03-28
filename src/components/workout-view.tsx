@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -380,7 +379,6 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      {/* TODAY'S WORKOUT - Top Priority */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -450,7 +448,6 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* PERSONAL RECORDS - Shifted Below Today's Workout */}
       <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
@@ -474,7 +471,6 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* WORKOUT SPLIT */}
       <Card 
         onClick={() => setActiveSubView('split')}
         className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
@@ -932,6 +928,8 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
 
   const isTimeBased = !viewingPRs.records[0].weight;
   const bestRecord = viewingPRs.records[0];
+  const daysAgo = differenceInDays(new Date(), parseISO(bestRecord.date));
+  const daysText = daysAgo === 0 ? "Achieved Today" : `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago`;
 
   return (
     <div className="space-y-6 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -941,33 +939,34 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
         </Button>
         <div className="min-w-0 flex-1">
           <h1 className="text-xl font-black uppercase tracking-tighter truncate leading-tight">{viewingPRs.name}</h1>
-          <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">PERSONAL PERFORMANCE DASHBOARD</p>
+          <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">PERFORMANCE DASHBOARD</p>
         </div>
       </div>
 
       <Card className={cn(
-        "border-none shadow-2xl p-10 rounded-[2.5rem] relative overflow-hidden mx-1 flex flex-col items-center justify-center min-h-[220px]",
+        "border-none shadow-xl p-5 rounded-[1.5rem] relative overflow-hidden mx-1 flex flex-col items-center justify-center min-h-[120px]",
         isTimeBased ? "bg-gradient-to-br from-[#0ea5e9] to-[#2563eb] text-white" : "bg-gradient-to-br from-[#f59e0b] to-[#ea580c] text-white"
       )}>
-        <div className="absolute -right-10 -top-10 w-48 h-48 bg-white/5 rounded-full blur-3xl" />
-        <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-black/10 rounded-full blur-2xl" />
+        <div className="absolute -right-6 -top-6 w-24 h-24 bg-white/10 rounded-full blur-2xl" />
         
-        <div className="relative z-10 flex flex-col items-center text-center space-y-5">
-          <div className="flex items-center gap-3 bg-black/10 px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
-            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">PERSONAL RECORD</span>
-            <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center border border-white/20">
-              <Trophy className="w-3 h-3 text-white" />
+        <div className="relative z-10 flex flex-col items-center text-center space-y-2">
+          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-black/10 backdrop-blur-md border border-white/10">
+            <span className="text-[10px] font-black uppercase tracking-widest text-white/90">PERSONAL RECORD</span>
+            <div className="w-5 h-5 rounded-full bg-white/20 flex items-center justify-center border border-white/20">
+              <Trophy className="w-2.5 h-2.5 text-white" />
             </div>
           </div>
 
-          <div className="space-y-1">
-            <p className="text-5xl font-black tracking-tighter drop-shadow-sm">
-              {isTimeBased 
-                ? `${bestRecord.time} SEC` 
-                : `${bestRecord.weight}KG * ${bestRecord.reps} REPS`
-              }
-            </p>
-          </div>
+          <p className="text-3xl font-black tracking-tighter">
+            {isTimeBased 
+              ? `${bestRecord.time} SEC` 
+              : `${bestRecord.weight}KG * ${bestRecord.reps} REPS`
+            }
+          </p>
+          
+          <p className="text-[9px] font-black uppercase tracking-widest text-white/60">
+            {daysText}
+          </p>
         </div>
       </Card>
 
@@ -1106,7 +1105,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
       allSubMusclesForMuscle.forEach(z => {
         const matchingDirect = directExercisesInSplit.filter(e => e.subMuscle === z);
         if (matchingDirect.length > 0) {
-          zonesDone[z] = matchingDirect.map(e => ({ name: e.name, day: e.day }));
+          zonesDone[z] = matchingDirect.map(ex => ({ name: ex.name, day: ex.day }));
         }
       });
 
