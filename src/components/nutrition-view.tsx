@@ -25,7 +25,8 @@ import {
   Calendar,
   ArrowUpRight,
   ArrowDownRight,
-  Target
+  Target,
+  Zap
 } from "lucide-react";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
@@ -70,6 +71,15 @@ interface LoggedMeal {
   timestamp: number;
   dateStr?: string; // YYYY-MM-DD
   items?: MealItem[];
+  isCached?: boolean;
+}
+
+interface CachedFoodItem {
+  calories: number;
+  protein: number;
+  carbs: number;
+  fat: number;
+  fiber: number;
 }
 
 interface NutritionViewProps {
@@ -97,6 +107,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   const [savedMeals, setSavedMeals] = useState<LoggedMeal[]>([]);
   const [allHistory, setAllHistory] = useState<LoggedMeal[]>([]);
   const [goalData, setGoalData] = useState<any>(null);
+  const [foodCache, setFoodCache] = useState<Record<string, CachedFoodItem>>({});
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -105,11 +116,13 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
     const savedHistory = localStorage.getItem('pulseflow_all_meals_history');
     const savedCredits = localStorage.getItem('pulseflow_meal_credits');
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
+    const savedCache = localStorage.getItem('pulseflow_food_cache');
     
     if (savedRecent) setRecentMeals(JSON.parse(savedRecent));
     if (savedFavorites) setSavedMeals(JSON.parse(savedFavorites));
     if (savedHistory) setAllHistory(JSON.parse(savedHistory));
     if (savedGoal) setGoalData(JSON.parse(savedGoal));
+    if (savedCache) setFoodCache(JSON.parse(savedCache));
     if (savedCredits !== null) setCredits(Number(savedCredits));
     
     setIsLoaded(true);
@@ -121,11 +134,67 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       localStorage.setItem('pulseflow_saved_meals', JSON.stringify(savedMeals));
       localStorage.setItem('pulseflow_all_meals_history', JSON.stringify(allHistory));
       localStorage.setItem('pulseflow_meal_credits', credits.toString());
+      localStorage.setItem('pulseflow_food_cache', JSON.stringify(foodCache));
     }
-  }, [recentMeals, savedMeals, allHistory, credits, isLoaded]);
+  }, [recentMeals, savedMeals, allHistory, credits, foodCache, isLoaded]);
+
+  const tryLocalParse = (input: string) => {
+    const normalized = input.toLowerCase();
+    // Regex to find the first number in the string
+    const numMatch = normalized.match(/(\d+(?:\.\d+)?)/);
+    const quantity = numMatch ? parseFloat(numMatch[0]) : 1;
+    
+    // Scan cache for matching item names within the input
+    for (const [foodName, data] of Object.entries(foodCache)) {
+      if (normalized.includes(foodName)) {
+        const today = new Date();
+        const dateStr = format(today, 'yyyy-MM-dd');
+        
+        return {
+          id: Math.random().toString(36).substr(2, 9),
+          type: getMealTypeByTime(),
+          name: `${quantity > 1 ? quantity + ' ' : ''}${foodName.charAt(0).toUpperCase() + foodName.slice(1)}`,
+          calories: Math.round(data.calories * quantity),
+          protein: Math.round(data.protein * quantity),
+          carbs: Math.round(data.carbs * quantity),
+          fat: Math.round(data.fat * quantity),
+          fiber: Math.round(data.fiber * quantity),
+          time: today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+          timestamp: today.getTime(),
+          dateStr,
+          isCached: true,
+          items: [{
+            name: foodName,
+            quantity: quantity.toString(),
+            calories: Math.round(data.calories * quantity),
+            protein: Math.round(data.protein * quantity),
+            carbs: Math.round(data.carbs * quantity),
+            fat: Math.round(data.fat * quantity),
+            fiber: Math.round(data.fiber * quantity),
+          }]
+        } as LoggedMeal;
+      }
+    }
+    return null;
+  };
 
   const handleLogMeal = async () => {
     if (!mealInput.trim()) return;
+
+    // 1. Try Local Atomic Cache first
+    const cachedMatch = tryLocalParse(mealInput);
+    if (cachedMatch) {
+      setLoggedMeals(prev => [cachedMatch, ...prev]);
+      setAllHistory(prev => [cachedMatch, ...prev]);
+      setRecentMeals(prev => {
+        const filtered = prev.filter(m => m.name.toLowerCase() !== cachedMatch.name.toLowerCase());
+        return [cachedMatch, ...filtered].slice(0, 10);
+      });
+      setMealInput("");
+      return;
+    }
+
+    // 2. If no cache hit, use AI
     setIsParsing(true);
     try {
       const result = await parseMeal({ description: mealInput });
@@ -154,6 +223,23 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         }))
       };
       
+      // Update Atomic Cache with new items
+      const newCacheItems: Record<string, CachedFoodItem> = {};
+      result.items.forEach(item => {
+        const qtyMatch = item.quantity.match(/(\d+(?:\.\d+)?)/);
+        const qty = qtyMatch ? parseFloat(qtyMatch[1]) : 1;
+        if (qty > 0) {
+          newCacheItems[item.name.toLowerCase()] = {
+            calories: item.calories / qty,
+            protein: item.protein / qty,
+            carbs: item.carbs / qty,
+            fat: item.fat / qty,
+            fiber: item.fiber / qty,
+          };
+        }
+      });
+      setFoodCache(prev => ({ ...prev, ...newCacheItems }));
+
       setLoggedMeals(prev => [newMeal, ...prev]);
       setAllHistory(prev => [newMeal, ...prev]);
       setCredits(prev => Math.max(0, prev - 1));
@@ -390,7 +476,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                         <span className="text-primary uppercase text-[10px] mr-1">{meal.type}:</span> {meal.name}
                       </h4>
                       <p className="text-[10px] font-black text-foreground/60 leading-none uppercase tracking-tight">
-                        {Math.round(meal.calories)} KCAL
+                        {Math.round(meal.calories)} KCAL {meal.isCached && <Badge variant="secondary" className="h-3 py-0 px-1 bg-green-50 text-green-600 border-none font-bold uppercase text-[6px] ml-1">Cached</Badge>}
                       </p>
                       
                       {meal.items && meal.items.length > 0 && (
@@ -466,7 +552,14 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               <Utensils className="w-4 h-4 text-primary" />
             </div>
             <div className="flex-1 min-w-0">
-              <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground/80">Meal Logging</h2>
+              <div className="flex items-center justify-between">
+                <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground/80">Meal Logging</h2>
+                {Object.keys(foodCache).length > 0 && (
+                  <Badge variant="outline" className="h-4 border-primary/20 text-primary text-[7px] font-black uppercase gap-1 px-1.5">
+                    <Zap className="w-2 h-2 fill-current" /> {Object.keys(foodCache).length} Learned
+                  </Badge>
+                )}
+              </div>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
                 TODAY'S CREDITS: <span className={cn("font-black", credits <= 5 ? "text-destructive" : "text-primary")}>{credits}/25</span>
               </p>
@@ -638,11 +731,11 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                           <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
                           <h4 className="font-bold text-[13px] text-foreground/90 truncate leading-tight">{meal.name}</h4>
                           <p className="text-[11px] font-bold text-foreground/60 tracking-tighter mt-0.5">
-                            {meal.calories} kcal
+                            {meal.calories} kcal {meal.isCached && <span className="text-[7px] text-green-600 font-black uppercase ml-1 opacity-60">Local</span>}
                           </p>
                         </div>
                       </div>
-                      <Button onClick={() => deleteLoggedMeal(meal.id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
+                      <Button onClick={() => deleteLoggedMeal(id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                       <span className="absolute bottom-2 right-2 text-[7px] font-bold text-muted-foreground/30">{meal.time}</span>
@@ -768,7 +861,6 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
 
   return (
     <div className="space-y-4">
-      {/* Date Shifter */}
       <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20">
         <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full hover:bg-muted">
           <ChevronLeft className="w-5 h-5 text-primary" />
