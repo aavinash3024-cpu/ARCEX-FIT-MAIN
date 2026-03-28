@@ -174,11 +174,11 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
           </CardContent>
         </Card>
 
-        {/* 2. Next Milestone */}
+        {/* 2. Your Milestone */}
         <Card className="border-none shadow-sm bg-primary/95 text-primary-foreground overflow-hidden rounded-[1rem]">
            <CardContent className="p-3 px-4 flex items-center justify-between">
               <div className="space-y-0.5">
-                 <p className="text-[7px] font-black uppercase tracking-[0.2em] opacity-70">Next Milestone</p>
+                 <p className="text-[7px] font-black uppercase tracking-[0.2em] opacity-70">Your Milestone</p>
                  <h4 className="font-black text-[11px] uppercase tracking-tight">Reach {targetWeight > 0 ? targetWeight.toFixed(1) : "---"} kg</h4>
               </div>
               <div className="flex items-center gap-3">
