@@ -812,7 +812,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
       </div>
 
       <div className="space-y-4">
-        {/* Type Shifter */}
         <div className="flex items-center justify-between bg-white p-2 rounded-2xl shadow-sm border border-muted/20 mx-1">
           <button 
             onClick={() => setActiveType('strength')}
@@ -834,7 +833,6 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
           </button>
         </div>
 
-        {/* Dynamic Swipable Muscle List */}
         <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-1">
           {filteredMuscles.map(muscle => (
             <button
@@ -1455,7 +1453,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                   "border-none shadow-sm overflow-hidden bg-white rounded-[1.25rem] transition-all",
                   exerciseNames.length === 0 ? "opacity-40" : ""
                 )}>
-                  <AccordionTrigger className="p-0 hover:no-underline [&[data-state=open]]:bg-muted/5 group">
+                  <AccordionTrigger className="p-0 hover:no-underline [&[data-state=open]]:bg-muted/5 group [&>svg]:hidden">
                     <div className="flex items-center justify-between w-full py-3 px-6">
                       <div className="text-left">
                         <h3 className="text-[13px] font-black text-foreground leading-tight">
