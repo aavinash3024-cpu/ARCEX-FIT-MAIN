@@ -932,7 +932,6 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
 
   const isTimeBased = !viewingPRs.records[0].weight;
   const bestRecord = viewingPRs.records[0];
-  const daysHeld = bestRecord.date ? differenceInDays(new Date(), parseISO(bestRecord.date)) : 0;
 
   return (
     <div className="space-y-6 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -947,44 +946,26 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
       </div>
 
       <Card className={cn(
-        "border-none shadow-2xl p-8 rounded-[2rem] relative overflow-hidden mx-1",
+        "border-none shadow-2xl p-10 rounded-[2.5rem] relative overflow-hidden mx-1 flex flex-col items-center justify-center min-h-[220px]",
         isTimeBased ? "bg-gradient-to-br from-[#0ea5e9] to-[#2563eb] text-white" : "bg-gradient-to-br from-[#f59e0b] to-[#ea580c] text-white"
       )}>
-        <div className="absolute -right-10 -top-10 w-48 h-48 bg-white/10 rounded-full blur-3xl" />
+        <div className="absolute -right-10 -top-10 w-48 h-48 bg-white/5 rounded-full blur-3xl" />
+        <div className="absolute -left-10 -bottom-10 w-32 h-32 bg-black/10 rounded-full blur-2xl" />
         
-        <div className="relative z-10 flex flex-col items-center text-center space-y-6">
+        <div className="relative z-10 flex flex-col items-center text-center space-y-5">
+          <div className="flex items-center gap-3 bg-black/10 px-4 py-2 rounded-full border border-white/10 backdrop-blur-md">
+            <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/90">PERSONAL RECORD</span>
+            <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center border border-white/20">
+              <Trophy className="w-3 h-3 text-white" />
+            </div>
+          </div>
+
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-[0.3em] opacity-80">ALL-TIME BEST</p>
-            <Badge className="bg-white/20 hover:bg-white/20 text-white text-[8px] font-black uppercase border-none px-2 h-5">
-              PERSONAL LEGEND
-            </Badge>
-          </div>
-
-          <div className="flex items-center justify-center gap-6 w-full">
-            <div className="w-14 h-14 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/20 shadow-inner shrink-0">
-              {isTimeBased ? <Timer className="w-7 h-7 text-white" /> : <Trophy className="w-7 h-7 text-white" />}
-            </div>
-            
-            <div className="flex items-baseline gap-1.5">
-              <span className="text-6xl font-black tracking-tighter">
-                {isTimeBased ? bestRecord.time : bestRecord.weight}
-              </span>
-              <span className="text-xl font-bold uppercase opacity-60">
-                {isTimeBased ? 'SEC' : 'KG'}
-              </span>
-            </div>
-
-            {!isTimeBased && (
-              <div className="bg-white/10 backdrop-blur-md border border-white/20 rounded-2xl p-2 min-w-[64px] shrink-0">
-                <p className="text-2xl font-black">{bestRecord.reps}</p>
-                <p className="text-[7px] font-black uppercase opacity-60 tracking-widest">MAX REPS</p>
-              </div>
-            )}
-          </div>
-
-          <div className="bg-black/10 px-4 py-1.5 rounded-full border border-white/5">
-            <p className="text-[10px] font-black uppercase tracking-widest">
-              ACHIEVED {daysHeld === 0 ? 'TODAY' : `${daysHeld} DAYS AGO`}
+            <p className="text-5xl font-black tracking-tighter drop-shadow-sm">
+              {isTimeBased 
+                ? `${bestRecord.time} SEC` 
+                : `${bestRecord.weight}KG * ${bestRecord.reps} REPS`
+              }
             </p>
           </div>
         </div>
