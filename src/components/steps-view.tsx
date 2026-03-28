@@ -166,7 +166,7 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
                 <Footprints className="w-4 h-4 text-green-500" />
               </div>
               <div>
-                <p className="text-[8px] font-black text-muted-foreground uppercase">Estimated</p>
+                <p className="text-[8px] font-black text-muted-foreground uppercase">Estimated Burn</p>
                 <p className="text-xs font-black">{(currentSteps * 0.04).toFixed(1)} Kcal</p>
               </div>
             </div>
@@ -175,7 +175,7 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
                 <TrendingUp className="w-4 h-4 text-primary" />
               </div>
               <div>
-                <p className="text-[8px] font-black text-muted-foreground uppercase">Distance</p>
+                <p className="text-[8px] font-black text-muted-foreground uppercase">Estimated Walked</p>
                 <p className="text-xs font-black">{(currentSteps * 0.0007).toFixed(2)} Km</p>
               </div>
             </div>
