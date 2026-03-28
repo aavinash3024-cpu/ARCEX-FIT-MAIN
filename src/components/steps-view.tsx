@@ -3,17 +3,13 @@
 import React, { useState, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
   Pencil, 
-  Minus, 
-  Plus,
   ChevronLeft, 
   Calendar,
   CheckCircle2,
   Footprints,
-  TrendingUp,
-  Target
+  TrendingUp
 } from "lucide-react";
 import { 
   BarChart, 
@@ -73,6 +69,11 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
     setIsEditing(false);
   };
 
+  // Circular progress constants
+  const radius = 80;
+  const circumference = 2 * Math.PI * radius;
+  const strokeDashoffset = circumference - (percentage / 100) * circumference;
+
   return (
     <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       {/* Header */}
@@ -83,24 +84,18 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
         <h1 className="text-2xl font-bold font-headline">Step Tracker</h1>
       </div>
 
-      {/* 1. Today's Summary Card */}
+      {/* 1. Today's Summary Card with Circular Bar */}
       <Card className="border-none shadow-lg overflow-hidden bg-white relative">
-        <CardContent className="p-6 space-y-8">
-          <div className="flex justify-between items-center">
-            <div className="space-y-1">
-              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
-                Today's Goal
-              </h3>
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black text-foreground">{currentSteps.toLocaleString()}</span>
-                <span className="text-sm font-bold text-muted-foreground">/ {targetSteps.toLocaleString()}</span>
-              </div>
-            </div>
+        <CardContent className="p-6 flex flex-col items-center">
+          <div className="w-full flex justify-between items-start mb-4">
+            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
+              Daily Achievement
+            </h3>
             
             <Dialog open={isEditing} onOpenChange={setIsEditing}>
               <DialogTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full bg-muted/30 text-muted-foreground">
-                  <Pencil className="w-4 h-4" />
+                <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full bg-muted/30 text-muted-foreground">
+                  <Pencil className="w-3.5 h-3.5" />
                 </Button>
               </DialogTrigger>
               <DialogContent className="rounded-2xl w-[90%] max-w-sm">
@@ -125,24 +120,47 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
             </Dialog>
           </div>
 
-          <div className="relative">
-            <div className="h-3 w-full bg-muted/30 rounded-full overflow-hidden shadow-inner">
-              <div 
-                className="h-full bg-green-500 transition-all duration-1000 ease-out relative"
-                style={{ width: `${percentage}%` }}
-              >
-                <div className="absolute inset-0 bg-gradient-to-r from-transparent to-white/20" />
+          {/* Circular Progress Gauge */}
+          <div className="relative flex items-center justify-center mb-8">
+            <svg className="w-48 h-48 transform -rotate-90">
+              <circle
+                cx="96"
+                cy="96"
+                r={radius}
+                stroke="currentColor"
+                strokeWidth="12"
+                fill="transparent"
+                className="text-muted/20"
+              />
+              <circle
+                cx="96"
+                cy="96"
+                r={radius}
+                stroke="currentColor"
+                strokeWidth="12"
+                fill="transparent"
+                strokeDasharray={circumference}
+                style={{ strokeDashoffset, transition: 'stroke-dashoffset 1s ease-in-out' }}
+                strokeLinecap="round"
+                className="text-green-500"
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center transform rotate-0">
+              <span className="text-3xl font-black text-foreground">{currentSteps.toLocaleString()}</span>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">/ {targetSteps.toLocaleString()}</span>
+              <div className="mt-1">
+                <CheckCircle2 className={`w-5 h-5 transition-colors ${currentSteps >= targetSteps ? 'text-green-500' : 'text-muted/30'}`} />
               </div>
-            </div>
-            <div className="flex justify-between mt-2 px-1">
-              <span className="text-[9px] font-black text-muted-foreground uppercase">{percentage}% Done</span>
-              <span className="text-[9px] font-black text-green-600 uppercase">
-                {currentSteps >= targetSteps ? "Goal Achieved!" : `${(targetSteps - currentSteps).toLocaleString()} more to go`}
-              </span>
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="text-center w-full mb-6">
+            <span className="text-[10px] font-black text-green-600 uppercase tracking-widest">
+              {currentSteps >= targetSteps ? "Goal Achieved!" : `${(targetSteps - currentSteps).toLocaleString()} more to go`}
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 w-full">
             <div className="bg-muted/10 p-4 rounded-2xl flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
                 <Footprints className="w-4 h-4 text-green-500" />
@@ -244,9 +262,9 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
             </div>
           </div>
           <div className="text-right">
-            <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-none text-[8px] font-black uppercase">
+            <div className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[8px] font-black uppercase">
               Consistent
-            </Badge>
+            </div>
           </div>
         </CardContent>
       </Card>
