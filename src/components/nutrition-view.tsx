@@ -310,7 +310,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
     return savedMeals.some(s => s.name.toLowerCase() === mealName.toLowerCase());
   };
 
-  const analysisImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
   const logHeaderImage = PlaceHolderImages.find(img => img.id === 'meal-quinoa-bowl');
 
   const renderTrendsView = () => {
@@ -518,28 +517,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </Button>
       </div>
 
-      <Card className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden">
-        <CardContent className="p-0 flex items-center">
-          <div className="shrink-0 w-20 h-20 relative">
-            <Image 
-              src={analysisImage?.imageUrl || "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=800&auto=format&fit=crop"} 
-              alt="AI Analysis"
-              fill
-              className="object-cover"
-              data-ai-hint="gourmet salad"
-            />
-          </div>
-          <div className="flex-1 p-3 min-w-0">
-            <h3 className="text-[10px] font-black flex items-center gap-1.5 uppercase tracking-wider text-primary">
-              <Sparkles className="w-3 h-3" /> AI Insight
-            </h3>
-            <p className="text-[11px] text-muted-foreground font-medium leading-tight mt-0.5 line-clamp-2">
-              Stay focused! Logging consistently is the best way to hit your goals.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
-
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -725,9 +702,9 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                         <div className="min-w-0">
                           <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
                           <h4 className="font-bold text-[13px] text-foreground/90 truncate leading-tight">{meal.name}</h4>
-                          <p className="text-[11px] font-bold text-foreground/60 tracking-tighter mt-0.5">
-                            {meal.calories} kcal {meal.isCached && <span className="text-[7px] text-green-600 font-black uppercase ml-1 opacity-60">Local</span>}
-                          </p>
+                          <div className="text-[11px] font-bold text-foreground/60 tracking-tighter mt-0.5 flex items-center">
+                            {meal.calories} kcal {meal.isCached && <Badge variant="secondary" className="h-3 py-0 px-1 bg-green-50 text-green-600 border-none font-bold uppercase text-[6px] ml-1">Local</Badge>}
+                          </div>
                         </div>
                       </div>
                       <Button onClick={() => deleteLoggedMeal(meal.id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
