@@ -727,7 +727,7 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
 
 function PersonalRecordsView({ onBack }: { onBack: () => void }) {
   const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
-  const [activeType, setActiveType] = useState<'strength' | 'time'>('strength');
+  const [activeType, setActiveType] = useState<'strength' | 'time' | 'rep'>('strength');
   const [activeMuscle, setActiveMuscle] = useState<string>("CHEST");
   const [viewingPRs, setViewingPRs] = useState<any | null>(null);
 
@@ -746,7 +746,8 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
     const muscles = new Set<string>();
     EXERCISES_DATA.forEach(ex => {
       const type = getExerciseType(ex.name);
-      if (type === activeType) {
+      const currentSelectionType = activeType === 'time' ? 'time' : 'strength';
+      if (type === currentSelectionType) {
         muscles.add(ex.muscle);
       }
     });
@@ -763,6 +764,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
     if (!activeMuscle) return [];
     
     const records: Record<string, any[]> = {};
+    const typeToFilter = activeType === 'time' ? 'time' : 'strength';
     
     Object.values(history).forEach(dayLogs => {
       Object.entries(dayLogs).forEach(([exName, sets]) => {
@@ -770,8 +772,8 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
         if (exData && exData.muscle === activeMuscle) {
           if (!records[exName]) records[exName] = [];
           sets.forEach(s => {
-            if (s.type === activeType) {
-              if (activeType === 'strength') {
+            if (s.type === typeToFilter) {
+              if (typeToFilter === 'strength') {
                 records[exName].push({
                   weight: parseFloat(s.weight),
                   reps: parseFloat(s.reps)
@@ -789,7 +791,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
 
     return Object.entries(records).map(([name, allSets]) => {
       let sortedSets;
-      if (activeType === 'strength') {
+      if (typeToFilter === 'strength') {
         sortedSets = allSets.sort((a, b) => b.weight - a.weight || b.reps - a.reps);
       } else {
         sortedSets = allSets.sort((a, b) => b.time - a.time);
@@ -817,7 +819,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
             onClick={() => setActiveType('strength')}
             className={cn(
               "flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-              activeType === 'strength' ? "bg-primary text-white shadow-lg" : "text-muted-foreground hover:bg-muted/5"
+              activeType !== 'time' ? "bg-primary text-white shadow-lg" : "text-muted-foreground hover:bg-muted/5"
             )}
           >
             Rep Based
@@ -852,7 +854,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
           {topLiftsForSelectedMuscle.length === 0 ? (
             <div className="text-center py-20 opacity-30">
               <Trophy className="w-12 h-12 mx-auto mb-4" />
-              <p className="text-sm font-black uppercase tracking-widest">No {activeType === 'strength' ? 'rep' : 'time'} records for this muscle</p>
+              <p className="text-sm font-black uppercase tracking-widest">No {activeType === 'time' ? 'time' : 'rep'} records for this muscle</p>
             </div>
           ) : (
             topLiftsForSelectedMuscle.map((ex, idx) => (
@@ -863,7 +865,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
               >
                 <div className="flex items-center gap-4 overflow-hidden">
                   <div className="shrink-0 w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center">
-                    {activeType === 'strength' ? (
+                    {activeType !== 'time' ? (
                       <Trophy className="w-5 h-5 text-yellow-500 fill-yellow-500/20" />
                     ) : (
                       <Timer className="w-5 h-5 text-sky-500" />
@@ -872,7 +874,7 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
                   <div className="min-w-0">
                     <span className="font-bold text-[14px] text-foreground/90 truncate block">{ex.name}</span>
                     <span className="text-[11px] font-black text-muted-foreground/60 uppercase">
-                      {activeType === 'strength' ? `${ex.records[0].weight}KG` : `${ex.records[0].time}S`}
+                      {activeType !== 'time' ? `${ex.records[0].weight}KG` : `${ex.records[0].time}S`}
                     </span>
                   </div>
                 </div>
@@ -891,61 +893,79 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
             <div className="flex items-center justify-between mb-6 pt-2">
               <div className="min-w-0 flex-1">
                 <h3 className="text-xl font-black uppercase tracking-tighter truncate">{viewingPRs.name}</h3>
-                <p className="text-[10px] font-black text-primary uppercase tracking-widest">TOP 10 {activeType === 'strength' ? 'REP' : 'TIME'} RECORDS</p>
+                <p className="text-[10px] font-black text-primary uppercase tracking-widest">TOP 10 {activeType !== 'time' ? 'REP' : 'TIME'} RECORDS</p>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setViewingPRs(null)} className="rounded-full shrink-0">
                 <X className="w-6 h-6" />
               </Button>
             </div>
 
-            <Card className="border-none shadow-lg bg-gradient-to-br from-amber-50 to-amber-100/50 border border-amber-200/50 p-5 rounded-3xl mb-6 relative overflow-hidden shrink-0">
-              <div className="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl" />
+            <Card className={cn(
+              "border-none shadow-2xl p-6 rounded-[2rem] mb-8 relative overflow-hidden shrink-0",
+              activeType !== 'time' 
+                ? "bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 text-white" 
+                : "bg-gradient-to-br from-sky-400 via-blue-600 to-indigo-700 text-white"
+            )}>
+              <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-3xl" />
+              <div className="absolute -left-6 -bottom-6 w-24 h-24 bg-black/10 rounded-full blur-2xl" />
+              
               <div className="flex justify-between items-center relative z-10">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-full bg-amber-500 flex items-center justify-center shadow-lg shadow-amber-500/20">
-                    <Medal className="w-6 h-6 text-white" />
+                <div className="flex items-center gap-5">
+                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner border border-white/30">
+                    {activeType !== 'time' ? (
+                      <Trophy className="w-8 h-8 text-white drop-shadow-md" />
+                    ) : (
+                      <Timer className="w-8 h-8 text-white drop-shadow-md" />
+                    )}
                   </div>
                   <div>
-                    <p className="text-[10px] font-black text-amber-600 uppercase tracking-widest">All-Time Best</p>
+                    <Badge variant="outline" className="bg-white/20 border-white/40 text-[8px] text-white font-black uppercase tracking-[0.2em] mb-1 h-5 px-2">
+                      Personal Legend
+                    </Badge>
+                    <p className="text-[10px] font-black uppercase tracking-widest opacity-80">All-Time Best</p>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-3xl font-black text-foreground">
-                        {activeType === 'strength' ? viewingPRs.records[0].weight : viewingPRs.records[0].time}
+                      <span className="text-4xl font-black tracking-tighter">
+                        {activeType !== 'time' ? viewingPRs.records[0].weight : viewingPRs.records[0].time}
                       </span>
-                      <span className="text-sm font-bold text-muted-foreground uppercase">
-                        {activeType === 'strength' ? 'kg' : 's'}
+                      <span className="text-sm font-bold uppercase opacity-70">
+                        {activeType !== 'time' ? 'kg' : 's'}
                       </span>
                     </div>
                   </div>
                 </div>
-                {activeType === 'strength' && (
-                  <div className="text-right">
-                    <p className="text-lg font-black text-amber-600">{viewingPRs.records[0].reps}</p>
-                    <p className="text-[8px] font-black text-muted-foreground uppercase">REPS</p>
+                {activeType !== 'time' && (
+                  <div className="text-right bg-white/10 backdrop-blur-sm p-3 rounded-2xl border border-white/20">
+                    <p className="text-2xl font-black">{viewingPRs.records[0].reps}</p>
+                    <p className="text-[8px] font-black uppercase opacity-60">REPS</p>
                   </div>
                 )}
               </div>
             </Card>
 
-            <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mb-3 px-1">Other Personal Records</h4>
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-4 px-1 flex items-center gap-2">
+              <RefreshCw className="w-3 h-3" /> Historical Timeline
+            </h4>
             
             <ScrollArea className="flex-1 -mx-2 px-2">
-              <div className="grid gap-2 pb-12">
+              <div className="grid gap-3 pb-12">
                 {viewingPRs.records.slice(1).map((record: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between bg-muted/5 p-4 rounded-2xl border border-muted/10 group">
+                  <div key={idx} className="flex items-center justify-between bg-white p-4 rounded-2xl border border-muted/10 shadow-sm group hover:border-primary/20 transition-all">
                     <div className="flex items-center gap-4">
-                      <span className="text-[11px] font-black text-muted-foreground/40 w-4">#{idx + 2}</span>
+                      <div className="w-8 h-8 rounded-full bg-muted/30 flex items-center justify-center border border-muted/10">
+                        <span className="text-[11px] font-black text-muted-foreground/60">#{idx + 2}</span>
+                      </div>
                       <div className="flex items-baseline gap-1">
-                        <p className="text-base font-black text-foreground">
-                          {activeType === 'strength' ? record.weight : record.time}
+                        <p className="text-lg font-black text-foreground">
+                          {activeType !== 'time' ? record.weight : record.time}
                         </p>
-                        <span className="text-[9px] font-bold text-muted-foreground uppercase">
-                          {activeType === 'strength' ? 'kg' : 's'}
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                          {activeType !== 'time' ? 'kg' : 's'}
                         </span>
                       </div>
                     </div>
-                    {activeType === 'strength' && (
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs font-bold text-foreground/70 uppercase">{record.reps} Reps</span>
+                    {activeType !== 'time' && (
+                      <div className="px-3 py-1 bg-muted/20 rounded-full">
+                        <span className="text-[10px] font-black text-foreground/70 uppercase">{record.reps} Reps</span>
                       </div>
                     )}
                   </div>
