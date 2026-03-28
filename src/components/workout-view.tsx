@@ -55,7 +55,9 @@ import {
   subWeeks, 
   isSameDay, 
   addDays,
-  isWithinInterval
+  isWithinInterval,
+  differenceInDays,
+  parseISO
 } from "date-fns";
 import {
   Accordion,
@@ -360,6 +362,7 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
+      {/* Exchanged locations: Split card first, PR card later */}
       <Card 
         onClick={() => setActiveSubView('split')}
         className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
@@ -776,24 +779,26 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
   const topLiftsForSelectedMuscle = useMemo(() => {
     if (!activeMuscle) return [];
     
-    const records: Record<string, any[]> = {};
+    const recordsMap: Record<string, any[]> = {};
     const typeToFilter = activeType === 'time' ? 'time' : 'strength';
     
-    Object.values(history).forEach(dayLogs => {
+    Object.entries(history).forEach(([dateStr, dayLogs]) => {
       Object.entries(dayLogs).forEach(([exName, sets]) => {
-        const exData = EXERCISES_DATA.find(e => e.name === name);
+        const exData = EXERCISES_DATA.find(e => e.name === exName);
         if (exData && exData.muscle === activeMuscle) {
-          if (!records[exName]) records[exName] = [];
+          if (!recordsMap[exName]) recordsMap[exName] = [];
           sets.forEach(s => {
             if (s.type === typeToFilter) {
               if (typeToFilter === 'strength') {
-                records[exName].push({
+                recordsMap[exName].push({
                   weight: parseFloat(s.weight),
-                  reps: parseFloat(s.reps)
+                  reps: parseFloat(s.reps),
+                  date: dateStr
                 });
               } else {
-                records[exName].push({
-                  time: parseFloat(s.time)
+                recordsMap[exName].push({
+                  time: parseFloat(s.time),
+                  date: dateStr
                 });
               }
             }
@@ -802,12 +807,12 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
       });
     });
 
-    return Object.entries(records).map(([name, allSets]) => {
+    return Object.entries(recordsMap).map(([name, allSets]) => {
       let sortedSets;
       if (typeToFilter === 'strength') {
-        sortedSets = allSets.sort((a, b) => b.weight - a.weight || b.reps - a.reps);
+        sortedSets = allSets.sort((a, b) => b.weight - a.weight || b.reps - a.reps || new Date(b.date).getTime() - new Date(a.date).getTime());
       } else {
-        sortedSets = allSets.sort((a, b) => b.time - a.time);
+        sortedSets = allSets.sort((a, b) => b.time - a.time || new Date(b.date).getTime() - new Date(a.date).getTime());
       }
       
       return {
@@ -905,8 +910,8 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
           <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[75vh]">
             <div className="flex items-center justify-between mb-6 pt-2">
               <div className="min-w-0 flex-1">
-                <h3 className="text-xl font-black uppercase tracking-tighter truncate">{viewingPRs.name}</h3>
-                <p className="text-[10px] font-black text-primary uppercase tracking-widest">TOP 10 {activeType !== 'time' ? 'REP' : 'TIME'} RECORDS</p>
+                <h3 className="text-xl font-black uppercase tracking-tighter truncate leading-tight">{viewingPRs.name}</h3>
+                <p className="text-[10px] font-black text-primary/60 uppercase tracking-widest">TOP 10 {activeType !== 'time' ? 'REP' : 'TIME'} RECORDS</p>
               </div>
               <Button variant="ghost" size="icon" onClick={() => setViewingPRs(null)} className="rounded-full shrink-0">
                 <X className="w-6 h-6" />
@@ -914,73 +919,68 @@ function PersonalRecordsView({ onBack }: { onBack: () => void }) {
             </div>
 
             <Card className={cn(
-              "border-none shadow-2xl p-6 rounded-[2rem] mb-8 relative overflow-hidden shrink-0",
-              activeType !== 'time' 
-                ? "bg-gradient-to-br from-amber-400 via-orange-500 to-amber-600 text-white" 
-                : "bg-gradient-to-br from-sky-400 via-blue-600 to-indigo-700 text-white"
+              "border-none shadow-xl p-6 rounded-[2rem] mb-8 relative overflow-hidden shrink-0 bg-[#fff9e6]",
             )}>
-              <div className="absolute -right-6 -top-6 w-32 h-32 bg-white/10 rounded-full blur-3xl" />
-              <div className="absolute -left-6 -bottom-6 w-24 h-24 bg-black/10 rounded-full blur-2xl" />
-              
               <div className="flex justify-between items-center relative z-10">
                 <div className="flex items-center gap-5">
-                  <div className="w-16 h-16 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center shadow-inner border border-white/30">
-                    {activeType !== 'time' ? (
-                      <Trophy className="w-8 h-8 text-white drop-shadow-md" />
-                    ) : (
-                      <Timer className="w-8 h-8 text-white drop-shadow-md" />
-                    )}
+                  <div className="w-14 h-14 rounded-full bg-orange-500 flex items-center justify-center shadow-lg shadow-orange-500/20">
+                    <Trophy className="w-7 h-7 text-white" />
                   </div>
                   <div>
-                    <Badge variant="outline" className="bg-white/20 border-white/40 text-[8px] text-white font-black uppercase tracking-[0.2em] mb-1 h-5 px-2">
-                      Personal Legend
-                    </Badge>
-                    <p className="text-[10px] font-black uppercase tracking-widest opacity-80">All-Time Best</p>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-black tracking-tighter">
+                    <p className="text-[10px] font-black text-orange-600 uppercase tracking-widest mb-1">ALL-TIME BEST</p>
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-4xl font-black tracking-tighter text-foreground">
                         {activeType !== 'time' ? viewingPRs.records[0].weight : viewingPRs.records[0].time}
                       </span>
-                      <span className="text-sm font-bold uppercase opacity-70">
+                      <span className="text-sm font-bold uppercase text-muted-foreground">
                         {activeType !== 'time' ? 'kg' : 's'}
                       </span>
                     </div>
+                    {viewingPRs.records[0].date && (
+                      <p className="text-[9px] font-bold text-orange-600/60 uppercase mt-1">
+                        Achieved {differenceInDays(new Date(), parseISO(viewingPRs.records[0].date)) === 0 ? 'Today' : `${differenceInDays(new Date(), parseISO(viewingPRs.records[0].date))} days ago`}
+                      </p>
+                    )}
                   </div>
                 </div>
                 {activeType !== 'time' && (
-                  <div className="text-right bg-white/10 backdrop-blur-sm p-3 rounded-2xl border border-white/20">
-                    <p className="text-2xl font-black">{viewingPRs.records[0].reps}</p>
-                    <p className="text-[8px] font-black uppercase opacity-60">REPS</p>
+                  <div className="text-right">
+                    <p className="text-2xl font-black text-orange-600">{viewingPRs.records[0].reps}</p>
+                    <p className="text-[8px] font-black uppercase text-orange-600/40">REPS</p>
                   </div>
                 )}
               </div>
             </Card>
 
-            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-4 px-1 flex items-center gap-2">
-              <RefreshCw className="w-3 h-3" /> Historical Timeline
+            <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 mb-4 px-1">
+              OTHER PERSONAL RECORDS
             </h4>
             
             <ScrollArea className="flex-1 -mx-2 px-2">
-              <div className="grid gap-3 pb-12">
+              <div className="grid gap-2.5 pb-12">
                 {viewingPRs.records.slice(1).map((record: any, idx: number) => (
-                  <div key={idx} className="flex items-center justify-between bg-white p-4 rounded-2xl border border-muted/10 shadow-sm group hover:border-primary/20 transition-all">
+                  <div key={idx} className="flex items-center justify-between bg-muted/5 p-4 rounded-2xl border border-muted/10 group transition-all">
                     <div className="flex items-center gap-4">
-                      <div className="w-8 h-8 rounded-full bg-muted/30 flex items-center justify-center border border-muted/10">
-                        <span className="text-[11px] font-black text-muted-foreground/60">#{idx + 2}</span>
-                      </div>
+                      <span className="text-[11px] font-black text-muted-foreground/40">#{idx + 2}</span>
                       <div className="flex items-baseline gap-1">
-                        <p className="text-lg font-black text-foreground">
+                        <p className="text-base font-black text-foreground/80">
                           {activeType !== 'time' ? record.weight : record.time}
                         </p>
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase">
+                        <span className="text-[9px] font-bold text-muted-foreground uppercase">
                           {activeType !== 'time' ? 'kg' : 's'}
                         </span>
                       </div>
                     </div>
-                    {activeType !== 'time' && (
-                      <div className="px-3 py-1 bg-muted/20 rounded-full">
-                        <span className="text-[10px] font-black text-foreground/70 uppercase">{record.reps} Reps</span>
-                      </div>
-                    )}
+                    <div className="flex items-center gap-4">
+                      {activeType !== 'time' && (
+                        <span className="text-[10px] font-black text-foreground/40 uppercase">{record.reps} Reps</span>
+                      )}
+                      {record.date && (
+                        <span className="text-[8px] font-bold text-muted-foreground/30 uppercase">
+                          {differenceInDays(new Date(), parseISO(record.date)) === 0 ? 'Today' : `${differenceInDays(new Date(), parseISO(record.date))}d ago`}
+                        </span>
+                      )}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1368,12 +1368,12 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
         const day = addDays(start, i);
         const dateStr = format(day, 'yyyy-MM-dd');
         const dayLogs = history[dateStr] || {};
-        Object.keys(dayLogs).forEach(name => {
-          const exercise = EXERCISES_DATA.find(e => e.name === name);
+        Object.keys(dayLogs).forEach(exName => {
+          const exercise = EXERCISES_DATA.find(e => e.name === exName);
           if (!exercise) return;
           const muscle = exercise.muscle;
           
-          dayLogs[name].forEach(s => {
+          dayLogs[exName].forEach(s => {
             if (s.type === 'strength') {
               const vol = (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
               muscleVolume[muscle] = (muscleVolume[muscle] || 0) + vol;
@@ -1465,14 +1465,14 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
           let primaryMusclesSet = new Set<string>();
           
           if (exerciseNames.length > 0) {
-            exerciseNames.forEach(name => {
-              const sets = dayLogs[name];
+            exerciseNames.forEach(exName => {
+              const sets = dayLogs[exName];
               sets.forEach(s => {
                 if (s.type === 'strength') {
                   dailyVolume += (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
                 }
               });
-              const ex = EXERCISES_DATA.find(e => e.name === name);
+              const ex = EXERCISES_DATA.find(e => e.name === exName);
               if (ex) primaryMusclesSet.add(ex.muscle);
             });
           }
@@ -1510,14 +1510,14 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                       {exerciseNames.length === 0 ? (
                         <p className="text-center py-4 text-[9px] font-bold text-muted-foreground uppercase">No logs recorded</p>
                       ) : (
-                        exerciseNames.map(name => {
-                          const sets = dayLogs[name];
+                        exerciseNames.map(exName => {
+                          const sets = dayLogs[exName];
                           return (
-                            <Card key={name} className="border border-muted/20 bg-white rounded-xl overflow-hidden shadow-sm">
+                            <Card key={exName} className="border border-muted/20 bg-white rounded-xl overflow-hidden shadow-sm">
                               <CardContent className="p-0">
                                 <div className="p-2.5 bg-muted/10 border-b border-muted/10 flex items-center gap-2">
                                   <RefreshCw className="w-3 h-3 text-primary" />
-                                  <h4 className="text-[11px] font-black uppercase text-foreground/80 truncate">{name}</h4>
+                                  <h4 className="text-[11px] font-black uppercase text-foreground/80 truncate">{exName}</h4>
                                 </div>
                                 <div className="p-2.5">
                                   <table className="w-full text-left">
