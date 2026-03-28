@@ -15,6 +15,7 @@ import { NutritionView } from '@/components/nutrition-view';
 import { WorkoutView } from '@/components/workout-view';
 import { ProgressView } from '@/components/progress-view';
 import { HydrationView } from '@/components/hydration-view';
+import { StepsView } from '@/components/steps-view';
 import { TasksView, type Task } from '@/components/tasks-view';
 import { CalculatorsView } from '@/components/calculators-view';
 import { GoalSettingView } from '@/components/goal-setting-view';
@@ -28,6 +29,8 @@ export default function PulseFlowApp() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [hydrationAmount, setHydrationAmount] = useState(0);
   const [hydrationHistory, setHydrationHistory] = useState<Record<string, number>>({});
+  const [stepsCount, setStepsCount] = useState(0);
+  const [stepsHistory, setStepsHistory] = useState<Record<string, number>>({});
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
@@ -45,6 +48,8 @@ export default function PulseFlowApp() {
     const savedTasks = localStorage.getItem('pulseflow_tasks');
     const savedHydration = localStorage.getItem('pulseflow_hydration');
     const savedHydrationHistory = localStorage.getItem('pulseflow_hydration_history');
+    const savedSteps = localStorage.getItem('pulseflow_steps');
+    const savedStepsHistory = localStorage.getItem('pulseflow_steps_history');
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
     const savedWeight = localStorage.getItem('pulseflow_weight_history');
     const savedMeals = localStorage.getItem('pulseflow_today_logged_meals');
@@ -62,8 +67,11 @@ export default function PulseFlowApp() {
     if (isNewDay) {
       setHydrationAmount(0);
       localStorage.setItem('pulseflow_hydration', '0');
-    } else if (savedHydration) {
-      setHydrationAmount(Number(savedHydration));
+      setStepsCount(0);
+      localStorage.setItem('pulseflow_steps', '0');
+    } else {
+      if (savedHydration) setHydrationAmount(Number(savedHydration));
+      if (savedSteps) setStepsCount(Number(savedSteps));
     }
 
     if (savedHydrationHistory) {
@@ -71,6 +79,14 @@ export default function PulseFlowApp() {
         setHydrationHistory(JSON.parse(savedHydrationHistory));
       } catch (e) {
         console.error("Failed to parse hydration history", e);
+      }
+    }
+
+    if (savedStepsHistory) {
+      try {
+        setStepsHistory(JSON.parse(savedStepsHistory));
+      } catch (e) {
+        console.error("Failed to parse steps history", e);
       }
     }
 
@@ -163,6 +179,22 @@ export default function PulseFlowApp() {
 
   useEffect(() => {
     if (isLoaded) {
+      localStorage.setItem('pulseflow_steps', stepsCount.toString());
+      
+      const today = format(new Date(), 'yyyy-MM-dd');
+      setStepsHistory(prev => {
+        const newHistory = {
+          ...prev,
+          [today]: stepsCount
+        };
+        localStorage.setItem('pulseflow_steps_history', JSON.stringify(newHistory));
+        return newHistory;
+      });
+    }
+  }, [stepsCount, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) {
       localStorage.setItem('pulseflow_weight_history', JSON.stringify(weightHistory));
     }
   }, [weightHistory, isLoaded]);
@@ -186,6 +218,10 @@ export default function PulseFlowApp() {
 
   const updateHydration = (amount: number) => {
     setHydrationAmount(prev => Math.max(0, prev + amount));
+  };
+
+  const updateSteps = (amount: number) => {
+    setStepsCount(prev => Math.max(0, prev + amount));
   };
 
   const handleOpenCalculator = (type: string) => {
@@ -220,11 +256,14 @@ export default function PulseFlowApp() {
             onToggleTask={toggleTask}
             hydrationAmount={hydrationAmount}
             onUpdateHydration={updateHydration}
+            stepsCount={stepsCount}
+            onUpdateSteps={updateSteps}
             goalData={goalData}
             weightHistory={weightHistory}
             loggedMeals={loggedMeals}
             streakData={streakData}
             onViewHydration={() => setActiveTab('hydration')} 
+            onViewSteps={() => setActiveTab('steps')}
             onViewTasks={() => setActiveTab('tasks')} 
             onViewCalculators={handleOpenCalculator}
             onViewGoalSetting={() => setActiveTab('goal-setting')}
@@ -253,6 +292,15 @@ export default function PulseFlowApp() {
             currentMl={hydrationAmount}
             history={hydrationHistory}
             onUpdateMl={updateHydration}
+            onBack={() => setActiveTab('dashboard')} 
+          />
+        );
+      case 'steps': 
+        return (
+          <StepsView 
+            currentSteps={stepsCount}
+            history={stepsHistory}
+            onUpdateSteps={updateSteps}
             onBack={() => setActiveTab('dashboard')} 
           />
         );

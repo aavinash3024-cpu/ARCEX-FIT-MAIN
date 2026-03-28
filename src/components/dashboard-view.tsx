@@ -40,11 +40,14 @@ interface DashboardViewProps {
   onToggleTask: (id: string) => void;
   hydrationAmount: number;
   onUpdateHydration: (amount: number) => void;
+  stepsCount?: number;
+  onUpdateSteps?: (amount: number) => void;
   goalData: any;
   weightHistory?: any[];
   loggedMeals?: any[];
   streakData?: { count: number, history: string[] };
   onViewHydration?: () => void;
+  onViewSteps?: () => void;
   onViewTasks?: () => void;
   onViewCalculators?: (type: string) => void;
   onViewGoalSetting?: () => void;
@@ -55,11 +58,14 @@ export function DashboardView({
   onToggleTask, 
   hydrationAmount, 
   onUpdateHydration, 
+  stepsCount = 0,
+  onUpdateSteps,
   goalData,
   weightHistory = [],
   loggedMeals = [],
   streakData = { count: 0, history: [] },
   onViewHydration, 
+  onViewSteps,
   onViewTasks,
   onViewCalculators,
   onViewGoalSetting
@@ -179,10 +185,10 @@ export function DashboardView({
     { 
       id: 'steps',
       label: "Steps", 
-      value: "8,432", 
+      value: stepsCount.toLocaleString(), 
       unit: "steps", 
       target: "10,000", 
-      current: 8432,
+      current: stepsCount,
       targetVal: 10000,
       icon: <Footprints className="w-4 h-4 text-green-500" />, 
       color: "bg-green-50" 
@@ -336,8 +342,9 @@ export function DashboardView({
               const percentage = Math.round((m.current / m.targetVal) * 100);
               const isCalories = m.id === "calories";
               const isHydration = m.id === "hydration";
+              const isSteps = m.id === "steps";
               const isStreak = m.id === "streak";
-              const showDetails = isHydration || m.id === "steps";
+              const showDetails = isHydration || isSteps;
 
               return (
                 <Card key={idx} className="min-w-[260px] flex-shrink-0 border-none shadow-sm bg-white snap-center">
@@ -408,7 +415,7 @@ export function DashboardView({
                             <Progress 
                               value={Math.min(percentage, 100)} 
                               className="h-1.5 w-full" 
-                              indicatorClassName={isCalories ? "bg-gradient-to-r from-[#F59202] to-[#FFB84D]" : ""}
+                              indicatorClassName={isCalories ? "bg-gradient-to-r from-[#F59202] to-[#FFB84D]" : isSteps ? "bg-green-500" : ""}
                             />
                             
                             {isCalories && (
@@ -432,7 +439,10 @@ export function DashboardView({
                           </div>
                           {showDetails && (
                             <button 
-                              onClick={() => isHydration && onViewHydration?.()}
+                              onClick={() => {
+                                if (isHydration) onViewHydration?.();
+                                if (isSteps) onViewSteps?.();
+                              }}
                               className="flex items-center gap-0.5 text-[8px] font-black text-primary uppercase shrink-0 hover:opacity-70 transition-opacity"
                             >
                               Details <ChevronRight className="w-2.5 h-2.5" />
