@@ -379,6 +379,7 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
+      {/* TODAYS WORKOUT AT TOP */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -448,6 +449,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
+      {/* PERSONAL RECORDS BELOW WORKOUT */}
       <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
@@ -923,13 +925,14 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
   );
 }
 
+// PR DETAIL VIEW DEFINED EXACTLY ONCE
 function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => void }) {
   if (!viewingPRs) return null;
 
   const isTimeBased = !viewingPRs.records[0].weight;
   const bestRecord = viewingPRs.records[0];
   const daysAgo = differenceInDays(new Date(), parseISO(bestRecord.date));
-  const daysText = daysAgo === 0 ? "Achieved Today" : `${daysAgo} day${daysAgo === 1 ? '' : 's'} ago`;
+  const daysText = daysAgo === 0 ? "Achieved Today" : `${daysAgo} Day${daysAgo === 1 ? '' : 's'} Ago`;
 
   return (
     <div className="space-y-6 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -973,7 +976,7 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
       <div className="px-1 space-y-4">
         <div className="flex items-center justify-between px-1">
           <h4 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 flex items-center gap-2">
-            <History className="w-3.5 h-3.5" /> TOP 10 RANKING HISTORY
+            <History className="w-3.5 h-3.5 text-primary" /> TOP 10 RANKING HISTORY
           </h4>
           <span className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">PERFORMANCE TIMELINE</span>
         </div>
