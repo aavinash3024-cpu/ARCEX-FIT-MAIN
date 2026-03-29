@@ -357,6 +357,18 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
     const leftCal = targetCal - totals.calories;
     
+    // Calorie based ratios
+    const pKcal = totals.protein * 4;
+    const cKcal = totals.carbs * 4;
+    const fKcal = totals.fat * 9;
+    const totalMacroKcal = pKcal + cKcal + fKcal;
+
+    const ratios = totalMacroKcal > 0 ? {
+      p: Math.round((pKcal / totalMacroKcal) * 100),
+      c: Math.round((cKcal / totalMacroKcal) * 100),
+      f: Math.max(0, 100 - Math.round((pKcal / totalMacroKcal) * 100) - Math.round((cKcal / totalMacroKcal) * 100))
+    } : { p: 0, c: 0, f: 0 };
+
     const macroStatuses = [
       { label: 'P', val: Math.round(targetP - totals.protein), color: MACRO_COLORS.protein },
       { label: 'C', val: Math.round(targetC - totals.carbs), color: MACRO_COLORS.carbs },
@@ -376,35 +388,41 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </div>
 
         <Card className="border-none shadow-sm bg-white overflow-hidden rounded-[2rem] border border-muted/10">
-          <CardContent className="p-6 space-y-6">
+          <CardContent className="p-5 space-y-4">
             <div className="flex justify-between items-start">
               <div className="space-y-0.5">
-                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">BUDGET REMAINING</p>
+                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">CALORIES LEFT</p>
                 <div className="flex items-baseline gap-2">
-                  <span className="text-4xl font-black text-foreground tracking-tighter">{Math.abs(Math.round(leftCal))}</span>
-                  <span className="text-xs font-black text-muted-foreground uppercase tracking-tight">KCAL {leftCal >= 0 ? 'LEFT' : 'OVER'}</span>
+                  <span className="text-2xl font-black text-foreground tracking-tighter">{Math.abs(Math.round(leftCal))}</span>
+                  <span className="text-[10px] font-black text-muted-foreground uppercase tracking-tight">KCAL {leftCal >= 0 ? 'LEFT' : 'OVER'}</span>
                 </div>
               </div>
               <div className="text-right space-y-0.5">
-                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">INTAKE</p>
+                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">INTAKE</p>
                 <div className="flex items-baseline gap-1">
-                  <span className="text-lg font-black text-foreground/80">{Math.round(totals.calories)}</span>
-                  <span className="text-[10px] font-bold text-muted-foreground uppercase">/ {targetCal} KCAL</span>
+                  <span className="text-sm font-black text-foreground/80">{Math.round(totals.calories)}</span>
+                  <span className="text-[9px] font-bold text-muted-foreground uppercase">/ {targetCal}</span>
                 </div>
               </div>
             </div>
 
-            <div className="flex h-2.5 w-full rounded-full overflow-hidden bg-muted/20">
-              <div style={{ width: `${Math.min(100, (totals.protein * 4 / targetCal) * 100)}%`, backgroundColor: MACRO_COLORS.protein }} className="h-full transition-all duration-1000 ease-out" />
-              <div style={{ width: `${Math.min(100, (totals.carbs * 4 / targetCal) * 100)}%`, backgroundColor: MACRO_COLORS.carbs }} className="h-full transition-all duration-1000 ease-out" />
-              <div style={{ width: `${Math.min(100, (totals.fat * 9 / targetCal) * 100)}%`, backgroundColor: MACRO_COLORS.fat }} className="h-full transition-all duration-1000 ease-out" />
+            <div className="space-y-1.5">
+              <div className="flex justify-between items-end">
+                <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Macro Ratio (P:C:F)</p>
+                <p className="text-[10px] font-black text-primary">{ratios.p}:{ratios.c}:{ratios.f}</p>
+              </div>
+              <div className="flex h-2 w-full rounded-full overflow-hidden bg-muted/20">
+                <div style={{ width: `${Math.min(100, (pKcal / Math.max(1, totalMacroKcal)) * 100)}%`, backgroundColor: MACRO_COLORS.protein }} className="h-full transition-all duration-1000 ease-out" />
+                <div style={{ width: `${Math.min(100, (cKcal / Math.max(1, totalMacroKcal)) * 100)}%`, backgroundColor: MACRO_COLORS.carbs }} className="h-full transition-all duration-1000 ease-out" />
+                <div style={{ width: `${Math.min(100, (fKcal / Math.max(1, totalMacroKcal)) * 100)}%`, backgroundColor: MACRO_COLORS.fat }} className="h-full transition-all duration-1000 ease-out" />
+              </div>
             </div>
 
             <div className="grid grid-cols-4 gap-2">
               {macroStatuses.map((macro, idx) => (
-                <div key={idx} className="bg-muted/5 rounded-3xl p-2.5 flex flex-col items-center justify-center border border-muted/10 shadow-sm transition-all hover:bg-muted/10">
-                  <span className="text-[10px] font-black text-muted-foreground/60 uppercase">{macro.label}</span>
-                  <span className="text-sm font-black mt-0.5" style={{ color: macro.color }}>
+                <div key={idx} className="bg-muted/5 rounded-2xl p-2 flex flex-col items-center justify-center border border-muted/10 shadow-sm transition-all hover:bg-muted/10">
+                  <span className="text-[9px] font-black text-muted-foreground/60 uppercase">{macro.label}</span>
+                  <span className="text-xs font-black mt-0.5" style={{ color: macro.color }}>
                     {Math.abs(macro.val)}g
                   </span>
                   <span className="text-[7px] font-black text-muted-foreground uppercase tracking-tighter leading-none mt-0.5">
