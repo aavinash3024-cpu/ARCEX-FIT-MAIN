@@ -4,6 +4,8 @@
 import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import { 
   ChevronLeft, 
   User, 
@@ -15,7 +17,6 @@ import {
   ChevronRight,
   Trophy,
   Scale,
-  Ruler,
   Target,
   RefreshCw,
   Star,
@@ -32,10 +33,18 @@ import {
   Banknote,
   Check,
   Bell,
-  Zap
+  Zap,
+  Save,
+  CheckCircle2
 } from "lucide-react";
+import { 
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
@@ -49,18 +58,31 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   const [activeSubView, setActiveSubView] = useState<SubView>('main');
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
+
+  // Profile Form State
+  const [profileName, setProfileName] = useState("Alex Johnson");
+  const [profileEmail, setProfileEmail] = useState("alex.j@pulseflow.ai");
+  const [profileLocation, setProfileLocation] = useState("London, UK");
+  const [profileDob, setProfileDob] = useState("1998-05-15");
+  const [profileGender, setProfileGender] = useState("male");
+  const [profileAge, setProfileAge] = useState("25");
 
   useEffect(() => {
+    // Load Goal Data
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
     if (savedGoal) {
       try {
         const data = JSON.parse(savedGoal);
         setGoalData(data);
+        if (data.gender) setProfileGender(data.gender);
+        if (data.age) setProfileAge(data.age.toString());
       } catch (e) {
         console.error("Failed to parse goal data", e);
       }
     }
 
+    // Load Weight History
     const savedWeight = localStorage.getItem('pulseflow_weight_history');
     if (savedWeight) {
       try {
@@ -69,7 +91,51 @@ export function ProfileView({ onBack }: ProfileViewProps) {
         console.error("Failed to parse weight history", e);
       }
     }
+
+    // Load Profile Specific Data
+    const savedProfile = localStorage.getItem('pulseflow_user_profile');
+    if (savedProfile) {
+      try {
+        const data = JSON.parse(savedProfile);
+        if (data.name) setProfileName(data.name);
+        if (data.email) setProfileEmail(data.email);
+        if (data.location) setProfileLocation(data.location);
+        if (data.dob) setProfileDob(data.dob);
+      } catch (e) {
+        console.error("Failed to parse profile data", e);
+      }
+    }
   }, []);
+
+  const handleSaveProfile = () => {
+    setIsSaving(true);
+    
+    // 1. Save general profile
+    const profileData = {
+      name: profileName,
+      email: profileEmail,
+      location: profileLocation,
+      dob: profileDob
+    };
+    localStorage.setItem('pulseflow_user_profile', JSON.stringify(profileData));
+
+    // 2. Sync with Goal Data (Age and Gender)
+    if (goalData) {
+      const updatedGoal = {
+        ...goalData,
+        gender: profileGender,
+        age: parseInt(profileAge) || goalData.age
+      };
+      localStorage.setItem('pulseflow_goal_data', JSON.stringify(updatedGoal));
+      setGoalData(updatedGoal);
+    }
+
+    // Simulate network delay
+    setTimeout(() => {
+      setIsSaving(false);
+      setActiveSubView('main');
+    }, 800);
+  };
 
   const handleBack = () => {
     if (activeSubView !== 'main') {
@@ -77,16 +143,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     } else {
       onBack();
     }
-  };
-
-  // Mock user data
-  const user = {
-    name: "Alex Johnson",
-    email: "alex.j@pulseflow.ai",
-    location: "London, UK",
-    dob: "15 May 1998",
-    membership: "Premium Member",
-    joined: "Jan 2024"
   };
 
   const currentWeight = useMemo(() => {
@@ -118,7 +174,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
       title: "My Account",
       items: [
         { id: 'personal-info', icon: User, label: "Personal Information", subLabel: "Name, email, and identity", color: "text-blue-500", bg: "bg-blue-50" },
-        { id: 'subscription', icon: CreditCard, label: "Subscription Plan", subLabel: user.membership, color: "text-purple-500", bg: "bg-purple-50" },
+        { id: 'subscription', icon: CreditCard, label: "Subscription Plan", subLabel: "Elite Premium", color: "text-purple-500", bg: "bg-purple-50" },
         { id: 'goals', icon: Target, label: "Goals", subLabel: "Active fitness objectives", color: "text-primary", bg: "bg-primary/5" },
         { id: 'reset', icon: RefreshCw, label: "Reset", subLabel: "Clear daily progress data", color: "text-rose-500", bg: "bg-rose-50" },
       ]
@@ -140,19 +196,95 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   ];
 
   const renderPersonalInfo = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       <div className="px-1 space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Identity Details</h3>
         <Card className="border-none shadow-md bg-white rounded-3xl overflow-hidden border border-muted/10">
-          <CardContent className="p-0 divide-y divide-muted/5">
-            <InfoRow icon={User} label="Username" value={user.name} />
-            <InfoRow icon={FileText} label="Email" value={user.email} />
-            <InfoRow icon={Calendar} label="Age" value={goalData?.age ? `${goalData.age} Years` : "--"} />
-            <InfoRow icon={MapPin} label="Location" value={user.location} />
-            <InfoRow icon={User} label="Sex" value={goalData?.gender?.toUpperCase() || "--"} />
-            <InfoRow icon={Calendar} label="Date of Birth" value={user.dob} />
+          <CardContent className="p-6 space-y-5">
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Username</Label>
+              <div className="relative">
+                <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
+                <Input 
+                  value={profileName} 
+                  onChange={(e) => setProfileName(e.target.value)}
+                  className="pl-10 h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Email Address</Label>
+              <div className="relative">
+                <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
+                <Input 
+                  value={profileEmail} 
+                  onChange={(e) => setProfileEmail(e.target.value)}
+                  className="pl-10 h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Age</Label>
+                <Input 
+                  type="number"
+                  value={profileAge} 
+                  onChange={(e) => setProfileAge(e.target.value)}
+                  className="h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs"
+                />
+              </div>
+              <div className="space-y-2">
+                <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Sex</Label>
+                <Select value={profileGender} onValueChange={setProfileGender}>
+                  <SelectTrigger className="h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl">
+                    <SelectItem value="male" className="text-xs font-bold">Male</SelectItem>
+                    <SelectItem value="female" className="text-xs font-bold">Female</SelectItem>
+                    <SelectItem value="other" className="text-xs font-bold">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Location</Label>
+              <div className="relative">
+                <MapPin className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
+                <Input 
+                  value={profileLocation} 
+                  onChange={(e) => setProfileLocation(e.target.value)}
+                  className="pl-10 h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs"
+                />
+              </div>
+            </div>
+
+            <div className="space-y-2">
+              <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Date of Birth</Label>
+              <div className="relative">
+                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
+                <Input 
+                  type="date"
+                  value={profileDob} 
+                  onChange={(e) => setProfileDob(e.target.value)}
+                  className="pl-10 h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs"
+                />
+              </div>
+            </div>
           </CardContent>
         </Card>
+
+        <Button 
+          onClick={handleSaveProfile}
+          disabled={isSaving}
+          className="w-full h-14 rounded-2xl bg-primary text-white font-black uppercase text-[11px] tracking-widest shadow-xl shadow-primary/20 gap-2 mt-4"
+        >
+          {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
+          Save Personal Details
+        </Button>
       </div>
     </div>
   );
@@ -225,7 +357,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
         <Card className="border-none shadow-md bg-white rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
             <SettingsButton icon={Palette} label="Theme" subLabel="Light / Dark / System" color="text-slate-500" bg="bg-slate-50" />
-            <SettingsButton icon={Smartphone} label="Haptics" subLabel="Tactile feedback" color="text-sky-500" bg="bg-sky-50" />
+            <SettingsButton icon={Smartphone} label="Haptics" subLabel="Tactile feedback" color="text-sky-500" bg="bg-slate-50" />
             <SettingsButton icon={Bell} label="Notifications" subLabel="Manage app alerts" color="text-primary" bg="bg-primary/5" />
           </CardContent>
         </Card>
@@ -257,14 +389,13 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   const renderMain = () => (
     <>
       <div className="px-1 space-y-4">
-        {/* Profile Identity Card */}
         <Card className="border-none bg-white shadow-sm rounded-[2.5rem] overflow-hidden border border-white/20 relative">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-white to-transparent pointer-events-none" />
           <CardContent className="p-6 relative z-10">
             <div className="flex items-center gap-5">
               <div className="relative shrink-0">
                 <div className="w-20 h-20 rounded-full bg-[#6b85a3] flex items-center justify-center shadow-xl border-4 border-white relative z-10">
-                  <span className="text-2xl font-black text-white">{user.name.charAt(0)}</span>
+                  <span className="text-2xl font-black text-white">{profileName.charAt(0)}</span>
                 </div>
                 <div className="absolute -bottom-1 -right-1 z-20 bg-[#6b85a3] text-white p-1.5 rounded-full border-2 border-white shadow-lg">
                   <Trophy className="w-2.5 h-2.5" />
@@ -272,22 +403,21 @@ export function ProfileView({ onBack }: ProfileViewProps) {
               </div>
               
               <div className="flex-1 min-w-0">
-                <h2 className="text-xl font-black text-foreground tracking-tighter truncate">{user.name}</h2>
+                <h2 className="text-xl font-black text-foreground tracking-tighter truncate">{profileName}</h2>
                 <div className="space-y-0.5 mt-0.5">
                   <p className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">
-                    {goalData?.age || "--"} Yrs • {goalData?.gender?.toUpperCase() || "--"}
+                    {profileAge} Yrs • {profileGender?.toUpperCase()}
                   </p>
-                  <p className="text-[10px] font-bold text-muted-foreground/60 tracking-tight truncate">{user.email}</p>
+                  <p className="text-[10px] font-bold text-muted-foreground/60 tracking-tight truncate">{profileEmail}</p>
                 </div>
                 <Badge variant="secondary" className="mt-2 bg-primary/10 text-primary hover:bg-primary/10 text-[8px] font-black uppercase tracking-widest px-2 h-4 border-none">
-                  {user.membership}
+                  Premium Member
                 </Badge>
               </div>
             </div>
           </CardContent>
         </Card>
 
-        {/* Sleek Weight Progress Card */}
         <Card className="border-none bg-white shadow-sm rounded-2xl overflow-hidden border border-muted/10">
           <CardContent className="p-4 space-y-3">
             <div className="flex items-center justify-between">
@@ -368,20 +498,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   );
 }
 
-function InfoRow({ icon: Icon, label, value }: { icon: any, label: string, value: string }) {
-  return (
-    <div className="p-4 flex items-center justify-between bg-white border-b border-muted/5 last:border-0">
-      <div className="flex items-center gap-4">
-        <div className="w-9 h-9 rounded-xl bg-primary/5 text-primary/60 flex items-center justify-center shadow-sm">
-          <Icon className="w-4 h-4" />
-        </div>
-        <p className="text-xs font-bold text-muted-foreground uppercase tracking-tight">{label}</p>
-      </div>
-      <p className="text-sm font-black text-foreground">{value}</p>
-    </div>
-  );
-}
-
 function LegalItem({ icon: Icon, label, color, bg }: { icon: any, label: string, color?: string, bg?: string }) {
   return (
     <button className="w-full p-4 flex items-center justify-between hover:bg-muted/5 transition-all text-left group border-b border-muted/5 last:border-0">
@@ -410,25 +526,5 @@ function SettingsButton({ icon: Icon, label, subLabel, color, bg }: { icon: any,
       </div>
       <ChevronRight className="w-4 h-4 text-muted-foreground/20 group-hover:text-primary transition-all" />
     </button>
-  );
-}
-
-function CheckCircle2(props: any) {
-  return (
-    <svg
-      {...props}
-      xmlns="http://www.w3.org/2000/svg"
-      width="24"
-      height="24"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z" />
-      <path d="m9 12 2 2 4-4" />
-    </svg>
   );
 }
