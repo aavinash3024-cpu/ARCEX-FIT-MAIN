@@ -35,7 +35,8 @@ import {
   Bell,
   Zap,
   Save,
-  CheckCircle2
+  CheckCircle2,
+  PieChart
 } from "lucide-react";
 import { 
   Select,
@@ -52,7 +53,7 @@ interface ProfileViewProps {
   onBack: () => void;
 }
 
-type SubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings';
+type SubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'goals';
 
 export function ProfileView({ onBack }: ProfileViewProps) {
   const [activeSubView, setActiveSubView] = useState<SubView>('main');
@@ -386,6 +387,106 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     </div>
   );
 
+  const renderGoals = () => (
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1">
+      {goalData ? (
+        <Card className="border-none shadow-xl bg-white rounded-[2.5rem] overflow-hidden border border-muted/10">
+          <CardContent className="p-0">
+            <div className="p-6 bg-primary/5 border-b border-muted/10 flex items-center justify-between">
+              <div className="space-y-1">
+                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Active Objective</p>
+                <h3 className="text-xl font-black text-foreground uppercase tracking-tight">
+                  {goalData.objective} Weight
+                </h3>
+              </div>
+              <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center">
+                <Target className="w-6 h-6 text-primary" />
+              </div>
+            </div>
+
+            <div className="p-6 space-y-8">
+              {/* Weight Section */}
+              <div className="space-y-4">
+                <div className="flex justify-between items-end">
+                  <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Weight Milestone</h4>
+                  <span className="text-lg font-black text-primary">{weightProgressPercent}%</span>
+                </div>
+                <Progress value={weightProgressPercent} className="h-2 bg-muted" />
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-center p-3 bg-muted/5 rounded-2xl border border-muted/10">
+                    <p className="text-[8px] font-bold text-muted-foreground uppercase">Start</p>
+                    <p className="text-sm font-black">{startWeight}kg</p>
+                  </div>
+                  <div className="text-center p-3 bg-primary/5 rounded-2xl border border-primary/10">
+                    <p className="text-[8px] font-bold text-primary uppercase">Current</p>
+                    <p className="text-sm font-black">{currentWeight.toFixed(1)}kg</p>
+                  </div>
+                  <div className="text-center p-3 bg-muted/5 rounded-2xl border border-muted/10">
+                    <p className="text-[8px] font-bold text-muted-foreground uppercase">Goal</p>
+                    <p className="text-sm font-black">{targetWeight}kg</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Nutrition Section */}
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest border-l-4 border-primary pl-3 py-0.5">Energy & Macros</h4>
+                <div className="bg-muted/5 p-4 rounded-2xl border border-muted/10">
+                  <div className="flex justify-between items-center mb-4">
+                    <p className="text-xs font-bold text-foreground/60 uppercase">Daily Budget</p>
+                    <p className="text-xl font-black text-primary">{goalData.finalCalories} kcal</p>
+                  </div>
+                  <div className="grid grid-cols-3 gap-2 text-center">
+                    <div>
+                      <p className="text-sm font-black text-amber-500">{goalData.protein}g</p>
+                      <p className="text-[7px] font-bold text-muted-foreground uppercase">Protein</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-blue-500">{goalData.carbs}g</p>
+                      <p className="text-[7px] font-bold text-muted-foreground uppercase">Carbs</p>
+                    </div>
+                    <div>
+                      <p className="text-sm font-black text-orange-500">{goalData.fats}g</p>
+                      <p className="text-[7px] font-bold text-muted-foreground uppercase">Fats</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Timeline Section */}
+              <div className="space-y-4">
+                <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest border-l-4 border-orange-400 pl-3 py-0.5">Estimated Timeline</h4>
+                <div className="flex gap-3">
+                  <div className="flex-1 bg-muted/5 p-4 rounded-2xl border border-muted/10">
+                    <p className="text-[8px] font-bold text-muted-foreground uppercase">Weekly Rate</p>
+                    <p className="text-sm font-black">{goalData.derivedWeeklyRate} kg</p>
+                  </div>
+                  <div className="flex-1 bg-muted/5 p-4 rounded-2xl border border-muted/10">
+                    <p className="text-[8px] font-bold text-muted-foreground uppercase">Duration</p>
+                    <p className="text-sm font-black">{goalData.weeksToGoal} Weeks</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+      ) : (
+        <Card className="border-none shadow-md bg-white p-12 text-center space-y-4 rounded-3xl">
+          <div className="w-16 h-16 bg-muted/10 rounded-full flex items-center justify-center mx-auto">
+            <Target className="w-8 h-8 text-muted-foreground/40" />
+          </div>
+          <div className="space-y-1">
+            <h3 className="font-bold text-lg">No Active Goal</h3>
+            <p className="text-sm text-muted-foreground">Setup your fitness journey to track progress.</p>
+          </div>
+          <Button variant="outline" className="rounded-xl border-primary/20 text-primary font-black uppercase text-[10px] tracking-widest">
+            Setup Goal Now
+          </Button>
+        </Card>
+      )}
+    </div>
+  );
+
   const renderMain = () => (
     <>
       <div className="px-1 space-y-4">
@@ -485,7 +586,8 @@ export function ProfileView({ onBack }: ProfileViewProps) {
           {activeSubView === 'personal-info' ? 'Personal Info' :
            activeSubView === 'subscription' ? 'Subscription' :
            activeSubView === 'legal' ? 'Legal' :
-           activeSubView === 'settings' ? 'Settings' : 'Profile'}
+           activeSubView === 'settings' ? 'Settings' : 
+           activeSubView === 'goals' ? 'My Goals' : 'Profile'}
         </h1>
       </div>
 
@@ -494,6 +596,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
       {activeSubView === 'subscription' && renderSubscription()}
       {activeSubView === 'legal' && renderLegal()}
       {activeSubView === 'settings' && renderSettings()}
+      {activeSubView === 'goals' && renderGoals()}
     </div>
   );
 }
