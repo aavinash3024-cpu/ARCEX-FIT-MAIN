@@ -30,7 +30,9 @@ import {
   Lock,
   Stethoscope,
   Banknote,
-  Check
+  Check,
+  Bell,
+  Zap
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
@@ -221,30 +223,18 @@ export function ProfileView({ onBack }: ProfileViewProps) {
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Preferences</h3>
         <Card className="border-none shadow-md bg-white rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
-            <div className="p-4 flex items-center justify-between border-b border-muted/5">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-slate-50 text-slate-500 flex items-center justify-center shadow-sm">
-                  <Palette className="w-5 h-5" />
-                </div>
-                <div className="space-y-0.5">
-                  <span className="text-sm font-bold text-foreground/90">Appearance</span>
-                  <span className="text-[10px] font-medium text-muted-foreground">Light / Dark / System</span>
-                </div>
-              </div>
-              <Badge variant="secondary" className="bg-muted/50 text-[10px] font-bold uppercase">System</Badge>
-            </div>
-            <div className="p-4 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-10 h-10 rounded-2xl bg-sky-50 text-sky-500 flex items-center justify-center shadow-sm">
-                  <Smartphone className="w-5 h-5" />
-                </div>
-                <div className="space-y-0.5">
-                  <span className="text-sm font-bold text-foreground/90">Haptics</span>
-                  <span className="text-[10px] font-medium text-muted-foreground">Tactile feedback</span>
-                </div>
-              </div>
-              <Switch defaultChecked />
-            </div>
+            <SettingsButton icon={Palette} label="Theme" subLabel="Light / Dark / System" color="text-slate-500" bg="bg-slate-50" />
+            <SettingsButton icon={Smartphone} label="Haptics" subLabel="Tactile feedback" color="text-sky-500" bg="bg-sky-50" />
+            <SettingsButton icon={Bell} label="Notifications" subLabel="Manage app alerts" color="text-primary" bg="bg-primary/5" />
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="px-1 space-y-3">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Sync & Devices</h3>
+        <Card className="border-none shadow-md bg-white rounded-3xl overflow-hidden border border-muted/10">
+          <CardContent className="p-0">
+            <SettingsButton icon={Zap} label="Health Connect" subLabel="Sync steps from your device" color="text-green-600" bg="bg-green-50" />
           </CardContent>
         </Card>
       </div>
@@ -272,10 +262,10 @@ export function ProfileView({ onBack }: ProfileViewProps) {
           <CardContent className="p-6 relative z-10">
             <div className="flex items-center gap-5">
               <div className="relative shrink-0">
-                <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-xl border-4 border-white relative z-10">
+                <div className="w-20 h-20 rounded-full bg-[#6b85a3] flex items-center justify-center shadow-xl border-4 border-white relative z-10">
                   <span className="text-2xl font-black text-white">{user.name.charAt(0)}</span>
                 </div>
-                <div className="absolute -bottom-1 -right-1 z-20 bg-primary text-white p-1.5 rounded-full border-2 border-white shadow-lg">
+                <div className="absolute -bottom-1 -right-1 z-20 bg-[#6b85a3] text-white p-1.5 rounded-full border-2 border-white shadow-lg">
                   <Trophy className="w-2.5 h-2.5" />
                 </div>
               </div>
