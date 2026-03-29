@@ -88,9 +88,11 @@ export function WorkoutView() {
   const [searchQuery, setSearchQuery] = useState("");
   const [muscleFilter, setMuscleFilter] = useState<string>("ALL");
   const [subMuscleFilter, setSubMuscleFilter] = useState<string>("ALL");
+  const [isLoaded, setIsLoaded] = useState(false);
 
   const todayName = format(new Date(), 'EEEE');
 
+  // Load initial data
   useEffect(() => {
     const savedSplit = localStorage.getItem('pulseflow_workout_split');
     if (savedSplit) {
@@ -104,37 +106,54 @@ export function WorkoutView() {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const savedExtra = localStorage.getItem('pulseflow_extra_moves');
     if (savedExtra) {
-      const parsed = JSON.parse(savedExtra);
-      if (parsed.date === todayStr) setExtraMoves(parsed.moves);
+      try {
+        const parsed = JSON.parse(savedExtra);
+        if (parsed.date === todayStr) setExtraMoves(parsed.moves);
+      } catch (e) {
+        console.error("Failed to load extra moves", e);
+      }
     }
 
     const savedLogs = localStorage.getItem('pulseflow_workout_logs');
     if (savedLogs) {
-      const parsed = JSON.parse(savedLogs);
-      if (parsed.date === todayStr) setLoggedSets(parsed.data);
+      try {
+        const parsed = JSON.parse(savedLogs);
+        if (parsed.date === todayStr) setLoggedSets(parsed.data);
+      } catch (e) {
+        console.error("Failed to load workout logs", e);
+      }
     }
+    
+    setIsLoaded(true);
   }, []);
 
+  // Save Split
   useEffect(() => {
-    if (Object.keys(split).length > 0) {
+    if (isLoaded && Object.keys(split).length > 0) {
       localStorage.setItem('pulseflow_workout_split', JSON.stringify(split));
     }
-  }, [split]);
+  }, [split, isLoaded]);
 
+  // Save Extra Moves
   useEffect(() => {
-    const todayStr = format(new Date(), 'yyyy-MM-dd');
-    localStorage.setItem('pulseflow_extra_moves', JSON.stringify({ date: todayStr, moves: extraMoves }));
-  }, [extraMoves]);
+    if (isLoaded) {
+      const todayStr = format(new Date(), 'yyyy-MM-dd');
+      localStorage.setItem('pulseflow_extra_moves', JSON.stringify({ date: todayStr, moves: extraMoves }));
+    }
+  }, [extraMoves, isLoaded]);
 
+  // Save Logs
   useEffect(() => {
-    const todayStr = format(new Date(), 'yyyy-MM-dd');
-    localStorage.setItem('pulseflow_workout_logs', JSON.stringify({ date: todayStr, data: loggedSets }));
-    
-    const savedHistory = localStorage.getItem('pulseflow_workout_history');
-    const historyObj = savedHistory ? JSON.parse(savedHistory) : {};
-    historyObj[todayStr] = loggedSets;
-    localStorage.setItem('pulseflow_workout_history', JSON.stringify(historyObj));
-  }, [loggedSets]);
+    if (isLoaded) {
+      const todayStr = format(new Date(), 'yyyy-MM-dd');
+      localStorage.setItem('pulseflow_workout_logs', JSON.stringify({ date: todayStr, data: loggedSets }));
+      
+      const savedHistory = localStorage.getItem('pulseflow_workout_history');
+      const historyObj = savedHistory ? JSON.parse(savedHistory) : {};
+      historyObj[todayStr] = loggedSets;
+      localStorage.setItem('pulseflow_workout_history', JSON.stringify(historyObj));
+    }
+  }, [loggedSets, isLoaded]);
 
   const muscleGroups = useMemo(() => {
     const groups = Array.from(new Set(EXERCISES_DATA.map(e => e.muscle)));
@@ -379,7 +398,6 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      {/* MY WORKOUT SPLIT AT TOP */}
       <Card 
         onClick={() => setActiveSubView('split')}
         className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
@@ -406,7 +424,6 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* TODAYS WORKOUT */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -476,7 +493,6 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* PERSONAL RECORDS (Now White) */}
       <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-white border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
