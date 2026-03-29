@@ -8,7 +8,8 @@ import {
   Dumbbell, 
   LineChart as ChartIcon,
   Bell,
-  Search
+  Search,
+  User
 } from 'lucide-react';
 import { DashboardView } from '@/components/dashboard-view';
 import { NutritionView } from '@/components/nutrition-view';
@@ -20,7 +21,7 @@ import { TasksView, type Task } from '@/components/tasks-view';
 import { CalculatorsView } from '@/components/calculators-view';
 import { GoalSettingView } from '@/components/goal-setting-view';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import { format, isYesterday } from 'date-fns';
 
 export default function PulseFlowApp() {
@@ -353,8 +354,9 @@ export default function PulseFlowApp() {
       <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b relative">
         <div className="flex items-center">
           <Avatar className="w-10 h-10 border-2 border-primary/20">
-            <AvatarImage src="https://picsum.photos/seed/user/100/100" />
-            <AvatarFallback>JD</AvatarFallback>
+            <AvatarFallback className="bg-muted/50">
+              <User className="w-5 h-5 text-muted-foreground" />
+            </AvatarFallback>
           </Avatar>
         </div>
 
