@@ -231,7 +231,7 @@ export function WorkoutView() {
           <h1 className="text-xl font-bold font-headline truncate">{selectedExercise.name}</h1>
         </div>
 
-        <Card className="border-none shadow-lg bg-white overflow-hidden rounded-3xl border border-muted/20">
+        <Card className="border-none shadow-lg bg-card overflow-hidden rounded-3xl border border-muted/20">
           <CardContent className="p-6 space-y-8">
             <div className="space-y-4">
               <div className="flex items-center gap-2 border-l-4 border-primary pl-4 py-0.5">
@@ -311,7 +311,7 @@ export function WorkoutView() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search exercise..." 
-              className="w-full h-12 pl-10 pr-4 bg-white border border-muted-foreground/10 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm font-bold"
+              className="w-full h-12 pl-10 pr-4 bg-background border border-muted-foreground/10 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm font-bold"
             />
           </div>
 
@@ -324,7 +324,7 @@ export function WorkoutView() {
                   "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
                   muscleFilter === m 
                     ? "bg-primary text-white border-primary shadow-md" 
-                    : "bg-white text-muted-foreground border-muted/20"
+                    : "bg-card text-muted-foreground border-muted/20"
                 )}
               >
                 {m}
@@ -333,7 +333,7 @@ export function WorkoutView() {
           </div>
 
           <Select value={subMuscleFilter} onValueChange={setSubMuscleFilter}>
-            <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-white h-11 text-[10px] font-black uppercase tracking-tighter">
+            <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-card h-11 text-[10px] font-black uppercase tracking-tighter">
               <SelectValue placeholder="Select Sub-Muscle" />
             </SelectTrigger>
             <SelectContent className="rounded-xl">
@@ -354,7 +354,7 @@ export function WorkoutView() {
               <button 
                 key={idx} 
                 onClick={() => setSelectedExercise(ex)}
-                className="flex items-center justify-between p-4 bg-white rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
+                className="flex items-center justify-between p-4 bg-card rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
               >
                 <div className="min-w-0 pr-4">
                   <h4 className="font-bold text-[13px] text-foreground/90 truncate">{ex.name}</h4>
@@ -408,7 +408,7 @@ export function WorkoutView() {
 
       <Card 
         onClick={() => setActiveSubView('split')}
-        className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
+        className="border-none shadow-sm bg-card overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
       >
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
@@ -432,7 +432,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
+      <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-full shrink-0">
@@ -461,7 +461,7 @@ export function WorkoutView() {
                     <div 
                       key={idx} 
                       onClick={() => setLoggingExercise(ex)}
-                      className="bg-white p-3 rounded-xl border border-muted/20 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
+                      className="bg-card p-3 rounded-xl border border-muted/20 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
                     >
                       <div className="flex justify-between items-start">
                         <div className="space-y-1">
@@ -501,7 +501,7 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-white border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
+      <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-card border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
@@ -527,7 +527,7 @@ export function WorkoutView() {
       <div className="grid grid-cols-2 gap-4 pb-6">
         <Card 
           onClick={() => setActiveSubView('history')}
-          className="border-none shadow-sm bg-white border border-muted/20 cursor-pointer hover:bg-muted/5 transition-all"
+          className="border-none shadow-sm bg-card border border-muted/20 cursor-pointer hover:bg-muted/5 transition-all"
         >
           <CardContent className="p-5 flex flex-col items-start gap-3">
             <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
@@ -542,7 +542,7 @@ export function WorkoutView() {
         
         <Card 
           onClick={() => setActiveSubView('library')}
-          className="border-none shadow-sm bg-white hover:bg-indigo-50 transition-all cursor-pointer border border-muted/20"
+          className="border-none shadow-sm bg-card hover:bg-indigo-50 transition-all cursor-pointer border border-muted/20"
         >
           <CardContent className="p-5 flex flex-col items-start gap-3">
             <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
@@ -568,7 +568,7 @@ export function WorkoutView() {
 
       {loggingExercise && (
         <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
-          <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[70vh]">
+          <div className="w-full max-w-lg mx-auto bg-card rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 overflow-hidden flex flex-col h-[70vh]">
             <div className="flex items-center justify-between mb-6 pt-2">
               <div className="min-w-0 flex-1">
                 <h3 className="text-xl font-black uppercase tracking-tighter truncate">{loggingExercise.name}</h3>
@@ -653,7 +653,7 @@ export function WorkoutView() {
                       <p className="text-[10px] italic text-muted-foreground py-4">No sets logged yet</p>
                     ) : (
                       (loggedSets[loggingExercise.name] || []).map((set, i) => (
-                        <div key={i} className="flex items-center justify-between p-3 bg-white border rounded-xl shadow-sm">
+                        <div key={i} className="flex items-center justify-between p-3 bg-card border rounded-xl shadow-sm">
                           <div className="flex items-center gap-3">
                             <Badge variant="outline" className="h-6 w-6 rounded-full flex items-center justify-center p-0 font-bold">
                               {i + 1}
@@ -711,7 +711,7 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
 
   return (
     <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
-      <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 flex flex-col h-[80vh]">
+      <div className="w-full max-w-lg mx-auto bg-card rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 flex flex-col h-[80vh]">
         <div className="flex items-center justify-between mb-2 pt-2">
           <div className="space-y-0.5">
             <h3 className="text-xl font-black uppercase tracking-tighter">Add Extra Exercise</h3>
@@ -743,7 +743,7 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
                 "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
                 muscleFilter === m 
                   ? "bg-primary text-white border-primary shadow-md" 
-                  : "bg-white text-muted-foreground border-muted/20"
+                  : "bg-card text-muted-foreground border-muted/20"
               )}
             >
               {m}
@@ -884,7 +884,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between bg-white p-2 rounded-2xl shadow-sm border border-muted/20 mx-1">
+        <div className="flex items-center justify-between bg-card p-2 rounded-2xl shadow-sm border border-muted/20 mx-1">
           <button 
             onClick={() => setActiveType('strength')}
             className={cn(
@@ -912,7 +912,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
               onClick={() => setActiveMuscle(muscle)}
               className={cn(
                 "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-                activeMuscle === muscle ? "bg-primary text-white border-primary shadow-lg" : "bg-white text-muted-foreground border-muted/20"
+                activeMuscle === muscle ? "bg-primary text-white border-primary shadow-lg" : "bg-card text-muted-foreground border-muted/20"
               )}
             >
               {muscle}
@@ -931,7 +931,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
               <button 
                 key={idx} 
                 onClick={() => onViewDetail(ex)}
-                className="flex items-center justify-between p-3 bg-white rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
+                className="flex items-center justify-between p-3 bg-card rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-4 overflow-hidden">
                   <div className="shrink-0 w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center">
@@ -1021,7 +1021,7 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
             const rankColors = ['#f59e0b', '#94a3b8', '#92400e'];
             
             return (
-              <Card key={idx} className="border-none shadow-sm bg-white hover:bg-muted/5 group transition-all rounded-2xl overflow-hidden border border-muted/10">
+              <Card key={idx} className="border-none shadow-sm bg-card hover:bg-muted/5 group transition-all rounded-2xl overflow-hidden border border-muted/10">
                 <CardContent className="p-0 flex items-stretch">
                   <div className={cn("w-1.5 shrink-0", !isTop3 && "bg-muted/20")} style={{ backgroundColor: isTop3 ? rankColors[idx] : undefined }} />
                   
@@ -1187,7 +1187,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
             onClick={() => setActiveDay(day)}
             className={cn(
               "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-              activeDay === day ? "bg-primary text-white border-primary shadow-lg" : "bg-white text-muted-foreground border-muted/20"
+              activeDay === day ? "bg-primary text-white border-primary shadow-lg" : "bg-card text-muted-foreground border-muted/20"
             )}
           >
             {day.substring(0, 3)}
@@ -1195,7 +1195,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
         ))}
       </div>
 
-      <Card className="border-none shadow-md bg-white overflow-hidden rounded-3xl mx-1">
+      <Card className="border-none shadow-md bg-card overflow-hidden rounded-3xl mx-1">
         <CardContent className="p-6 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-sm font-black uppercase tracking-tighter text-foreground flex items-center gap-2">
@@ -1252,7 +1252,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
                 onClick={() => setActiveMuscleReport(muscle)}
                 className={cn(
                   "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-                  activeMuscleReport === muscle ? "bg-primary text-white border-primary shadow-md" : "bg-white text-muted-foreground border-muted/20"
+                  activeMuscleReport === muscle ? "bg-primary text-white border-primary shadow-md" : "bg-card text-muted-foreground border-muted/20"
                 )}
               >
                 {muscle}
@@ -1262,7 +1262,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
 
           {currentMuscleReport && (
             <div className="px-1">
-              <Card className="border-none bg-white rounded-3xl shadow-sm p-6 space-y-6">
+              <Card className="border-none bg-card rounded-3xl shadow-sm p-6 space-y-6">
                 <div className="flex justify-between items-center border-b border-muted/10 pb-4">
                   <div>
                     <h3 className="text-lg font-black uppercase tracking-tight text-foreground">{activeMuscleReport}</h3>
@@ -1346,7 +1346,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
 
       {isAdding && (
         <div className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
-          <div className="w-full max-w-lg mx-auto bg-white rounded-t-[2.5rem] shadow-2xl p-6 h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-500">
+          <div className="w-full max-w-lg mx-auto bg-card rounded-t-[2.5rem] shadow-2xl p-6 h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-500">
             <div className="flex items-center justify-between mb-4 pt-2">
               <h3 className="text-xl font-black uppercase tracking-tighter">Choose Moves</h3>
               <Button variant="ghost" size="icon" onClick={() => setIsAdding(false)} className="rounded-full">
@@ -1364,7 +1364,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
                   onClick={() => setMuscleFilter(m)} 
                   className={cn(
                     "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all shrink-0", 
-                    muscleFilter === m ? "bg-primary text-white border-primary" : "bg-muted/5 text-muted-foreground border-muted/20"
+                    muscleFilter === m ? "bg-primary text-white border-primary" : "bg-card text-muted-foreground border-muted/20"
                   )}
                 >
                   {m}
@@ -1489,7 +1489,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
         <h1 className="text-2xl font-bold font-headline">Workout History</h1>
       </div>
 
-      <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
+      <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
         <Button variant="ghost" size="icon" onClick={handlePrevWeek} className="rounded-full hover:bg-muted">
           <ChevronLeft className="w-5 h-5 text-primary" />
         </Button>
@@ -1506,7 +1506,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
         </Button>
       </div>
 
-      <Card className="border-none shadow-md bg-white rounded-[1.5rem] p-4 space-y-3 mx-1">
+      <Card className="border-none shadow-md bg-card rounded-[1.5rem] p-4 space-y-3 mx-1">
         <div className="flex items-center gap-2 border-b pb-2 border-muted/10">
           <TrendingUp className="w-3.5 h-3.5 text-primary" />
           <h3 className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">STRENGTH GROWTH FROM LAST WEEK</h3>
@@ -1563,7 +1563,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
             <Accordion key={dateStr} type="single" collapsible className="w-full">
               <AccordionItem value={dateStr} className="border-none">
                 <Card className={cn(
-                  "border-none shadow-sm overflow-hidden bg-white rounded-[1.25rem] transition-all",
+                  "border-none shadow-sm overflow-hidden bg-card rounded-[1.25rem] transition-all",
                   exerciseNames.length === 0 ? "opacity-40" : ""
                 )}>
                   <AccordionTrigger className="p-0 hover:no-underline [&[data-state=open]]:bg-muted/5 group [&>svg]:hidden">
@@ -1594,7 +1594,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                           const sets = dayLogs[exName];
                           const isTimeType = getExerciseType(exName) === 'time';
                           return (
-                            <Card key={exName} className="border border-muted/20 bg-white rounded-xl overflow-hidden shadow-sm">
+                            <Card key={exName} className="border border-muted/20 bg-card rounded-xl overflow-hidden shadow-sm">
                               <CardContent className="p-0">
                                 <div className="p-2.5 bg-muted/10 border-b border-muted/10 flex items-center gap-2">
                                   <RefreshCw className="w-3 h-3 text-primary" />

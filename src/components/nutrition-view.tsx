@@ -323,7 +323,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </div>
 
         <Tabs defaultValue="weekly" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 h-11 bg-white/80 backdrop-blur-sm p-1.5 rounded-2xl shadow-sm border border-muted/20">
+          <TabsList className="grid w-full grid-cols-2 h-11 bg-card/80 backdrop-blur-sm p-1.5 rounded-2xl shadow-sm border border-muted/20">
             <TabsTrigger value="weekly" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Weekly</TabsTrigger>
             <TabsTrigger value="monthly" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Monthly</TabsTrigger>
           </TabsList>
@@ -387,7 +387,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
           <h1 className="text-2xl font-bold font-headline">Daily Summary</h1>
         </div>
 
-        <Card className="border-none shadow-sm bg-white overflow-hidden rounded-[2rem] border border-muted/10">
+        <Card className="border-none shadow-sm bg-card overflow-hidden rounded-[2rem] border border-muted/10">
           <CardContent className="p-5 space-y-4">
             <div className="flex justify-between items-start">
               <div className="space-y-0.5">
@@ -438,7 +438,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
             <BarChart3 className="w-3.5 h-3.5 text-primary" /> Top Macro Sources
           </h3>
-          <Card className="border-none shadow-sm bg-white overflow-hidden rounded-2xl">
+          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl">
             <CardContent className="p-0">
               <Tabs defaultValue="protein" className="w-full">
                 <TabsList className="grid w-full grid-cols-4 h-9 bg-muted/30 p-1 rounded-none">
@@ -488,7 +488,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               <p className="text-center py-16 opacity-30 text-[10px] font-black uppercase tracking-widest">No entries recorded</p>
             ) : (
               loggedMeals.map(meal => (
-                <Card key={meal.id} className="border-none shadow-sm bg-white hover:bg-muted/5 transition-all">
+                <Card key={meal.id} className="border-none shadow-sm bg-card hover:bg-muted/5 transition-all">
                   <CardContent className="p-4 relative">
                     <div className="space-y-2 pr-4">
                       <h4 className="font-bold text-sm text-foreground leading-tight">
@@ -542,7 +542,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </Button>
       </div>
 
-      <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
+      <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-full shrink-0">
@@ -590,7 +590,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                   value={mealInput}
                   onChange={(e) => setMealInput(e.target.value)}
                   placeholder="What did you eat?" 
-                  className="w-full h-12 pl-10 pr-4 bg-white border border-muted-foreground/10 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm font-bold"
+                  className="w-full h-12 pl-10 pr-4 bg-background border border-muted-foreground/10 rounded-xl text-xs focus:outline-none focus:ring-2 focus:ring-primary/20 transition-all shadow-sm font-bold"
                 />
                 <div className="absolute inset-y-0 right-2 flex items-center gap-1">
                   <Button onClick={handleSpeech} size="icon" variant="ghost" className={`w-8 h-8 rounded-full transition-colors ${isListening ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}>
@@ -620,7 +620,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                     recentMeals.map((meal) => {
                       const saved = isAlreadySaved(meal.name);
                       return (
-                        <div key={meal.id} className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-muted/20">
+                        <div key={meal.id} className="flex items-center justify-between p-3 bg-card/60 rounded-xl border border-muted/20">
                           <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
                               <Utensils className="w-4 h-4 text-muted-foreground/60" />
@@ -661,7 +661,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                     </div>
                   ) : (
                     savedMeals.map((meal) => (
-                      <div key={meal.id} className="flex items-center justify-between p-3 bg-white/60 rounded-xl border border-muted/20">
+                      <div key={meal.id} className="flex items-center justify-between p-3 bg-card/60 rounded-xl border border-muted/20">
                         <div className="flex items-center gap-3">
                           <div className="w-8 h-8 rounded-lg bg-muted flex items-center justify-center">
                             <Utensils className="w-4 h-4 text-muted-foreground/60" />
@@ -689,7 +689,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </CardContent>
       </Card>
 
-      <Card className="border-none shadow-md overflow-hidden bg-white rounded-2xl">
+      <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
         <div className="h-14 w-full relative">
           <Image 
             src={logHeaderImage?.imageUrl || "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=800&auto=format&fit=crop"} 
@@ -720,7 +720,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                   <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-muted/20 hover:bg-muted/30 transition-all group relative">
                     <CardContent className="p-0 flex min-h-[72px]">
                       <div className="w-1.5 bg-primary/40 shrink-0" />
-                      <div className="w-12 bg-white/50 shrink-0 flex items-center justify-center">
+                      <div className="w-12 bg-card/50 shrink-0 flex items-center justify-center">
                         <Utensils className="w-4 h-4 text-primary/30" />
                       </div>
                       <div className="flex-1 p-2.5 flex flex-col justify-center min-w-0 pr-10">
@@ -748,7 +748,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       <div className="grid grid-cols-1 gap-4 pb-6">
         <Card 
           onClick={() => setShowTrends(true)}
-          className="border-none shadow-sm bg-white hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group rounded-2xl"
+          className="border-none shadow-sm bg-card hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group rounded-2xl"
         >
           <CardContent className="p-4 flex flex-col items-start gap-2">
             <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center">
@@ -858,7 +858,7 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
 
   return (
     <div className="space-y-4">
-      <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20">
+      <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20">
         <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full hover:bg-muted">
           <ChevronLeft className="w-5 h-5 text-primary" />
         </Button>
@@ -876,21 +876,21 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
       </div>
 
       {!stats ? (
-        <Card className="border-none shadow-sm bg-white p-12 flex flex-col items-center justify-center opacity-30 gap-4">
+        <Card className="border-none shadow-sm bg-card p-12 flex flex-col items-center justify-center opacity-30 gap-4">
           <Calendar className="w-12 h-12" />
           <p className="text-[10px] font-black uppercase tracking-widest text-center">No data logged for this period</p>
         </Card>
       ) : (
         <>
           <div className="grid grid-cols-2 gap-3">
-            <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+            <Card className="border-none shadow-sm bg-card p-4 space-y-1">
               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Avg Calories</p>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl font-black">{stats.avgCalories}</span>
                 <span className="text-[8px] font-bold text-muted-foreground uppercase">Kcal</span>
               </div>
             </Card>
-            <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+            <Card className="border-none shadow-sm bg-card p-4 space-y-1">
               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Net {stats.netSurplusDeficit >= 0 ? 'Surplus' : 'Deficit'}</p>
               <div className={cn("flex items-center gap-1", stats.netSurplusDeficit >= 0 ? "text-orange-500" : "text-green-600")}>
                 {stats.netSurplusDeficit >= 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
@@ -899,7 +899,7 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
             </Card>
           </div>
 
-          <Card className="border-none shadow-sm bg-white overflow-hidden">
+          <Card className="border-none shadow-sm bg-card overflow-hidden">
             <CardContent className="p-4 space-y-4">
               <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                 <History className="w-3.5 h-3.5 text-primary" /> Daily Extremes
@@ -919,7 +919,7 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-sm bg-white">
+          <Card className="border-none shadow-sm bg-card">
             <CardContent className="p-4 space-y-4">
               <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                 <PieChart className="w-3.5 h-3.5 text-primary" /> Average Macro Ratio
@@ -939,7 +939,7 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-sm bg-white">
+          <Card className="border-none shadow-sm bg-card">
             <CardContent className="p-4 space-y-4">
               <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
                 <Target className="w-3.5 h-3.5 text-primary" /> Goal Achievements
