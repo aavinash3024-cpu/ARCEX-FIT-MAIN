@@ -56,6 +56,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
+import { Switch } from "@/components/ui/switch";
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -88,6 +89,11 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+
+  // Preference States
+  const [darkMode, setDarkMode] = useState(false);
+  const [hapticsEnabled, setHapticsEnabled] = useState(true);
+  const [notificationsEnabled, setNotificationsEnabled] = useState(true);
 
   // Profile Form State
   const [profileName, setProfileName] = useState("Alex Johnson");
@@ -189,9 +195,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
 
     // Remove the keys
     keysToRemove.forEach(key => localStorage.removeItem(key));
-
-    // Note: We EXPLICITLY do NOT remove 'pulseflow_user_profile' or 'pulseflow_food_cache'
-    // This preserves personal details and AI efficiency as requested.
 
     setTimeout(() => {
       setIsResetting(false);
@@ -418,9 +421,33 @@ export function ProfileView({ onBack }: ProfileViewProps) {
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Preferences</h3>
         <Card className="border-none shadow-md bg-white rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
-            <SettingsButton icon={Palette} label="Theme" subLabel="Light / Dark / System" color="text-slate-500" bg="bg-slate-50" />
-            <SettingsButton icon={Smartphone} label="Haptics" subLabel="Tactile feedback" color="text-sky-500" bg="bg-slate-50" />
-            <SettingsButton icon={Bell} label="Notifications" subLabel="Manage app alerts" color="text-primary" bg="bg-primary/5" />
+            <SettingsSwitch 
+              icon={Palette} 
+              label="Dark Mode" 
+              subLabel="Switch app appearance" 
+              color="text-slate-500" 
+              bg="bg-slate-50"
+              checked={darkMode}
+              onCheckedChange={setDarkMode}
+            />
+            <SettingsSwitch 
+              icon={Smartphone} 
+              label="Haptics" 
+              subLabel="Tactile feedback" 
+              color="text-sky-500" 
+              bg="bg-slate-50"
+              checked={hapticsEnabled}
+              onCheckedChange={setHapticsEnabled}
+            />
+            <SettingsSwitch 
+              icon={Bell} 
+              label="Notifications" 
+              subLabel="Manage app alerts" 
+              color="text-primary" 
+              bg="bg-primary/5"
+              checked={notificationsEnabled}
+              onCheckedChange={setNotificationsEnabled}
+            />
           </CardContent>
         </Card>
       </div>
@@ -548,11 +575,11 @@ export function ProfileView({ onBack }: ProfileViewProps) {
                   </div>
                   <div className="text-center">
                     <p className="text-[7px] font-black text-muted-foreground uppercase">CARBS</p>
-                    <p className="text-xs font-black" style={{ color: MACRO_COLORS.carbs }}>{goalData.carbPct}%</p>
+                    <p className="text-xs font-black" style={{ color: MACRO_COLORS.carbPct > 0 ? MACRO_COLORS.carbs : '#ccc' }}>{goalData.carbPct}%</p>
                   </div>
                   <div className="text-center">
                     <p className="text-[7px] font-black text-muted-foreground uppercase">FATS</p>
-                    <p className="text-xs font-black" style={{ color: MACRO_COLORS.fat }}>{goalData.fatPct}%</p>
+                    <p className="text-xs font-black" style={{ color: goalData.fatPct > 0 ? MACRO_COLORS.fat : '#ccc' }}>{goalData.fatPct}%</p>
                   </div>
                 </div>
               </div>
@@ -854,5 +881,30 @@ function SettingsButton({ icon: Icon, label, subLabel, color, bg }: { icon: any,
       </div>
       <ChevronRight className="w-4 h-4 text-muted-foreground/20 group-hover:text-primary transition-all" />
     </button>
+  );
+}
+
+function SettingsSwitch({ icon: Icon, label, subLabel, color, bg, checked, onCheckedChange }: { 
+  icon: any, 
+  label: string, 
+  subLabel: string, 
+  color?: string, 
+  bg?: string,
+  checked: boolean,
+  onCheckedChange: (val: boolean) => void
+}) {
+  return (
+    <div className="w-full p-4 flex items-center justify-between group border-b border-muted/5 last:border-0">
+      <div className="flex items-center gap-4">
+        <div className={cn("w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm", bg || "bg-muted/30", color || "text-muted-foreground")}>
+          <Icon className="w-5 h-5" />
+        </div>
+        <div className="space-y-0.5">
+          <span className="text-sm font-bold text-foreground/90 block leading-tight">{label}</span>
+          <span className="text-[10px] font-medium text-muted-foreground">{subLabel}</span>
+        </div>
+      </div>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} className="data-[state=checked]:bg-primary" />
+    </div>
   );
 }
