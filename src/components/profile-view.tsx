@@ -44,7 +44,8 @@ import {
   ArrowDownRight,
   BarChart3,
   Timer,
-  AlertTriangle
+  AlertTriangle,
+  Check
 } from "lucide-react";
 import { 
   Select,
@@ -176,7 +177,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     ];
 
     // Remove the keys
-    keysToRemove.forEach(key => localStorage.removeItem(keys));
+    keysToRemove.forEach(key => localStorage.removeItem(key));
 
     // Note: We EXPLICITLY do NOT remove 'pulseflow_user_profile' or 'pulseflow_food_cache'
     // This preserves personal details and AI efficiency as requested.
