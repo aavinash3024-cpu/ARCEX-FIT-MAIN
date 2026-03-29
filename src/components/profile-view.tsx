@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -140,7 +139,34 @@ export function ProfileView({ onBack }: ProfileViewProps) {
         console.error("Failed to parse profile data", e);
       }
     }
+
+    // Load Preferences
+    const savedDarkMode = localStorage.getItem('pulseflow_dark_mode');
+    if (savedDarkMode !== null) setDarkMode(savedDarkMode === 'true');
+    const savedHaptics = localStorage.getItem('pulseflow_haptics');
+    if (savedHaptics !== null) setHapticsEnabled(savedHaptics === 'true');
+    const savedNotify = localStorage.getItem('pulseflow_notifications');
+    if (savedNotify !== null) setNotificationsEnabled(savedNotify === 'true');
   }, []);
+
+  // Theme Side Effect
+  useEffect(() => {
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+    localStorage.setItem('pulseflow_dark_mode', darkMode.toString());
+  }, [darkMode]);
+
+  // Haptics & Notifications Side Effects
+  useEffect(() => {
+    localStorage.setItem('pulseflow_haptics', hapticsEnabled.toString());
+  }, [hapticsEnabled]);
+
+  useEffect(() => {
+    localStorage.setItem('pulseflow_notifications', notificationsEnabled.toString());
+  }, [notificationsEnabled]);
 
   const handleSaveProfile = () => {
     setIsSaving(true);
@@ -264,7 +290,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       <div className="px-1 space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Identity Details</h3>
-        <Card className="border-none shadow-md bg-white rounded-3xl overflow-hidden border border-muted/10">
+        <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-6 space-y-5">
             <div className="space-y-2">
               <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Username</Label>
@@ -403,7 +429,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="px-1 space-y-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Documentation</h3>
-        <Card className="border-none shadow-md bg-white rounded-3xl overflow-hidden border border-muted/10">
+        <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
             <LegalItem icon={FileText} label="Terms and Conditions" color="text-blue-600" bg="bg-blue-50" />
             <LegalItem icon={Lock} label="Privacy Policy" color="text-indigo-600" bg="bg-indigo-50" />
@@ -419,11 +445,11 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="px-1 space-y-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Preferences</h3>
-        <Card className="border-none shadow-md bg-white rounded-3xl overflow-hidden border border-muted/10">
+        <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
             <SettingsSwitch 
               icon={Palette} 
-              label="Dark Mode" 
+              label="Dark Theme" 
               subLabel="Switch app appearance" 
               color="text-slate-500" 
               bg="bg-slate-50"
@@ -454,7 +480,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
 
       <div className="px-1 space-y-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Sync & Devices</h3>
-        <Card className="border-none shadow-md bg-white rounded-3xl overflow-hidden border border-muted/10">
+        <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
             <SettingsButton icon={Zap} label="Health Connect" subLabel="Sync steps from your device" color="text-green-600" bg="bg-green-50" />
           </CardContent>
@@ -463,7 +489,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
 
       <div className="px-1 space-y-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Data & Security</h3>
-        <Card className="border-none shadow-md bg-white rounded-3xl overflow-hidden border border-muted/10">
+        <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
             <SettingsButton icon={Database} label="Export Data" subLabel="Download your wellness history" />
             <SettingsButton icon={Key} label="Change Password" subLabel="Update security credentials" />
@@ -480,13 +506,13 @@ export function ProfileView({ onBack }: ProfileViewProps) {
       {goalData ? (
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-3">
-            <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+            <Card className="border-none shadow-sm bg-card p-4 space-y-1">
               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Weight Objective</p>
               <div className="flex items-center gap-1">
                 <span className="text-sm font-black text-primary uppercase">{goalData.objective}</span>
               </div>
             </Card>
-            <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+            <Card className="border-none shadow-sm bg-card p-4 space-y-1">
               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Total Progress</p>
               <div className="flex items-center gap-1 text-green-600">
                 <ArrowUpRight className="w-3.5 h-3.5" />
@@ -495,7 +521,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
             </Card>
           </div>
 
-          <Card className="border-none shadow-sm bg-white overflow-hidden rounded-3xl border border-muted/10">
+          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-3xl border border-muted/10">
             <CardContent className="p-5 space-y-4">
               <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
                 <Scale className="w-3.5 h-3.5 text-primary" /> Body Milestone
@@ -520,7 +546,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-sm bg-white overflow-hidden rounded-3xl border border-muted/10">
+          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-3xl border border-muted/10">
             <CardContent className="p-5 space-y-4">
               <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
                 <Calendar className="w-3.5 h-3.5 text-orange-400" /> Timeline Strategy
@@ -541,14 +567,14 @@ export function ProfileView({ onBack }: ProfileViewProps) {
           </Card>
 
           <div className="grid grid-cols-2 gap-3">
-            <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+            <Card className="border-none shadow-sm bg-card p-4 space-y-1">
               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Daily Budget</p>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl font-black text-primary">{goalData.finalCalories}</span>
                 <span className="text-[8px] font-bold text-muted-foreground uppercase">Kcal</span>
               </div>
             </Card>
-            <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+            <Card className="border-none shadow-sm bg-card p-4 space-y-1">
               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Maintenance</p>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl font-black text-foreground/40">{goalData.tdee}</span>
@@ -557,7 +583,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
             </Card>
           </div>
 
-          <Card className="border-none shadow-sm bg-white rounded-3xl border border-muted/10 overflow-hidden">
+          <Card className="border-none shadow-sm bg-card rounded-3xl border border-muted/10 overflow-hidden">
             <CardContent className="p-5 space-y-4">
               <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
                 <PieChart className="w-3.5 h-3.5 text-primary" /> Strategy Split
@@ -586,7 +612,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-sm bg-white rounded-3xl border border-muted/10">
+          <Card className="border-none shadow-sm bg-card rounded-3xl border border-muted/10">
             <CardContent className="p-5 space-y-5">
               <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
                 <BarChart3 className="w-3.5 h-3.5 text-primary" /> Target Metrics
@@ -614,7 +640,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
 
           <div className="space-y-3">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-2">Activity Targets</h3>
-            <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-muted/10 shadow-sm">
+            <div className="flex items-center justify-between bg-card p-4 rounded-2xl border border-muted/10 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
                   <Droplets className="w-5 h-5 text-blue-600" />
@@ -629,7 +655,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
               </div>
             </div>
 
-            <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-muted/10 shadow-sm">
+            <div className="flex items-center justify-between bg-card p-4 rounded-2xl border border-muted/10 shadow-sm">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
                   <Footprints className="w-5 h-5 text-green-600" />
@@ -646,7 +672,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
           </div>
         </div>
       ) : (
-        <Card className="border-none shadow-md bg-white p-16 text-center space-y-5 rounded-[2.5rem] border border-muted/10">
+        <Card className="border-none shadow-md bg-card p-16 text-center space-y-5 rounded-[2.5rem] border border-muted/10">
           <div className="w-20 h-20 bg-muted/5 rounded-full flex items-center justify-center mx-auto border border-muted/10">
             <Target className="w-10 h-10 text-muted-foreground/30" />
           </div>
@@ -664,7 +690,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
 
   const renderReset = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1">
-      <Card className="border-none shadow-xl bg-white rounded-[2.5rem] overflow-hidden border border-muted/10">
+      <Card className="border-none shadow-xl bg-card rounded-[2.5rem] overflow-hidden border border-muted/10">
         <CardContent className="p-8 space-y-8">
           <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto border-4 border-white shadow-lg">
             <RefreshCw className="w-8 h-8 text-rose-500" />
@@ -740,8 +766,8 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   const renderMain = () => (
     <>
       <div className="px-1 space-y-4">
-        <Card className="border-none bg-white shadow-sm rounded-[2.5rem] overflow-hidden border border-white/20 relative">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-white to-transparent pointer-events-none" />
+        <Card className="border-none bg-card shadow-sm rounded-[2.5rem] overflow-hidden border border-white/20 relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-card to-transparent pointer-events-none" />
           <CardContent className="p-6 relative z-10">
             <div className="flex items-center gap-5">
               <div className="relative shrink-0">
@@ -769,7 +795,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
           </CardContent>
         </Card>
 
-        <Card className="border-none bg-white shadow-sm rounded-2xl overflow-hidden border border-muted/10">
+        <Card className="border-none bg-card shadow-sm rounded-2xl overflow-hidden border border-muted/10">
           <CardContent className="p-4 space-y-3">
             <div className="flex items-center justify-between">
               <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
@@ -796,7 +822,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
             <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">
               {section.title}
             </h3>
-            <Card className="border-none shadow-md bg-white overflow-hidden rounded-3xl border border-muted/10">
+            <Card className="border-none shadow-md bg-card overflow-hidden rounded-3xl border border-muted/10">
               <CardContent className="p-0">
                 {section.items.map((item, i) => (
                   <button 

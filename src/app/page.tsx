@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -43,6 +42,12 @@ export default function PulseFlowApp() {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const lastResetDate = localStorage.getItem('pulseflow_last_reset_date');
     
+    // Theme initialization
+    const savedDarkMode = localStorage.getItem('pulseflow_dark_mode');
+    if (savedDarkMode === 'true') {
+      document.documentElement.classList.add('dark');
+    }
+
     // Check if we need to reset daily trackers for a new day
     const isNewDay = lastResetDate !== todayStr;
 
@@ -368,7 +373,7 @@ export default function PulseFlowApp() {
         </div>
 
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none">
-          <span className="font-black text-xl tracking-tighter text-black">arcex</span>
+          <span className="font-black text-xl tracking-tighter text-foreground">arcex</span>
           <span className="font-black text-xl tracking-tighter text-primary">fit</span>
         </div>
 
@@ -387,7 +392,7 @@ export default function PulseFlowApp() {
         {renderContent()}
       </main>
 
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-white/90 backdrop-blur-xl border-t px-6 py-2 flex justify-between items-center z-50">
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card/90 backdrop-blur-xl border-t px-6 py-2 flex justify-between items-center z-50">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;

@@ -1,4 +1,3 @@
-
 "use client";
 
 import { useRef, useState, useMemo } from 'react';
@@ -347,7 +346,7 @@ export function DashboardView({
               const showDetails = isHydration || isSteps;
 
               return (
-                <Card key={idx} className="min-w-[260px] flex-shrink-0 border-none shadow-sm bg-white snap-center">
+                <Card key={idx} className="min-w-[260px] flex-shrink-0 border-none shadow-sm bg-card snap-center">
                   <CardContent className="p-3 flex flex-col justify-between h-32">
                     <div className="flex justify-between items-start">
                       <div className="flex flex-col gap-1">
@@ -468,7 +467,7 @@ export function DashboardView({
         </div>
       </section>
 
-      <Card className="border-none shadow-sm overflow-hidden bg-white">
+      <Card className="border-none shadow-sm overflow-hidden bg-card">
         <CardContent className="p-5 space-y-5">
           <div className="flex items-center justify-start">
             <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
@@ -508,7 +507,7 @@ export function DashboardView({
         </CardContent>
       </Card>
 
-      <Card className="border-none shadow-sm bg-white overflow-hidden">
+      <Card className="border-none shadow-sm bg-card overflow-hidden">
         <CardContent className="p-4 space-y-3">
           <div className="flex items-center justify-between">
             <div className="space-y-0.5 flex flex-col items-start w-full">
@@ -556,7 +555,7 @@ export function DashboardView({
           onScroll={() => handleScroll(toolsRef, setActiveTool)}
           className="flex gap-3 overflow-x-auto pb-4 swipe-container snap-x snap-mandatory scroll-smooth"
         >
-          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm bg-white overflow-hidden snap-center">
+          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm bg-card overflow-hidden snap-center">
             <CardContent className="p-4 space-y-4">
               <div className="flex justify-between items-start">
                 <div>
@@ -600,7 +599,7 @@ export function DashboardView({
             </CardContent>
           </Card>
 
-          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm bg-white snap-center">
+          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm bg-card snap-center">
             <CardContent className="p-4 space-y-3">
               <h3 className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest flex items-center gap-1.5">
                 <Calculator className="w-3 h-3 text-primary" /> Performance Tools
@@ -631,7 +630,7 @@ export function DashboardView({
         </div>
       </section>
 
-      <Card className="border-none shadow-sm overflow-hidden bg-white">
+      <Card className="border-none shadow-sm overflow-hidden bg-card">
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between">
             <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
