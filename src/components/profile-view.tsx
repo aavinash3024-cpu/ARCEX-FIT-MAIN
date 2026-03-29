@@ -19,7 +19,6 @@ import {
   Scale,
   Target,
   RefreshCw,
-  Star,
   MapPin,
   Calendar,
   Key,
@@ -31,7 +30,6 @@ import {
   Lock,
   Stethoscope,
   Banknote,
-  Check,
   Bell,
   Zap,
   Save,
@@ -39,7 +37,8 @@ import {
   PieChart,
   Droplets,
   Footprints,
-  Activity
+  Activity,
+  X
 } from "lucide-react";
 import { 
   Select,
@@ -114,7 +113,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   const handleSaveProfile = () => {
     setIsSaving(true);
     
-    // 1. Save general profile
     const profileData = {
       name: profileName,
       email: profileEmail,
@@ -123,7 +121,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     };
     localStorage.setItem('pulseflow_user_profile', JSON.stringify(profileData));
 
-    // 2. Sync with Goal Data (Age and Gender)
     if (goalData) {
       const updatedGoal = {
         ...goalData,
@@ -134,7 +131,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
       setGoalData(updatedGoal);
     }
 
-    // Simulate network delay
     setTimeout(() => {
       setIsSaving(false);
       setActiveSubView('main');
@@ -394,97 +390,95 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1">
       {goalData ? (
         <div className="space-y-6">
-          {/* Objective Summary Card */}
-          <Card className="border-none shadow-md bg-primary text-primary-foreground rounded-[2rem] overflow-hidden">
+          {/* Main Focus Banner */}
+          <Card className="border-none shadow-md bg-primary/5 border border-primary/10 rounded-[2.5rem] overflow-hidden">
             <CardContent className="p-6 flex items-center justify-between">
               <div className="space-y-1">
-                <p className="text-[10px] font-black uppercase tracking-widest opacity-70">Main Focus</p>
-                <h3 className="text-2xl font-black uppercase tracking-tight leading-none">
+                <p className="text-[10px] font-black uppercase tracking-[0.2em] text-primary/60">Primary Objective</p>
+                <h3 className="text-2xl font-black uppercase tracking-tighter leading-none text-foreground">
                   {goalData.objective} Weight
                 </h3>
               </div>
-              <div className="w-12 h-12 rounded-2xl bg-white/10 backdrop-blur-md flex items-center justify-center border border-white/10">
-                <Activity className="w-6 h-6 text-white" />
+              <div className="w-14 h-14 rounded-[1.25rem] bg-primary text-white flex items-center justify-center shadow-lg shadow-primary/20">
+                <Activity className="w-7 h-7" />
               </div>
             </CardContent>
           </Card>
 
-          {/* Weight Milestone Card */}
+          {/* Body Milestone Section */}
           <section className="space-y-3">
-            <div className="px-2 flex items-center justify-between">
+            <div className="px-3 flex items-center justify-between">
               <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                <Scale className="w-3 h-3 text-primary" /> Body Milestone
+                <Scale className="w-3.5 h-3.5 text-primary" /> Body Composition
               </h4>
-              <span className="text-[10px] font-black text-primary uppercase">{weightProgressPercent}% Complete</span>
+              <Badge variant="secondary" className="bg-primary/5 text-primary border-none font-black uppercase text-[10px]">{weightProgressPercent}% Progress</Badge>
             </div>
-            <Card className="border-none shadow-sm bg-white rounded-3xl p-5 space-y-4">
-              <Progress value={weightProgressPercent} className="h-2 bg-muted rounded-full" />
-              <div className="grid grid-cols-3 gap-2">
-                <div className="text-center p-3 bg-muted/5 rounded-2xl border border-muted/10">
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Start</p>
-                  <p className="text-sm font-black">{startWeight}kg</p>
-                </div>
-                <div className="text-center p-3 bg-primary/5 rounded-2xl border border-primary/10">
-                  <p className="text-[8px] font-bold text-primary uppercase">Current</p>
-                  <p className="text-sm font-black">{currentWeight.toFixed(1)}kg</p>
-                </div>
-                <div className="text-center p-3 bg-muted/5 rounded-2xl border border-muted/10">
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Goal</p>
-                  <p className="text-sm font-black">{targetWeight}kg</p>
+            <Card className="border-none shadow-sm bg-white rounded-3xl p-6 space-y-5 border border-muted/10">
+              <div className="space-y-2">
+                <Progress value={weightProgressPercent} className="h-2.5 bg-muted rounded-full overflow-hidden" />
+                <div className="flex justify-between items-center text-[10px] font-black text-muted-foreground/60 uppercase px-1">
+                  <span>Start: {startWeight}kg</span>
+                  <span className="text-primary">Current: {currentWeight.toFixed(1)}kg</span>
+                  <span>Goal: {targetWeight}kg</span>
                 </div>
               </div>
             </Card>
           </section>
 
-          {/* Lifestyle Targets Grid */}
+          {/* Daily Activity Targets */}
           <section className="space-y-3">
-            <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-2 flex items-center gap-2">
-              <Zap className="w-3 h-3 text-amber-500" /> Lifestyle Targets
+            <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-3 flex items-center gap-2">
+              <Zap className="w-3.5 h-3.5 text-amber-500" /> Lifestyle Targets
             </h4>
             <div className="grid grid-cols-2 gap-4">
-              <Card className="border-none shadow-sm bg-white rounded-3xl p-5 space-y-3">
-                <div className="w-9 h-9 rounded-xl bg-blue-50 flex items-center justify-center">
+              <Card className="border-none shadow-sm bg-white rounded-3xl p-5 space-y-3 border border-muted/10 hover:bg-muted/5 transition-all">
+                <div className="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center">
                   <Droplets className="w-5 h-5 text-blue-500" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-foreground uppercase">Hydration</p>
-                  <p className="text-lg font-black text-blue-600">{goalData.hydrationTargetLiters || "3.0"}<span className="text-[10px] ml-1">LITERS</span></p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-tight">Daily Hydration</p>
+                  <p className="text-xl font-black text-blue-600">{goalData.hydrationTargetLiters || "3.0"}<span className="text-xs ml-1 opacity-60">LITERS</span></p>
                 </div>
               </Card>
-              <Card className="border-none shadow-sm bg-white rounded-3xl p-5 space-y-3">
-                <div className="w-9 h-9 rounded-xl bg-green-50 flex items-center justify-center">
+              <Card className="border-none shadow-sm bg-white rounded-3xl p-5 space-y-3 border border-muted/10 hover:bg-muted/5 transition-all">
+                <div className="w-10 h-10 rounded-2xl bg-green-50 flex items-center justify-center">
                   <Footprints className="w-5 h-5 text-green-500" />
                 </div>
                 <div>
-                  <p className="text-[10px] font-black text-foreground uppercase">Daily Steps</p>
-                  <p className="text-lg font-black text-green-600">10,000</p>
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-tight">Step Goal</p>
+                  <p className="text-xl font-black text-green-600">10,000</p>
                 </div>
               </Card>
             </div>
           </section>
 
-          {/* Nutrition Strategy Card */}
+          {/* Nutrition Strategy Section */}
           <section className="space-y-3">
-            <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-2 flex items-center gap-2">
-              <PieChart className="w-3 h-3 text-primary" /> Energy & Nutrition
+            <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-3 flex items-center gap-2">
+              <PieChart className="w-3.5 h-3.5 text-primary" /> Energy & Nutrition
             </h4>
-            <Card className="border-none shadow-sm bg-white rounded-3xl p-6 space-y-6">
-              <div className="flex justify-between items-center border-b border-muted/10 pb-4">
-                <p className="text-[10px] font-black text-muted-foreground uppercase">Daily Budget</p>
-                <p className="text-2xl font-black text-primary">{goalData.finalCalories} <span className="text-xs">KCAL</span></p>
+            <Card className="border-none shadow-sm bg-white rounded-3xl p-6 space-y-6 border border-muted/10">
+              <div className="flex justify-between items-center bg-muted/5 p-4 rounded-2xl border border-muted/10">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Daily Energy Budget</p>
+                <p className="text-2xl font-black text-primary tracking-tighter">{goalData.finalCalories} <span className="text-xs uppercase opacity-40 ml-1">kcal</span></p>
               </div>
-              <div className="grid grid-cols-3 gap-2 text-center">
-                <div className="space-y-1">
+              
+              <div className="grid grid-cols-4 gap-2">
+                <div className="bg-muted/5 p-3 rounded-2xl border border-muted/5 text-center">
                   <p className="text-sm font-black text-amber-500">{goalData.protein}g</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Protein</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase mt-0.5">Protein</p>
                 </div>
-                <div className="space-y-1">
+                <div className="bg-muted/5 p-3 rounded-2xl border border-muted/5 text-center">
                   <p className="text-sm font-black text-blue-500">{goalData.carbs}g</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Carbs</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase mt-0.5">Carbs</p>
                 </div>
-                <div className="space-y-1">
+                <div className="bg-muted/5 p-3 rounded-2xl border border-muted/5 text-center">
                   <p className="text-sm font-black text-orange-500">{goalData.fats}g</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Fats</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase mt-0.5">Fats</p>
+                </div>
+                <div className="bg-muted/5 p-3 rounded-2xl border border-muted/5 text-center">
+                  <p className="text-sm font-black text-[#10b981]">{goalData.fiber}g</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase mt-0.5">Fiber</p>
                 </div>
               </div>
             </Card>
@@ -492,34 +486,34 @@ export function ProfileView({ onBack }: ProfileViewProps) {
 
           {/* Timeline Analysis */}
           <section className="space-y-3">
-            <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-2 flex items-center gap-2">
-              <Calendar className="w-3 h-3 text-orange-400" /> Estimated Timeline
+            <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest px-3 flex items-center gap-2">
+              <Calendar className="w-3.5 h-3.5 text-orange-400" /> Journey Timeline
             </h4>
-            <Card className="border-none shadow-sm bg-muted/5 border border-muted/10 rounded-3xl p-5">
-              <div className="flex justify-between items-center">
-                <div className="space-y-1">
-                  <p className="text-sm font-black text-foreground">{goalData.derivedWeeklyRate} kg</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Weekly Rate</p>
+            <Card className="border-none shadow-sm bg-white border border-muted/10 rounded-3xl p-6">
+              <div className="flex items-center justify-around">
+                <div className="text-center space-y-1">
+                  <p className="text-lg font-black text-foreground">{goalData.derivedWeeklyRate} kg</p>
+                  <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Weekly Rate</p>
                 </div>
-                <div className="h-8 w-px bg-muted/20" />
-                <div className="text-right space-y-1">
-                  <p className="text-sm font-black text-primary">{goalData.weeksToGoal} Weeks</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Duration</p>
+                <div className="h-10 w-px bg-muted/20" />
+                <div className="text-center space-y-1">
+                  <p className="text-lg font-black text-primary">{goalData.weeksToGoal} Weeks</p>
+                  <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Est. Duration</p>
                 </div>
               </div>
             </Card>
           </section>
         </div>
       ) : (
-        <Card className="border-none shadow-md bg-white p-12 text-center space-y-4 rounded-3xl">
-          <div className="w-16 h-16 bg-muted/10 rounded-full flex items-center justify-center mx-auto">
-            <Target className="w-8 h-8 text-muted-foreground/40" />
+        <Card className="border-none shadow-md bg-white p-16 text-center space-y-5 rounded-[2.5rem] border border-muted/10">
+          <div className="w-20 h-20 bg-muted/5 rounded-full flex items-center justify-center mx-auto border border-muted/10">
+            <Target className="w-10 h-10 text-muted-foreground/30" />
           </div>
-          <div className="space-y-1">
-            <h3 className="font-bold text-lg">No Active Goal</h3>
-            <p className="text-sm text-muted-foreground">Setup your fitness journey to track progress.</p>
+          <div className="space-y-2">
+            <h3 className="font-black text-xl tracking-tight">No Active Goals</h3>
+            <p className="text-xs text-muted-foreground font-medium leading-relaxed px-4">Setup your fitness journey to track weight, nutrition, and lifestyle progress.</p>
           </div>
-          <Button variant="outline" className="rounded-xl border-primary/20 text-primary font-black uppercase text-[10px] tracking-widest">
+          <Button variant="outline" className="rounded-2xl border-primary/20 text-primary font-black uppercase text-[11px] tracking-widest h-12 px-8">
             Setup Goal Now
           </Button>
         </Card>
