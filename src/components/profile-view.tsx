@@ -9,18 +9,19 @@ import {
   User, 
   Settings, 
   Shield, 
-  Bell, 
   LogOut,
   CreditCard,
   HelpCircle,
-  Mail,
   ChevronRight,
   Trophy,
   Calendar,
   Zap,
   Activity,
   Scale,
-  Ruler
+  Ruler,
+  Target,
+  RefreshCw,
+  Star
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -56,23 +57,24 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     {
       title: "Account Settings",
       items: [
-        { icon: User, label: "Personal Information", subLabel: "Name, email, and goals", color: "text-blue-500", bg: "bg-blue-50" },
+        { icon: User, label: "Personal Information", subLabel: "Name, email, and identity", color: "text-blue-500", bg: "bg-blue-50" },
         { icon: CreditCard, label: "Subscription Plan", subLabel: user.membership + " Membership", color: "text-purple-500", bg: "bg-purple-50" },
-        { icon: Mail, label: "Email Preferences", subLabel: "Newsletter and alerts", color: "text-amber-500", bg: "bg-amber-50" },
+        { icon: Target, label: "Goals", subLabel: "Active fitness objectives", color: "text-primary", bg: "bg-primary/5" },
+        { icon: RefreshCw, label: "Reset", subLabel: "Clear daily progress data", color: "text-rose-500", bg: "bg-rose-50" },
       ]
     },
     {
       title: "Security & Privacy",
       items: [
-        { icon: Shield, label: "Privacy Settings", subLabel: "Data visibility & sharing", color: "text-green-500", bg: "bg-green-50" },
-        { icon: Bell, label: "Push Notifications", subLabel: "Daily reminders & updates", color: "text-rose-500", bg: "bg-rose-50" },
+        { icon: HelpCircle, label: "Help Center", subLabel: "FAQs and troubleshooting", color: "text-sky-500", bg: "bg-sky-50" },
+        { icon: Shield, label: "Legal", subLabel: "Privacy policy & terms", color: "text-green-500", bg: "bg-green-50" },
       ]
     },
     {
       title: "Pulse Support",
       items: [
-        { icon: HelpCircle, label: "Help Center", subLabel: "FAQ and contact us", color: "text-sky-500", bg: "bg-sky-50" },
-        { icon: Settings, label: "App Settings", subLabel: "Units, theme, and more", color: "text-slate-500", bg: "bg-slate-50" },
+        { icon: Settings, label: "Settings", subLabel: "Units and app preferences", color: "text-slate-500", bg: "bg-slate-50" },
+        { icon: Star, label: "Rate the App", subLabel: "Share your feedback", color: "text-amber-500", bg: "bg-amber-50" },
       ]
     }
   ];
