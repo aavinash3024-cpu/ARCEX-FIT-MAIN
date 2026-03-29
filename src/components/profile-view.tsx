@@ -55,7 +55,6 @@ import {
 import { Badge } from "@/components/ui/badge";
 import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
-import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 
 interface ProfileViewProps {
   onBack: () => void;
@@ -402,226 +401,176 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   const renderGoals = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1">
       {goalData ? (
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-3 h-11 bg-white/80 backdrop-blur-sm p-1.5 rounded-2xl shadow-sm border border-muted/20">
-            <TabsTrigger value="overview" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Overview</TabsTrigger>
-            <TabsTrigger value="nutrition" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Nutrition</TabsTrigger>
-            <TabsTrigger value="lifestyle" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Lifestyle</TabsTrigger>
-          </TabsList>
+        <div className="space-y-6">
+          {/* Weight Overview */}
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Weight Objective</p>
+              <div className="flex items-center gap-1">
+                <span className="text-sm font-black text-primary uppercase">{goalData.objective}</span>
+              </div>
+            </Card>
+            <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Total Progress</p>
+              <div className="flex items-center gap-1 text-green-600">
+                <ArrowUpRight className="w-3.5 h-3.5" />
+                <span className="text-sm font-black">{weightProgressPercent}%</span>
+              </div>
+            </Card>
+          </div>
 
-          <TabsContent value="overview" className="space-y-4 mt-4">
-            <div className="grid grid-cols-2 gap-3">
-              <Card className="border-none shadow-sm bg-white p-4 space-y-1">
-                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Weight Objective</p>
-                <div className="flex items-center gap-1">
-                  <span className="text-sm font-black text-primary uppercase">{goalData.objective}</span>
+          <Card className="border-none shadow-sm bg-white overflow-hidden rounded-3xl border border-muted/10">
+            <CardContent className="p-5 space-y-4">
+              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+                <Scale className="w-3.5 h-3.5 text-primary" /> Body Milestone
+              </h3>
+              <div className="space-y-2.5">
+                <Progress value={weightProgressPercent} className="h-2.5 bg-muted rounded-full overflow-hidden" />
+                <div className="flex justify-between items-center text-[10px] font-black text-muted-foreground/60 uppercase px-1">
+                  <div className="text-left">
+                    <p className="text-[8px] opacity-50">START</p>
+                    <p>{startWeight}kg</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[8px] opacity-50">CURRENT</p>
+                    <p className="text-primary">{currentWeight.toFixed(1)}kg</p>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-[8px] opacity-50">GOAL</p>
+                    <p>{targetWeight}kg</p>
+                  </div>
                 </div>
-              </Card>
-              <Card className="border-none shadow-sm bg-white p-4 space-y-1">
-                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Total Progress</p>
-                <div className="flex items-center gap-1 text-green-600">
-                  <ArrowUpRight className="w-3.5 h-3.5" />
-                  <span className="text-sm font-black">{weightProgressPercent}%</span>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-sm bg-white overflow-hidden rounded-3xl border border-muted/10">
+            <CardContent className="p-5 space-y-4">
+              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+                <Calendar className="w-3.5 h-3.5 text-orange-400" /> Timeline Strategy
+              </h3>
+              <div className="grid grid-cols-2 gap-6">
+                <div className="space-y-1 border-l-2 border-muted/10 pl-3">
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Weekly Rate</p>
+                  <p className="text-sm font-black">{goalData.derivedWeeklyRate} kg</p>
+                  <p className="text-[8px] font-black text-primary/60 uppercase">Target Pace</p>
                 </div>
-              </Card>
+                <div className="space-y-1 border-l-2 border-muted/10 pl-3">
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Est. Duration</p>
+                  <p className="text-sm font-black">{goalData.weeksToGoal} Weeks</p>
+                  <p className="text-[8px] font-black text-primary/60 uppercase">To Milestone</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Energy & Nutrition */}
+          <div className="grid grid-cols-2 gap-3">
+            <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Daily Budget</p>
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl font-black text-primary">{goalData.finalCalories}</span>
+                <span className="text-[8px] font-bold text-muted-foreground uppercase">Kcal</span>
+              </div>
+            </Card>
+            <Card className="border-none shadow-sm bg-white p-4 space-y-1">
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Maintenance</p>
+              <div className="flex items-baseline gap-1">
+                <span className="text-xl font-black text-foreground/40">{goalData.tdee}</span>
+                <span className="text-[8px] font-bold text-muted-foreground uppercase">TDEE</span>
+              </div>
+            </Card>
+          </div>
+
+          <Card className="border-none shadow-sm bg-white rounded-3xl border border-muted/10 overflow-hidden">
+            <CardContent className="p-5 space-y-4">
+              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+                <PieChart className="w-3.5 h-3.5 text-primary" /> Strategy Split
+              </h3>
+              <div className="space-y-3">
+                <div className="flex h-3 w-full rounded-full overflow-hidden bg-muted/20">
+                  <div style={{ width: `${goalData.proteinPct}%`, backgroundColor: MACRO_COLORS.protein }} className="h-full" />
+                  <div style={{ width: `${goalData.carbPct}%`, backgroundColor: MACRO_COLORS.carbs }} className="h-full" />
+                  <div style={{ width: `${goalData.fatPct}%`, backgroundColor: MACRO_COLORS.fat }} className="h-full" />
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <div className="text-center">
+                    <p className="text-[7px] font-black text-muted-foreground uppercase">PROTEIN</p>
+                    <p className="text-xs font-black" style={{ color: MACRO_COLORS.protein }}>{goalData.proteinPct}%</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[7px] font-black text-muted-foreground uppercase">CARBS</p>
+                    <p className="text-xs font-black" style={{ color: MACRO_COLORS.carbs }}>{goalData.carbPct}%</p>
+                  </div>
+                  <div className="text-center">
+                    <p className="text-[7px] font-black text-muted-foreground uppercase">FATS</p>
+                    <p className="text-xs font-black" style={{ color: MACRO_COLORS.fat }}>{goalData.fatPct}%</p>
+                  </div>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+
+          <Card className="border-none shadow-sm bg-white rounded-3xl border border-muted/10">
+            <CardContent className="p-5 space-y-5">
+              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
+                <BarChart3 className="w-3.5 h-3.5 text-primary" /> Target Metrics
+              </h3>
+              <div className="grid grid-cols-2 gap-x-6 gap-y-5">
+                {[
+                  { label: 'PROTEIN', val: goalData.protein, unit: 'G', color: MACRO_COLORS.protein },
+                  { label: 'CARBS', val: goalData.carbs, unit: 'G', color: MACRO_COLORS.carbs },
+                  { label: 'FATS', val: goalData.fats, unit: 'G', color: MACRO_COLORS.fat },
+                  { label: 'FIBER', val: goalData.fiber, unit: 'G', color: MACRO_COLORS.fiber }
+                ].map(m => (
+                  <div key={m.label} className="space-y-1.5">
+                    <div className="flex justify-between items-baseline">
+                      <p className="text-[8px] font-black uppercase text-muted-foreground/60">{m.label}</p>
+                      <span className="text-[10px] font-black" style={{ color: m.color }}>{m.val}{m.unit}</span>
+                    </div>
+                    <div className="h-1.5 w-full bg-muted/30 rounded-full overflow-hidden">
+                      <div className="h-full" style={{ width: '100%', backgroundColor: m.color }} />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Activity Targets */}
+          <div className="space-y-3">
+            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-2">Activity Targets</h3>
+            <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-muted/10 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
+                  <Droplets className="w-5 h-5 text-blue-600" />
+                </div>
+                <div>
+                  <p className="text-xs font-black text-foreground/80 uppercase">Hydration</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Daily Target</p>
+                </div>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-black text-blue-600">{goalData.hydrationTargetLiters || "3.0"} L</p>
+              </div>
             </div>
 
-            <Card className="border-none shadow-sm bg-white overflow-hidden rounded-3xl border border-muted/10">
-              <CardContent className="p-5 space-y-4">
-                <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
-                  <Scale className="w-3.5 h-3.5 text-primary" /> Body Milestone
-                </h3>
-                <div className="space-y-2.5">
-                  <Progress value={weightProgressPercent} className="h-2.5 bg-muted rounded-full overflow-hidden" />
-                  <div className="flex justify-between items-center text-[10px] font-black text-muted-foreground/60 uppercase px-1">
-                    <div className="text-left">
-                      <p className="text-[8px] opacity-50">START</p>
-                      <p>{startWeight}kg</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-[8px] opacity-50">CURRENT</p>
-                      <p className="text-primary">{currentWeight.toFixed(1)}kg</p>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-[8px] opacity-50">GOAL</p>
-                      <p>{targetWeight}kg</p>
-                    </div>
-                  </div>
+            <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-muted/10 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
+                  <Footprints className="w-5 h-5 text-green-600" />
                 </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-none shadow-sm bg-white overflow-hidden rounded-3xl border border-muted/10">
-              <CardContent className="p-5 space-y-4">
-                <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
-                  <Calendar className="w-3.5 h-3.5 text-orange-400" /> Timeline Strategy
-                </h3>
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-1 border-l-2 border-muted/10 pl-3">
-                    <p className="text-[8px] font-bold text-muted-foreground uppercase">Weekly Rate</p>
-                    <p className="text-sm font-black">{goalData.derivedWeeklyRate} kg</p>
-                    <p className="text-[8px] font-black text-primary/60 uppercase">Target Pace</p>
-                  </div>
-                  <div className="space-y-1 border-l-2 border-muted/10 pl-3">
-                    <p className="text-[8px] font-bold text-muted-foreground uppercase">Est. Duration</p>
-                    <p className="text-sm font-black">{goalData.weeksToGoal} Weeks</p>
-                    <p className="text-[8px] font-black text-primary/60 uppercase">To Milestone</p>
-                  </div>
+                <div>
+                  <p className="text-xs font-black text-foreground/80 uppercase">Movement</p>
+                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Step Goal</p>
                 </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="nutrition" className="space-y-4 mt-4">
-            <div className="grid grid-cols-2 gap-3">
-              <Card className="border-none shadow-sm bg-white p-4 space-y-1">
-                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Daily Budget</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-xl font-black text-primary">{goalData.finalCalories}</span>
-                  <span className="text-[8px] font-bold text-muted-foreground uppercase">Kcal</span>
-                </div>
-              </Card>
-              <Card className="border-none shadow-sm bg-white p-4 space-y-1">
-                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Maintenance</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-xl font-black text-foreground/40">{goalData.tdee}</span>
-                  <span className="text-[8px] font-bold text-muted-foreground uppercase">TDEE</span>
-                </div>
-              </Card>
+              </div>
+              <div className="text-right">
+                <p className="text-sm font-black text-green-600">10,000</p>
+              </div>
             </div>
-
-            <Card className="border-none shadow-sm bg-white rounded-3xl border border-muted/10 overflow-hidden">
-              <CardContent className="p-5 space-y-4">
-                <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
-                  <PieChart className="w-3.5 h-3.5 text-primary" /> Strategy Split
-                </h3>
-                <div className="space-y-3">
-                  <div className="flex h-3 w-full rounded-full overflow-hidden bg-muted/20">
-                    <div style={{ width: `${goalData.proteinPct}%`, backgroundColor: MACRO_COLORS.protein }} className="h-full" />
-                    <div style={{ width: `${goalData.carbPct}%`, backgroundColor: MACRO_COLORS.carbs }} className="h-full" />
-                    <div style={{ width: `${goalData.fatPct}%`, backgroundColor: MACRO_COLORS.fat }} className="h-full" />
-                  </div>
-                  <div className="grid grid-cols-3 gap-2">
-                    <div className="text-center">
-                      <p className="text-[7px] font-black text-muted-foreground uppercase">PROTEIN</p>
-                      <p className="text-xs font-black" style={{ color: MACRO_COLORS.protein }}>{goalData.proteinPct}%</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-[7px] font-black text-muted-foreground uppercase">CARBS</p>
-                      <p className="text-xs font-black" style={{ color: MACRO_COLORS.carbs }}>{goalData.carbPct}%</p>
-                    </div>
-                    <div className="text-center">
-                      <p className="text-[7px] font-black text-muted-foreground uppercase">FATS</p>
-                      <p className="text-xs font-black" style={{ color: MACRO_COLORS.fat }}>{goalData.fatPct}%</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-
-            <Card className="border-none shadow-sm bg-white rounded-3xl border border-muted/10">
-              <CardContent className="p-5 space-y-5">
-                <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
-                  <BarChart3 className="w-3.5 h-3.5 text-primary" /> Target Metrics
-                </h3>
-                <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-                  {[
-                    { label: 'PROTEIN', val: goalData.protein, unit: 'G', color: MACRO_COLORS.protein },
-                    { label: 'CARBS', val: goalData.carbs, unit: 'G', color: MACRO_COLORS.carbs },
-                    { label: 'FATS', val: goalData.fats, unit: 'G', color: MACRO_COLORS.fat },
-                    { label: 'FIBER', val: goalData.fiber, unit: 'G', color: MACRO_COLORS.fiber }
-                  ].map(m => (
-                    <div key={m.label} className="space-y-1.5">
-                      <div className="flex justify-between items-baseline">
-                        <p className="text-[8px] font-black uppercase text-muted-foreground/60">{m.label}</p>
-                        <span className="text-[10px] font-black" style={{ color: m.color }}>{m.val}{m.unit}</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-muted/30 rounded-full overflow-hidden">
-                        <div className="h-full" style={{ width: '100%', backgroundColor: m.color }} />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          <TabsContent value="lifestyle" className="space-y-4 mt-4">
-            <div className="grid grid-cols-2 gap-3">
-              <Card className="border-none shadow-sm bg-white p-4 space-y-1">
-                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Training Frequency</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-xl font-black text-primary">4</span>
-                  <span className="text-[8px] font-bold text-muted-foreground uppercase">Days / Week</span>
-                </div>
-              </Card>
-              <Card className="border-none shadow-sm bg-white p-4 space-y-1">
-                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Sleep Hygiene</p>
-                <div className="flex items-baseline gap-1">
-                  <span className="text-xl font-black text-indigo-600">8.0</span>
-                  <span className="text-[8px] font-bold text-muted-foreground uppercase">Hrs / Night</span>
-                </div>
-              </Card>
-            </div>
-
-            <Card className="border-none shadow-sm bg-white rounded-3xl border border-muted/10 overflow-hidden">
-              <CardContent className="p-5 space-y-4">
-                <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
-                  <Zap className="w-3.5 h-3.5 text-amber-500" /> Daily Habits
-                </h3>
-                <div className="grid gap-2.5">
-                  <div className="flex items-center justify-between bg-muted/5 p-3.5 rounded-2xl border border-muted/10 transition-all hover:bg-muted/10">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center shadow-sm">
-                        <Droplets className="w-5 h-5 text-blue-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-black text-foreground/80 uppercase">Hydration</p>
-                        <p className="text-[8px] font-bold text-muted-foreground uppercase">Optimized Intake</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-black text-blue-600">{goalData.hydrationTargetLiters || "3.0"} L</p>
-                      <p className="text-[7px] font-bold text-muted-foreground uppercase">DAILY</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between bg-muted/5 p-3.5 rounded-2xl border border-muted/10 transition-all hover:bg-muted/10">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center shadow-sm">
-                        <Footprints className="w-5 h-5 text-green-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-black text-foreground/80 uppercase">Activity</p>
-                        <p className="text-[8px] font-bold text-muted-foreground uppercase">Movement Goal</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-black text-green-600">10,000</p>
-                      <p className="text-[7px] font-bold text-muted-foreground uppercase">STEPS</p>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center justify-between bg-muted/5 p-3.5 rounded-2xl border border-muted/10 transition-all hover:bg-muted/10">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-purple-100 flex items-center justify-center shadow-sm">
-                        <Timer className="w-5 h-5 text-purple-600" />
-                      </div>
-                      <div>
-                        <p className="text-xs font-black text-foreground/80 uppercase">Consistency</p>
-                        <p className="text-[8px] font-bold text-muted-foreground uppercase">Training Days</p>
-                      </div>
-                    </div>
-                    <div className="text-right">
-                      <p className="text-sm font-black text-purple-600">4 / 7</p>
-                      <p className="text-[7px] font-bold text-muted-foreground uppercase">SESSIONS</p>
-                    </div>
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
+          </div>
+        </div>
       ) : (
         <Card className="border-none shadow-md bg-white p-16 text-center space-y-5 rounded-[2.5rem] border border-muted/10">
           <div className="w-20 h-20 bg-muted/5 rounded-full flex items-center justify-center mx-auto border border-muted/10">
