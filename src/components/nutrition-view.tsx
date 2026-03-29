@@ -349,10 +349,20 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       fiber: acc.fiber + meal.fiber
     }), { calories: 0, protein: 0, carbs: 0, fat: 0, fiber: 0 });
 
-    const totalMainMacros = totals.protein + totals.carbs + totals.fat;
-    const proteinPct = totalMainMacros > 0 ? (totals.protein / totalMainMacros) * 100 : 0;
-    const carbsPct = totalMainMacros > 0 ? (totals.carbs / totalMainMacros) * 100 : 0;
-    const fatPct = totalMainMacros > 0 ? (totals.fat / totalMainMacros) * 100 : 0;
+    const targetCal = goalData?.finalCalories || 2200;
+    const targetP = goalData?.protein || 150;
+    const targetC = goalData?.carbs || 250;
+    const targetF = goalData?.fats || 70;
+    const targetFI = goalData?.fiber || 30;
+
+    const leftCal = targetCal - totals.calories;
+    
+    const macroStatuses = [
+      { label: 'P', val: Math.round(targetP - totals.protein), color: MACRO_COLORS.protein },
+      { label: 'C', val: Math.round(targetC - totals.carbs), color: MACRO_COLORS.carbs },
+      { label: 'F', val: Math.round(targetF - totals.fat), color: MACRO_COLORS.fat },
+      { label: 'FI', val: Math.round(targetFI - totals.fiber), color: MACRO_COLORS.fiber }
+    ];
 
     const allItems = loggedMeals.flatMap(m => m.items || []);
 
@@ -365,46 +375,43 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
           <h1 className="text-2xl font-bold font-headline">Daily Summary</h1>
         </div>
 
-        <Card className="border-none shadow-sm bg-white overflow-hidden rounded-[1.25rem]">
-          <CardContent className="p-4 space-y-3">
-            <div className="text-center">
-              <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Total Intake</p>
-              <div className="flex items-baseline justify-center gap-0.5 mt-1">
-                <p className="text-3xl font-black text-foreground">{Math.round(totals.calories)}</p>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">Kcal</span>
+        <Card className="border-none shadow-sm bg-white overflow-hidden rounded-[2rem] border border-muted/10">
+          <CardContent className="p-6 space-y-6">
+            <div className="flex justify-between items-start">
+              <div className="space-y-0.5">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">BUDGET REMAINING</p>
+                <div className="flex items-baseline gap-2">
+                  <span className="text-4xl font-black text-foreground tracking-tighter">{Math.abs(Math.round(leftCal))}</span>
+                  <span className="text-xs font-black text-muted-foreground uppercase tracking-tight">KCAL {leftCal >= 0 ? 'LEFT' : 'OVER'}</span>
+                </div>
+              </div>
+              <div className="text-right space-y-0.5">
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">INTAKE</p>
+                <div className="flex items-baseline gap-1">
+                  <span className="text-lg font-black text-foreground/80">{Math.round(totals.calories)}</span>
+                  <span className="text-[10px] font-bold text-muted-foreground uppercase">/ {targetCal} KCAL</span>
+                </div>
               </div>
             </div>
 
-            <div className="space-y-1.5 px-2">
-              <div className="flex h-2 w-full rounded-full overflow-hidden bg-muted/20">
-                <div style={{ width: `${proteinPct}%`, backgroundColor: MACRO_COLORS.protein }} className="h-full transition-all duration-1000" />
-                <div style={{ width: `${carbsPct}%`, backgroundColor: MACRO_COLORS.carbs }} className="h-full transition-all duration-1000" />
-                <div style={{ width: `${fatPct}%`, backgroundColor: MACRO_COLORS.fat }} className="h-full transition-all duration-1000" />
-              </div>
-              <div className="flex justify-between text-[7px] font-black text-muted-foreground uppercase tracking-widest px-0.5">
-                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: MACRO_COLORS.protein }} /> PROTEIN</span>
-                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: MACRO_COLORS.carbs }} /> CARBS</span>
-                <span className="flex items-center gap-1"><div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: MACRO_COLORS.fat }} /> FATS</span>
-              </div>
+            <div className="flex h-2.5 w-full rounded-full overflow-hidden bg-muted/20">
+              <div style={{ width: `${Math.min(100, (totals.protein * 4 / targetCal) * 100)}%`, backgroundColor: MACRO_COLORS.protein }} className="h-full transition-all duration-1000 ease-out" />
+              <div style={{ width: `${Math.min(100, (totals.carbs * 4 / targetCal) * 100)}%`, backgroundColor: MACRO_COLORS.carbs }} className="h-full transition-all duration-1000 ease-out" />
+              <div style={{ width: `${Math.min(100, (totals.fat * 9 / targetCal) * 100)}%`, backgroundColor: MACRO_COLORS.fat }} className="h-full transition-all duration-1000 ease-out" />
             </div>
 
-            <div className="grid grid-cols-4 gap-2 pt-2 border-t border-muted/10">
-              <div className="text-center">
-                <p className="text-base font-black leading-none" style={{ color: MACRO_COLORS.protein }}>{Math.round(totals.protein)}g</p>
-                <p className="text-[7px] font-bold text-muted-foreground uppercase mt-1">Protein</p>
-              </div>
-              <div className="text-center">
-                <p className="text-base font-black leading-none" style={{ color: MACRO_COLORS.carbs }}>{Math.round(totals.carbs)}g</p>
-                <p className="text-[7px] font-bold text-muted-foreground uppercase mt-1">Carbs</p>
-              </div>
-              <div className="text-center">
-                <p className="text-base font-black leading-none" style={{ color: MACRO_COLORS.fat }}>{Math.round(totals.fat)}g</p>
-                <p className="text-[7px] font-bold text-muted-foreground uppercase mt-1">Fats</p>
-              </div>
-              <div className="text-center">
-                <p className="text-base font-black leading-none" style={{ color: MACRO_COLORS.fiber }}>{Math.round(totals.fiber)}g</p>
-                <p className="text-[7px] font-bold text-muted-foreground uppercase mt-1">Fiber</p>
-              </div>
+            <div className="grid grid-cols-4 gap-2">
+              {macroStatuses.map((macro, idx) => (
+                <div key={idx} className="bg-muted/5 rounded-3xl p-2.5 flex flex-col items-center justify-center border border-muted/10 shadow-sm transition-all hover:bg-muted/10">
+                  <span className="text-[10px] font-black text-muted-foreground/60 uppercase">{macro.label}</span>
+                  <span className="text-sm font-black mt-0.5" style={{ color: macro.color }}>
+                    {Math.abs(macro.val)}g
+                  </span>
+                  <span className="text-[7px] font-black text-muted-foreground uppercase tracking-tighter leading-none mt-0.5">
+                    {macro.val >= 0 ? 'LEFT' : 'OVER'}
+                  </span>
+                </div>
+              ))}
             </div>
           </CardContent>
         </Card>
