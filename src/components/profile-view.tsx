@@ -1,7 +1,7 @@
 
 "use client";
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -18,7 +18,9 @@ import {
   Trophy,
   Calendar,
   Zap,
-  Activity
+  Activity,
+  Scale,
+  Ruler
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
@@ -28,6 +30,19 @@ interface ProfileViewProps {
 }
 
 export function ProfileView({ onBack }: ProfileViewProps) {
+  const [goalData, setGoalData] = useState<any>(null);
+
+  useEffect(() => {
+    const savedGoal = localStorage.getItem('pulseflow_goal_data');
+    if (savedGoal) {
+      try {
+        setGoalData(JSON.parse(savedGoal));
+      } catch (e) {
+        console.error("Failed to parse goal data", e);
+      }
+    }
+  }, []);
+
   // Mock user data
   const user = {
     name: "Alex Johnson",
@@ -79,25 +94,62 @@ export function ProfileView({ onBack }: ProfileViewProps) {
 
       {/* Hero Profile Section */}
       <div className="px-1">
-        <Card className="border-none bg-gradient-to-br from-primary/10 via-background to-accent/10 shadow-sm rounded-[2rem] overflow-hidden">
-          <CardContent className="p-6 flex flex-col items-center text-center space-y-4">
-            <div className="relative">
-              <div className="w-24 h-24 rounded-full bg-white flex items-center justify-center shadow-xl border-4 border-white relative z-10">
-                <User className="w-10 h-10 text-primary" />
+        <Card className="border-none bg-gradient-to-br from-primary/10 via-background to-accent/10 shadow-sm rounded-[2.5rem] overflow-hidden border border-white/20">
+          <CardContent className="p-6 space-y-6">
+            {/* Top Row: Info */}
+            <div className="flex items-center gap-5">
+              <div className="relative shrink-0">
+                <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-xl border-4 border-white relative z-10">
+                  <User className="w-8 h-8 text-primary" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 z-20 bg-primary text-white p-1.5 rounded-full border-2 border-white shadow-lg">
+                  <Trophy className="w-2.5 h-2.5" />
+                </div>
               </div>
-              <div className="absolute -inset-2 bg-gradient-to-tr from-primary to-accent rounded-full blur-lg opacity-20 animate-pulse" />
-              <div className="absolute -bottom-1 -right-1 z-20 bg-primary text-white p-1.5 rounded-full border-2 border-white shadow-lg">
-                <Trophy className="w-3 h-3" />
+              
+              <div className="flex-1 min-w-0">
+                <h2 className="text-xl font-black text-foreground tracking-tighter truncate">{user.name}</h2>
+                <div className="space-y-0.5 mt-0.5">
+                  <p className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">
+                    {goalData?.age || "--"} Yrs • {goalData?.gender?.toUpperCase() || "--"}
+                  </p>
+                  <p className="text-[10px] font-bold text-muted-foreground/60 tracking-tight truncate">{user.email}</p>
+                </div>
+                <Badge variant="secondary" className="mt-2 bg-primary/10 text-primary hover:bg-primary/10 text-[8px] font-black uppercase tracking-widest px-2 h-4 border-none">
+                  {user.membership} Member
+                </Badge>
               </div>
             </div>
-            
-            <div className="space-y-1">
-              <h2 className="text-xl font-black text-foreground tracking-tight">{user.name}</h2>
-              <div className="flex items-center justify-center gap-2">
-                <Badge variant="secondary" className="bg-primary/10 text-primary hover:bg-primary/10 text-[9px] font-black uppercase tracking-widest px-2 h-5">
-                  {user.membership}
-                </Badge>
-                <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">{user.email}</span>
+
+            {/* Separator */}
+            <div className="h-px w-full bg-muted-foreground/10" />
+
+            {/* Bottom Row: Metrics */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm shrink-0">
+                  <Scale className="w-4 h-4 text-primary/60" />
+                </div>
+                <div>
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.15em] leading-none mb-1">Weight</p>
+                  <div className="flex items-baseline gap-0.5">
+                    <span className="text-lg font-black text-foreground">{goalData?.weight || "--"}</span>
+                    <span className="text-[9px] font-bold text-muted-foreground uppercase">kg</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex items-center gap-3">
+                <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm shrink-0">
+                  <Ruler className="w-4 h-4 text-primary/60" />
+                </div>
+                <div>
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.15em] leading-none mb-1">Height</p>
+                  <div className="flex items-baseline gap-0.5">
+                    <span className="text-lg font-black text-foreground">{goalData?.height || "--"}</span>
+                    <span className="text-[9px] font-bold text-muted-foreground uppercase">cm</span>
+                  </div>
+                </div>
               </div>
             </div>
           </CardContent>
