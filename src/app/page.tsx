@@ -20,6 +20,7 @@ import { StepsView } from '@/components/steps-view';
 import { TasksView, type Task } from '@/components/tasks-view';
 import { CalculatorsView } from '@/components/calculators-view';
 import { GoalSettingView } from '@/components/goal-setting-view';
+import { ProfileView } from '@/components/profile-view';
 import { Button } from '@/components/ui/button';
 import { format, isYesterday } from 'date-fns';
 
@@ -326,6 +327,12 @@ export default function PulseFlowApp() {
             onGoalSaved={refreshGoalData}
           />
         );
+      case 'profile':
+        return (
+          <ProfileView 
+            onBack={() => setActiveTab('dashboard')}
+          />
+        );
       default: return (
         <DashboardView 
           tasks={tasks} 
@@ -352,9 +359,12 @@ export default function PulseFlowApp() {
     <div className="min-h-screen max-w-lg mx-auto bg-background flex flex-col relative shadow-xl border-x">
       <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b relative">
         <div className="flex items-center">
-          <div className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center">
+          <button 
+            onClick={() => setActiveTab('profile')}
+            className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted/80 transition-colors"
+          >
             <User className="w-4 h-4 text-foreground" />
-          </div>
+          </button>
         </div>
 
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none">
