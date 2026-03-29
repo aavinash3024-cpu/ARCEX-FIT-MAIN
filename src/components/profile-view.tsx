@@ -43,7 +43,8 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   BarChart3,
-  Timer
+  Timer,
+  AlertTriangle
 } from "lucide-react";
 import { 
   Select,
@@ -67,13 +68,14 @@ const MACRO_COLORS = {
   fiber: "#10b981"
 };
 
-type SubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'goals';
+type SubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'goals' | 'reset';
 
 export function ProfileView({ onBack }: ProfileViewProps) {
   const [activeSubView, setActiveSubView] = useState<SubView>('main');
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
 
   // Profile Form State
   const [profileName, setProfileName] = useState("Alex Johnson");
@@ -149,6 +151,42 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     }, 800);
   };
 
+  const handleResetApp = () => {
+    setIsResetting(true);
+    
+    // Define keys to remove (progress, logs, goals)
+    const keysToRemove = [
+      'pulseflow_goal_data',
+      'pulseflow_tasks',
+      'pulseflow_hydration',
+      'pulseflow_hydration_history',
+      'pulseflow_steps',
+      'pulseflow_steps_history',
+      'pulseflow_weight_history',
+      'pulseflow_today_logged_meals',
+      'pulseflow_recent_meals',
+      'pulseflow_saved_meals',
+      'pulseflow_all_meals_history',
+      'pulseflow_workout_split',
+      'pulseflow_extra_moves',
+      'pulseflow_workout_logs',
+      'pulseflow_workout_history',
+      'pulseflow_streak_v3',
+      'pulseflow_last_reset_date'
+    ];
+
+    // Remove the keys
+    keysToRemove.forEach(key => localStorage.removeItem(keys));
+
+    // Note: We EXPLICITLY do NOT remove 'pulseflow_user_profile' or 'pulseflow_food_cache'
+    // This preserves personal details and AI efficiency as requested.
+
+    setTimeout(() => {
+      setIsResetting(false);
+      window.location.reload(); // Force reload to apply clean state
+    }, 1500);
+  };
+
   const handleBack = () => {
     if (activeSubView !== 'main') {
       setActiveSubView('main');
@@ -188,7 +226,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
         { id: 'personal-info', icon: User, label: "Personal Information", subLabel: "Name, email, and identity", color: "text-blue-500", bg: "bg-blue-50" },
         { id: 'subscription', icon: CreditCard, label: "Subscription Plan", subLabel: "Elite Premium", color: "text-purple-500", bg: "bg-purple-50" },
         { id: 'goals', icon: Target, label: "Goals", subLabel: "Active fitness objectives", color: "text-primary", bg: "bg-primary/5" },
-        { id: 'reset', icon: RefreshCw, label: "Reset", subLabel: "Clear daily progress data", color: "text-rose-500", bg: "bg-rose-50" },
+        { id: 'reset', icon: RefreshCw, label: "Reset Progress", subLabel: "Fresh start, keep profile", color: "text-rose-500", bg: "bg-rose-50" },
       ]
     },
     {
@@ -402,7 +440,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1">
       {goalData ? (
         <div className="space-y-6">
-          {/* Weight Overview */}
           <div className="grid grid-cols-2 gap-3">
             <Card className="border-none shadow-sm bg-white p-4 space-y-1">
               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Weight Objective</p>
@@ -464,7 +501,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
             </CardContent>
           </Card>
 
-          {/* Energy & Nutrition */}
           <div className="grid grid-cols-2 gap-3">
             <Card className="border-none shadow-sm bg-white p-4 space-y-1">
               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Daily Budget</p>
@@ -537,7 +573,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
             </CardContent>
           </Card>
 
-          {/* Activity Targets */}
           <div className="space-y-3">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-2">Activity Targets</h3>
             <div className="flex items-center justify-between bg-white p-4 rounded-2xl border border-muted/10 shadow-sm">
@@ -585,6 +620,59 @@ export function ProfileView({ onBack }: ProfileViewProps) {
           </Button>
         </Card>
       )}
+    </div>
+  );
+
+  const renderReset = () => (
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1">
+      <Card className="border-none shadow-xl bg-white rounded-[2.5rem] overflow-hidden border border-muted/10">
+        <CardContent className="p-8 space-y-8">
+          <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto border-4 border-white shadow-lg">
+            <RefreshCw className="w-8 h-8 text-rose-500" />
+          </div>
+          
+          <div className="text-center space-y-3">
+            <h2 className="text-2xl font-black tracking-tighter text-foreground">Start Fresh?</h2>
+            <p className="text-sm text-muted-foreground font-medium leading-relaxed">
+              Resetting will clear your active goals, nutrition logs, and workout history. You can start your journey from day one again.
+            </p>
+          </div>
+
+          <div className="space-y-4">
+            <div className="bg-muted/5 p-4 rounded-2xl border border-muted/10 space-y-3">
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <Check className="w-3 h-3 text-green-600" />
+                </div>
+                <p className="text-[11px] font-bold text-foreground/70 leading-tight">
+                  <span className="text-foreground font-black uppercase block text-[9px] tracking-widest mb-0.5">Will NOT Affect:</span>
+                  Your personal identity details (Name, Email, Location) and your Learned AI Food Cache will be preserved.
+                </p>
+              </div>
+              <div className="flex items-start gap-3">
+                <div className="w-5 h-5 rounded-full bg-rose-100 flex items-center justify-center shrink-0 mt-0.5">
+                  <AlertTriangle className="w-3 h-3 text-rose-600" />
+                </div>
+                <p className="text-[11px] font-bold text-foreground/70 leading-tight">
+                  <span className="text-rose-600 font-black uppercase block text-[9px] tracking-widest mb-0.5">Will Clear:</span>
+                  All weight history, meal logs, hydration charts, workout splits, and active goals.
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div className="pt-2">
+            <Button 
+              onClick={handleResetApp}
+              disabled={isResetting}
+              className="w-full h-14 rounded-2xl bg-rose-500 hover:bg-rose-600 text-white font-black uppercase text-[11px] tracking-widest shadow-xl shadow-rose-200 transition-all active:scale-[0.98] gap-2"
+            >
+              {isResetting ? <RefreshCw className="w-4 h-4 animate-spin" /> : "Confirm Full App Reset"}
+            </Button>
+            <p className="text-[9px] text-center text-muted-foreground/40 font-black uppercase tracking-widest mt-4">This action is irreversible</p>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 
@@ -688,6 +776,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
            activeSubView === 'subscription' ? 'Subscription' :
            activeSubView === 'legal' ? 'Legal' :
            activeSubView === 'settings' ? 'Settings' : 
+           activeSubView === 'reset' ? 'Start Fresh' : 
            activeSubView === 'goals' ? 'My Goals' : 'Profile'}
         </h1>
       </div>
@@ -698,6 +787,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
       {activeSubView === 'legal' && renderLegal()}
       {activeSubView === 'settings' && renderSettings()}
       {activeSubView === 'goals' && renderGoals()}
+      {activeSubView === 'reset' && renderReset()}
     </div>
   );
 }
