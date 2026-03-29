@@ -38,7 +38,8 @@ import {
   Droplets,
   Footprints,
   Activity,
-  X
+  X,
+  Star
 } from "lucide-react";
 import { 
   Select,
