@@ -75,6 +75,14 @@ const getExerciseType = (name: string): 'strength' | 'time' => {
   return 'strength';
 };
 
+const formatExerciseTime = (seconds: any) => {
+  const total = parseInt(seconds) || 0;
+  const m = Math.floor(total / 60);
+  const s = total % 60;
+  if (m === 0) return `${s}s`;
+  return `${m}m ${s}s`;
+};
+
 export function WorkoutView() {
   const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split' | 'history' | 'pr' | 'pr-detail'>('main');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
@@ -468,7 +476,7 @@ export function WorkoutView() {
                         <div className="mt-2 flex flex-wrap gap-1.5">
                           {logs.map((set, i) => (
                             <div key={i} className="text-[8px] font-black bg-muted/30 px-1.5 py-0.5 rounded uppercase">
-                              {set.type === 'time' ? `${set.time}s` : `${set.weight}kg x ${set.reps}`}
+                              {set.type === 'time' ? formatExerciseTime(set.time) : `${set.weight}kg x ${set.reps}`}
                             </div>
                           ))}
                         </div>
@@ -578,21 +586,31 @@ export function WorkoutView() {
                     {getExerciseType(loggingExercise.name) === 'time' ? (
                       <div className="space-y-2">
                         <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">Log Duration</label>
-                        <div className="flex gap-2">
-                          <Input id="time-input" type="number" placeholder="Seconds" className="h-12 text-lg font-bold rounded-xl" />
-                          <Button 
-                            onClick={() => {
-                              const input = document.getElementById('time-input') as HTMLInputElement;
-                              if (input.value) {
-                                handleLogSet(loggingExercise.name, { type: 'time', time: input.value });
-                                input.value = "";
-                              }
-                            }}
-                            className="h-12 w-12 rounded-xl bg-primary"
-                          >
-                            <Plus className="w-5 h-5" />
-                          </Button>
+                        <div className="grid grid-cols-2 gap-2">
+                          <div className="space-y-1">
+                            <label className="text-[8px] font-bold text-muted-foreground pl-1">MINUTES</label>
+                            <Input id="min-input" type="number" placeholder="0" className="h-12 text-lg font-bold rounded-xl" />
+                          </div>
+                          <div className="space-y-1">
+                            <label className="text-[8px] font-bold text-muted-foreground pl-1">SECONDS</label>
+                            <Input id="sec-input" type="number" placeholder="0" className="h-12 text-lg font-bold rounded-xl" />
+                          </div>
                         </div>
+                        <Button 
+                          onClick={() => {
+                            const minInput = document.getElementById('min-input') as HTMLInputElement;
+                            const secInput = document.getElementById('sec-input') as HTMLInputElement;
+                            const total = (parseInt(minInput.value) || 0) * 60 + (parseInt(secInput.value) || 0);
+                            if (total > 0) {
+                              handleLogSet(loggingExercise.name, { type: 'time', time: total });
+                              minInput.value = "";
+                              secInput.value = "";
+                            }
+                          }}
+                          className="w-full h-12 rounded-xl bg-primary mt-2 font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
+                        >
+                          Log Duration
+                        </Button>
                       </div>
                     ) : (
                       <div className="space-y-2">
@@ -617,7 +635,7 @@ export function WorkoutView() {
                               rInput.value = "";
                             }
                           }}
-                          className="w-full h-12 rounded-xl bg-primary mt-2 font-black uppercase tracking-widest"
+                          className="w-full h-12 rounded-xl bg-primary mt-2 font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
                         >
                           Log Set
                         </Button>
@@ -641,7 +659,7 @@ export function WorkoutView() {
                               {i + 1}
                             </Badge>
                             <p className="text-sm font-bold">
-                              {set.type === 'time' ? `${set.time} Seconds` : `${set.weight} kg x ${set.reps} reps`}
+                              {set.type === 'time' ? formatExerciseTime(set.time) : `${set.weight} kg x ${set.reps} reps`}
                             </p>
                           </div>
                           <Button variant="ghost" size="icon" onClick={() => removeSet(loggingExercise.name, i)} className="h-8 w-8 text-destructive/40 hover:text-destructive rounded-full">
@@ -926,7 +944,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
                   <div className="min-w-0">
                     <span className="font-bold text-[14px] text-foreground/90 truncate block">{ex.name}</span>
                     <span className="text-[11px] font-black text-muted-foreground/60 uppercase">
-                      {activeType !== 'time' ? `${ex.records[0].weight}KG` : `${ex.records[0].time}S`}
+                      {activeType !== 'time' ? `${ex.records[0].weight}KG` : formatExerciseTime(ex.records[0].time).toUpperCase()}
                     </span>
                   </div>
                 </div>
@@ -978,7 +996,7 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
 
           <p className="text-3xl font-black tracking-tighter">
             {isTimeBased 
-              ? `${bestRecord.time} SEC` 
+              ? formatExerciseTime(bestRecord.time).toUpperCase()
               : `${bestRecord.weight}KG * ${bestRecord.reps} REPS`
             }
           </p>
@@ -1018,10 +1036,10 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
                       <div className="space-y-0.5">
                         <div className="flex items-baseline gap-1">
                           <p className="text-xl font-black text-foreground/80 leading-none">
-                            {isTimeBased ? record.time : record.weight}
+                            {isTimeBased ? formatExerciseTime(record.time) : record.weight}
                           </p>
                           <span className="text-[10px] font-bold text-muted-foreground uppercase">
-                            {isTimeBased ? 'SEC' : 'KG'}
+                            {isTimeBased ? '' : 'KG'}
                           </span>
                         </div>
                         <p className="text-[9px] font-bold text-muted-foreground/40 uppercase">
@@ -1594,7 +1612,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                                       {sets.map((s, idx) => (
                                         <tr key={idx}>
                                           <td className="py-1.5 text-[9px] font-black text-foreground/40">{idx + 1}</td>
-                                          <td className="py-1.5 text-[9px] font-bold text-center">{s.type === 'time' ? s.time : s.reps}</td>
+                                          <td className="py-1.5 text-[9px] font-bold text-center">{s.type === 'time' ? formatExerciseTime(s.time) : s.reps}</td>
                                           <td className="py-1.5 text-[9px] font-bold text-right">{s.type === 'time' ? '---' : `${s.weight}kg`}</td>
                                         </tr>
                                       ))}
