@@ -379,7 +379,34 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      {/* TODAYS WORKOUT AT TOP */}
+      {/* MY WORKOUT SPLIT AT TOP */}
+      <Card 
+        onClick={() => setActiveSubView('split')}
+        className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
+      >
+        <CardContent className="p-0 flex items-center h-20">
+          <div className="shrink-0 w-20 h-full relative">
+            <Image 
+              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
+              alt="My Split"
+              fill
+              className="object-cover"
+              data-ai-hint="gym weights"
+            />
+          </div>
+          <div className="flex-1 px-4 flex items-center justify-between min-w-0">
+            <div className="space-y-0.5">
+              <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
+                <Layout className="w-3 h-3" /> My Workout Split
+              </h3>
+              <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
+            </div>
+            <ChevronRight className="w-4 h-4 text-purple-300/40" />
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* TODAYS WORKOUT */}
       <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -449,8 +476,8 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* PERSONAL RECORDS BELOW WORKOUT */}
-      <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-primary/5 border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
+      {/* PERSONAL RECORDS (Now White) */}
+      <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-white border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
         <CardContent className="p-0 flex items-center h-20">
           <div className="shrink-0 w-20 h-full relative">
             <Image 
@@ -469,32 +496,6 @@ export function WorkoutView() {
               <p className="text-xs font-bold text-foreground/90 leading-tight">Your recent milestones</p>
             </div>
             <ChevronRight className="w-4 h-4 text-primary/30" />
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card 
-        onClick={() => setActiveSubView('split')}
-        className="border-none shadow-sm bg-white overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
-      >
-        <CardContent className="p-0 flex items-center h-20">
-          <div className="shrink-0 w-20 h-full relative">
-            <Image 
-              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
-              alt="My Split"
-              fill
-              className="object-cover"
-              data-ai-hint="gym weights"
-            />
-          </div>
-          <div className="flex-1 px-4 flex items-center justify-between min-w-0">
-            <div className="space-y-0.5">
-              <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
-                <Layout className="w-3 h-3" /> My Workout Split
-              </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-purple-300/40" />
           </div>
         </CardContent>
       </Card>
@@ -925,7 +926,6 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
   );
 }
 
-// PR DETAIL VIEW DEFINED EXACTLY ONCE
 function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => void }) {
   if (!viewingPRs) return null;
 
