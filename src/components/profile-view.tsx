@@ -321,18 +321,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
             </Card>
           </div>
         ))}
-
-        <div className="px-2 pt-2">
-          <Button 
-            variant="ghost" 
-            className="w-full h-14 rounded-2xl text-destructive hover:text-destructive hover:bg-destructive/5 font-black uppercase text-[11px] tracking-[0.2em] border-2 border-dashed border-destructive/10"
-          >
-            <LogOut className="w-4 h-4 mr-2" /> Sign Out of Account
-          </Button>
-          <p className="text-center text-[8px] font-bold text-muted-foreground uppercase tracking-widest mt-4 opacity-40">
-            PulseFlow AI v3.2.0 • Build 2024.01
-          </p>
-        </div>
       </div>
     </>
   );
