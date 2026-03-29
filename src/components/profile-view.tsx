@@ -14,9 +14,6 @@ import {
   HelpCircle,
   ChevronRight,
   Trophy,
-  Calendar,
-  Zap,
-  Activity,
   Scale,
   Ruler,
   Target,
@@ -55,7 +52,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
 
   const sections = [
     {
-      title: "Account Settings",
+      title: "My Account",
       items: [
         { icon: User, label: "Personal Information", subLabel: "Name, email, and identity", color: "text-blue-500", bg: "bg-blue-50" },
         { icon: CreditCard, label: "Subscription Plan", subLabel: user.membership + " Membership", color: "text-purple-500", bg: "bg-purple-50" },
@@ -71,18 +68,12 @@ export function ProfileView({ onBack }: ProfileViewProps) {
       ]
     },
     {
-      title: "Pulse Support",
+      title: "App Settings",
       items: [
         { icon: Settings, label: "Settings", subLabel: "Units and app preferences", color: "text-slate-500", bg: "bg-slate-50" },
         { icon: Star, label: "Rate the App", subLabel: "Share your feedback", color: "text-amber-500", bg: "bg-amber-50" },
       ]
     }
-  ];
-
-  const stats = [
-    { label: "Level", value: user.level, icon: Activity, color: "text-primary" },
-    { label: "Joined", value: user.joined, icon: Calendar, color: "text-orange-500" },
-    { label: "Status", value: "Active", icon: Zap, color: "text-yellow-500" },
   ];
 
   return (
@@ -156,19 +147,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
             </div>
           </CardContent>
         </Card>
-      </div>
-
-      {/* Quick Stats */}
-      <div className="grid grid-cols-3 gap-3 px-1">
-        {stats.map((stat, i) => (
-          <Card key={i} className="border-none shadow-sm bg-white rounded-2xl">
-            <CardContent className="p-3 flex flex-col items-center justify-center text-center space-y-1">
-              <stat.icon className={cn("w-3.5 h-3.5", stat.color)} />
-              <p className="text-[11px] font-black text-foreground uppercase tracking-tight leading-none">{stat.value}</p>
-              <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-widest leading-none">{stat.label}</p>
-            </CardContent>
-          </Card>
-        ))}
       </div>
 
       {/* Settings Sections */}
