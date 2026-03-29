@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
@@ -29,10 +29,12 @@ import {
   FileText,
   Lock,
   Stethoscope,
-  Banknote
+  Banknote,
+  Check
 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Progress } from "@/components/ui/progress";
 import { cn } from "@/lib/utils";
 
 interface ProfileViewProps {
@@ -44,6 +46,7 @@ type SubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings';
 export function ProfileView({ onBack }: ProfileViewProps) {
   const [activeSubView, setActiveSubView] = useState<SubView>('main');
   const [goalData, setGoalData] = useState<any>(null);
+  const [weightHistory, setWeightHistory] = useState<any[]>([]);
 
   useEffect(() => {
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
@@ -52,6 +55,15 @@ export function ProfileView({ onBack }: ProfileViewProps) {
         setGoalData(JSON.parse(savedGoal));
       } catch (e) {
         console.error("Failed to parse goal data", e);
+      }
+    }
+
+    const savedWeight = localStorage.getItem('pulseflow_weight_history');
+    if (savedWeight) {
+      try {
+        setWeightHistory(JSON.parse(savedWeight));
+      } catch (e) {
+        console.error("Failed to parse weight history", e);
       }
     }
   }, []);
@@ -73,6 +85,30 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     membership: "Premium Member",
     joined: "Jan 2024"
   };
+
+  const currentWeight = useMemo(() => {
+    if (weightHistory.length > 0) {
+      return weightHistory[weightHistory.length - 1].weight;
+    }
+    return goalData?.weight ? parseFloat(goalData.weight) : 0;
+  }, [weightHistory, goalData]);
+
+  const startWeight = goalData?.weight ? parseFloat(goalData.weight) : 0;
+  const targetWeight = goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 0;
+
+  const weightProgressPercent = useMemo(() => {
+    if (!startWeight || !targetWeight || startWeight === targetWeight) return 0;
+    const objective = goalData?.objective || 'loss';
+    let progress = 0;
+    if (objective === 'loss') {
+      if (currentWeight >= startWeight) return 0;
+      progress = ((startWeight - currentWeight) / (startWeight - targetWeight)) * 100;
+    } else {
+      if (currentWeight <= startWeight) return 0;
+      progress = ((currentWeight - startWeight) / (targetWeight - startWeight)) * 100;
+    }
+    return Math.min(100, Math.max(0, Math.round(progress)));
+  }, [startWeight, targetWeight, currentWeight, goalData]);
 
   const menuSections = [
     {
@@ -229,13 +265,15 @@ export function ProfileView({ onBack }: ProfileViewProps) {
 
   const renderMain = () => (
     <>
-      <div className="px-1">
-        <Card className="border-none bg-gradient-to-br from-primary/10 via-background to-accent/10 shadow-sm rounded-[2.5rem] overflow-hidden border border-white/20">
-          <CardContent className="p-6 space-y-6">
+      <div className="px-1 space-y-4">
+        {/* Profile Identity Card */}
+        <Card className="border-none bg-white shadow-sm rounded-[2.5rem] overflow-hidden border border-white/20 relative">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-white to-transparent pointer-events-none" />
+          <CardContent className="p-6 relative z-10">
             <div className="flex items-center gap-5">
               <div className="relative shrink-0">
-                <div className="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-xl border-4 border-white relative z-10">
-                  <User className="w-8 h-8 text-primary" />
+                <div className="w-20 h-20 rounded-full bg-primary flex items-center justify-center shadow-xl border-4 border-white relative z-10">
+                  <span className="text-2xl font-black text-white">{user.name.charAt(0)}</span>
                 </div>
                 <div className="absolute -bottom-1 -right-1 z-20 bg-primary text-white p-1.5 rounded-full border-2 border-white shadow-lg">
                   <Trophy className="w-2.5 h-2.5" />
@@ -255,41 +293,32 @@ export function ProfileView({ onBack }: ProfileViewProps) {
                 </Badge>
               </div>
             </div>
+          </CardContent>
+        </Card>
 
-            <div className="h-px w-full bg-muted-foreground/10" />
-
-            <div className="grid grid-cols-2 gap-4">
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm shrink-0">
-                  <Scale className="w-4 h-4 text-primary/60" />
-                </div>
-                <div>
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.15em] leading-none mb-1">Weight</p>
-                  <div className="flex items-baseline gap-0.5">
-                    <span className="text-lg font-black text-foreground">{goalData?.weight || "--"}</span>
-                    <span className="text-[9px] font-bold text-muted-foreground uppercase">kg</span>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <div className="w-9 h-9 rounded-xl bg-white flex items-center justify-center shadow-sm shrink-0">
-                  <Ruler className="w-4 h-4 text-primary/60" />
-                </div>
-                <div>
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.15em] leading-none mb-1">Height</p>
-                  <div className="flex items-baseline gap-0.5">
-                    <span className="text-lg font-black text-foreground">{goalData?.height || "--"}</span>
-                    <span className="text-[9px] font-bold text-muted-foreground uppercase">cm</span>
-                  </div>
-                </div>
+        {/* Sleek Weight Progress Card */}
+        <Card className="border-none bg-white shadow-sm rounded-2xl overflow-hidden border border-muted/10">
+          <CardContent className="p-4 space-y-3">
+            <div className="flex items-center justify-between">
+              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                <Scale className="w-3.5 h-3.5 text-primary" /> Weight Goal
+              </h3>
+              <span className="text-[10px] font-black text-primary">{weightProgressPercent}%</span>
+            </div>
+            
+            <div className="space-y-1.5">
+              <Progress value={weightProgressPercent} className="h-1.5 bg-muted" />
+              <div className="flex justify-between items-center text-[9px] font-black text-muted-foreground/60 uppercase">
+                <span>Start: {startWeight > 0 ? startWeight.toFixed(1) : "--"}kg</span>
+                <span className="text-primary">Current: {currentWeight > 0 ? currentWeight.toFixed(1) : "--"}kg</span>
+                <span>Goal: {targetWeight > 0 ? targetWeight.toFixed(1) : "--"}kg</span>
               </div>
             </div>
           </CardContent>
         </Card>
       </div>
 
-      <div className="space-y-8 px-1">
+      <div className="space-y-8 px-1 mt-6">
         {menuSections.map((section, idx) => (
           <div key={idx} className="space-y-3">
             <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">
