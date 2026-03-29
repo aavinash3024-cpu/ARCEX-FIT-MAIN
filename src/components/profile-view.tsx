@@ -54,7 +54,8 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
     if (savedGoal) {
       try {
-        setGoalData(JSON.parse(savedGoal));
+        const data = JSON.parse(savedGoal);
+        setGoalData(data);
       } catch (e) {
         console.error("Failed to parse goal data", e);
       }
@@ -207,10 +208,10 @@ export function ProfileView({ onBack }: ProfileViewProps) {
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Documentation</h3>
         <Card className="border-none shadow-md bg-white rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
-            <LegalItem icon={FileText} label="Terms and Conditions" />
-            <LegalItem icon={Lock} label="Privacy Policy" />
-            <LegalItem icon={Stethoscope} label="Health and Medical Disclaimer" />
-            <LegalItem icon={Banknote} label="Payment and Subscription Policy" />
+            <LegalItem icon={FileText} label="Terms and Conditions" color="text-blue-600" bg="bg-blue-50" />
+            <LegalItem icon={Lock} label="Privacy Policy" color="text-indigo-600" bg="bg-indigo-50" />
+            <LegalItem icon={Stethoscope} label="Health and Medical Disclaimer" color="text-rose-600" bg="bg-rose-50" />
+            <LegalItem icon={Banknote} label="Payment and Subscription Policy" color="text-emerald-600" bg="bg-emerald-50" />
           </CardContent>
         </Card>
       </div>
@@ -381,11 +382,11 @@ function InfoRow({ icon: Icon, label, value }: { icon: any, label: string, value
   );
 }
 
-function LegalItem({ icon: Icon, label }: { icon: any, label: string }) {
+function LegalItem({ icon: Icon, label, color, bg }: { icon: any, label: string, color?: string, bg?: string }) {
   return (
     <button className="w-full p-4 flex items-center justify-between hover:bg-muted/5 transition-all text-left group border-b border-muted/5 last:border-0">
       <div className="flex items-center gap-4">
-        <div className="w-9 h-9 rounded-xl bg-green-50 text-green-600 flex items-center justify-center shadow-sm">
+        <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shadow-sm", bg || "bg-green-50", color || "text-green-600")}>
           <Icon className="w-4 h-4" />
         </div>
         <span className="text-sm font-bold text-foreground/90">{label}</span>
