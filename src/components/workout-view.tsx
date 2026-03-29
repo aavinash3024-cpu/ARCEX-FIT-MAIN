@@ -1049,7 +1049,7 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
                     </div>
                     
                     <div className="flex items-center gap-4">
-                      {!isTimeBased && (
+                      {!isTop3 && !isTimeBased && (
                         <div className="text-right">
                           <p className="text-[12px] font-black text-foreground/60">{record.reps}</p>
                           <p className="text-[8px] font-bold text-muted-foreground/40 uppercase tracking-widest">REPS</p>
@@ -1592,6 +1592,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                       ) : (
                         exerciseNames.map(exName => {
                           const sets = dayLogs[exName];
+                          const isTimeType = getExerciseType(exName) === 'time';
                           return (
                             <Card key={exName} className="border border-muted/20 bg-white rounded-xl overflow-hidden shadow-sm">
                               <CardContent className="p-0">
@@ -1604,16 +1605,28 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                                     <thead>
                                       <tr className="border-b border-muted/10">
                                         <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5">Set</th>
-                                        <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5 text-center">Reps</th>
-                                        <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5 text-right">WGT</th>
+                                        {isTimeType ? (
+                                          <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5 text-right">Duration</th>
+                                        ) : (
+                                          <>
+                                            <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5 text-center">Reps</th>
+                                            <th className="text-[7px] font-black text-muted-foreground uppercase pb-1.5 text-right">WGT</th>
+                                          </>
+                                        )}
                                       </tr>
                                     </thead>
                                     <tbody className="divide-y divide-muted/5">
                                       {sets.map((s, idx) => (
                                         <tr key={idx}>
                                           <td className="py-1.5 text-[9px] font-black text-foreground/40">{idx + 1}</td>
-                                          <td className="py-1.5 text-[9px] font-bold text-center">{s.type === 'time' ? formatExerciseTime(s.time) : s.reps}</td>
-                                          <td className="py-1.5 text-[9px] font-bold text-right">{s.type === 'time' ? '---' : `${s.weight}kg`}</td>
+                                          {isTimeType ? (
+                                            <td className="py-1.5 text-[9px] font-bold text-right">{formatExerciseTime(s.time)}</td>
+                                          ) : (
+                                            <>
+                                              <td className="py-1.5 text-[9px] font-bold text-center">{s.reps}</td>
+                                              <td className="py-1.5 text-[9px] font-bold text-right">{s.weight}kg</td>
+                                            </>
+                                          )}
                                         </tr>
                                       ))}
                                     </tbody>
