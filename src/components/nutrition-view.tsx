@@ -311,6 +311,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   };
 
   const logHeaderImage = PlaceHolderImages.find(img => img.id === 'meal-quinoa-bowl');
+  const loggingIconImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
 
   const renderTrendsView = () => {
     return (
@@ -542,8 +543,14 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       <Card className="border-none shadow-sm overflow-hidden bg-card">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-full shrink-0">
-              <Utensils className="w-4 h-4 text-primary" />
+            <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 relative bg-muted shadow-sm">
+              <Image 
+                src={loggingIconImage?.imageUrl || "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=400&auto=format&fit=crop"} 
+                alt="Meal Logging"
+                fill
+                className="object-cover"
+                data-ai-hint="gourmet salad"
+              />
             </div>
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
@@ -750,7 +757,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
           onClick={() => setShowTrends(true)}
           className="w-full border-none shadow-sm bg-card hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group rounded-2xl p-4 flex flex-col items-start gap-2 active:scale-[0.99]"
         >
-          <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center">
+          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
             <TrendingUp className="w-5 h-5 text-primary" />
           </div>
           <div className="space-y-0.5">
