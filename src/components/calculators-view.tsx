@@ -143,14 +143,14 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
       </div>
 
       <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as CalculatorType)} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-11 bg-white/80 backdrop-blur-sm p-1.5 rounded-2xl shadow-sm border border-muted/20">
+        <TabsList className="grid w-full grid-cols-3 h-11 bg-card/80 backdrop-blur-sm p-1.5 rounded-2xl shadow-sm border border-muted/20">
           <TabsTrigger value="bmr" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Energy</TabsTrigger>
           <TabsTrigger value="1rm" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Power</TabsTrigger>
           <TabsTrigger value="bodyfat" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Body</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bmr" className="space-y-4 pt-4">
-          <Card className="border-none shadow-sm bg-white overflow-hidden">
+          <Card className="border-none shadow-sm bg-card overflow-hidden">
             <CardContent className="p-6 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Calculator className="w-4 h-4 text-primary" />
@@ -160,7 +160,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Gender</Label>
                   <Select value={gender} onValueChange={(val: Gender) => setGender(val)}>
-                    <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold">
+                    <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
@@ -171,23 +171,23 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Age (Years)</Label>
-                  <Input type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Weight (kg)</Label>
-                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Height (cm)</Label>
-                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Activity Level</Label>
                 <Select value={activity} onValueChange={(val: ActivityLevel) => setActivity(val)}>
-                  <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold">
+                  <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -203,7 +203,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg bg-white overflow-hidden">
+          <Card className="border-none shadow-lg bg-card overflow-hidden">
             <CardContent className="p-6 space-y-6">
               <div className="text-center space-y-1">
                 <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">YOUR ENERGY BALANCE</h3>
@@ -212,7 +212,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-muted/10 p-5 rounded-3xl border border-muted/20 flex flex-col items-center text-center space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center shadow-sm">
                     <Flame className="w-5 h-5 text-muted-foreground/40" />
                   </div>
                   <p className="text-[10px] font-black text-primary uppercase tracking-widest">BMR</p>
@@ -220,7 +220,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                   <p className="text-[8px] font-black text-muted-foreground uppercase tracking-tighter">KCAL/DAY</p>
                 </div>
                 <div className="bg-muted/10 p-5 rounded-3xl border border-muted/20 flex flex-col items-center text-center space-y-2">
-                  <div className="w-10 h-10 rounded-full bg-white flex items-center justify-center shadow-sm">
+                  <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center shadow-sm">
                     <Zap className="w-5 h-5 text-accent" />
                   </div>
                   <p className="text-[10px] font-black text-accent uppercase tracking-widest">TDEE</p>
@@ -258,7 +258,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
         </TabsContent>
 
         <TabsContent value="1rm" className="space-y-4 pt-4">
-          <Card className="border-none shadow-sm bg-white overflow-hidden">
+          <Card className="border-none shadow-sm bg-card overflow-hidden">
             <CardContent className="p-6 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Dumbbell className="w-4 h-4 text-primary" />
@@ -267,18 +267,18 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Weight Lifted (kg)</Label>
-                  <Input type="number" value={liftWeight} onChange={(e) => setLiftWeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={liftWeight} onChange={(e) => setLiftWeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Reps</Label>
-                  <Input type="number" value={reps} onChange={(e) => setReps(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={reps} onChange={(e) => setReps(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
               <Button onClick={calculateOrm} className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">Calculate Max</Button>
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg bg-white overflow-hidden">
+          <Card className="border-none shadow-lg bg-card overflow-hidden">
             <CardContent className="p-5 space-y-5">
               <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10 flex flex-col items-center text-center space-y-1.5 relative overflow-hidden shadow-inner">
                 <div className="absolute -right-4 -top-4 w-20 h-20 bg-primary/5 rounded-full blur-2xl" />
@@ -336,7 +336,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
         </TabsContent>
 
         <TabsContent value="bodyfat" className="space-y-4 pt-4">
-          <Card className="border-none shadow-sm bg-white overflow-hidden">
+          <Card className="border-none shadow-sm bg-card overflow-hidden">
             <CardContent className="p-6 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Scale className="w-4 h-4 text-primary" />
@@ -346,7 +346,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Gender</Label>
                   <Select value={gender} onValueChange={(val: Gender) => setGender(val)}>
-                    <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold">
+                    <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
@@ -357,28 +357,28 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Weight (kg)</Label>
-                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Height (cm)</Label>
-                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Neck (cm)</Label>
-                  <Input type="number" value={neck} onChange={(e) => setNeck(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={neck} onChange={(e) => setNeck(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Waist (cm)</Label>
-                  <Input type="number" value={waist} onChange={(e) => setWaist(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={waist} onChange={(e) => setArea(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
                 {gender === 'female' && (
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Hip (cm)</Label>
-                    <Input type="number" value={hip} onChange={(e) => setHip(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                    <Input type="number" value={hip} onChange={(e) => setHip(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                   </div>
                 )}
               </div>
@@ -386,7 +386,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg bg-white overflow-hidden">
+          <Card className="border-none shadow-lg bg-card overflow-hidden">
             <CardContent className="p-5 space-y-5">
               <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10 flex flex-col items-center text-center space-y-1 relative overflow-hidden shadow-inner">
                 <Activity className="absolute -right-4 -top-4 w-16 h-16 text-primary/5 -rotate-12" />

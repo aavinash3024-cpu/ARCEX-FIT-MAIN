@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -138,7 +137,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
       </div>
 
       {/* Simplified Date Shifter */}
-      <div className="flex items-center justify-between bg-white p-3 rounded-2xl shadow-sm border border-muted/20">
+      <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20">
         <Button variant="ghost" size="icon" onClick={() => setSelectedDate(addDays(selectedDate, -1))} className="rounded-full hover:bg-muted">
           <ChevronLeft className="w-5 h-5 text-primary" />
         </Button>
@@ -157,7 +156,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
         </Button>
       </div>
 
-      <Card className="border-none shadow-md bg-white overflow-hidden">
+      <Card className="border-none shadow-md bg-card overflow-hidden">
         <CardContent className="p-0">
           <div className="p-6 space-y-6 border-b border-muted/10">
             <div className="space-y-1">
@@ -196,7 +195,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
                       className={cn(
                         "py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
                         selectedPriority === p 
-                          ? "bg-white text-primary shadow-sm scale-[1.02] border border-primary/5" 
+                          ? "bg-background text-primary shadow-sm scale-[1.02] border border-primary/5" 
                           : "text-muted-foreground hover:text-foreground/70"
                       )}
                     >
@@ -276,7 +275,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
         </CardContent>
       </Card>
 
-      <Card className="border-none shadow-lg bg-white border border-muted/10">
+      <Card className="border-none shadow-lg bg-card border border-muted/10">
         <CardContent className="p-4">
           <div className="flex items-center justify-between mb-3 border-b border-muted/20 pb-2">
             <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">

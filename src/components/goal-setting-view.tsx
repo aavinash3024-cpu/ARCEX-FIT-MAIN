@@ -206,7 +206,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
           <h1 className="text-xl font-bold font-headline">Saved Goal</h1>
         </div>
 
-        <Card className="border-none shadow-xl bg-white overflow-hidden rounded-[1.5rem] border border-muted/20">
+        <Card className="border-none shadow-xl bg-card overflow-hidden rounded-[1.5rem] border border-muted/20">
           <CardContent className="p-0">
             <div className="p-6 flex items-center justify-between border-b border-muted/10">
               <div className="space-y-0.5">
@@ -221,13 +221,13 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
             <div className="flex bg-muted/5">
               <div className="flex-1 p-5 border-r border-muted/10">
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">Starting Weight</p>
-                <div className="bg-white p-3 rounded-xl border border-muted/10 mt-1 shadow-sm">
+                <div className="bg-background p-3 rounded-xl border border-muted/10 mt-1 shadow-sm">
                   <p className="text-xl font-black text-foreground text-center">{weight}kg</p>
                 </div>
               </div>
               <div className="flex-1 p-5">
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight text-right">Target Weight</p>
-                <div className="bg-white p-3 rounded-xl border border-muted/10 mt-1 shadow-sm">
+                <div className="bg-background p-3 rounded-xl border border-muted/10 mt-1 shadow-sm">
                   <p className="text-xl font-black text-primary text-center">{targetWeight}kg</p>
                 </div>
               </div>
@@ -347,7 +347,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
 
       <div className="space-y-4">
         {step === 1 && (
-          <Card className="border-none shadow-sm bg-white overflow-hidden">
+          <Card className="border-none shadow-sm bg-card overflow-hidden">
             <CardContent className="p-6 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Scale className="w-4 h-4 text-primary" />
@@ -357,7 +357,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                 <div className="space-y-2">
                   <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Gender</Label>
                   <Select value={gender} onValueChange={(val: any) => setGender(val)}>
-                    <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold">
+                    <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold">
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent className="rounded-xl">
@@ -368,23 +368,23 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Age</Label>
-                  <Input type="number" value={age} onChange={(e) => setAge(e.target.value)} className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={age} onChange={(e) => setAge(e.target.value)} className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Weight (kg)</Label>
-                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Height (cm)</Label>
-                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold" />
+                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Activity Level</Label>
                 <Select value={activity} onValueChange={(val: any) => setActivity(val)}>
-                  <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-muted/5 h-11 text-xs font-bold">
+                  <SelectTrigger className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
@@ -401,7 +401,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
         )}
 
         {step === 2 && (
-          <Card className="border-none shadow-sm bg-white overflow-hidden">
+          <Card className="border-none shadow-sm bg-card overflow-hidden">
             <CardContent className="p-6 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Target className="w-4 h-4 text-primary" />
@@ -431,7 +431,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                    onChange={(e) => setTargetWeight(e.target.value)} 
                    className={cn(
                       "rounded-xl h-11 text-xs font-bold",
-                      !calculations.isWeightValid ? "border-destructive" : "border-muted-foreground/10 bg-muted/5"
+                      !calculations.isWeightValid ? "border-destructive" : "border-muted-foreground/10 bg-background"
                    )} 
                 />
                 {!calculations.isWeightValid && (
@@ -481,7 +481,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
         )}
 
         {step === 3 && (
-          <Card className="border-none shadow-sm bg-white overflow-hidden">
+          <Card className="border-none shadow-sm bg-card overflow-hidden">
             <CardContent className="p-6 space-y-8">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Settings2 className="w-4 h-4 text-primary" />
@@ -552,7 +552,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
         )}
 
         {step === 4 && (
-          <Card className="border-none shadow-sm bg-white overflow-hidden">
+          <Card className="border-none shadow-sm bg-card overflow-hidden">
             <CardContent className="p-6 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Sparkles className="w-4 h-4 text-primary" />

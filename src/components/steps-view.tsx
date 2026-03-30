@@ -85,7 +85,7 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
       </div>
 
       {/* 1. Today's Summary Card with Circular Bar */}
-      <Card className="border-none shadow-lg overflow-hidden bg-white relative">
+      <Card className="border-none shadow-lg overflow-hidden bg-card relative">
         <CardContent className="p-6 flex flex-col items-center">
           <div className="w-full flex justify-between items-start mb-4">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">
@@ -162,7 +162,7 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
 
           <div className="grid grid-cols-2 gap-4 w-full">
             <div className="bg-muted/10 p-4 rounded-2xl flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm">
                 <Footprints className="w-4 h-4 text-green-500" />
               </div>
               <div>
@@ -171,7 +171,7 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
               </div>
             </div>
             <div className="bg-muted/10 p-4 rounded-2xl flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white flex items-center justify-center shadow-sm">
+              <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm">
                 <TrendingUp className="w-4 h-4 text-primary" />
               </div>
               <div>
@@ -184,7 +184,7 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
       </Card>
 
       {/* 2. 7-Day History Card */}
-      <Card className="border-none shadow-md bg-white overflow-hidden">
+      <Card className="border-none shadow-md bg-card overflow-hidden">
         <CardContent className="p-5 space-y-6">
           <div className="flex justify-between items-center">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
@@ -234,14 +234,14 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
 
       {/* 3. Stats Summary */}
       <div className="grid grid-cols-2 gap-4">
-        <Card className="border-none shadow-sm bg-white">
+        <Card className="border-none shadow-sm bg-card">
           <CardContent className="p-4 space-y-1 text-center">
             <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Weekly Avg</p>
             <p className="text-lg font-black text-primary">{avgSteps.toLocaleString()}</p>
             <p className="text-[8px] font-bold text-muted-foreground uppercase">Steps / Day</p>
           </CardContent>
         </Card>
-        <Card className="border-none shadow-sm bg-white">
+        <Card className="border-none shadow-sm bg-card">
           <CardContent className="p-4 space-y-1 text-center">
             <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Week Total</p>
             <p className="text-lg font-black text-foreground">{totalWeekSteps.toLocaleString()}</p>

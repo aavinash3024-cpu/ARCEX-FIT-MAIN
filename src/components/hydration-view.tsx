@@ -79,7 +79,7 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
       </div>
 
       {/* 1. The Interactive Tracker Card */}
-      <Card className="border-none shadow-md overflow-hidden bg-white relative">
+      <Card className="border-none shadow-md overflow-hidden bg-card relative">
         <CardContent className="p-6 flex flex-col items-center relative">
           
           {/* Top Row: Daily Progress */}
@@ -207,7 +207,7 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
       </Card>
 
       {/* 2. Detailed History Card */}
-      <Card className="border-none shadow-md bg-white overflow-hidden">
+      <Card className="border-none shadow-md bg-card overflow-hidden">
         <CardContent className="p-5 space-y-6">
           <div className="flex justify-between items-center">
             <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
@@ -259,8 +259,8 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
         </CardContent>
       </Card>
 
-      {/* 3. Performance Summary Card (White) */}
-      <Card className="border-none shadow-sm bg-white border border-muted/20">
+      {/* 3. Performance Summary Card */}
+      <Card className="border-none shadow-sm bg-card border border-muted/20">
         <CardContent className="p-4 flex justify-between items-center">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
