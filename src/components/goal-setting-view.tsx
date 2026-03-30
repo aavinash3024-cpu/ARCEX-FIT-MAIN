@@ -215,7 +215,6 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                   {objective} weight
                 </h3>
               </div>
-              <ChevronDown className="w-4 h-4 text-muted-foreground/40" />
             </div>
 
             <div className="flex bg-muted/5">
@@ -508,7 +507,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                       <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black">{calculations.carbPct}%</Badge>
                     </div>
                     <div className="text-center space-y-0.5">
-                      <p className="text-lg font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
+                      <p className="text-lg font-black" style={{ color: MACRO_COLORS.fats > 0 ? MACRO_COLORS.fat : '#ccc' }}>{calculations.fats}g</p>
                       <p className="text-[8px] font-bold text-muted-foreground uppercase">Fats</p>
                       <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black">{calculations.fatPct}%</Badge>
                     </div>

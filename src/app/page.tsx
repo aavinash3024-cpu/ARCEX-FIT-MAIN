@@ -7,7 +7,8 @@ import {
   Dumbbell, 
   LineChart as ChartIcon,
   Bell,
-  User
+  User,
+  Crown
 } from 'lucide-react';
 import { DashboardView } from '@/components/dashboard-view';
 import { NutritionView } from '@/components/nutrition-view';
@@ -397,6 +398,9 @@ export default function PulseFlowApp() {
         </div>
 
         <div className="flex gap-2">
+          <Button variant="ghost" size="icon" className="rounded-full bg-muted/50 w-9 h-9">
+            <Crown className="w-4 h-4 text-amber-500" />
+          </Button>
           <Button variant="ghost" size="icon" className="rounded-full bg-muted/50 w-9 h-9 relative">
             <Bell className="w-4 h-4" />
             <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-accent rounded-full border border-background"></span>
