@@ -537,9 +537,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
     <div className="space-y-4 pb-24 pt-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold font-headline">Nutrition</h1>
-        <Button size="sm" variant="ghost" className="rounded-full w-9 h-9 p-0 bg-muted/50">
-          <Search className="w-4 h-4" />
-        </Button>
       </div>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card">
@@ -706,9 +703,12 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         <CardContent className="p-4 space-y-4">
           <div className="flex items-center justify-between px-1">
             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">TRACKING</p>
-            <span onClick={() => setShowSummary(true)} className="text-[9px] font-bold text-primary uppercase flex items-center cursor-pointer hover:opacity-70 transition-opacity">
+            <button 
+              onClick={() => setShowSummary(true)} 
+              className="text-[9px] font-bold text-primary uppercase flex items-center hover:opacity-70 transition-opacity"
+            >
               View Summary <ChevronRight className="w-3 h-3 ml-0.5" />
-            </span>
+            </button>
           </div>
           
           <ScrollArea className="h-[216px] pr-2">
@@ -746,23 +746,21 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       </Card>
 
       <div className="grid grid-cols-1 gap-4 pb-6">
-        <Card 
+        <button 
           onClick={() => setShowTrends(true)}
-          className="border-none shadow-sm bg-card hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group rounded-2xl"
+          className="w-full border-none shadow-sm bg-card hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group rounded-2xl p-4 flex flex-col items-start gap-2 active:scale-[0.99]"
         >
-          <CardContent className="p-4 flex flex-col items-start gap-2">
-            <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center">
-              <TrendingUp className="w-5 h-5 text-primary" />
-            </div>
-            <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Trends Analysis</p>
-              <p className="text-xs font-bold text-foreground/80">Analyze intake</p>
-            </div>
-            <button className="flex items-center gap-1 mt-1 text-[9px] font-black text-primary uppercase tracking-widest hover:opacity-70 transition-opacity">
-              Go to Tool <ChevronRight className="w-3 h-3" />
-            </button>
-          </CardContent>
-        </Card>
+          <div className="w-9 h-9 bg-primary/10 rounded-xl flex items-center justify-center">
+            <TrendingUp className="w-5 h-5 text-primary" />
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Trends Analysis</p>
+            <p className="text-xs font-bold text-foreground/80">Analyze intake</p>
+          </div>
+          <div className="flex items-center gap-1 mt-1 text-[9px] font-black text-primary uppercase tracking-widest hover:opacity-70 transition-opacity">
+            Go to Tool <ChevronRight className="w-3 h-3" />
+          </div>
+        </button>
       </div>
     </div>
   );

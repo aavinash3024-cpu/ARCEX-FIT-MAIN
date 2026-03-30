@@ -406,31 +406,29 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      <Card 
+      <button 
         onClick={() => setActiveSubView('split')}
-        className="border-none shadow-sm bg-card overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400"
+        className="w-full text-left border-none shadow-sm bg-card overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400 rounded-lg flex items-center h-20"
       >
-        <CardContent className="p-0 flex items-center h-20">
-          <div className="shrink-0 w-20 h-full relative">
-            <Image 
-              src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
-              alt="My Split"
-              fill
-              className="object-cover"
-              data-ai-hint="gym weights"
-            />
+        <div className="shrink-0 w-20 h-full relative">
+          <Image 
+            src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
+            alt="My Split"
+            fill
+            className="object-cover"
+            data-ai-hint="gym weights"
+          />
+        </div>
+        <div className="flex-1 px-4 flex items-center justify-between min-w-0">
+          <div className="space-y-0.5">
+            <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
+              <Layout className="w-3 h-3" /> My Workout Split
+            </h3>
+            <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
           </div>
-          <div className="flex-1 px-4 flex items-center justify-between min-w-0">
-            <div className="space-y-0.5">
-              <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
-                <Layout className="w-3 h-3" /> My Workout Split
-              </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-purple-300/40" />
-          </div>
-        </CardContent>
-      </Card>
+          <ChevronRight className="w-4 h-4 text-purple-300/40" />
+        </div>
+      </button>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
@@ -458,10 +456,10 @@ export function WorkoutView() {
                 todaysExercises.map((ex, idx) => {
                   const logs = loggedSets[ex.name] || [];
                   return (
-                    <div 
+                    <button 
                       key={idx} 
                       onClick={() => setLoggingExercise(ex)}
-                      className="bg-card p-3 rounded-xl border border-muted/20 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
+                      className="w-full text-left bg-card p-3 rounded-xl border border-muted/20 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
                     >
                       <div className="flex justify-between items-start">
                         <div className="space-y-1">
@@ -481,7 +479,7 @@ export function WorkoutView() {
                           ))}
                         </div>
                       )}
-                    </div>
+                    </button>
                   );
                 })
               )}
@@ -501,59 +499,56 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      <Card onClick={() => setActiveSubView('pr')} className="border-none shadow-sm bg-card border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all">
-        <CardContent className="p-0 flex items-center h-20">
-          <div className="shrink-0 w-20 h-full relative">
-            <Image 
-              src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
-              alt="Personal Records"
-              fill
-              className="object-cover"
-              data-ai-hint="gym weights"
-            />
+      <button 
+        onClick={() => setActiveSubView('pr')} 
+        className="w-full text-left border-none shadow-sm bg-card border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all rounded-lg flex items-center h-20"
+      >
+        <div className="shrink-0 w-20 h-full relative">
+          <Image 
+            src={prImage?.imageUrl || "https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=600&auto=format&fit=crop"} 
+            alt="Personal Records"
+            fill
+            className="object-cover"
+            data-ai-hint="gym weights"
+          />
+        </div>
+        <div className="flex-1 px-4 flex items-center justify-between min-w-0">
+          <div className="space-y-0.5">
+            <h3 className="text-[10px] font-black text-primary uppercase tracking-tight flex items-center gap-1.5">
+              <Trophy className="w-3 h-3" /> Personal Records
+            </h3>
+            <p className="text-xs font-bold text-foreground/90 leading-tight">Your recent milestones</p>
           </div>
-          <div className="flex-1 px-4 flex items-center justify-between min-w-0">
-            <div className="space-y-0.5">
-              <h3 className="text-[10px] font-black text-primary uppercase tracking-tight flex items-center gap-1.5">
-                <Trophy className="w-3 h-3" /> Personal Records
-              </h3>
-              <p className="text-xs font-bold text-foreground/90 leading-tight">Your recent milestones</p>
-            </div>
-            <ChevronRight className="w-4 h-4 text-primary/30" />
-          </div>
-        </CardContent>
-      </Card>
+          <ChevronRight className="w-4 h-4 text-primary/30" />
+        </div>
+      </button>
 
       <div className="grid grid-cols-2 gap-4 pb-6">
-        <Card 
+        <button 
           onClick={() => setActiveSubView('history')}
-          className="border-none shadow-sm bg-card border border-muted/20 cursor-pointer hover:bg-muted/5 transition-all"
+          className="w-full text-left border-none shadow-sm bg-card border border-muted/20 cursor-pointer hover:bg-muted/5 transition-all p-5 flex flex-col items-start gap-3 rounded-2xl active:scale-[0.99]"
         >
-          <CardContent className="p-5 flex flex-col items-start gap-3">
-            <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
-              <History className="w-5 h-5 text-sky-600" />
-            </div>
-            <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">History</p>
-              <p className="text-xs font-bold text-foreground/80">Logs</p>
-            </div>
-          </CardContent>
-        </Card>
+          <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
+            <History className="w-5 h-5 text-sky-600" />
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">History</p>
+            <p className="text-xs font-bold text-foreground/80">Logs</p>
+          </div>
+        </button>
         
-        <Card 
+        <button 
           onClick={() => setActiveSubView('library')}
-          className="border-none shadow-sm bg-card hover:bg-indigo-50 transition-all cursor-pointer border border-muted/20"
+          className="w-full text-left border-none shadow-sm bg-card hover:bg-indigo-50 transition-all cursor-pointer border border-muted/20 p-5 flex flex-col items-start gap-3 rounded-2xl active:scale-[0.99]"
         >
-          <CardContent className="p-5 flex flex-col items-start gap-3">
-            <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
-              <Library className="w-5 h-5 text-indigo-600" />
-            </div>
-            <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Library</p>
-              <p className="text-xs font-bold text-foreground/80">350+ Moves</p>
-            </div>
-          </CardContent>
-        </Card>
+          <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
+            <Library className="w-5 h-5 text-indigo-600" />
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Library</p>
+            <p className="text-xs font-bold text-foreground/80">350+ Moves</p>
+          </div>
+        </button>
       </div>
 
       <ExtraMovesModal 
@@ -646,7 +641,7 @@ export function WorkoutView() {
 
                 <div className="space-y-2">
                   <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground flex items-center gap-2">
-                    <History className="w-3 h-3" /> Today's Sets
+                    <History className="w-3.5 h-3.5" /> Today's Sets
                   </h4>
                   <div className="grid gap-2">
                     {(loggedSets[loggingExercise.name] || []).length === 0 ? (
