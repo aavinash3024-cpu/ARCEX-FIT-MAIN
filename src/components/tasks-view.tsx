@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from 'react';
@@ -10,12 +11,10 @@ import {
   Plus, 
   Trash2,
   AlertCircle,
-  ClipboardList,
-  ChevronDown
+  ClipboardList
 } from "lucide-react";
 import { addDays, format, startOfToday, isSameDay } from 'date-fns';
 import { cn } from "@/lib/utils";
-import { Textarea } from "@/components/ui/textarea";
 
 export type Priority = 'low' | 'medium' | 'high';
 
@@ -25,7 +24,6 @@ export interface Task {
   priority: Priority;
   completed: boolean;
   date: Date;
-  details?: string;
 }
 
 interface TasksViewProps {
@@ -38,7 +36,6 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
   const [selectedDate, setSelectedDate] = useState(startOfToday());
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [selectedPriority, setSelectedPriority] = useState<Priority>('medium');
-  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   const priorityBgColor = {
     low: 'bg-green-500',
@@ -69,8 +66,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
       title: newTaskTitle,
       priority: selectedPriority,
       completed: false,
-      date: selectedDate,
-      details: ""
+      date: selectedDate
     };
     setTasks([...tasks, newTask]);
     setNewTaskTitle("");
@@ -78,10 +74,6 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
 
   const toggleTask = (id: string) => {
     setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
-  };
-
-  const updateTaskDetails = (id: string, details: string) => {
-    setTasks(tasks.map(t => t.id === id ? { ...t, details } : t));
   };
 
   const deleteTask = (id: string) => {
@@ -201,66 +193,35 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
             ) : (
               <div className="divide-y divide-muted/10">
                 {filteredTasks.map((task) => (
-                  <div key={task.id} className="group border-b border-muted/10 last:border-0">
-                    <div 
-                      className="relative flex items-center justify-between p-4 pl-6 hover:bg-muted/5 transition-colors cursor-pointer"
-                      onClick={() => setExpandedTaskId(expandedTaskId === task.id ? null : task.id)}
-                    >
-                      <div className={cn("absolute left-0 top-0 bottom-0 w-1.5", priorityBgColor[task.priority])} />
-                      
-                      <div className="flex items-center gap-4 min-w-0">
-                        <Checkbox 
-                          checked={task.completed} 
-                          onCheckedChange={(checked) => {
-                            toggleTask(task.id);
-                          }}
-                          onClick={(e) => e.stopPropagation()}
-                          className="h-5 w-5 rounded-md border-2 border-primary/20 data-[state=checked]:bg-primary"
-                        />
-                        <div className="space-y-0.5 min-w-0">
-                          <p className={cn(
-                            "text-xs font-bold transition-all truncate",
-                            task.completed ? "text-muted-foreground line-through opacity-50" : "text-foreground"
-                          )}>
-                            {task.title}
-                          </p>
-                        </div>
+                  <div key={task.id} className="relative flex items-center justify-between p-4 pl-6 hover:bg-muted/5 transition-colors group">
+                    <div className={cn("absolute left-0 top-0 bottom-0 w-1.5", priorityBgColor[task.priority])} />
+                    
+                    <div className="flex items-center gap-4 min-w-0">
+                      <Checkbox 
+                        checked={task.completed} 
+                        onCheckedChange={() => {
+                          toggleTask(task.id);
+                        }}
+                        className="h-5 w-5 rounded-md border-2 border-primary/20 data-[state=checked]:bg-primary"
+                      />
+                      <div className="space-y-0.5 min-w-0">
+                        <p className={cn(
+                          "text-xs font-bold transition-all truncate",
+                          task.completed ? "text-muted-foreground line-through opacity-50" : "text-foreground"
+                        )}>
+                          {task.title}
+                        </p>
                       </div>
-                      
-                      <Button 
-                        variant="ghost" 
-                        size="icon" 
-                        className="h-8 w-8 rounded-full text-muted-foreground/40 hover:text-foreground"
-                      >
-                        <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", expandedTaskId === task.id && "rotate-180")} />
-                      </Button>
                     </div>
-
-                    {expandedTaskId === task.id && (
-                      <div className="px-6 pb-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
-                        <div className="space-y-2">
-                          <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest pl-1">
-                            Task Details
-                          </label>
-                          <Textarea 
-                            value={task.details || ""}
-                            onChange={(e) => updateTaskDetails(task.id, e.target.value)}
-                            placeholder="Add more information about this objective..."
-                            className="min-h-[100px] rounded-xl border border-muted-foreground/10 text-xs font-medium focus:ring-primary/20 bg-muted/5"
-                          />
-                        </div>
-                        <div className="flex justify-end">
-                          <Button 
-                            variant="ghost" 
-                            size="sm" 
-                            onClick={() => deleteTask(task.id)}
-                            className="text-destructive hover:text-destructive hover:bg-destructive/10 text-[10px] font-black uppercase tracking-widest h-8 px-3 rounded-lg"
-                          >
-                            <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete Task
-                          </Button>
-                        </div>
-                      </div>
-                    )}
+                    
+                    <Button 
+                      variant="ghost" 
+                      size="icon" 
+                      onClick={() => deleteTask(task.id)}
+                      className="h-8 w-8 rounded-full text-muted-foreground/40 hover:text-destructive transition-colors"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </Button>
                   </div>
                 ))}
               </div>
