@@ -664,20 +664,20 @@ export function DashboardView({
                     <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
                   </div>
                 ))}
-                {todaysTasks.length > 2 && (
-                  <div className="flex justify-center pt-1">
-                    <p className="text-[10px] font-bold text-muted-foreground/60 uppercase tracking-widest">
-                      + {todaysTasks.length - 2} more tasks
-                    </p>
-                  </div>
-                )}
               </>
             )}
           </div>
-          <div className="pt-2 border-t border-muted/20 flex justify-center">
+          <div className="pt-3 border-t border-muted/20 flex items-center justify-between">
+            <div className="flex-1">
+              {todaysTasks.length > 2 && (
+                <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.1em]">
+                  + {todaysTasks.length - 2} more tasks
+                </p>
+              )}
+            </div>
             <button 
               onClick={() => onViewTasks?.()}
-              className="text-[10px] font-bold text-primary uppercase flex items-center gap-1 hover:opacity-70 transition-opacity"
+              className="text-[9px] font-black text-primary uppercase flex items-center gap-1 hover:opacity-70 transition-all"
             >
               See More <ChevronRight className="w-3 h-3" />
             </button>
