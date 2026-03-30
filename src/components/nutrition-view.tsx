@@ -542,7 +542,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </Button>
       </div>
 
-      <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
+      <Card className="border-none shadow-sm overflow-hidden bg-card">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-full shrink-0">
