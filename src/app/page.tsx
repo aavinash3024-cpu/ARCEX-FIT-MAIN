@@ -7,7 +7,6 @@ import {
   Dumbbell, 
   LineChart as ChartIcon,
   Bell,
-  Search,
   User
 } from 'lucide-react';
 import { DashboardView } from '@/components/dashboard-view';
@@ -36,6 +35,26 @@ export default function PulseFlowApp() {
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [streakData, setStreakData] = useState({ count: 0, history: [] as string[] });
   const [isLoaded, setIsLoaded] = useState(false);
+
+  // Global Haptics Listener
+  useEffect(() => {
+    const handleGlobalClick = (e: MouseEvent) => {
+      const hapticsSetting = localStorage.getItem('pulseflow_haptics');
+      const isHapticsEnabled = hapticsSetting === null || hapticsSetting === 'true';
+      
+      if (!isHapticsEnabled) return;
+
+      const target = e.target as HTMLElement;
+      if (target.closest('button')) {
+        if (typeof navigator !== 'undefined' && navigator.vibrate) {
+          navigator.vibrate(8);
+        }
+      }
+    };
+
+    window.addEventListener('click', handleGlobalClick);
+    return () => window.removeEventListener('click', handleGlobalClick);
+  }, []);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -378,9 +397,6 @@ export default function PulseFlowApp() {
         </div>
 
         <div className="flex gap-2">
-          <Button variant="ghost" size="icon" className="rounded-full bg-muted/50 w-9 h-9">
-            <Search className="w-4 h-4" />
-          </Button>
           <Button variant="ghost" size="icon" className="rounded-full bg-muted/50 w-9 h-9 relative">
             <Bell className="w-4 h-4" />
             <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-accent rounded-full border border-background"></span>
