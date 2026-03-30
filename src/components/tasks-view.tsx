@@ -11,24 +11,10 @@ import {
   Trash2,
   AlertCircle,
   ClipboardList,
-  MoreVertical,
-  Save
+  ChevronDown
 } from "lucide-react";
 import { addDays, format, startOfToday, isSameDay } from 'date-fns';
 import { cn } from "@/lib/utils";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
 
 export type Priority = 'low' | 'medium' | 'high';
@@ -52,9 +38,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
   const [selectedDate, setSelectedDate] = useState(startOfToday());
   const [newTaskTitle, setNewTaskTitle] = useState("");
   const [selectedPriority, setSelectedPriority] = useState<Priority>('medium');
-  
-  const [editingTask, setEditingTask] = useState<Task | null>(null);
-  const [detailsText, setDetailsText] = useState("");
+  const [expandedTaskId, setExpandedTaskId] = useState<string | null>(null);
 
   const priorityBgColor = {
     low: 'bg-green-500',
@@ -96,19 +80,12 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
     setTasks(tasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
   };
 
+  const updateTaskDetails = (id: string, details: string) => {
+    setTasks(tasks.map(t => t.id === id ? { ...t, details } : t));
+  };
+
   const deleteTask = (id: string) => {
     setTasks(tasks.filter(t => t.id !== id));
-  };
-
-  const openEditDetails = (task: Task) => {
-    setEditingTask(task);
-    setDetailsText(task.details || "");
-  };
-
-  const saveDetails = () => {
-    if (!editingTask) return;
-    setTasks(tasks.map(t => t.id === editingTask.id ? { ...t, details: detailsText } : t));
-    setEditingTask(null);
   };
 
   const getStats = () => {
@@ -136,7 +113,6 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
         <h1 className="text-2xl font-bold font-headline">Daily Tasks</h1>
       </div>
 
-      {/* Simplified Date Shifter */}
       <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20">
         <Button variant="ghost" size="icon" onClick={() => setSelectedDate(addDays(selectedDate, -1))} className="rounded-full hover:bg-muted">
           <ChevronLeft className="w-5 h-5 text-primary" />
@@ -225,48 +201,66 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
             ) : (
               <div className="divide-y divide-muted/10">
                 {filteredTasks.map((task) => (
-                  <div 
-                    key={task.id} 
-                    className="relative flex items-center justify-between group hover:bg-muted/5 transition-colors p-4 pl-6"
-                  >
-                    <div className={cn("absolute left-0 top-0 bottom-0 w-1.5", priorityBgColor[task.priority])} />
-                    
-                    <div className="flex items-center gap-4 min-w-0">
-                      <Checkbox 
-                        checked={task.completed} 
-                        onCheckedChange={() => toggleTask(task.id)}
-                        className="h-5 w-5 rounded-md border-2 border-primary/20 data-[state=checked]:bg-primary"
-                      />
-                      <div className="space-y-0.5 min-w-0">
-                        <p className={cn(
-                          "text-xs font-bold transition-all truncate",
-                          task.completed ? "text-muted-foreground line-through opacity-50" : "text-foreground"
-                        )}>
-                          {task.title}
-                        </p>
-                        {task.details && (
-                          <p className="text-[10px] text-muted-foreground truncate max-w-[200px] italic font-medium">
-                            {task.details}
+                  <div key={task.id} className="group border-b border-muted/10 last:border-0">
+                    <div 
+                      className="relative flex items-center justify-between p-4 pl-6 hover:bg-muted/5 transition-colors cursor-pointer"
+                      onClick={() => setExpandedTaskId(expandedTaskId === task.id ? null : task.id)}
+                    >
+                      <div className={cn("absolute left-0 top-0 bottom-0 w-1.5", priorityBgColor[task.priority])} />
+                      
+                      <div className="flex items-center gap-4 min-w-0">
+                        <Checkbox 
+                          checked={task.completed} 
+                          onCheckedChange={(checked) => {
+                            toggleTask(task.id);
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className="h-5 w-5 rounded-md border-2 border-primary/20 data-[state=checked]:bg-primary"
+                        />
+                        <div className="space-y-0.5 min-w-0">
+                          <p className={cn(
+                            "text-xs font-bold transition-all truncate",
+                            task.completed ? "text-muted-foreground line-through opacity-50" : "text-foreground"
+                          )}>
+                            {task.title}
                           </p>
-                        )}
+                        </div>
                       </div>
+                      
+                      <Button 
+                        variant="ghost" 
+                        size="icon" 
+                        className="h-8 w-8 rounded-full text-muted-foreground/40 hover:text-foreground"
+                      >
+                        <ChevronDown className={cn("w-4 h-4 transition-transform duration-200", expandedTaskId === task.id && "rotate-180")} />
+                      </Button>
                     </div>
-                    
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button variant="ghost" size="icon" className="h-8 w-8 rounded-full text-muted-foreground/40 hover:text-foreground">
-                          <MoreVertical className="w-4 h-4" />
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end" className="rounded-xl">
-                        <DropdownMenuItem onClick={() => openEditDetails(task)} className="text-xs font-bold gap-2">
-                          Edit Details
-                        </DropdownMenuItem>
-                        <DropdownMenuItem onClick={() => deleteTask(task.id)} className="text-xs font-bold gap-2 text-destructive">
-                          Delete
-                        </DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
+
+                    {expandedTaskId === task.id && (
+                      <div className="px-6 pb-4 space-y-4 animate-in slide-in-from-top-2 duration-200">
+                        <div className="space-y-2">
+                          <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest pl-1">
+                            Task Details
+                          </label>
+                          <Textarea 
+                            value={task.details || ""}
+                            onChange={(e) => updateTaskDetails(task.id, e.target.value)}
+                            placeholder="Add more information about this objective..."
+                            className="min-h-[100px] rounded-xl border border-muted-foreground/10 text-xs font-medium focus:ring-primary/20 bg-muted/5"
+                          />
+                        </div>
+                        <div className="flex justify-end">
+                          <Button 
+                            variant="ghost" 
+                            size="sm" 
+                            onClick={() => deleteTask(task.id)}
+                            className="text-destructive hover:text-destructive hover:bg-destructive/10 text-[10px] font-black uppercase tracking-widest h-8 px-3 rounded-lg"
+                          >
+                            <Trash2 className="w-3.5 h-3.5 mr-1.5" /> Delete Task
+                          </Button>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
@@ -311,42 +305,6 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
           </div>
         </CardContent>
       </Card>
-
-      <Dialog open={!!editingTask} onOpenChange={(open) => !open && setEditingTask(null)}>
-        <DialogContent className="rounded-2xl w-[90%] max-w-sm">
-          <DialogHeader>
-            <DialogTitle className="text-[11px] font-black uppercase tracking-widest text-primary">
-              Edit Task Details
-            </DialogTitle>
-          </DialogHeader>
-          <div className="py-4 space-y-4">
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                OBJECTIVE
-              </label>
-              <div className="p-3 rounded-xl border border-muted/20 bg-muted/5">
-                <p className="text-sm font-bold text-foreground">{editingTask?.title}</p>
-              </div>
-            </div>
-            <div className="space-y-2">
-              <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                ADDITIONAL NOTES
-              </label>
-              <Textarea 
-                value={detailsText}
-                onChange={(e) => setDetailsText(e.target.value)}
-                placeholder="Add more information about this task..."
-                className="min-h-[120px] rounded-xl border border-muted-foreground/10 text-xs font-medium focus:ring-primary/20 bg-muted/5"
-              />
-            </div>
-          </div>
-          <DialogFooter>
-            <Button onClick={saveDetails} className="w-full h-12 rounded-xl bg-primary font-black uppercase text-[11px] tracking-widest gap-2 shadow-lg shadow-primary/20">
-              <Save className="w-4 h-4" /> Save Details
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   );
 }
