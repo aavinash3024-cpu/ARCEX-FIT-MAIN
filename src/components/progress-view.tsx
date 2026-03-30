@@ -134,7 +134,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
   };
 
   return (
-    <div className="space-y-4 pb-32 pt-4">
+    <div className="space-y-4 pb-24 pt-4">
       <h1 className="text-2xl font-bold font-headline mb-2 px-1">Progress</h1>
 
       <div className="space-y-4 animate-in fade-in duration-500">

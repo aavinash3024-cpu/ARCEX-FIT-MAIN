@@ -406,9 +406,9 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      <button 
+      <Card 
         onClick={() => setActiveSubView('split')}
-        className="w-full text-left border-none shadow-sm bg-card overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400 rounded-lg flex items-center h-20"
+        className="border-none shadow-sm bg-card overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400 rounded-lg flex items-center h-20"
       >
         <div className="shrink-0 w-20 h-full relative">
           <Image 
@@ -428,7 +428,7 @@ export function WorkoutView() {
           </div>
           <ChevronRight className="w-4 h-4 text-purple-300/40" />
         </div>
-      </button>
+      </Card>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
         <div className="px-5 pt-5 pb-2">
@@ -456,7 +456,7 @@ export function WorkoutView() {
                 todaysExercises.map((ex, idx) => {
                   const logs = loggedSets[ex.name] || [];
                   return (
-                    <button 
+                    <div 
                       key={idx} 
                       onClick={() => setLoggingExercise(ex)}
                       className="w-full text-left bg-card p-3 rounded-xl border border-muted/20 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
@@ -479,7 +479,7 @@ export function WorkoutView() {
                           ))}
                         </div>
                       )}
-                    </button>
+                    </div>
                   );
                 })
               )}
@@ -499,9 +499,9 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      <button 
+      <Card 
         onClick={() => setActiveSubView('pr')} 
-        className="w-full text-left border-none shadow-sm bg-card border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all rounded-lg flex items-center h-20"
+        className="border-none shadow-sm bg-card border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all rounded-lg flex items-center h-20"
       >
         <div className="shrink-0 w-20 h-full relative">
           <Image 
@@ -521,12 +521,12 @@ export function WorkoutView() {
           </div>
           <ChevronRight className="w-4 h-4 text-primary/30" />
         </div>
-      </button>
+      </Card>
 
       <div className="grid grid-cols-2 gap-4 pb-6">
-        <button 
+        <Card 
           onClick={() => setActiveSubView('history')}
-          className="w-full text-left border-none shadow-sm bg-card border border-muted/20 cursor-pointer hover:bg-muted/5 transition-all p-5 flex flex-col items-start gap-3 rounded-2xl active:scale-[0.99]"
+          className="border-none shadow-sm bg-card border border-muted/20 cursor-pointer hover:bg-muted/5 transition-all p-5 flex flex-col items-start gap-3 rounded-2xl active:scale-[0.99]"
         >
           <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
             <History className="w-5 h-5 text-sky-600" />
@@ -535,11 +535,11 @@ export function WorkoutView() {
             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">History</p>
             <p className="text-xs font-bold text-foreground/80">Logs</p>
           </div>
-        </button>
+        </Card>
         
-        <button 
+        <Card 
           onClick={() => setActiveSubView('library')}
-          className="w-full text-left border-none shadow-sm bg-card hover:bg-indigo-50 transition-all cursor-pointer border border-muted/20 p-5 flex flex-col items-start gap-3 rounded-2xl active:scale-[0.99]"
+          className="border-none shadow-sm bg-card hover:bg-indigo-50 transition-all cursor-pointer border border-muted/20 p-5 flex flex-col items-start gap-3 rounded-2xl active:scale-[0.99]"
         >
           <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
             <Library className="w-5 h-5 text-indigo-600" />
@@ -548,7 +548,7 @@ export function WorkoutView() {
             <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Library</p>
             <p className="text-xs font-bold text-foreground/80">350+ Moves</p>
           </div>
-        </button>
+        </Card>
       </div>
 
       <ExtraMovesModal 
@@ -870,7 +870,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
   }, [history, activeMuscle, activeType]);
 
   return (
-    <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2 px-1">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
@@ -964,7 +964,7 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
   const daysText = daysAgo === 0 ? "Achieved Today" : `${daysAgo} Day${daysAgo === 1 ? '' : 's'} Ago`;
 
   return (
-    <div className="space-y-6 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-6 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2 px-1">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
@@ -1167,7 +1167,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
   const currentMuscleReport = report.muscleStats[activeMuscleReport] || null;
 
   return (
-    <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
@@ -1476,7 +1476,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
   const handleNextWeek = () => setRefDate(prev => addWeeks(prev, 1));
 
   return (
-    <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />

@@ -134,7 +134,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
   };
 
   return (
-    <div className="space-y-4 pb-32 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
@@ -373,7 +373,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Waist (cm)</Label>
-                  <Input type="number" value={waist} onChange={(e) => setArea(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input type="number" value={waist} onChange={(e) => setWaist(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
                 {gender === 'female' && (
                   <div className="space-y-2">
