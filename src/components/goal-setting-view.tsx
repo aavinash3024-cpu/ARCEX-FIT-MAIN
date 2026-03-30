@@ -461,7 +461,9 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                                   {rate === 1.0 && (
                                     <div className="mt-2 flex items-center gap-2 bg-destructive/10 p-2 rounded-lg border border-destructive/20 max-w-fit">
                                       <AlertTriangle className="w-3 h-3 text-destructive" />
-                                      <span className="text-[9px] font-black uppercase text-destructive tracking-tighter">Consult doctor before losing 1kg / week</span>
+                                      <span className="text-[9px] font-black uppercase text-destructive tracking-tighter">
+                                        Consult doctor before {objective === 'loss' ? 'losing' : 'gaining'} 1kg / week
+                                      </span>
                                     </div>
                                   )}
                                </div>
@@ -507,7 +509,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                       <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black">{calculations.carbPct}%</Badge>
                     </div>
                     <div className="text-center space-y-0.5">
-                      <p className="text-lg font-black" style={{ color: MACRO_COLORS.fats > 0 ? MACRO_COLORS.fat : '#ccc' }}>{calculations.fats}g</p>
+                      <p className="text-lg font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
                       <p className="text-[8px] font-bold text-muted-foreground uppercase">Fats</p>
                       <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black">{calculations.fatPct}%</Badge>
                     </div>
