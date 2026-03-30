@@ -292,7 +292,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   };
 
   const handleSpeech = () => {
-    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+    const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitRecognition;
     if (!SpeechRecognition) return;
     const recognition = new SpeechRecognition();
     recognition.lang = 'en-US';
@@ -315,7 +315,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
   const renderTrendsView = () => {
     return (
-      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="space-y-4 pb-20 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
           <Button variant="ghost" size="icon" onClick={() => setShowTrends(false)} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
@@ -380,7 +380,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
     const allItems = loggedMeals.flatMap(m => m.items || []);
 
     return (
-      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="space-y-4 pb-20 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
           <Button variant="ghost" size="icon" onClick={() => setShowSummary(false)} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
@@ -535,7 +535,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   }
 
   return (
-    <div className="space-y-4 pb-24 pt-4">
+    <div className="space-y-4 pb-20 pt-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold font-headline">Nutrition</h1>
       </div>
