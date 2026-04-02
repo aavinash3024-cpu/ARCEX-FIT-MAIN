@@ -98,9 +98,14 @@ export function WorkoutView() {
   const [subMuscleFilter, setSubMuscleFilter] = useState<string>("ALL");
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Input states for the logging modal
+  const [weightInput, setWeightInput] = useState("");
+  const [repsInput, setRepsInput] = useState("");
+  const [minInput, setMinInput] = useState("");
+  const [secInput, setSecInput] = useState("");
+
   const todayName = format(new Date(), 'EEEE');
 
-  // Load initial data
   useEffect(() => {
     const savedSplit = localStorage.getItem('pulseflow_workout_split');
     if (savedSplit) {
@@ -135,14 +140,12 @@ export function WorkoutView() {
     setIsLoaded(true);
   }, []);
 
-  // Save Split
   useEffect(() => {
     if (isLoaded && Object.keys(split).length > 0) {
       localStorage.setItem('pulseflow_workout_split', JSON.stringify(split));
     }
   }, [split, isLoaded]);
 
-  // Save Extra Moves
   useEffect(() => {
     if (isLoaded) {
       const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -150,7 +153,6 @@ export function WorkoutView() {
     }
   }, [extraMoves, isLoaded]);
 
-  // Save Logs
   useEffect(() => {
     if (isLoaded) {
       const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -201,12 +203,17 @@ export function WorkoutView() {
   const handleLogSet = (exerciseName: string, setData: any) => {
     setLoggedSets(prev => {
       const current = prev[exerciseName] || [];
+      if (current.length >= 20) return prev;
       return { ...prev, [exerciseName]: [...current, setData] };
     });
   };
 
   const handleAddExtraMoves = (exercises: Exercise[]) => {
-    const newMoves = exercises.filter(ex => !todaysExercises.some(e => e.name === ex.name));
+    const currentTotal = todaysExercises.length;
+    const capacity = 50 - currentTotal;
+    const newMoves = exercises
+      .filter(ex => !todaysExercises.some(e => e.name === ex.name))
+      .slice(0, capacity);
     setExtraMoves(prev => [...prev, ...newMoves]);
   };
 
@@ -401,8 +408,8 @@ export function WorkoutView() {
   }
 
   return (
-    <div className="space-y-4 pb-20">
-      <div className="pt-2">
+    <div className="space-y-4 pb-20 pt-4">
+      <div>
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
@@ -458,7 +465,13 @@ export function WorkoutView() {
                   return (
                     <div 
                       key={idx} 
-                      onClick={() => setLoggingExercise(ex)}
+                      onClick={() => {
+                        setLoggingExercise(ex);
+                        setWeightInput("");
+                        setRepsInput("");
+                        setMinInput("");
+                        setSecInput("");
+                      }}
                       className="w-full text-left bg-card p-3 rounded-xl border border-muted/20 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
                     >
                       <div className="flex justify-between items-start">
@@ -558,7 +571,8 @@ export function WorkoutView() {
         searchQuery={searchQuery} 
         setSearchQuery={setSearchQuery} 
         muscleFilter={muscleFilter} 
-        setMuscleFilter={setMuscleFilter} 
+        setMuscleFilter={setMuscleFilter}
+        todaysCount={todaysExercises.length}
       />
 
       {loggingExercise && (
@@ -584,27 +598,38 @@ export function WorkoutView() {
                         <div className="grid grid-cols-2 gap-2">
                           <div className="space-y-1">
                             <label className="text-[8px] font-bold text-muted-foreground pl-1">MINUTES</label>
-                            <Input id="min-input" type="number" placeholder="0" className="h-12 text-lg font-bold rounded-xl" />
+                            <Input 
+                              value={minInput}
+                              onChange={(e) => setMinInput(e.target.value === "" ? "" : Math.min(1440, parseInt(e.target.value) || 0).toString())}
+                              type="number" 
+                              placeholder="0" 
+                              className="h-12 text-lg font-bold rounded-xl" 
+                            />
                           </div>
                           <div className="space-y-1">
                             <label className="text-[8px] font-bold text-muted-foreground pl-1">SECONDS</label>
-                            <Input id="sec-input" type="number" placeholder="0" className="h-12 text-lg font-bold rounded-xl" />
+                            <Input 
+                              value={secInput}
+                              onChange={(e) => setSecInput(e.target.value === "" ? "" : Math.min(59, parseInt(e.target.value) || 0).toString())}
+                              type="number" 
+                              placeholder="0" 
+                              className="h-12 text-lg font-bold rounded-xl" 
+                            />
                           </div>
                         </div>
                         <Button 
                           onClick={() => {
-                            const minInput = document.getElementById('min-input') as HTMLInputElement;
-                            const secInput = document.getElementById('sec-input') as HTMLInputElement;
-                            const total = (parseInt(minInput.value) || 0) * 60 + (parseInt(secInput.value) || 0);
+                            const total = (parseInt(minInput) || 0) * 60 + (parseInt(secInput) || 0);
                             if (total > 0) {
                               handleLogSet(loggingExercise.name, { type: 'time', time: total });
-                              minInput.value = "";
-                              secInput.value = "";
+                              setMinInput("");
+                              setSecInput("");
                             }
                           }}
+                          disabled={(loggedSets[loggingExercise.name] || []).length >= 20}
                           className="w-full h-12 rounded-xl bg-primary mt-2 font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
                         >
-                          Log Duration
+                          {(loggedSets[loggingExercise.name] || []).length >= 20 ? "Limit Reached (20 Sets)" : "Log Duration"}
                         </Button>
                       </div>
                     ) : (
@@ -613,26 +638,37 @@ export function WorkoutView() {
                         <div className="grid grid-cols-2 gap-2">
                           <div className="space-y-1">
                             <label className="text-[8px] font-bold text-muted-foreground pl-1">WEIGHT (KG)</label>
-                            <Input id="weight-input" type="number" placeholder="0.0" className="h-12 text-lg font-bold rounded-xl" />
+                            <Input 
+                              value={weightInput}
+                              onChange={(e) => setWeightInput(e.target.value === "" ? "" : Math.min(1000, parseInt(e.target.value) || 0).toString())}
+                              type="number" 
+                              placeholder="0.0" 
+                              className="h-12 text-lg font-bold rounded-xl" 
+                            />
                           </div>
                           <div className="space-y-1">
                             <label className="text-[8px] font-bold text-muted-foreground pl-1">REPS</label>
-                            <Input id="reps-input" type="number" placeholder="0" className="h-12 text-lg font-bold rounded-xl" />
+                            <Input 
+                              value={repsInput}
+                              onChange={(e) => setRepsInput(e.target.value === "" ? "" : Math.min(1000, parseInt(e.target.value) || 0).toString())}
+                              type="number" 
+                              placeholder="0" 
+                              className="h-12 text-lg font-bold rounded-xl" 
+                            />
                           </div>
                         </div>
                         <Button 
                           onClick={() => {
-                            const wInput = document.getElementById('weight-input') as HTMLInputElement;
-                            const rInput = document.getElementById('reps-input') as HTMLInputElement;
-                            if (wInput.value && rInput.value) {
-                              handleLogSet(loggingExercise.name, { type: 'strength', weight: wInput.value, reps: rInput.value });
-                              wInput.value = "";
-                              rInput.value = "";
+                            if (weightInput && repsInput) {
+                              handleLogSet(loggingExercise.name, { type: 'strength', weight: weightInput, reps: repsInput });
+                              setWeightInput("");
+                              setRepsInput("");
                             }
                           }}
+                          disabled={(loggedSets[loggingExercise.name] || []).length >= 20}
                           className="w-full h-12 rounded-xl bg-primary mt-2 font-black uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
                         >
-                          Log Set
+                          {(loggedSets[loggingExercise.name] || []).length >= 20 ? "Limit Reached (20 Sets)" : "Log Set"}
                         </Button>
                       </div>
                     )}
@@ -674,7 +710,7 @@ export function WorkoutView() {
   );
 }
 
-function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, setSearchQuery, muscleFilter, setMuscleFilter }: any) {
+function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, setSearchQuery, muscleFilter, setMuscleFilter, todaysCount }: any) {
   const [isOpen, setIsOpen] = useState(false);
   const [selectedItems, setSelectedItems] = useState<Exercise[]>([]);
 
@@ -694,7 +730,9 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
     if (isSelected) {
       setSelectedItems(prev => prev.filter(i => i.name !== ex.name));
     } else {
-      setSelectedItems(prev => [...prev, ex]);
+      if (todaysCount + selectedItems.length < 50) {
+        setSelectedItems(prev => [...prev, ex]);
+      }
     }
   };
 
@@ -704,13 +742,17 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
     setSelectedItems([]);
   };
 
+  const isAtLimit = todaysCount + selectedItems.length >= 50;
+
   return (
     <div className="fixed inset-0 z-[70] bg-black/60 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
       <div className="w-full max-w-lg mx-auto bg-card rounded-t-[2.5rem] p-6 animate-in slide-in-from-bottom duration-500 flex flex-col h-[80vh]">
         <div className="flex items-center justify-between mb-2 pt-2">
           <div className="space-y-0.5">
             <h3 className="text-xl font-black uppercase tracking-tighter">Add Extra Exercise</h3>
-            <p className="text-[10px] font-bold text-muted-foreground uppercase">Added moves are temporary for today</p>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase">
+              {isAtLimit ? "Daily Limit of 50 Exercises Reached" : "Added moves are temporary for today"}
+            </p>
           </div>
           <Button variant="ghost" size="icon" onClick={() => setIsOpen(false)} className="rounded-full">
             <X className="w-6 h-6" />
@@ -754,9 +796,11 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
                 <button 
                   key={idx} 
                   onClick={() => toggleSelection(ex)}
+                  disabled={!isSelected && isAtLimit}
                   className={cn(
                     "flex items-center justify-between p-4 rounded-2xl text-left transition-all border",
-                    isSelected ? "bg-primary/5 border-primary/20" : "bg-muted/5 border-transparent"
+                    isSelected ? "bg-primary/5 border-primary/20" : "bg-muted/5 border-transparent",
+                    (!isSelected && isAtLimit) && "opacity-50"
                   )}
                 >
                   <div className="min-w-0 pr-4">
@@ -791,7 +835,7 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
 
 function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onViewDetail: (pr: any) => void }) {
   const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
-  const [activeType, setActiveType] = useState<'strength' | 'time' | 'rep'>('strength');
+  const [activeType, setActiveType] = useState<'strength' | 'time'>('strength');
   const [activeMuscle, setActiveMuscle] = useState<string>("CHEST");
 
   useEffect(() => {
@@ -809,8 +853,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
     const muscles = new Set<string>();
     EXERCISES_DATA.forEach(ex => {
       const type = getExerciseType(ex.name);
-      const currentSelectionType = activeType === 'time' ? 'time' : 'strength';
-      if (type === currentSelectionType) {
+      if (type === activeType) {
         muscles.add(ex.muscle);
       }
     });
@@ -827,7 +870,6 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
     if (!activeMuscle) return [];
     
     const recordsMap: Record<string, any[]> = {};
-    const typeToFilter = activeType === 'time' ? 'time' : 'strength';
     
     Object.entries(history).forEach(([dateStr, dayLogs]) => {
       Object.entries(dayLogs).forEach(([exName, sets]) => {
@@ -835,8 +877,8 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
         if (exData && exData.muscle === activeMuscle) {
           if (!recordsMap[exName]) recordsMap[exName] = [];
           sets.forEach(s => {
-            if (s.type === typeToFilter) {
-              if (typeToFilter === 'strength') {
+            if (s.type === activeType) {
+              if (activeType === 'strength') {
                 recordsMap[exName].push({
                   weight: parseFloat(s.weight),
                   reps: parseFloat(s.reps),
@@ -856,7 +898,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
 
     return Object.entries(recordsMap).map(([name, allSets]) => {
       let sortedSets;
-      if (typeToFilter === 'strength') {
+      if (activeType === 'strength') {
         sortedSets = allSets.sort((a, b) => b.weight - a.weight || b.reps - a.reps || new Date(b.date).getTime() - new Date(a.date).getTime());
       } else {
         sortedSets = allSets.sort((a, b) => b.time - a.time || new Date(b.date).getTime() - new Date(a.date).getTime());
@@ -884,7 +926,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
             onClick={() => setActiveType('strength')}
             className={cn(
               "flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-              activeType !== 'time' ? "bg-primary text-white shadow-lg" : "text-muted-foreground hover:bg-muted/5"
+              activeType === 'strength' ? "bg-primary text-white shadow-lg" : "text-muted-foreground hover:bg-muted/5"
             )}
           >
             Rep Based
@@ -930,7 +972,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
               >
                 <div className="flex items-center gap-4 overflow-hidden">
                   <div className="shrink-0 w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center">
-                    {activeType !== 'time' ? (
+                    {activeType === 'strength' ? (
                       <Trophy className="w-5 h-5 text-yellow-500 fill-yellow-500/20" />
                     ) : (
                       <Timer className="w-5 h-5 text-sky-500" />
@@ -939,7 +981,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
                   <div className="min-w-0">
                     <span className="font-bold text-[14px] text-foreground/90 truncate block">{ex.name}</span>
                     <span className="text-[11px] font-black text-muted-foreground/60 uppercase">
-                      {activeType !== 'time' ? `${ex.records[0].weight}KG` : formatExerciseTime(ex.records[0].time).toUpperCase()}
+                      {activeType === 'strength' ? `${ex.records[0].weight}KG` : formatExerciseTime(ex.records[0].time).toUpperCase()}
                     </span>
                   </div>
                 </div>
@@ -1077,17 +1119,25 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
 
   const toggleSelection = (ex: Exercise) => {
     const isSelected = selectedItems.some(i => i.name === ex.name);
+    const dayExercisesCount = (split[activeDay] || []).length;
+    
     if (isSelected) {
       setSelectedItems(prev => prev.filter(i => i.name !== ex.name));
     } else {
-      setSelectedItems(prev => [...prev, ex]);
+      if (dayExercisesCount + selectedItems.length < 50) {
+        setSelectedItems(prev => [...prev, ex]);
+      }
     }
   };
 
   const handleConfirmAdd = () => {
     setSplit(prev => {
       const dayExercises = prev[activeDay] || [];
-      const newItems = selectedItems.filter(s => !dayExercises.some(e => e.name === s.name));
+      const currentCount = dayExercises.length;
+      const capacity = 50 - currentCount;
+      const newItems = selectedItems
+        .filter(s => !dayExercises.some(e => e.name === s.name))
+        .slice(0, capacity);
       return {
         ...prev,
         [activeDay]: [...dayExercises, ...newItems]
@@ -1197,7 +1247,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
               <Calendar className="w-4 h-4 text-primary" /> {activeDay} Routine
             </h3>
             <Badge variant="secondary" className="bg-primary/10 text-primary text-[10px] h-5 px-2">
-              {(split[activeDay] || []).length} MOVES
+              {(split[activeDay] || []).length} / 50 MOVES
             </Badge>
           </div>
 
@@ -1223,8 +1273,12 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
             </div>
           </ScrollArea>
 
-          <Button onClick={() => { setIsAdding(true); setSelectedItems([]); }} className="w-full h-12 rounded-xl border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest gap-2">
-            <Plus className="w-4 h-4" /> Add Exercises
+          <Button 
+            onClick={() => { setIsAdding(true); setSelectedItems([]); }} 
+            disabled={(split[activeDay] || []).length >= 50}
+            className="w-full h-12 rounded-xl border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest gap-2"
+          >
+            <Plus className="w-4 h-4" /> {(split[activeDay] || []).length >= 50 ? "Day Full (50 Max)" : "Add Exercises"}
           </Button>
         </CardContent>
       </Card>
@@ -1370,13 +1424,18 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
               <div className="grid gap-2 pb-24">
                 {filteredLibrary.map((ex, idx) => {
                   const isSelected = selectedItems.some(i => i.name === ex.name);
+                  const dayExercisesCount = (split[activeDay] || []).length;
+                  const isDayAtLimit = dayExercisesCount + selectedItems.length >= 50;
+
                   return (
                     <button 
                       key={idx} 
                       onClick={() => toggleSelection(ex)} 
+                      disabled={!isSelected && isDayAtLimit}
                       className={cn(
                         "flex items-center justify-between p-4 rounded-2xl text-left border transition-all",
-                        isSelected ? "bg-primary/5 border-primary/20" : "bg-muted/5 border-transparent"
+                        isSelected ? "bg-primary/5 border-primary/20" : "bg-muted/5 border-transparent",
+                        (!isSelected && isDayAtLimit) && "opacity-50"
                       )}
                     >
                       <div>
