@@ -322,7 +322,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
                 <Input 
                   type="number"
                   value={profileAge} 
-                  onChange={(e) => setProfileAge(e.target.value)}
+                  onChange={(e) => setProfileAge(e.target.value === "" ? "" : Math.min(100, parseInt(e.target.value) || 0).toString())}
                   className="h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs"
                 />
               </div>

@@ -367,17 +367,32 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Age</Label>
-                  <Input type="number" value={age} onChange={(e) => setAge(e.target.value)} className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input 
+                    type="number" 
+                    value={age} 
+                    onChange={(e) => setAge(e.target.value === "" ? "" : Math.min(100, parseInt(e.target.value) || 0).toString())} 
+                    className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" 
+                  />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Weight (kg)</Label>
-                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input 
+                    type="number" 
+                    value={weight} 
+                    onChange={(e) => setWeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} 
+                    className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" 
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Height (cm)</Label>
-                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input 
+                    type="number" 
+                    value={height} 
+                    onChange={(e) => setHeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} 
+                    className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" 
+                  />
                 </div>
               </div>
               <div className="space-y-2">
@@ -427,7 +442,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                 <Input 
                    type="number" 
                    value={targetWeight} 
-                   onChange={(e) => setTargetWeight(e.target.value)} 
+                   onChange={(e) => setTargetWeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} 
                    className={cn(
                       "rounded-xl h-11 text-xs font-bold",
                       !calculations.isWeightValid ? "border-destructive" : "border-muted-foreground/10 bg-background"

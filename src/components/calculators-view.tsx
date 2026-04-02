@@ -171,17 +171,17 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Age (Years)</Label>
-                  <Input type="number" value={age} onChange={(e) => setAge(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input type="number" value={age} onChange={(e) => setAge(e.target.value === "" ? "" : Math.min(100, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Weight (kg)</Label>
-                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Height (cm)</Label>
-                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="space-y-2">
@@ -267,7 +267,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Weight Lifted (kg)</Label>
-                  <Input type="number" value={liftWeight} onChange={(e) => setLiftWeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input type="number" value={liftWeight} onChange={(e) => setLiftWeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Reps</Label>
@@ -357,28 +357,28 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Weight (kg)</Label>
-                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input type="number" value={weight} onChange={(e) => setWeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Height (cm)</Label>
-                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input type="number" value={height} onChange={(e) => setHeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Neck (cm)</Label>
-                  <Input type="number" value={neck} onChange={(e) => setNeck(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input type="number" value={neck} onChange={(e) => setNeck(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Waist (cm)</Label>
-                  <Input type="number" value={waist} onChange={(e) => setWaist(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input type="number" value={waist} onChange={(e) => setWaist(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
                 {gender === 'female' && (
                   <div className="space-y-2">
                     <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Hip (cm)</Label>
-                    <Input type="number" value={hip} onChange={(e) => setHip(e.target.value)} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                    <Input type="number" value={hip} onChange={(e) => setHip(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                   </div>
                 )}
               </div>
