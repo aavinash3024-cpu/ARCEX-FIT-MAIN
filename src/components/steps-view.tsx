@@ -111,7 +111,6 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
                       className="w-40 text-center text-xl font-bold rounded-xl h-12"
                     />
                   </div>
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Max goal: 1,000,000 steps</p>
                 </div>
                 <DialogFooter>
                   <Button onClick={handleUpdateTarget} className="w-full h-12 rounded-xl bg-primary font-black uppercase text-[11px] tracking-widest">Update Target</Button>
