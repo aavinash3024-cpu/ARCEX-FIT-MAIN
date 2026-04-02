@@ -139,9 +139,6 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
                   <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                     NEW OBJECTIVE
                   </label>
-                  <span className={cn("text-[9px] font-bold uppercase", filteredTasks.length >= 100 ? "text-destructive" : "text-muted-foreground/40")}>
-                    {filteredTasks.length}/100 MAX
-                  </span>
                 </div>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">

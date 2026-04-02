@@ -73,7 +73,6 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
     return Math.min(100, Math.max(0, Math.round(progress)));
   }, [startWeight, targetWeight, currentWeight, goalData]);
 
-  // Updated weightChange to compare currentWeight vs startWeight
   const weightChange = useMemo(() => {
     if (!startWeight || !currentWeight) return 0;
     return parseFloat((currentWeight - startWeight).toFixed(1));
@@ -138,7 +137,6 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
       <h1 className="text-2xl font-bold font-headline mb-2 px-1">Progress</h1>
 
       <div className="space-y-4 animate-in fade-in duration-500">
-        {/* 1. Current Status */}
         <Card className="border-none shadow-sm bg-card overflow-hidden">
           <CardContent className="p-5 space-y-6">
             <div className="flex justify-between items-start">
@@ -174,7 +172,6 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
           </CardContent>
         </Card>
 
-        {/* 2. Your Milestone */}
         <Card className="border-none shadow-sm bg-primary/95 text-primary-foreground overflow-hidden rounded-[1rem]">
            <CardContent className="p-3 px-4 flex items-center justify-between">
               <div className="space-y-0.5">
@@ -193,7 +190,6 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
            </CardContent>
         </Card>
 
-        {/* 3. Weight Trend Chart */}
         <Card className="border-none shadow-sm overflow-hidden bg-card">
           <CardContent className="p-5 space-y-4">
             <div className="flex items-center justify-between">
@@ -253,7 +249,6 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
           </CardContent>
         </Card>
 
-        {/* 4. Log New Weight Button */}
         <Dialog open={isLogOpen} onOpenChange={setIsLogOpen}>
           <DialogTrigger asChild>
             <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2">
@@ -274,7 +269,14 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
                   value={newWeight} 
                   onChange={(e) => {
                     const val = e.target.value;
-                    if (val === "" || (parseFloat(val) <= 1000)) {
+                    if (val === "") {
+                      setNewWeight("");
+                      return;
+                    }
+                    const num = parseFloat(val);
+                    if (num > 1000) {
+                      setNewWeight("1000");
+                    } else {
                       setNewWeight(val);
                     }
                   }}
@@ -289,11 +291,10 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
           </DialogContent>
         </Dialog>
 
-        {/* 5. Log History */}
         <section className="space-y-3 pt-2">
           <div className="flex items-center justify-between px-1">
             <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/70 flex items-center gap-2">
-              <History className="w-3 h-3" /> Log History
+              <History className="w-3.5 h-3.5" /> Log History
             </h3>
           </div>
           <div className="space-y-2">
