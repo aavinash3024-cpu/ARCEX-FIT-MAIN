@@ -60,6 +60,8 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
 
   const addTask = () => {
     if (!newTaskTitle.trim()) return;
+    if (filteredTasks.length >= 100) return;
+
     const newTask: Task = {
       id: Math.random().toString(36).substr(2, 9),
       title: newTaskTitle,
@@ -133,9 +135,14 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
-                  NEW OBJECTIVE
-                </label>
+                <div className="flex justify-between items-center">
+                  <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
+                    NEW OBJECTIVE
+                  </label>
+                  <span className={cn("text-[9px] font-bold uppercase", filteredTasks.length >= 100 ? "text-destructive" : "text-muted-foreground/40")}>
+                    {filteredTasks.length}/100 MAX
+                  </span>
+                </div>
                 <div className="relative group">
                   <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                     <Plus className="w-4 h-4 text-primary/40 group-focus-within:text-primary transition-colors" />
@@ -144,8 +151,9 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
                     type="text" 
                     value={newTaskTitle}
                     onChange={(e) => setNewTaskTitle(e.target.value)}
-                    placeholder="What needs to be done?" 
-                    className="w-full h-12 pl-10 pr-4 bg-muted/5 border border-muted-foreground/10 rounded-xl text-xs focus:ring-1 focus:ring-primary/20 transition-all font-bold"
+                    disabled={filteredTasks.length >= 100}
+                    placeholder={filteredTasks.length >= 100 ? "Daily limit reached" : "What needs to be done?"}
+                    className="w-full h-12 pl-10 pr-4 bg-muted/5 border border-muted-foreground/10 rounded-xl text-xs focus:ring-1 focus:ring-primary/20 transition-all font-bold disabled:opacity-50"
                   />
                 </div>
               </div>
@@ -159,11 +167,13 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
                     <button
                       key={p}
                       onClick={() => setSelectedPriority(p)}
+                      disabled={filteredTasks.length >= 100}
                       className={cn(
                         "py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
                         selectedPriority === p 
                           ? "bg-background text-primary shadow-sm scale-[1.02] border border-primary/5" 
-                          : "text-muted-foreground hover:text-foreground/70"
+                          : "text-muted-foreground hover:text-foreground/70",
+                        "disabled:opacity-50"
                       )}
                     >
                       {p}
@@ -174,9 +184,10 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
 
               <Button 
                 onClick={addTask}
+                disabled={filteredTasks.length >= 100 || !newTaskTitle.trim()}
                 className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]"
               >
-                Add to List
+                {filteredTasks.length >= 100 ? "Daily Limit Reached" : "Add to List"}
               </Button>
             </div>
           </div>

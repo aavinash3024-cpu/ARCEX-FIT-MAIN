@@ -127,7 +127,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
     if (isNaN(val)) return;
     onLogWeight({
       date: new Date().toISOString(),
-      weight: val
+      weight: Math.min(val, 1000)
     });
     setNewWeight("");
     setIsLogOpen(false);
@@ -272,7 +272,12 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
                 <Input 
                   type="number" 
                   value={newWeight} 
-                  onChange={(e) => setNewWeight(e.target.value)}
+                  onChange={(e) => {
+                    const val = e.target.value;
+                    if (val === "" || (parseFloat(val) <= 1000)) {
+                      setNewWeight(val);
+                    }
+                  }}
                   placeholder={currentWeight > 0 ? currentWeight.toString() : "0.0"}
                   className="rounded-xl h-12 text-lg font-bold text-center border-muted-foreground/10 bg-muted/5"
                 />
