@@ -64,7 +64,7 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
   const goalsMet = chartData.filter(d => d.amount >= (targetMl / 1000)).length; 
 
   const handleUpdateTarget = () => {
-    setTargetMl(tempTarget);
+    setTargetMl(Math.min(tempTarget, 50000));
     setIsEditing(false);
   };
 
@@ -113,7 +113,7 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
                     />
                     <span className="font-bold text-muted-foreground">ML</span>
                   </div>
-                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Typical target: 2000 - 4000 ml</p>
+                  <p className="text-[10px] text-muted-foreground uppercase font-bold">Max goal: 50,000 ml</p>
                 </div>
                 <DialogFooter>
                   <Button onClick={handleUpdateTarget} className="w-full h-12 rounded-xl bg-primary font-black uppercase text-[11px] tracking-widest">Update Goal</Button>
