@@ -26,8 +26,25 @@ import {
   ArrowUpRight,
   ArrowDownRight,
   Target,
-  Zap
+  Zap,
+  Info,
+  Check
 } from "lucide-react";
+import { 
+  AreaChart, 
+  Area, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer
+} from 'recharts';
+import {
+  Accordion,
+  AccordionItem,
+  AccordionTrigger,
+  AccordionContent
+} from "@/components/ui/accordion";
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { parseMeal } from '@/ai/flows/parse-meal-flow';
@@ -45,7 +62,8 @@ import {
   addWeeks,
   subWeeks,
   addMonths,
-  subMonths
+  subMonths,
+  addDays
 } from 'date-fns';
 
 interface MealItem {
@@ -97,6 +115,7 @@ const MACRO_COLORS = {
 export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProps) {
   const [showSummary, setShowSummary] = useState(false);
   const [showTrends, setShowTrends] = useState(false);
+  const [showMealHistory, setShowMealHistory] = useState(false);
   const [logTab, setLogTab] = useState("log");
   const [mealInput, setMealInput] = useState("");
   const [isParsing, setIsParsing] = useState(false);
@@ -313,9 +332,11 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   const logHeaderImage = PlaceHolderImages.find(img => img.id === 'meal-quinoa-bowl');
   const loggingIconImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
 
-  const renderTrendsView = () => {
+  if (showMealHistory) return <MealHistoryView allHistory={allHistory} goalData={goalData} onBack={() => setShowMealHistory(false)} />;
+
+  if (showTrends) {
     return (
-      <div className="space-y-4 pb-20 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
           <Button variant="ghost" size="icon" onClick={() => setShowTrends(false)} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
@@ -337,9 +358,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </Tabs>
       </div>
     );
-  };
-
-  if (showTrends) return renderTrendsView();
+  }
 
   if (showSummary) {
     const totals = loggedMeals.reduce((acc, meal) => ({
@@ -380,7 +399,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
     const allItems = loggedMeals.flatMap(m => m.items || []);
 
     return (
-      <div className="space-y-4 pb-20 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
           <Button variant="ghost" size="icon" onClick={() => setShowSummary(false)} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
@@ -535,7 +554,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   }
 
   return (
-    <div className="space-y-4 pb-20 pt-4">
+    <div className="space-y-4 pb-24 pt-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold font-headline">Nutrition</h1>
       </div>
@@ -752,22 +771,254 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-1 gap-4 pb-6">
+      <div className="grid grid-cols-2 gap-4 pb-6">
+        <button 
+          onClick={() => setShowMealHistory(true)}
+          className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
+        >
+          <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
+            <History className="w-5 h-5 text-sky-600" />
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
+            <p className="text-xs font-bold text-foreground/80">Logs</p>
+          </div>
+        </button>
+
         <button 
           onClick={() => setShowTrends(true)}
-          className="w-full border-none shadow-sm bg-card hover:bg-primary/5 transition-all cursor-pointer border border-muted/20 group rounded-2xl p-4 flex flex-col items-start gap-2 active:scale-[0.99]"
+          className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
         >
           <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
             <TrendingUp className="w-5 h-5 text-primary" />
           </div>
           <div className="space-y-0.5">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Trends Analysis</p>
-            <p className="text-xs font-bold text-foreground/80">Analyze intake</p>
-          </div>
-          <div className="flex items-center gap-1 mt-1 text-[9px] font-black text-primary uppercase tracking-widest hover:opacity-70 transition-opacity">
-            Go to Tool <ChevronRight className="w-3 h-3" />
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Trends</p>
+            <p className="text-xs font-bold text-foreground/80">Intake</p>
           </div>
         </button>
+      </div>
+    </div>
+  );
+}
+
+function MealHistoryView({ allHistory, goalData, onBack }: { allHistory: LoggedMeal[], goalData: any, onBack: () => void }) {
+  const [refDate, setRefDate] = useState(new Date());
+
+  const weekInterval = useMemo(() => {
+    const start = startOfWeek(refDate, { weekStartsOn: 1 });
+    const end = endOfWeek(refDate, { weekStartsOn: 1 });
+    return { start, end };
+  }, [refDate]);
+
+  const weekDays = useMemo(() => {
+    return [0, 1, 2, 3, 4, 5, 6].map(i => addDays(weekInterval.start, i));
+  }, [weekInterval]);
+
+  const chartData = useMemo(() => {
+    const targetCal = goalData?.finalCalories || 2200;
+    return weekDays.map(day => {
+      const dateStr = format(day, 'yyyy-MM-dd');
+      const dayMeals = allHistory.filter(m => m.dateStr === dateStr);
+      const calories = dayMeals.reduce((acc, m) => acc + m.calories, 0);
+      return {
+        day: format(day, 'EEE'),
+        calories,
+        target: targetCal,
+        dateStr
+      };
+    });
+  }, [allHistory, weekDays, goalData]);
+
+  const weeklyStats = useMemo(() => {
+    const targetCal = goalData?.finalCalories || 2200;
+    const totalIntake = chartData.reduce((acc, curr) => acc + curr.calories, 0);
+    const totalTarget = targetCal * 7;
+    const balance = totalIntake - totalTarget;
+    const daysTracked = chartData.filter(d => d.calories > 0).length;
+    const avgIntake = daysTracked > 0 ? Math.round(totalIntake / daysTracked) : 0;
+
+    return { totalIntake, balance, avgIntake, daysTracked };
+  }, [chartData, goalData]);
+
+  const handlePrevWeek = () => setRefDate(prev => subWeeks(prev, 1));
+  const handleNextWeek = () => setRefDate(prev => addWeeks(prev, 1));
+
+  return (
+    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="flex items-center gap-4 pt-2 px-1">
+        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
+          <ChevronLeft className="w-5 h-5" />
+        </Button>
+        <h1 className="text-2xl font-bold font-headline">Meal History</h1>
+      </div>
+
+      <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
+        <Button variant="ghost" size="icon" onClick={handlePrevWeek} className="rounded-full hover:bg-muted">
+          <ChevronLeft className="w-5 h-5 text-primary" />
+        </Button>
+        <div className="flex flex-col items-center">
+          <span className="text-xs font-black text-foreground uppercase tracking-tight">
+            {format(weekInterval.start, 'MMM d')} - {format(weekInterval.end, 'MMM d, yyyy')}
+          </span>
+          <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none mt-1">
+            WEEKLY TIMELINE
+          </span>
+        </div>
+        <Button variant="ghost" size="icon" onClick={handleNextWeek} className="rounded-full hover:bg-muted">
+          <ChevronRight className="w-5 h-5 text-primary" />
+        </Button>
+      </div>
+
+      <Card className="border-none shadow-md bg-card rounded-[1.5rem] p-5 space-y-4 mx-1">
+        <div className="flex items-center justify-between">
+          <div className="space-y-1">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WEEKLY BALANCE</p>
+            <div className={cn("flex items-center gap-1.5", weeklyStats.balance <= 0 ? "text-green-600" : "text-orange-500")}>
+              {weeklyStats.balance <= 0 ? <ArrowDownRight className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
+              <span className="text-2xl font-black">{Math.abs(weeklyStats.balance).toLocaleString()}</span>
+              <span className="text-[10px] font-bold uppercase">Kcal {weeklyStats.balance <= 0 ? 'Deficit' : 'Surplus'}</span>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">AVG INTAKE</p>
+            <p className="text-lg font-black">{weeklyStats.avgIntake.toLocaleString()} <span className="text-[8px] opacity-40">KCAL</span></p>
+          </div>
+        </div>
+
+        <div className="h-[160px] w-full mt-2">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
+              <defs>
+                <linearGradient id="colorCal" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
+                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.5} />
+              <XAxis 
+                dataKey="day" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 9, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }} 
+                dy={10}
+              />
+              <YAxis 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 9, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }}
+              />
+              <Tooltip 
+                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 16px rgba(0,0,0,0.08)', fontSize: '10px', fontWeight: 'bold' }}
+                itemStyle={{ color: 'hsl(var(--primary))' }}
+              />
+              <Area 
+                type="monotone" 
+                dataKey="calories" 
+                stroke="hsl(var(--primary))" 
+                strokeWidth={3} 
+                fillOpacity={1} 
+                fill="url(#colorCal)" 
+                animationDuration={1500}
+                dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "#fff" }}
+                activeDot={{ r: 6, strokeWidth: 0 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </Card>
+
+      <div className="space-y-3 px-1">
+        {weekDays.map((day) => {
+          const dateStr = format(day, 'yyyy-MM-dd');
+          const dayMeals = allHistory.filter(m => m.dateStr === dateStr);
+          const dailyCal = dayMeals.reduce((acc, m) => acc + m.calories, 0);
+          const targetCal = goalData?.finalCalories || 2200;
+          const diff = dailyCal - targetCal;
+
+          return (
+            <Accordion key={dateStr} type="single" collapsible className="w-full">
+              <AccordionItem value={dateStr} className="border-none">
+                <Card className={cn(
+                  "border-none shadow-sm overflow-hidden bg-card rounded-[1.25rem] transition-all",
+                  dayMeals.length === 0 ? "opacity-40" : ""
+                )}>
+                  <AccordionTrigger className="p-0 hover:no-underline [&[data-state=open]]:bg-muted/5 group [&>svg]:hidden">
+                    <div className="flex items-center justify-between w-full py-3 px-6">
+                      <div className="text-left">
+                        <h3 className="text-[13px] font-black text-foreground leading-tight">
+                          {format(day, 'EEEE, MMM d')}
+                        </h3>
+                        <p className={cn(
+                          "text-[9px] font-black uppercase mt-0.5",
+                          dayMeals.length > 0 ? "text-primary" : "text-muted-foreground"
+                        )}>
+                          {dayMeals.length > 0 ? `${dayMeals.length} MEALS LOGGED` : "NO DATA"}
+                        </p>
+                      </div>
+                      <div className="text-right flex items-center gap-4">
+                        <div className="space-y-0.5">
+                          <p className="text-[11px] font-black text-foreground/80">{dailyCal.toLocaleString()} <span className="text-[8px] opacity-40">KCAL</span></p>
+                          {dailyCal > 0 && (
+                            <p className={cn("text-[7px] font-black uppercase", diff <= 0 ? "text-green-600" : "text-orange-500")}>
+                              {diff <= 0 ? 'UNDER' : 'OVER'} TARGET
+                            </p>
+                          )}
+                        </div>
+                        <ChevronRight className="w-4 h-4 text-muted-foreground/30 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+                      </div>
+                    </div>
+                  </AccordionTrigger>
+                  <AccordionContent className="p-0">
+                    <div className="p-3 space-y-2 bg-muted/5 border-t border-muted/10">
+                      {dayMeals.length === 0 ? (
+                        <p className="text-center py-4 text-[9px] font-bold text-muted-foreground uppercase">No entries recorded</p>
+                      ) : (
+                        dayMeals.map(meal => (
+                          <Card key={meal.id} className="border border-muted/20 bg-card rounded-xl overflow-hidden shadow-sm">
+                            <CardContent className="p-3 space-y-2">
+                              <div className="flex justify-between items-start">
+                                <div className="space-y-0.5">
+                                  <p className="text-[8px] font-black text-primary uppercase tracking-widest">{meal.type}</p>
+                                  <h4 className="text-xs font-bold text-foreground/90">{meal.name}</h4>
+                                </div>
+                                <div className="text-right">
+                                  <p className="text-[11px] font-black">{Math.round(meal.calories)} <span className="text-[8px] opacity-40 uppercase">Kcal</span></p>
+                                  <p className="text-[7px] font-bold text-muted-foreground uppercase">{meal.time}</p>
+                                </div>
+                              </div>
+                              
+                              {meal.items && meal.items.length > 0 && (
+                                <div className="border-l-2 border-muted/20 pl-2.5 py-0.5 space-y-1 my-1">
+                                  {meal.items.map((item, i) => (
+                                    <div key={i} className="flex justify-between items-center">
+                                      <span className="text-[9px] font-bold text-muted-foreground/80 uppercase truncate max-w-[180px]">
+                                        {item.quantity} {item.name}
+                                      </span>
+                                      <span className="text-[8px] font-black text-muted-foreground/40 uppercase">
+                                        {Math.round(item.calories)} kcal
+                                      </span>
+                                    </div>
+                                  ))}
+                                </div>
+                              )}
+
+                              <div className="flex gap-3 text-[9px] font-black uppercase tracking-tight pt-1 border-t border-muted/5">
+                                <span style={{ color: MACRO_COLORS.protein }}>P {Math.round(meal.protein)}G</span>
+                                <span style={{ color: MACRO_COLORS.carbs }}>C {Math.round(meal.carbs)}G</span>
+                                <span style={{ color: MACRO_COLORS.fat }}>F {Math.round(meal.fat)}G</span>
+                              </div>
+                            </CardContent>
+                          </Card>
+                        ))
+                      )}
+                    </div>
+                  </AccordionContent>
+                </Card>
+              </AccordionItem>
+            </Accordion>
+          );
+        })}
       </div>
     </div>
   );
