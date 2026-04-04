@@ -852,7 +852,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4 pb-6">
+      <div className="grid grid-cols-2 gap-4">
         <Card 
           onClick={() => setShowMicroAnalysis(true)}
           className="border-none shadow-md bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5"
@@ -862,7 +862,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               <HeartPulse className="w-5 h-5 text-amber-600" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Technical</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">TRACK</p>
               <p className="text-xs font-bold text-foreground/80">Micro Analysis</p>
             </div>
           </CardContent>
@@ -877,7 +877,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               <TrendingUp className="w-5 h-5 text-primary" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Performance</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">TRACK</p>
               <p className="text-xs font-bold text-foreground/80">Trends Analysis</p>
             </div>
           </CardContent>
