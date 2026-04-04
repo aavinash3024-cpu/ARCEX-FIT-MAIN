@@ -54,7 +54,6 @@ import {
   subWeeks, 
   isSameDay, 
   addDays,
-  isWithinInterval,
   differenceInDays,
   parseISO
 } from "date-fns";
@@ -437,7 +436,7 @@ export function WorkoutView() {
         </div>
       </Card>
 
-      <Card className="border-none shadow-sm overflow-hidden bg-card/50 backdrop-blur-sm">
+      <Card className="border-none shadow-sm overflow-hidden bg-card border border-muted/20">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-primary/10 rounded-full shrink-0">
