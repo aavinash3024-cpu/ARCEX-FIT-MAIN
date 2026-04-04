@@ -457,20 +457,34 @@ export function WorkoutView() {
         </div>
       </Card>
 
-      <Card className="border-none shadow-sm overflow-hidden bg-card border border-muted/20">
+      <Card className="border-none shadow-sm overflow-hidden bg-card border border-muted/20 relative">
         <div className="px-5 pt-5 pb-2">
-          <div className="flex items-center gap-3">
-            <WorkoutSphere icon={Dumbbell} />
-            <div className="flex-1 min-w-0">
-              <h2 className="text-xs font-black uppercase tracking-tight text-foreground/80">Today's Workout</h2>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                {todayName.toUpperCase()}: <span className="text-primary font-black">{todaysExercises.length} EXERCISES</span>
-              </p>
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <WorkoutSphere icon={Dumbbell} />
+              <div className="flex-1 min-w-0">
+                <h2 className="text-xs font-black uppercase tracking-tight text-foreground/80">Today's Workout</h2>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
+                  {todayName.toUpperCase()}: <span className="text-primary font-black">{todaysExercises.length} EXERCISES</span>
+                </p>
+              </div>
             </div>
+            <Button 
+              variant="ghost" 
+              size="icon"
+              onClick={() => {
+                setSearchQuery("");
+                setMuscleFilter("ALL");
+                document.dispatchEvent(new CustomEvent('open-extra-moves'));
+              }}
+              className="h-8 w-8 rounded-full bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+            >
+              <Plus className="w-4 h-4" />
+            </Button>
           </div>
         </div>
 
-        <CardContent className="p-4 space-y-4">
+        <CardContent className="p-4">
           <ScrollArea className="h-[160px] pr-2">
             <div className="space-y-2.5 pb-2">
               {todaysExercises.length === 0 ? (
@@ -516,17 +530,6 @@ export function WorkoutView() {
               )}
             </div>
           </ScrollArea>
-
-          <Button 
-            onClick={() => {
-              setSearchQuery("");
-              setMuscleFilter("ALL");
-              document.dispatchEvent(new CustomEvent('open-extra-moves'));
-            }}
-            className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
-          >
-            <Plus className="w-4 h-4" /> ADD EXTRA EXERCISE
-          </Button>
         </CardContent>
       </Card>
 
