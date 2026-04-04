@@ -82,6 +82,27 @@ const formatExerciseTime = (seconds: any) => {
   return `${m}m ${s}s`;
 };
 
+const WorkoutSphere = ({ icon: Icon }: { icon: any }) => (
+  <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+    {/* Centered Boundary Ring */}
+    <div className="absolute inset-[-3px] rounded-full border border-[#14b8a6]/30 opacity-40 pointer-events-none" />
+    
+    {/* 3D Sphere Body */}
+    <div 
+      className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden shadow-[0_4px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.3)]"
+      style={{ background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)' }}
+    >
+      {/* Gloss Highlight */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.4)_0%,transparent_65%)]" />
+      
+      {/* Icon */}
+      <div className="relative z-10 text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.3)]">
+        <Icon className="w-5 h-5" />
+      </div>
+    </div>
+  </div>
+);
+
 export function WorkoutView() {
   const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split' | 'history' | 'pr' | 'pr-detail'>('main');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
@@ -439,9 +460,7 @@ export function WorkoutView() {
       <Card className="border-none shadow-sm overflow-hidden bg-card border border-muted/20">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
-            <div className="p-2 bg-primary/10 rounded-full shrink-0">
-              <Dumbbell className="w-4 h-4 text-primary" />
-            </div>
+            <WorkoutSphere icon={Dumbbell} />
             <div className="flex-1 min-w-0">
               <h2 className="text-xs font-black uppercase tracking-tight text-foreground/80">Today's Workout</h2>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">

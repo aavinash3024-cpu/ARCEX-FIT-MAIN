@@ -151,9 +151,18 @@ const MACRO_COLORS = {
 
 const NutritionSphere = ({ icon: Icon }: { icon: any }) => (
   <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
-    <div className="absolute inset-[-3px] rounded-full border border-primary/20 opacity-40 pointer-events-none" />
-    <div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden shadow-[0_4px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.3)] bg-gradient-to-br from-primary to-primary/80">
+    {/* Centered Boundary Ring */}
+    <div className="absolute inset-[-3px] rounded-full border border-[#14b8a6]/30 opacity-40 pointer-events-none" />
+    
+    {/* 3D Sphere Body */}
+    <div 
+      className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden shadow-[0_4px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.3)]"
+      style={{ background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)' }}
+    >
+      {/* Gloss Highlight */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.4)_0%,transparent_65%)]" />
+      
+      {/* Icon */}
       <div className="relative z-10 text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.3)]">
         <Icon className="w-5 h-5" />
       </div>
@@ -826,7 +835,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                           </div>
                         </div>
                       </div>
-                      <Button onClick={() => deleteLoggedMeal(id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
+                      <Button onClick={() => deleteLoggedMeal(meal.id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                       <span className="absolute bottom-2 right-2 text-[7px] font-bold text-muted-foreground/30">{meal.time}</span>
