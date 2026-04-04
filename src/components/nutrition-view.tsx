@@ -157,7 +157,6 @@ const MACRO_COLORS = {
 export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProps) {
   const [showSummary, setShowSummary] = useState(false);
   const [showTrends, setShowTrends] = useState(false);
-  const [showMealHistory, setShowMealHistory] = useState(false);
   const [showMicroAnalysis, setShowMicroAnalysis] = useState(false);
   const [logTab, setLogTab] = useState("log");
   const [mealInput, setMealInput] = useState("");
@@ -416,7 +415,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   const loggingIconImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
 
   if (showMicroAnalysis) return <MicroAnalysisView allHistory={allHistory} loggedMeals={loggedMeals} goalData={goalData} onBack={() => setShowMicroAnalysis(false)} />;
-  if (showMealHistory) return <MealHistoryView allHistory={allHistory} goalData={goalData} onBack={() => setShowMealHistory(false)} />;
 
   if (showTrends) {
     return (
@@ -854,41 +852,37 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </CardContent>
       </Card>
 
-      <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
-        <CardContent className="p-0">
-          <div className="grid grid-cols-3 divide-x divide-muted/10">
-            <button 
-              onClick={() => setShowMicroAnalysis(true)}
-              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
-            >
-              <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-                <HeartPulse className="w-4 h-4 text-amber-600" />
-              </div>
-              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Micros</span>
-            </button>
-            
-            <button 
-              onClick={() => setShowMealHistory(true)}
-              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
-            >
-              <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
-                <History className="w-4 h-4 text-sky-600" />
-              </div>
-              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">History</span>
-            </button>
+      <div className="grid grid-cols-2 gap-4 pb-6">
+        <Card 
+          onClick={() => setShowMicroAnalysis(true)}
+          className="border-none shadow-md bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5"
+        >
+          <CardContent className="p-5 flex flex-col items-start gap-3">
+            <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center shadow-sm">
+              <HeartPulse className="w-5 h-5 text-amber-600" />
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Technical</p>
+              <p className="text-xs font-black uppercase text-foreground">Micro Analysis</p>
+            </div>
+          </CardContent>
+        </Card>
 
-            <button 
-              onClick={() => setShowTrends(true)}
-              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
-            >
-              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-primary" />
-              </div>
-              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Trends</span>
-            </button>
-          </div>
-        </CardContent>
-      </Card>
+        <Card 
+          onClick={() => setShowTrends(true)}
+          className="border-none shadow-md bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5"
+        >
+          <CardContent className="p-5 flex flex-col items-start gap-3">
+            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shadow-sm">
+              <TrendingUp className="w-5 h-5 text-primary" />
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Performance</p>
+              <p className="text-xs font-black uppercase text-foreground">Trends Analysis</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 }
@@ -1152,262 +1146,6 @@ function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: 
         </div>
       </div>
     </Card>
-  );
-}
-
-function MealHistoryView({ allHistory, goalData, onBack }: { allHistory: LoggedMeal[], goalData: any, onBack: () => void }) {
-  const [refDate, setRefDate] = useState(new Date());
-
-  const weekInterval = useMemo(() => {
-    const start = startOfWeek(refDate, { weekStartsOn: 1 });
-    const end = endOfWeek(refDate, { weekStartsOn: 1 });
-    return { start, end };
-  }, [refDate]);
-
-  const weekDays = useMemo(() => {
-    return [0, 1, 2, 3, 4, 5, 6].map(i => addDays(weekInterval.start, i));
-  }, [weekInterval]);
-
-  const chartData = useMemo(() => {
-    const targetCal = goalData?.finalCalories || 2200;
-    return weekDays.map(day => {
-      const dateStr = format(day, 'yyyy-MM-dd');
-      const dayMeals = allHistory.filter(m => m.dateStr === dateStr);
-      const calories = dayMeals.reduce((acc, m) => acc + m.calories, 0);
-      return {
-        day: format(day, 'EEE'),
-        calories,
-        target: targetCal,
-        dateStr
-      };
-    });
-  }, [allHistory, weekDays, goalData]);
-
-  const weeklyStats = useMemo(() => {
-    const targetCal = goalData?.finalCalories || 2200;
-    const totalIntake = chartData.reduce((acc, curr) => acc + curr.calories, 0);
-    const daysTracked = chartData.filter(d => d.calories > 0).length;
-    const totalTargetForLoggedDays = targetCal * daysTracked;
-    const balance = daysTracked > 0 ? totalIntake - totalTargetForLoggedDays : 0;
-    const avgIntake = daysTracked > 0 ? Math.round(totalIntake / daysTracked) : 0;
-
-    return { totalIntake, balance, avgIntake, daysTracked };
-  }, [chartData, goalData]);
-
-  const handlePrevWeek = () => setRefDate(prev => subWeeks(prev, 1));
-  const handleNextWeek = () => setRefDate(prev => addWeeks(prev, 1));
-
-  return (
-    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
-      <div className="flex items-center gap-4 pt-2 px-1">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
-        <h1 className="text-2xl font-bold font-headline">Meal History</h1>
-      </div>
-
-      <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
-        <Button variant="ghost" size="icon" onClick={handlePrevWeek} className="rounded-full hover:bg-muted">
-          <ChevronLeft className="w-5 h-5 text-primary" />
-        </Button>
-        <div className="flex flex-col items-center">
-          <span className="text-xs font-black text-foreground uppercase tracking-tight">
-            {format(weekInterval.start, 'MMM d')} - {format(weekInterval.end, 'MMM d, yyyy')}
-          </span>
-          <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest leading-none mt-1">
-            WEEKLY TIMELINE
-          </span>
-        </div>
-        <Button variant="ghost" size="icon" onClick={handleNextWeek} className="rounded-full hover:bg-muted">
-          <ChevronRight className="w-5 h-5 text-primary" />
-        </Button>
-      </div>
-
-      <Card className="border-none shadow-md bg-card rounded-[1.5rem] p-5 space-y-4 mx-1">
-        <div className="flex items-center justify-between">
-          <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">LOGGED DAYS BALANCE</p>
-            <div className={cn("flex items-center gap-1.5", weeklyStats.balance <= 0 ? "text-green-600" : "text-orange-500")}>
-              {weeklyStats.balance <= 0 ? <ArrowDownRight className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
-              <span className="text-2xl font-black">{Math.abs(weeklyStats.balance).toLocaleString()}</span>
-              <span className="text-[10px] font-bold uppercase">Kcal {weeklyStats.balance <= 0 ? 'Deficit' : 'Surplus'}</span>
-            </div>
-          </div>
-          <div className="text-right">
-            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">AVG ({weeklyStats.daysTracked} DAYS)</p>
-            <p className="text-lg font-black">{weeklyStats.avgIntake.toLocaleString()} <span className="text-[8px] opacity-40">KCAL</span></p>
-          </div>
-        </div>
-
-        <div className="h-[160px] w-full mt-2">
-          <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
-              <defs>
-                <linearGradient id="colorCal" x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.2}/>
-                  <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0}/>
-                </linearGradient>
-              </defs>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.5} />
-              <XAxis 
-                dataKey="day" 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{ fontSize: 9, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }} 
-                dy={10}
-              />
-              <YAxis 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{ fontSize: 9, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }}
-              />
-              <Tooltip 
-                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 16px rgba(0,0,0,0.08)', fontSize: '10px', fontWeight: 'bold' }}
-                itemStyle={{ color: 'hsl(var(--primary))' }}
-              />
-              <Area 
-                type="monotone" 
-                dataKey="calories" 
-                stroke="hsl(var(--primary))" 
-                strokeWidth={3} 
-                fillOpacity={1} 
-                fill="url(#colorCal)" 
-                animationDuration={1500}
-                dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "#fff" }}
-                activeDot={{ r: 6, strokeWidth: 0 }}
-              />
-            </AreaChart>
-          </ResponsiveContainer>
-        </div>
-      </Card>
-
-      <div className="space-y-4 px-1">
-        {weekDays.map((day) => {
-          const dateStr = format(day, 'yyyy-MM-dd');
-          const dayMeals = allHistory.filter(m => m.dateStr === dateStr);
-          const dailyCal = dayMeals.reduce((acc, m) => acc + m.calories, 0);
-          const targetCal = goalData?.finalCalories || 2200;
-          const diff = dailyCal - targetCal;
-          const hasLogs = dayMeals.length > 0;
-          const percentage = Math.min(100, Math.round((dailyCal / targetCal) * 100));
-
-          return (
-            <Accordion key={dateStr} type="single" collapsible className="w-full">
-              <AccordionItem value={dateStr} className="border-none">
-                <Card className={cn(
-                  "border shadow-sm overflow-hidden bg-card rounded-2xl transition-all border-muted/20",
-                  !hasLogs && "opacity-40 grayscale"
-                )}>
-                  <AccordionTrigger className="p-0 hover:no-underline [&[data-state=open]]:bg-muted/5 group [&>svg]:hidden">
-                    <div className="flex w-full min-h-[80px]">
-                      {/* Left Date Block */}
-                      <div className={cn(
-                        "w-16 shrink-0 flex flex-col items-center justify-center border-r border-muted/10",
-                        hasLogs && (diff <= 0 ? "bg-green-50/50" : "bg-orange-50/50")
-                      )}>
-                        <p className="text-[10px] font-black text-muted-foreground uppercase leading-none mb-1">{format(day, 'EEE')}</p>
-                        <p className="text-xl font-black text-foreground leading-none">{format(day, 'd')}</p>
-                      </div>
-
-                      {/* Main Info */}
-                      <div className="flex-1 p-4 flex flex-col justify-center gap-2">
-                        <div className="flex items-center justify-between">
-                          <div className="flex flex-col items-start">
-                            <span className="text-[11px] font-black text-foreground uppercase tracking-tight">
-                              {hasLogs ? `${dayMeals.length} Meals Logged` : "No Entry Recorded"}
-                            </span>
-                            <div className="flex items-baseline gap-1 mt-0.5">
-                              <span className="text-xs font-black text-foreground/60">{dailyCal.toLocaleString()}</span>
-                              <span className="text-[8px] font-bold text-muted-foreground uppercase">/ {targetCal} Kcal</span>
-                            </div>
-                          </div>
-                          
-                          {hasLogs && (
-                            <Badge variant="outline" className={cn(
-                              "text-[8px] h-5 font-black uppercase border-none gap-1",
-                              diff <= 0 ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
-                            )}>
-                              {diff <= 0 ? <CircleCheck className="w-2.5 h-2.5" /> : <AlertCircle className="w-2.5 h-2.5" />}
-                              {diff <= 0 ? "Optimized" : "Surplus"}
-                            </Badge>
-                          )}
-                        </div>
-
-                        {hasLogs && (
-                          <div className="w-full h-1 bg-muted/20 rounded-full overflow-hidden">
-                            <div 
-                              className={cn("h-full transition-all duration-700 ease-out", diff <= 0 ? "bg-green-500" : "bg-orange-500")}
-                              style={{ width: `${percentage}%` }}
-                            />
-                          </div>
-                        )}
-                      </div>
-
-                      {/* Right Icon */}
-                      <div className="w-10 flex items-center justify-center border-l border-muted/5">
-                        <ChevronRight className="w-4 h-4 text-muted-foreground/30 transition-transform duration-300 group-data-[state=open]:rotate-90" />
-                      </div>
-                    </div>
-                  </AccordionTrigger>
-                  <AccordionContent className="p-0 border-t border-muted/10">
-                    <div className="bg-muted/5 divide-y divide-muted/10">
-                      {dayMeals.length === 0 ? (
-                        <p className="text-center py-8 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
-                          Awaiting your nutritional logs
-                        </p>
-                      ) : (
-                        dayMeals.map(meal => (
-                          <div key={meal.id} className="p-4 space-y-3">
-                            <div className="flex justify-between items-start">
-                              <div className="flex items-center gap-3">
-                                <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
-                                  <Utensils className="w-4 h-4 text-primary" />
-                                </div>
-                                <div>
-                                  <p className="text-[8px] font-black text-primary uppercase tracking-widest leading-none mb-1">{meal.type}</p>
-                                  <h4 className="text-[13px] font-bold text-foreground leading-tight">{meal.name}</h4>
-                                </div>
-                              </div>
-                              <div className="text-right">
-                                <p className="text-[13px] font-black">{Math.round(meal.calories)} <span className="text-[8px] opacity-40 uppercase">Kcal</span></p>
-                                <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.time}</p>
-                              </div>
-                            </div>
-                            
-                            {meal.items && meal.items.length > 0 && (
-                              <div className="flex flex-wrap gap-2">
-                                {meal.items.map((item, i) => (
-                                  <Badge key={i} variant="outline" className="text-[8px] font-bold text-muted-foreground/80 py-0 h-4 border-muted/20">
-                                    {item.quantity} {item.name}
-                                  </Badge>
-                                ))}
-                              </div>
-                            )}
-
-                            <div className="flex items-center gap-4 pt-1">
-                              {[
-                                { label: 'P', val: meal.protein, color: MACRO_COLORS.protein },
-                                { label: 'C', val: meal.carbs, color: MACRO_COLORS.carbs },
-                                { label: 'F', val: meal.fat, color: MACRO_COLORS.fat }
-                              ].map(m => (
-                                <div key={m.label} className="flex items-baseline gap-1">
-                                  <span className="text-[8px] font-black text-muted-foreground/40 uppercase">{m.label}</span>
-                                  <span className="text-[10px] font-black" style={{ color: m.color }}>{Math.round(m.val)}g</span>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        ))
-                      )}
-                    </div>
-                  </AccordionContent>
-                </Card>
-              </AccordionItem>
-            </Accordion>
-          );
-        })}
-      </div>
-    </div>
   );
 }
 
