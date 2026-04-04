@@ -794,42 +794,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       </Card>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
-        <CardContent className="p-0">
-          <div className="grid grid-cols-3 divide-x divide-muted/10">
-            <button 
-              onClick={() => setShowMicroAnalysis(true)}
-              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
-            >
-              <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-                <HeartPulse className="w-4 h-4 text-amber-600" />
-              </div>
-              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Micros</span>
-            </button>
-            
-            <button 
-              onClick={() => setShowMealHistory(true)}
-              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
-            >
-              <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
-                <History className="w-4 h-4 text-sky-600" />
-              </div>
-              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">History</span>
-            </button>
-
-            <button 
-              onClick={() => setShowTrends(true)}
-              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
-            >
-              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-primary" />
-              </div>
-              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Trends</span>
-            </button>
-          </div>
-        </CardContent>
-      </Card>
-
-      <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
         <div className="h-14 w-full relative">
           <Image 
             src={logHeaderImage?.imageUrl || "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=800&auto=format&fit=crop"} 
@@ -885,6 +849,42 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               )}
             </div>
           </ScrollArea>
+        </CardContent>
+      </Card>
+
+      <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
+        <CardContent className="p-0">
+          <div className="grid grid-cols-3 divide-x divide-muted/10">
+            <button 
+              onClick={() => setShowMicroAnalysis(true)}
+              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
+            >
+              <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                <HeartPulse className="w-4 h-4 text-amber-600" />
+              </div>
+              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Micros</span>
+            </button>
+            
+            <button 
+              onClick={() => setShowMealHistory(true)}
+              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
+            >
+              <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
+                <History className="w-4 h-4 text-sky-600" />
+              </div>
+              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">History</span>
+            </button>
+
+            <button 
+              onClick={() => setShowTrends(true)}
+              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
+            >
+              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-primary" />
+              </div>
+              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Trends</span>
+            </button>
+          </div>
         </CardContent>
       </Card>
     </div>
