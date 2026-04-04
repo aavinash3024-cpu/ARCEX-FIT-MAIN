@@ -56,7 +56,7 @@ import {
   AccordionItem,
   AccordionTrigger,
   AccordionContent
-} from "@/components/ui/accordion";
+} from "@/accordion"; // Assuming standard import if UI exists
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { parseMeal } from '@/ai/flows/parse-meal-flow';
@@ -156,7 +156,7 @@ const MACRO_COLORS = {
 
 export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProps) {
   const [showSummary, setShowSummary] = useState(false);
-  const [showTrends, setShowTrends] = useState(false);
+  const [showMacroAnalysis, setShowMacroAnalysis] = useState(false);
   const [showMicroAnalysis, setShowMicroAnalysis] = useState(false);
   const [logTab, setLogTab] = useState("log");
   const [mealInput, setMealInput] = useState("");
@@ -416,14 +416,14 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
   if (showMicroAnalysis) return <MicroAnalysisView allHistory={allHistory} loggedMeals={loggedMeals} goalData={goalData} onBack={() => setShowMicroAnalysis(false)} />;
 
-  if (showTrends) {
+  if (showMacroAnalysis) {
     return (
       <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
-          <Button variant="ghost" size="icon" onClick={() => setShowTrends(false)} className="rounded-full bg-muted/50 w-9 h-9">
+          <Button variant="ghost" size="icon" onClick={() => setShowMacroAnalysis(false)} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
           </Button>
-          <h1 className="text-2xl font-bold font-headline">Trends Analysis</h1>
+          <h1 className="text-2xl font-bold font-headline">Macro Analysis</h1>
         </div>
 
         <Tabs defaultValue="weekly" className="w-full">
@@ -855,7 +855,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       <div className="grid grid-cols-2 gap-4">
         <Card 
           onClick={() => setShowMicroAnalysis(true)}
-          className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5 group"
+          className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5 group shadow-none"
         >
           <CardContent className="p-5 flex flex-col items-start gap-3 relative">
             <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center shadow-sm">
@@ -869,8 +869,8 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </Card>
 
         <Card 
-          onClick={() => setShowTrends(true)}
-          className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5 group"
+          onClick={() => setShowMacroAnalysis(true)}
+          className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5 group shadow-none"
         >
           <CardContent className="p-5 flex flex-col items-start gap-3 relative">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shadow-sm">
@@ -878,7 +878,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
             </div>
             <div className="space-y-0.5 pr-6">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">TRACK</p>
-              <p className="text-xs font-bold text-foreground/80">Trends Analysis</p>
+              <p className="text-xs font-bold text-foreground/80">Macro Analysis</p>
             </div>
           </CardContent>
         </Card>
@@ -888,6 +888,48 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 }
 
 function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allHistory: LoggedMeal[], loggedMeals: LoggedMeal[], goalData: any, onBack: () => void }) {
+  const [period, setPeriod] = useState<'weekly' | 'monthly'>('weekly');
+  const [refDate, setRefDate] = useState(new Date());
+
+  const handlePrev = () => {
+    if (period === 'weekly') setRefDate(prev => subWeeks(prev, 1));
+    else setRefDate(prev => subMonths(prev, 1));
+  };
+
+  const handleNext = () => {
+    if (period === 'weekly') setRefDate(prev => addWeeks(prev, 1));
+    else setRefDate(prev => addMonths(prev, 1));
+  };
+
+  const { interval, periodLabel } = useMemo(() => {
+    if (period === 'weekly') {
+      const start = startOfWeek(refDate, { weekStartsOn: 1 });
+      const end = endOfWeek(refDate, { weekStartsOn: 1 });
+      return { 
+        interval: { start, end },
+        periodLabel: `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`
+      };
+    } else {
+      const start = startOfMonth(refDate);
+      const end = endOfMonth(refDate);
+      return {
+        interval: { start, end },
+        periodLabel: format(refDate, 'MMMM yyyy')
+      };
+    }
+  }, [refDate, period]);
+
+  const periodMeals = useMemo(() => {
+    return allHistory.filter(m => {
+      const d = new Date(m.timestamp);
+      return isWithinInterval(d, interval);
+    });
+  }, [allHistory, interval]);
+
+  const trackedDaysInPeriod = useMemo(() => {
+    return Array.from(new Set(periodMeals.map(m => m.dateStr))).length;
+  }, [periodMeals]);
+
   const userGender = goalData?.gender || 'male';
   const userAge = parseInt(goalData?.age) || 25;
 
@@ -906,8 +948,8 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
     };
   }, [userGender, userAge]);
 
-  const totals = useMemo(() => {
-    return loggedMeals.reduce((acc, meal) => ({
+  const periodAverages = useMemo(() => {
+    const sums = periodMeals.reduce((acc, meal) => ({
       vitaminA: acc.vitaminA + (meal.vitaminA || 0),
       omega3: acc.omega3 + (meal.omega3 || 0),
       vitaminC: acc.vitaminC + (meal.vitaminC || 0),
@@ -922,22 +964,36 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
       vitaminA: 0, omega3: 0, vitaminC: 0, zinc: 0, selenium: 0,
       magnesium: 0, vitaminD: 0, potassium: 0, iron: 0, calcium: 0
     });
-  }, [loggedMeals]);
+
+    const divisor = Math.max(1, trackedDaysInPeriod);
+    return {
+      vitaminA: sums.vitaminA / divisor,
+      omega3: sums.omega3 / divisor,
+      vitaminC: sums.vitaminC / divisor,
+      zinc: sums.zinc / divisor,
+      selenium: sums.selenium / divisor,
+      magnesium: sums.magnesium / divisor,
+      vitaminD: sums.vitaminD / divisor,
+      potassium: sums.potassium / divisor,
+      iron: sums.iron / divisor,
+      calcium: sums.calcium / divisor,
+    };
+  }, [periodMeals, trackedDaysInPeriod]);
 
   const aesthetics = [
-    { id: 'vitaminA', label: "Vitamin A", sub: "Texture/Acne", val: totals.vitaminA, target: targets.vitaminA, unit: "mcg", color: "#f97316" },
-    { id: 'omega3', label: "Omega-3", sub: "Hydration/Inflammation", val: totals.omega3, target: targets.omega3, unit: "g", color: "#0ea5e9" },
-    { id: 'vitaminC', label: "Vitamin C", sub: "Collagen/Firmness", val: totals.vitaminC, target: targets.vitaminC, unit: "mg", color: "#eab308" },
-    { id: 'zinc', label: "Zinc", sub: "Oil Control/Healing", val: totals.zinc, target: targets.zinc, unit: "mg", color: "#6366f1" },
-    { id: 'selenium', label: "Selenium", sub: "UV Protection", val: totals.selenium, target: targets.selenium, unit: "mcg", color: "#f43f5e" },
+    { id: 'vitaminA', label: "Vitamin A", sub: "Texture/Acne", val: periodAverages.vitaminA, target: targets.vitaminA, unit: "mcg", color: "#f97316" },
+    { id: 'omega3', label: "Omega-3", sub: "Hydration/Inflammation", val: periodAverages.omega3, target: targets.omega3, unit: "g", color: "#0ea5e9" },
+    { id: 'vitaminC', label: "Vitamin C", sub: "Collagen/Firmness", val: periodAverages.vitaminC, target: targets.vitaminC, unit: "mg", color: "#eab308" },
+    { id: 'zinc', label: "Zinc", sub: "Oil Control/Healing", val: periodAverages.zinc, target: targets.zinc, unit: "mg", color: "#6366f1" },
+    { id: 'selenium', label: "Selenium", sub: "UV Protection", val: periodAverages.selenium, target: targets.selenium, unit: "mcg", color: "#f43f5e" },
   ];
 
   const performance = [
-    { id: 'magnesium', label: "Magnesium", sub: "Repair/Relaxation", val: totals.magnesium, target: targets.magnesium, unit: "mg", color: "#a855f7" },
-    { id: 'vitaminD', label: "Vitamin D", sub: "Power/Hormones", val: totals.vitaminD, target: targets.vitaminD, unit: "mcg", color: "#f59e0b" },
-    { id: 'potassium', label: "Potassium", sub: "Signaling/Pump", val: totals.potassium, target: targets.potassium, unit: "mg", color: "#10b981" },
-    { id: 'iron', label: "Iron", sub: "Stamina/Oxygen", val: totals.iron, target: targets.iron, unit: "mg", color: "#ef4444" },
-    { id: 'calcium', label: "Calcium", sub: "Contraction/Firing", val: totals.calcium, target: targets.calcium, unit: "mg", color: "#64748b" },
+    { id: 'magnesium', label: "Magnesium", sub: "Repair/Relaxation", val: periodAverages.magnesium, target: targets.magnesium, unit: "mg", color: "#a855f7" },
+    { id: 'vitaminD', label: "Vitamin D", sub: "Power/Hormones", val: periodAverages.vitaminD, target: targets.vitaminD, unit: "mcg", color: "#f59e0b" },
+    { id: 'potassium', label: "Potassium", sub: "Signaling/Pump", val: periodAverages.potassium, target: targets.potassium, unit: "mg", color: "#10b981" },
+    { id: 'iron', label: "Iron", sub: "Stamina/Oxygen", val: periodAverages.iron, target: targets.iron, unit: "mg", color: "#ef4444" },
+    { id: 'calcium', label: "Calcium", sub: "Contraction/Firing", val: periodAverages.calcium, target: targets.calcium, unit: "mg", color: "#64748b" },
   ];
 
   return (
@@ -948,7 +1004,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
         </Button>
         <div className="space-y-0.5">
           <h1 className="text-2xl font-bold font-headline leading-none">Micro Analysis</h1>
-          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Today's Precision</p>
+          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Precision Tracking</p>
         </div>
       </div>
 
@@ -964,11 +1020,32 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
               <MicroCard key={idx} {...item} />
             ))}
           </div>
+          
+          <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mt-6 mx-1">
+            <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full hover:bg-muted">
+              <ChevronLeft className="w-5 h-5 text-primary" />
+            </Button>
+            <div className="flex flex-col items-center">
+              <span className="text-[11px] font-black text-foreground uppercase tracking-tight">
+                {periodLabel}
+              </span>
+              <div className="flex gap-2 mt-1">
+                 <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Week</button>
+                 <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Month</button>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full hover:bg-muted">
+              <ChevronRight className="w-5 h-5 text-primary" />
+            </Button>
+          </div>
+
           <WeeklyMicroTable 
             allHistory={allHistory} 
             targets={targets} 
             micros={aesthetics} 
             title="Skin and Heal" 
+            refDate={refDate}
+            period={period}
           />
         </TabsContent>
 
@@ -978,11 +1055,32 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
               <MicroCard key={idx} {...item} />
             ))}
           </div>
+
+          <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mt-6 mx-1">
+            <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full hover:bg-muted">
+              <ChevronLeft className="w-5 h-5 text-primary" />
+            </Button>
+            <div className="flex flex-col items-center">
+              <span className="text-[11px] font-black text-foreground uppercase tracking-tight">
+                {periodLabel}
+              </span>
+              <div className="flex gap-2 mt-1">
+                 <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Week</button>
+                 <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Month</button>
+              </div>
+            </div>
+            <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full hover:bg-muted">
+              <ChevronRight className="w-5 h-5 text-primary" />
+            </Button>
+          </div>
+
           <WeeklyMicroTable 
             allHistory={allHistory} 
             targets={targets} 
             micros={performance} 
             title="Gym and Recovery" 
+            refDate={refDate}
+            period={period}
           />
         </TabsContent>
       </Tabs>
@@ -1002,7 +1100,7 @@ function MicroCard({ label, sub, val, target, unit, color }: any) {
           <div className="flex justify-between items-baseline">
             <h4 className="font-black text-xs text-foreground uppercase tracking-tight">{label}</h4>
             <span className={cn("text-[9px] font-black uppercase tracking-tighter", isComplete ? "text-green-600" : "text-muted-foreground/40")}>
-              {percent}% MET
+              {percent}% AVG
             </span>
           </div>
           <p className="text-[8px] font-bold text-muted-foreground/60 uppercase tracking-widest leading-none">{sub}</p>
@@ -1014,7 +1112,7 @@ function MicroCard({ label, sub, val, target, unit, color }: any) {
               />
             </div>
             <div className="flex justify-between text-[7px] font-black text-muted-foreground/30 uppercase tracking-tighter">
-              <span>{val.toFixed(val < 1 && val > 0 ? 2 : 0)} {unit}</span>
+              <span>{val.toFixed(val < 1 && val > 0 ? 2 : 0)} {unit} AVG</span>
               <span>GOAL {target} {unit}</span>
             </div>
           </div>
@@ -1024,31 +1122,39 @@ function MicroCard({ label, sub, val, target, unit, color }: any) {
   );
 }
 
-function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: LoggedMeal[], targets: any, micros: any[], title: string }) {
-  const last7Days = useMemo(() => {
-    return [6, 5, 4, 3, 2, 1, 0].map(daysAgo => {
-      const d = subDays(new Date(), daysAgo);
-      return {
-        dateStr: format(d, 'yyyy-MM-dd'),
-        dayName: format(d, 'EEE')
-      };
-    });
-  }, []);
+function WeeklyMicroTable({ allHistory, targets, micros, title, refDate, period }: { allHistory: LoggedMeal[], targets: any, micros: any[], title: string, refDate: Date, period: 'weekly' | 'monthly' }) {
+  const daysToShow = useMemo(() => {
+    if (period === 'weekly') {
+      const start = startOfWeek(refDate, { weekStartsOn: 1 });
+      return [0, 1, 2, 3, 4, 5, 6].map(offset => {
+        const d = addDays(start, offset);
+        return {
+          dateStr: format(d, 'yyyy-MM-dd'),
+          dayName: format(d, 'EEE')
+        };
+      });
+    } else {
+      // For monthly, showing all days is too wide, so we show the "Last 7 Days" of that month or just first 7
+      // For simplicity and user expectation, showing the selected week is better if the UI supports only 7 cols.
+      const start = startOfMonth(refDate);
+      return [0, 1, 2, 3, 4, 5, 6].map(offset => {
+        const d = addDays(start, offset);
+        return {
+          dateStr: format(d, 'yyyy-MM-dd'),
+          dayName: format(d, 'd')
+        };
+      });
+    }
+  }, [refDate, period]);
 
   const trackedDaysCount = useMemo(() => {
     const datesWithLogs = new Set(allHistory.map(m => m.dateStr));
-    return last7Days.filter(day => datesWithLogs.has(day.dateStr)).length;
-  }, [allHistory, last7Days]);
-
-  const dateRangeStr = useMemo(() => {
-    const start = subDays(new Date(), 6);
-    const end = new Date();
-    return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
-  }, []);
+    return daysToShow.filter(day => datesWithLogs.has(day.dateStr)).length;
+  }, [allHistory, daysToShow]);
 
   const tableData = useMemo(() => {
     return micros.map(m => {
-      const dailyValues = last7Days.map(day => {
+      const dailyValues = daysToShow.map(day => {
         const dayMeals = allHistory.filter(meal => meal.dateStr === day.dateStr);
         const sum = dayMeals.reduce((acc, meal) => acc + ((meal as any)[m.id] || 0), 0);
         return sum;
@@ -1069,23 +1175,23 @@ function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: 
         color: m.color
       };
     });
-  }, [allHistory, last7Days, micros, targets, trackedDaysCount]);
+  }, [allHistory, daysToShow, micros, targets, trackedDaysCount]);
 
   return (
-    <Card className="border-none shadow-md bg-card rounded-3xl p-6 mx-1 mt-6 border border-muted/10 overflow-hidden relative">
+    <Card className="border-none shadow-md bg-card rounded-3xl p-6 mx-1 mt-4 border border-muted/10 overflow-hidden relative">
       <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
         <TableIcon className="w-20 h-20 text-muted-foreground" />
       </div>
       <div className="relative z-10 space-y-5">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">{dateRangeStr}</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">{period === 'weekly' ? 'WEEKLY BREAKDOWN' : 'MONTH START SAMPLE'}</p>
             <h3 className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-primary" /> {title}
             </h3>
           </div>
           <div className="text-right">
-            <p className="text-lg font-black text-primary leading-none">WEEKLY</p>
+            <p className="text-lg font-black text-primary leading-none">{period.toUpperCase()}</p>
             <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mt-1">LOGGED DAYS ONLY</p>
           </div>
         </div>
@@ -1095,7 +1201,7 @@ function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: 
             <thead>
               <tr className="border-b border-muted/10">
                 <th className="py-2 pr-4 text-[8px] font-black uppercase text-muted-foreground tracking-widest whitespace-nowrap">Nutrient</th>
-                {last7Days.map((day, i) => (
+                {daysToShow.map((day, i) => (
                   <th key={i} className="py-2 px-3 text-[8px] font-black uppercase text-muted-foreground text-center">{day.dayName}</th>
                 ))}
                 <th className="py-2 px-3 text-[8px] font-black uppercase text-primary text-center bg-primary/5">Avg</th>
@@ -1140,7 +1246,7 @@ function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: 
           <div className="flex items-center gap-3 bg-muted/10 p-3 rounded-xl">
             <Info className="w-3 h-3 text-muted-foreground/40 shrink-0" />
             <p className="text-[8px] font-bold text-muted-foreground/60 uppercase leading-relaxed">
-              Analysis based on your biological markers. Averages are calculated using only days where data was recorded.
+              Analysis based on your biological markers. {period} averages calculated using only days where data was recorded.
             </p>
           </div>
         </div>
