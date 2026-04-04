@@ -855,31 +855,33 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       <div className="grid grid-cols-2 gap-4">
         <Card 
           onClick={() => setShowMicroAnalysis(true)}
-          className="border-none shadow-md bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5"
+          className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5 group"
         >
-          <CardContent className="p-5 flex flex-col items-start gap-3">
+          <CardContent className="p-5 flex flex-col items-start gap-3 relative">
             <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center shadow-sm">
               <HeartPulse className="w-5 h-5 text-amber-600" />
             </div>
-            <div className="space-y-0.5">
+            <div className="space-y-0.5 pr-6">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">TRACK</p>
               <p className="text-xs font-bold text-foreground/80">Micro Analysis</p>
             </div>
+            <ChevronRight className="absolute bottom-5 right-5 w-4 h-4 text-muted-foreground/20 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
           </CardContent>
         </Card>
 
         <Card 
           onClick={() => setShowTrends(true)}
-          className="border-none shadow-md bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5"
+          className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5 group"
         >
-          <CardContent className="p-5 flex flex-col items-start gap-3">
+          <CardContent className="p-5 flex flex-col items-start gap-3 relative">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shadow-sm">
               <TrendingUp className="w-5 h-5 text-primary" />
             </div>
-            <div className="space-y-0.5">
+            <div className="space-y-0.5 pr-6">
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">TRACK</p>
               <p className="text-xs font-bold text-foreground/80">Trends Analysis</p>
             </div>
+            <ChevronRight className="absolute bottom-5 right-5 w-4 h-4 text-muted-foreground/20 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
           </CardContent>
         </Card>
       </div>
