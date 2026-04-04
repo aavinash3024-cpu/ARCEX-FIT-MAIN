@@ -401,7 +401,7 @@ export function DashboardView({
                   <CardContent className="p-3 flex flex-col justify-between h-32">
                     <div className="flex justify-between items-start">
                       <div className="flex flex-col gap-1">
-                        {isCalories || isHydration || isSteps ? (
+                        {isCalories || isHydration || isSteps || isStreak ? (
                           <MetricSphere type={m.id as any} icon={m.icon} />
                         ) : (
                           <div className={`p-1.5 rounded-lg w-fit ${m.color}`}>
