@@ -82,20 +82,13 @@ const formatExerciseTime = (seconds: any) => {
   return `${m}m ${s}s`;
 };
 
-const WorkoutSphere = ({ icon: Icon }: { icon: any }) => (
+const WorkoutSphere = ({ icon: Icon, colorClass, bgClass }: { icon: any, colorClass: string, bgClass: string }) => (
   <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
-    {/* Centered Boundary Ring */}
-    <div className="absolute inset-[-3px] rounded-full border border-[#14b8a6]/30 opacity-40 pointer-events-none" />
-    
-    {/* 3D Sphere Body */}
+    <div className={cn("absolute inset-[-3px] rounded-full border opacity-40 pointer-events-none", colorClass.replace('text-', 'border-'))} />
     <div 
-      className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden shadow-[0_4px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.3)]"
-      style={{ background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)' }}
+      className={cn("absolute inset-0 rounded-full flex items-center justify-center overflow-hidden shadow-[0_4px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.3)]", bgClass)}
     >
-      {/* Gloss Highlight */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.4)_0%,transparent_65%)]" />
-      
-      {/* Icon */}
       <div className="relative z-10 text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.3)]">
         <Icon className="w-5 h-5" />
       </div>
@@ -118,7 +111,6 @@ export function WorkoutView() {
   const [subMuscleFilter, setSubMuscleFilter] = useState<string>("ALL");
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Input states for the logging modal
   const [weightInput, setWeightInput] = useState("");
   const [repsInput, setRepsInput] = useState("");
   const [minInput, setMinInput] = useState("");
@@ -429,45 +421,27 @@ export function WorkoutView() {
 
   return (
     <div className="space-y-4 pb-20 pt-4">
-      <div>
+      <div className="px-1">
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      <Card 
-        onClick={() => setActiveSubView('split')}
-        className="border-none shadow-sm bg-card overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400 rounded-lg flex items-center h-20"
-      >
-        <div className="shrink-0 w-20 h-full relative">
+      {/* Today's Workout - Redesigned to match Meal Logging card */}
+      <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
+        <div className="relative h-24 w-full">
           <Image 
-            src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
-            alt="My Split"
+            src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop"
+            alt="Workout Banner"
             fill
             className="object-cover"
             data-ai-hint="gym weights"
           />
-        </div>
-        <div className="flex-1 px-4 flex items-center justify-between min-w-0">
-          <div className="space-y-0.5">
-            <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
-              <Layout className="w-3 h-3" /> My Workout Split
-            </h3>
-            <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
-          </div>
-          <ChevronRight className="w-4 h-4 text-purple-300/40" />
-        </div>
-      </Card>
-
-      <Card className="border-none shadow-sm overflow-hidden bg-card border border-muted/20 relative">
-        <div className="px-5 pt-5 pb-2">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <WorkoutSphere icon={Dumbbell} />
-              <div className="flex-1 min-w-0">
-                <h2 className="text-xs font-black uppercase tracking-tight text-foreground/80">Today's Workout</h2>
-                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                  {todayName.toUpperCase()}: <span className="text-primary font-black">{todaysExercises.length} EXERCISES</span>
-                </p>
-              </div>
+          <div className="absolute inset-0 bg-gradient-to-t from-card/90 to-transparent" />
+          <div className="absolute bottom-3 left-5 right-5 flex items-center justify-between">
+            <div className="space-y-0.5">
+              <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground">Today's Session</h2>
+              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
+                {todayName.toUpperCase()}: <span className="text-primary font-black">{todaysExercises.length} EXERCISES</span>
+              </p>
             </div>
             <Button 
               variant="ghost" 
@@ -477,7 +451,7 @@ export function WorkoutView() {
                 setMuscleFilter("ALL");
                 document.dispatchEvent(new CustomEvent('open-extra-moves'));
               }}
-              className="h-8 w-8 rounded-full bg-muted/30 text-muted-foreground hover:bg-primary/10 hover:text-primary transition-colors"
+              className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm text-white hover:bg-primary transition-colors border border-white/10"
             >
               <Plus className="w-4 h-4" />
             </Button>
@@ -485,10 +459,10 @@ export function WorkoutView() {
         </div>
 
         <CardContent className="p-4">
-          <ScrollArea className="h-[160px] pr-2">
+          <ScrollArea className="h-[200px] pr-2">
             <div className="space-y-2.5 pb-2">
               {todaysExercises.length === 0 ? (
-                <div className="text-center py-8 opacity-30 border-2 border-dashed rounded-xl">
+                <div className="text-center py-12 border-2 border-dashed border-muted/20 rounded-xl opacity-30">
                   <p className="text-[10px] font-black uppercase tracking-widest">No moves planned for today</p>
                 </div>
               ) : (
@@ -504,7 +478,7 @@ export function WorkoutView() {
                         setMinInput("");
                         setSecInput("");
                       }}
-                      className="w-full text-left bg-card p-3 rounded-xl border border-muted/20 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
+                      className="w-full text-left bg-muted/20 p-3 rounded-xl border border-muted/10 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
                     >
                       <div className="flex justify-between items-start">
                         <div className="space-y-1">
@@ -533,9 +507,35 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
+      {/* Split Card */}
+      <Card 
+        onClick={() => setActiveSubView('split')}
+        className="border-none shadow-sm bg-card overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400 rounded-lg flex items-center h-20 mx-1"
+      >
+        <div className="shrink-0 w-20 h-full relative">
+          <Image 
+            src={splitImage?.imageUrl || "https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"} 
+            alt="My Split"
+            fill
+            className="object-cover"
+            data-ai-hint="gym weights"
+          />
+        </div>
+        <div className="flex-1 px-4 flex items-center justify-between min-w-0">
+          <div className="space-y-0.5">
+            <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
+              <Layout className="w-3 h-3" /> My Workout Split
+            </h3>
+            <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
+          </div>
+          <ChevronRight className="w-4 h-4 text-purple-300/40" />
+        </div>
+      </Card>
+
+      {/* PR Card */}
       <Card 
         onClick={() => setActiveSubView('pr')} 
-        className="border-none shadow-sm bg-card border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all rounded-lg flex items-center h-20"
+        className="border-none shadow-sm bg-card border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all rounded-lg flex items-center h-20 mx-1"
       >
         <div className="shrink-0 w-20 h-full relative">
           <Image 
@@ -557,7 +557,8 @@ export function WorkoutView() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4 pb-6">
+      {/* History and Library Grid */}
+      <div className="grid grid-cols-2 gap-4 pb-6 mx-1">
         <Card 
           onClick={() => setActiveSubView('history')}
           className="border-none shadow-sm bg-card border border-muted/20 cursor-pointer hover:bg-muted/5 transition-all p-5 flex flex-col items-start gap-3 rounded-2xl active:scale-[0.99]"
