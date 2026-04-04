@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -938,19 +937,19 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
   }, [loggedMeals]);
 
   const aesthetics = [
-    { key: 'vitaminA', label: "Vitamin A", sub: "Texture/Acne", val: totals.vitaminA, target: targets.vitaminA, unit: "mcg", color: "#f97316" },
-    { key: 'omega3', label: "Omega-3", sub: "Hydration/Inflammation", val: totals.omega3, target: targets.omega3, unit: "g", color: "#0ea5e9" },
-    { key: 'vitaminC', label: "Vitamin C", sub: "Collagen/Firmness", val: totals.vitaminC, target: targets.vitaminC, unit: "mg", color: "#eab308" },
-    { key: 'zinc', label: "Zinc", sub: "Oil Control/Healing", val: totals.zinc, target: targets.zinc, unit: "mg", color: "#6366f1" },
-    { key: 'selenium', label: "Selenium", sub: "UV Protection", val: totals.selenium, target: targets.selenium, unit: "mcg", color: "#f43f5e" },
+    { id: 'vitaminA', label: "Vitamin A", sub: "Texture/Acne", val: totals.vitaminA, target: targets.vitaminA, unit: "mcg", color: "#f97316" },
+    { id: 'omega3', label: "Omega-3", sub: "Hydration/Inflammation", val: totals.omega3, target: targets.omega3, unit: "g", color: "#0ea5e9" },
+    { id: 'vitaminC', label: "Vitamin C", sub: "Collagen/Firmness", val: totals.vitaminC, target: targets.vitaminC, unit: "mg", color: "#eab308" },
+    { id: 'zinc', label: "Zinc", sub: "Oil Control/Healing", val: totals.zinc, target: targets.zinc, unit: "mg", color: "#6366f1" },
+    { id: 'selenium', label: "Selenium", sub: "UV Protection", val: totals.selenium, target: targets.selenium, unit: "mcg", color: "#f43f5e" },
   ];
 
   const performance = [
-    { key: 'magnesium', label: "Magnesium", sub: "Repair/Relaxation", val: totals.magnesium, target: targets.magnesium, unit: "mg", color: "#a855f7" },
-    { key: 'vitaminD', label: "Vitamin D", sub: "Power/Hormones", val: totals.vitaminD, target: targets.vitaminD, unit: "mcg", color: "#f59e0b" },
-    { key: 'potassium', label: "Potassium", sub: "Signaling/Pump", val: totals.potassium, target: targets.potassium, unit: "mg", color: "#10b981" },
-    { key: 'iron', label: "Iron", sub: "Stamina/Oxygen", val: totals.iron, target: targets.iron, unit: "mg", color: "#ef4444" },
-    { key: 'calcium', label: "Calcium", sub: "Contraction/Firing", val: totals.calcium, target: targets.calcium, unit: "mg", color: "#64748b" },
+    { id: 'magnesium', label: "Magnesium", sub: "Repair/Relaxation", val: totals.magnesium, target: targets.magnesium, unit: "mg", color: "#a855f7" },
+    { id: 'vitaminD', label: "Vitamin D", sub: "Power/Hormones", val: totals.vitaminD, target: targets.vitaminD, unit: "mcg", color: "#f59e0b" },
+    { id: 'potassium', label: "Potassium", sub: "Signaling/Pump", val: totals.potassium, target: targets.potassium, unit: "mg", color: "#10b981" },
+    { id: 'iron', label: "Iron", sub: "Stamina/Oxygen", val: totals.iron, target: targets.iron, unit: "mg", color: "#ef4444" },
+    { id: 'calcium', label: "Calcium", sub: "Contraction/Firing", val: totals.calcium, target: targets.calcium, unit: "mg", color: "#64748b" },
   ];
 
   const todayMatrixData = useMemo(() => {
@@ -958,23 +957,23 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
     const dataPoints: any[] = [{ name: 'Start' }];
     
     // Initial point
-    aesthetics.forEach(m => dataPoints[0][m.key] = 0);
-    performance.forEach(m => dataPoints[0][m.key] = 0);
+    aesthetics.forEach(m => dataPoints[0][m.id] = 0);
+    performance.forEach(m => dataPoints[0][m.id] = 0);
 
     let cumulativeAes: any = {};
     let cumulativePerf: any = {};
-    aesthetics.forEach(m => cumulativeAes[m.key] = 0);
-    performance.forEach(m => cumulativePerf[m.key] = 0);
+    aesthetics.forEach(m => cumulativeAes[m.id] = 0);
+    performance.forEach(m => cumulativePerf[m.id] = 0);
 
     todayMeals.forEach((meal, idx) => {
       const point: any = { name: `Meal ${idx + 1}` };
       aesthetics.forEach(m => {
-        cumulativeAes[m.key] += (meal as any)[m.key] || 0;
-        point[m.key] = Math.min(100, Math.round((cumulativeAes[m.key] / targets[m.key as keyof typeof targets]) * 100));
+        cumulativeAes[m.id] += (meal as any)[m.id] || 0;
+        point[m.id] = Math.min(100, Math.round((cumulativeAes[m.id] / targets[m.id as keyof typeof targets]) * 100));
       });
       performance.forEach(m => {
-        cumulativePerf[m.key] += (meal as any)[m.key] || 0;
-        point[m.key] = Math.min(100, Math.round((cumulativePerf[m.key] / targets[m.key as keyof typeof targets]) * 100));
+        cumulativePerf[m.id] += (meal as any)[m.id] || 0;
+        point[m.id] = Math.min(100, Math.round((cumulativePerf[m.id] / targets[m.id as keyof typeof targets]) * 100));
       });
       dataPoints.push(point);
     });
@@ -1108,9 +1107,9 @@ function TodayMatrixCard({ data, title, micros }: { data: any[], title: string, 
               
               {micros.map((m, i) => (
                 <Line 
-                  key={m.key}
+                  key={m.id}
                   type="monotone"
-                  dataKey={m.key}
+                  dataKey={m.id}
                   name={m.label}
                   stroke={m.color}
                   strokeWidth={2.5}
