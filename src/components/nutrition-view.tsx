@@ -406,7 +406,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
     return savedMeals.some(s => s.name.toLowerCase() === mealName.toLowerCase());
   };
 
-  const logHeaderImage = PlaceHolderImages.find(img => img.id === 'meal-quinoa-bowl');
   const loggingIconImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
 
   if (showMicroAnalysis) return <MicroAnalysisView allHistory={allHistory} loggedMeals={loggedMeals} goalData={goalData} onBack={() => setShowMicroAnalysis(false)} />;
@@ -789,22 +788,13 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       </Card>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
-        <div className="h-14 w-full relative">
-          <Image 
-            src={logHeaderImage?.imageUrl || "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=800&auto=format&fit=crop"} 
-            alt="Log Header"
-            fill
-            className="object-cover"
-            data-ai-hint="premium salad"
-          />
-          <div className="absolute inset-0 bg-black/25" />
-          <div className="absolute bottom-3 left-5">
-            <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-white">MEALS</h2>
-          </div>
-        </div>
-        <CardContent className="p-4 space-y-4">
+        <div className="h-1.5 bg-primary w-full" />
+        <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between px-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/50">TRACKING</p>
+            <div className="space-y-0.5">
+              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">MEALS</h2>
+              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/30">DAILY LOGGING</p>
+            </div>
             <button 
               onClick={() => setShowSummary(true)} 
               className="text-[9px] font-bold text-primary uppercase flex items-center hover:opacity-70 transition-opacity"
