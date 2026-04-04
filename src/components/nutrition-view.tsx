@@ -28,7 +28,12 @@ import {
   Target,
   Zap,
   Info,
-  Check
+  Check,
+  Activity,
+  Droplets,
+  HeartPulse,
+  Flame,
+  Dumbbell
 } from "lucide-react";
 import { 
   AreaChart, 
@@ -74,6 +79,16 @@ interface MealItem {
   carbs: number;
   fat: number;
   fiber: number;
+  vitaminA?: number;
+  omega3?: number;
+  vitaminC?: number;
+  zinc?: number;
+  selenium?: number;
+  magnesium?: number;
+  vitaminD?: number;
+  potassium?: number;
+  iron?: number;
+  calcium?: number;
 }
 
 interface LoggedMeal {
@@ -85,6 +100,16 @@ interface LoggedMeal {
   protein: number;
   fat: number;
   fiber: number;
+  vitaminA?: number;
+  omega3?: number;
+  vitaminC?: number;
+  zinc?: number;
+  selenium?: number;
+  magnesium?: number;
+  vitaminD?: number;
+  potassium?: number;
+  iron?: number;
+  calcium?: number;
   time: string;
   timestamp: number;
   dateStr?: string; // YYYY-MM-DD
@@ -98,6 +123,16 @@ interface CachedFoodItem {
   carbs: number;
   fat: number;
   fiber: number;
+  vitaminA: number;
+  omega3: number;
+  vitaminC: number;
+  zinc: number;
+  selenium: number;
+  magnesium: number;
+  vitaminD: number;
+  potassium: number;
+  iron: number;
+  calcium: number;
 }
 
 interface NutritionViewProps {
@@ -116,6 +151,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   const [showSummary, setShowSummary] = useState(false);
   const [showTrends, setShowTrends] = useState(false);
   const [showMealHistory, setShowMealHistory] = useState(false);
+  const [showMicroAnalysis, setShowMicroAnalysis] = useState(false);
   const [logTab, setLogTab] = useState("log");
   const [mealInput, setMealInput] = useState("");
   const [isParsing, setIsParsing] = useState(false);
@@ -176,6 +212,16 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
           carbs: Math.round(data.carbs * quantity),
           fat: Math.round(data.fat * quantity),
           fiber: Math.round(data.fiber * quantity),
+          vitaminA: Math.round((data.vitaminA || 0) * quantity),
+          omega3: (data.omega3 || 0) * quantity,
+          vitaminC: Math.round((data.vitaminC || 0) * quantity),
+          zinc: Math.round((data.zinc || 0) * quantity),
+          selenium: Math.round((data.selenium || 0) * quantity),
+          magnesium: Math.round((data.magnesium || 0) * quantity),
+          vitaminD: Math.round((data.vitaminD || 0) * quantity),
+          potassium: Math.round((data.potassium || 0) * quantity),
+          iron: Math.round((data.iron || 0) * quantity),
+          calcium: Math.round((data.calcium || 0) * quantity),
           time: today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
           timestamp: today.getTime(),
           dateStr,
@@ -188,6 +234,16 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
             carbs: Math.round(data.carbs * quantity),
             fat: Math.round(data.fat * quantity),
             fiber: Math.round(data.fiber * quantity),
+            vitaminA: Math.round((data.vitaminA || 0) * quantity),
+            omega3: (data.omega3 || 0) * quantity,
+            vitaminC: Math.round((data.vitaminC || 0) * quantity),
+            zinc: Math.round((data.zinc || 0) * quantity),
+            selenium: Math.round((data.selenium || 0) * quantity),
+            magnesium: Math.round((data.magnesium || 0) * quantity),
+            vitaminD: Math.round((data.vitaminD || 0) * quantity),
+            potassium: Math.round((data.potassium || 0) * quantity),
+            iron: Math.round((data.iron || 0) * quantity),
+            calcium: Math.round((data.calcium || 0) * quantity),
           }]
         } as LoggedMeal;
       }
@@ -225,6 +281,16 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         protein: Math.round(result.protein),
         fat: Math.round(result.fat),
         fiber: Math.round(result.fiber || 0),
+        vitaminA: result.vitaminA,
+        omega3: result.omega3,
+        vitaminC: result.vitaminC,
+        zinc: result.zinc,
+        selenium: result.selenium,
+        magnesium: result.magnesium,
+        vitaminD: result.vitaminD,
+        potassium: result.potassium,
+        iron: result.iron,
+        calcium: result.calcium,
         time: today.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
         timestamp: today.getTime(),
         dateStr,
@@ -249,6 +315,16 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
             carbs: item.carbs / qty,
             fat: item.fat / qty,
             fiber: item.fiber / qty,
+            vitaminA: (item.vitaminA || 0) / qty,
+            omega3: (item.omega3 || 0) / qty,
+            vitaminC: (item.vitaminC || 0) / qty,
+            zinc: (item.zinc || 0) / qty,
+            selenium: (item.selenium || 0) / qty,
+            magnesium: (item.magnesium || 0) / qty,
+            vitaminD: (item.vitaminD || 0) / qty,
+            potassium: (item.potassium || 0) / qty,
+            iron: (item.iron || 0) / qty,
+            calcium: (item.calcium || 0) / qty,
           };
         }
       });
@@ -332,6 +408,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   const logHeaderImage = PlaceHolderImages.find(img => img.id === 'meal-quinoa-bowl');
   const loggingIconImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
 
+  if (showMicroAnalysis) return <MicroAnalysisView loggedMeals={loggedMeals} goalData={goalData} onBack={() => setShowMicroAnalysis(false)} />;
   if (showMealHistory) return <MealHistoryView allHistory={allHistory} goalData={goalData} onBack={() => setShowMealHistory(false)} />;
 
   if (showTrends) {
@@ -377,7 +454,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
     const leftCal = targetCal - totals.calories;
     
-    // Calorie based ratios
     const pKcal = totals.protein * 4;
     const cKcal = totals.carbs * 4;
     const fKcal = totals.fat * 9;
@@ -712,6 +788,34 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </CardContent>
       </Card>
 
+      <div className="grid grid-cols-2 gap-4">
+        <button 
+          onClick={() => setShowMicroAnalysis(true)}
+          className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
+        >
+          <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+            <HeartPulse className="w-5 h-5 text-amber-600" />
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Micro Analysis</p>
+            <p className="text-xs font-bold text-foreground/80">Skin & Performance</p>
+          </div>
+        </button>
+
+        <button 
+          onClick={() => setShowMealHistory(true)}
+          className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
+        >
+          <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
+            <History className="w-5 h-5 text-sky-600" />
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
+            <p className="text-xs font-bold text-foreground/80">Logs</p>
+          </div>
+        </button>
+      </div>
+
       <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
         <div className="h-14 w-full relative">
           <Image 
@@ -771,20 +875,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4 pb-6">
-        <button 
-          onClick={() => setShowMealHistory(true)}
-          className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
-        >
-          <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
-            <History className="w-5 h-5 text-sky-600" />
-          </div>
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
-            <p className="text-xs font-bold text-foreground/80">Logs</p>
-          </div>
-        </button>
-
+      <div className="pb-6">
         <button 
           onClick={() => setShowTrends(true)}
           className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
@@ -799,6 +890,133 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </button>
       </div>
     </div>
+  );
+}
+
+function MicroAnalysisView({ loggedMeals, goalData, onBack }: { loggedMeals: LoggedMeal[], goalData: any, onBack: () => void }) {
+  const userWeight = parseFloat(goalData?.weight) || 75;
+  const userGender = goalData?.gender || 'male';
+  const userAge = parseInt(goalData?.age) || 25;
+
+  // Calculate dynamic targets based on user profile
+  const targets = useMemo(() => {
+    return {
+      // Aesthetics
+      vitaminA: userGender === 'male' ? 900 : 700, // mcg
+      omega3: userGender === 'male' ? 1.6 : 1.1, // g
+      vitaminC: userGender === 'male' ? 90 : 75, // mg
+      zinc: userGender === 'male' ? 11 : 8, // mg
+      selenium: 55, // mcg
+      // Performance
+      magnesium: userGender === 'male' ? 420 : 320, // mg
+      vitaminD: userAge > 70 ? 20 : 15, // mcg
+      potassium: userGender === 'male' ? 3400 : 2600, // mg
+      iron: userGender === 'male' ? 8 : (userAge < 50 ? 18 : 8), // mg
+      calcium: userAge > 50 && userGender === 'female' ? 1200 : 1000, // mg
+    };
+  }, [userWeight, userGender, userAge]);
+
+  const totals = useMemo(() => {
+    return loggedMeals.reduce((acc, meal) => ({
+      vitaminA: acc.vitaminA + (meal.vitaminA || 0),
+      omega3: acc.omega3 + (meal.omega3 || 0),
+      vitaminC: acc.vitaminC + (meal.vitaminC || 0),
+      zinc: acc.zinc + (meal.zinc || 0),
+      selenium: acc.selenium + (meal.selenium || 0),
+      magnesium: acc.magnesium + (meal.magnesium || 0),
+      vitaminD: acc.vitaminD + (meal.vitaminD || 0),
+      potassium: acc.potassium + (meal.potassium || 0),
+      iron: acc.iron + (meal.iron || 0),
+      calcium: acc.calcium + (meal.calcium || 0),
+    }), {
+      vitaminA: 0, omega3: 0, vitaminC: 0, zinc: 0, selenium: 0,
+      magnesium: 0, vitaminD: 0, potassium: 0, iron: 0, calcium: 0
+    });
+  }, [loggedMeals]);
+
+  const aesthetics = [
+    { label: "Vitamin A", sub: "Texture/Acne", val: totals.vitaminA, target: targets.vitaminA, unit: "mcg", color: "text-orange-500", bg: "bg-orange-50" },
+    { label: "Omega-3", sub: "Hydration/Inflammation", val: totals.omega3, target: targets.omega3, unit: "g", color: "text-sky-500", bg: "bg-sky-50" },
+    { label: "Vitamin C", sub: "Collagen/Firmness", val: totals.vitaminC, target: targets.vitaminC, unit: "mg", color: "text-yellow-500", bg: "bg-yellow-50" },
+    { label: "Zinc", sub: "Oil Control/Healing", val: totals.zinc, target: targets.zinc, unit: "mg", color: "text-indigo-500", bg: "bg-indigo-50" },
+    { label: "Selenium", sub: "UV Protection", val: totals.selenium, target: targets.selenium, unit: "mcg", color: "text-rose-500", bg: "bg-rose-50" },
+  ];
+
+  const performance = [
+    { label: "Magnesium", sub: "Repair/Relaxation", val: totals.magnesium, target: targets.magnesium, unit: "mg", color: "text-purple-500", bg: "bg-purple-50" },
+    { label: "Vitamin D", sub: "Power/Hormones", val: totals.vitaminD, target: targets.vitaminD, unit: "mcg", color: "text-amber-500", bg: "bg-amber-50" },
+    { label: "Potassium", sub: "Signaling/Pump", val: totals.potassium, target: targets.potassium, unit: "mg", color: "text-emerald-500", bg: "bg-emerald-50" },
+    { label: "Iron", sub: "Stamina/Oxygen", val: totals.iron, target: targets.iron, unit: "mg", color: "text-red-500", bg: "bg-red-50" },
+    { label: "Calcium", sub: "Contraction/Firing", val: totals.calcium, target: targets.calcium, unit: "mg", color: "text-slate-500", bg: "bg-slate-50" },
+  ];
+
+  return (
+    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="flex items-center gap-4 pt-2">
+        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
+          <ChevronLeft className="w-5 h-5" />
+        </Button>
+        <h1 className="text-2xl font-bold font-headline">Micro Analysis</h1>
+      </div>
+
+      <Tabs defaultValue="aesthetics" className="w-full">
+        <TabsList className="grid w-full grid-cols-2 h-11 bg-card/80 backdrop-blur-sm p-1.5 rounded-2xl shadow-sm border border-muted/20">
+          <TabsTrigger value="aesthetics" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Aesthetics (Skin)</TabsTrigger>
+          <TabsTrigger value="performance" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Performance (Gym)</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="aesthetics" className="space-y-4 mt-4">
+          <div className="grid gap-3">
+            {aesthetics.map((item, idx) => (
+              <MicroCard key={idx} rank={idx + 1} {...item} />
+            ))}
+          </div>
+        </TabsContent>
+
+        <TabsContent value="performance" className="space-y-4 mt-4">
+          <div className="grid gap-3">
+            {performance.map((item, idx) => (
+              <MicroCard key={idx} rank={idx + 1} {...item} />
+            ))}
+          </div>
+        </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function MicroCard({ rank, label, sub, val, target, unit, color, bg }: any) {
+  const percent = Math.min(100, Math.round((val / target) * 100));
+  
+  return (
+    <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl border border-muted/10">
+      <CardContent className="p-4 flex items-center gap-4">
+        <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shadow-sm shrink-0", bg, color)}>
+          {rank}
+        </div>
+        <div className="flex-1 min-w-0 space-y-1">
+          <div className="flex justify-between items-baseline">
+            <h4 className="font-bold text-[13px] text-foreground truncate">{label}</h4>
+            <span className={cn("text-[9px] font-black uppercase", percent >= 100 ? "text-green-600" : "text-muted-foreground/40")}>
+              {percent}% MET
+            </span>
+          </div>
+          <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-tight leading-none">{sub}</p>
+          <div className="pt-1.5 space-y-1">
+            <div className="h-1.5 w-full bg-muted/30 rounded-full overflow-hidden">
+              <div 
+                className={cn("h-full transition-all duration-1000 ease-out rounded-full", percent >= 100 ? "bg-green-500" : color.replace('text-', 'bg-'))} 
+                style={{ width: `${percent}%` }}
+              />
+            </div>
+            <div className="flex justify-between text-[8px] font-bold text-muted-foreground/40 uppercase">
+              <span>{val.toFixed(val < 1 ? 2 : 0)}{unit}</span>
+              <span>Target: {target}{unit}</span>
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
   );
 }
 
