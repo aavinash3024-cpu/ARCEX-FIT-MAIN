@@ -408,7 +408,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   const logHeaderImage = PlaceHolderImages.find(img => img.id === 'meal-quinoa-bowl');
   const loggingIconImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
 
-  if (showMicroAnalysis) return <MicroAnalysisView loggedMeals={loggedMeals} goalData={goalData} onBack={() => setShowMicroAnalysis(false)} />;
+  if (showMicroAnalysis) return <MicroAnalysisView allHistory={allHistory} loggedMeals={loggedMeals} goalData={goalData} onBack={() => setShowMicroAnalysis(false)} />;
   if (showMealHistory) return <MealHistoryView allHistory={allHistory} goalData={goalData} onBack={() => setShowMealHistory(false)} />;
 
   if (showTrends) {
@@ -635,6 +635,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         <h1 className="text-2xl font-bold font-headline">Nutrition</h1>
       </div>
 
+      {/* 1. MEAL LOGGING CARD */}
       <Card className="border-none shadow-sm overflow-hidden bg-card">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
@@ -788,34 +789,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4">
-        <button 
-          onClick={() => setShowMicroAnalysis(true)}
-          className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
-        >
-          <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-            <HeartPulse className="w-5 h-5 text-amber-600" />
-          </div>
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Micro Analysis</p>
-            <p className="text-xs font-bold text-foreground/80">Skin & Performance</p>
-          </div>
-        </button>
-
-        <button 
-          onClick={() => setShowMealHistory(true)}
-          className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
-        >
-          <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
-            <History className="w-5 h-5 text-sky-600" />
-          </div>
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
-            <p className="text-xs font-bold text-foreground/80">Logs</p>
-          </div>
-        </button>
-      </div>
-
+      {/* 2. TODAY'S MEAL LIST (Shifted Up) */}
       <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
         <div className="h-14 w-full relative">
           <Image 
@@ -875,6 +849,36 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </CardContent>
       </Card>
 
+      {/* 3. MICRO & HISTORY GRID (Shifted Down) */}
+      <div className="grid grid-cols-2 gap-4">
+        <button 
+          onClick={() => setShowMicroAnalysis(true)}
+          className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
+        >
+          <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
+            <HeartPulse className="w-5 h-5 text-amber-600" />
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Micro Analysis</p>
+            <p className="text-xs font-bold text-foreground/80">Skin & Performance</p>
+          </div>
+        </button>
+
+        <button 
+          onClick={() => setShowMealHistory(true)}
+          className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
+        >
+          <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
+            <History className="w-5 h-5 text-sky-600" />
+          </div>
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
+            <p className="text-xs font-bold text-foreground/80">Logs</p>
+          </div>
+        </button>
+      </div>
+
+      {/* 4. TRENDS CARD (Bottom) */}
       <div className="pb-6">
         <button 
           onClick={() => setShowTrends(true)}
@@ -893,26 +897,23 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   );
 }
 
-function MicroAnalysisView({ loggedMeals, goalData, onBack }: { loggedMeals: LoggedMeal[], goalData: any, onBack: () => void }) {
+function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allHistory: LoggedMeal[], loggedMeals: LoggedMeal[], goalData: any, onBack: () => void }) {
   const userWeight = parseFloat(goalData?.weight) || 75;
   const userGender = goalData?.gender || 'male';
   const userAge = parseInt(goalData?.age) || 25;
 
-  // Calculate dynamic targets based on user profile
   const targets = useMemo(() => {
     return {
-      // Aesthetics
-      vitaminA: userGender === 'male' ? 900 : 700, // mcg
-      omega3: userGender === 'male' ? 1.6 : 1.1, // g
-      vitaminC: userGender === 'male' ? 90 : 75, // mg
-      zinc: userGender === 'male' ? 11 : 8, // mg
-      selenium: 55, // mcg
-      // Performance
-      magnesium: userGender === 'male' ? 420 : 320, // mg
-      vitaminD: userAge > 70 ? 20 : 15, // mcg
-      potassium: userGender === 'male' ? 3400 : 2600, // mg
-      iron: userGender === 'male' ? 8 : (userAge < 50 ? 18 : 8), // mg
-      calcium: userAge > 50 && userGender === 'female' ? 1200 : 1000, // mg
+      vitaminA: userGender === 'male' ? 900 : 700,
+      omega3: userGender === 'male' ? 1.6 : 1.1,
+      vitaminC: userGender === 'male' ? 90 : 75,
+      zinc: userGender === 'male' ? 11 : 8,
+      selenium: 55,
+      magnesium: userGender === 'male' ? 420 : 320,
+      vitaminD: userAge > 70 ? 20 : 15,
+      potassium: userGender === 'male' ? 3400 : 2600,
+      iron: userGender === 'male' ? 8 : (userAge < 50 ? 18 : 8),
+      calcium: userAge > 50 && userGender === 'female' ? 1200 : 1000,
     };
   }, [userWeight, userGender, userAge]);
 
@@ -935,20 +936,44 @@ function MicroAnalysisView({ loggedMeals, goalData, onBack }: { loggedMeals: Log
   }, [loggedMeals]);
 
   const aesthetics = [
-    { label: "Vitamin A", sub: "Texture/Acne", val: totals.vitaminA, target: targets.vitaminA, unit: "mcg", color: "text-orange-500", bg: "bg-orange-50" },
-    { label: "Omega-3", sub: "Hydration/Inflammation", val: totals.omega3, target: targets.omega3, unit: "g", color: "text-sky-500", bg: "bg-sky-50" },
-    { label: "Vitamin C", sub: "Collagen/Firmness", val: totals.vitaminC, target: targets.vitaminC, unit: "mg", color: "text-yellow-500", bg: "bg-yellow-50" },
-    { label: "Zinc", sub: "Oil Control/Healing", val: totals.zinc, target: targets.zinc, unit: "mg", color: "text-indigo-500", bg: "bg-indigo-50" },
-    { label: "Selenium", sub: "UV Protection", val: totals.selenium, target: targets.selenium, unit: "mcg", color: "text-rose-500", bg: "bg-rose-50" },
+    { key: 'vitaminA', label: "Vitamin A", sub: "Texture/Acne", val: totals.vitaminA, target: targets.vitaminA, unit: "mcg", color: "text-orange-500", bg: "bg-orange-50", fill: "bg-orange-500" },
+    { key: 'omega3', label: "Omega-3", sub: "Hydration/Inflammation", val: totals.omega3, target: targets.omega3, unit: "g", color: "text-sky-500", bg: "bg-sky-50", fill: "bg-sky-500" },
+    { key: 'vitaminC', label: "Vitamin C", sub: "Collagen/Firmness", val: totals.vitaminC, target: targets.vitaminC, unit: "mg", color: "text-yellow-500", bg: "bg-yellow-50", fill: "bg-yellow-500" },
+    { key: 'zinc', label: "Zinc", sub: "Oil Control/Healing", val: totals.zinc, target: targets.zinc, unit: "mg", color: "text-indigo-500", bg: "bg-indigo-50", fill: "bg-indigo-500" },
+    { key: 'selenium', label: "Selenium", sub: "UV Protection", val: totals.selenium, target: targets.selenium, unit: "mcg", color: "text-rose-500", bg: "bg-rose-50", fill: "bg-rose-500" },
   ];
 
   const performance = [
-    { label: "Magnesium", sub: "Repair/Relaxation", val: totals.magnesium, target: targets.magnesium, unit: "mg", color: "text-purple-500", bg: "bg-purple-50" },
-    { label: "Vitamin D", sub: "Power/Hormones", val: totals.vitaminD, target: targets.vitaminD, unit: "mcg", color: "text-amber-500", bg: "bg-amber-50" },
-    { label: "Potassium", sub: "Signaling/Pump", val: totals.potassium, target: targets.potassium, unit: "mg", color: "text-emerald-500", bg: "bg-emerald-50" },
-    { label: "Iron", sub: "Stamina/Oxygen", val: totals.iron, target: targets.iron, unit: "mg", color: "text-red-500", bg: "bg-red-50" },
-    { label: "Calcium", sub: "Contraction/Firing", val: totals.calcium, target: targets.calcium, unit: "mg", color: "text-slate-500", bg: "bg-slate-50" },
+    { key: 'magnesium', label: "Magnesium", sub: "Repair/Relaxation", val: totals.magnesium, target: targets.magnesium, unit: "mg", color: "text-purple-500", bg: "bg-purple-50", fill: "bg-purple-500" },
+    { key: 'vitaminD', label: "Vitamin D", sub: "Power/Hormones", val: totals.vitaminD, target: targets.vitaminD, unit: "mcg", color: "text-amber-500", bg: "bg-amber-50", fill: "bg-amber-500" },
+    { key: 'potassium', label: "Potassium", sub: "Signaling/Pump", val: totals.potassium, target: targets.potassium, unit: "mg", color: "text-emerald-500", bg: "bg-emerald-50", fill: "bg-emerald-500" },
+    { key: 'iron', label: "Iron", sub: "Stamina/Oxygen", val: totals.iron, target: targets.iron, unit: "mg", color: "text-red-500", bg: "bg-red-50", fill: "bg-red-500" },
+    { key: 'calcium', label: "Calcium", sub: "Contraction/Firing", val: totals.calcium, target: targets.calcium, unit: "mg", color: "text-slate-500", bg: "bg-slate-50", fill: "bg-slate-500" },
   ];
+
+  const historyTrendData = useMemo(() => {
+    return [6, 5, 4, 3, 2, 1, 0].map(daysAgo => {
+      const date = subDays(new Date(), daysAgo);
+      const dateStr = format(date, 'yyyy-MM-dd');
+      const dayMeals = allHistory.filter(m => m.dateStr === dateStr);
+      
+      const aesScore = aesthetics.reduce((acc, micro) => {
+        const dayVal = dayMeals.reduce((sum, meal) => sum + ((meal as any)[micro.key] || 0), 0);
+        return acc + Math.min(100, (dayVal / micro.target) * 100);
+      }, 0) / aesthetics.length;
+
+      const perfScore = performance.reduce((acc, micro) => {
+        const dayVal = dayMeals.reduce((sum, meal) => sum + ((meal as any)[micro.key] || 0), 0);
+        return acc + Math.min(100, (dayVal / micro.target) * 100);
+      }, 0) / performance.length;
+
+      return {
+        day: format(date, 'EEE'),
+        aesthetics: Math.round(aesScore),
+        performance: Math.round(perfScore),
+      };
+    });
+  }, [allHistory, targets]);
 
   return (
     <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -966,56 +991,122 @@ function MicroAnalysisView({ loggedMeals, goalData, onBack }: { loggedMeals: Log
         </TabsList>
 
         <TabsContent value="aesthetics" className="space-y-4 mt-4">
-          <div className="grid gap-3">
+          <div className="grid gap-3 px-1">
             {aesthetics.map((item, idx) => (
               <MicroCard key={idx} rank={idx + 1} {...item} />
             ))}
           </div>
+          <TrendAnalysisCard data={historyTrendData} dataKey="aesthetics" title="7 Days Aesthetics Score" color="#f97316" />
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-4 mt-4">
-          <div className="grid gap-3">
+          <div className="grid gap-3 px-1">
             {performance.map((item, idx) => (
               <MicroCard key={idx} rank={idx + 1} {...item} />
             ))}
           </div>
+          <TrendAnalysisCard data={historyTrendData} dataKey="performance" title="7 Days Performance Score" color="#10b981" />
         </TabsContent>
       </Tabs>
     </div>
   );
 }
 
-function MicroCard({ rank, label, sub, val, target, unit, color, bg }: any) {
+function MicroCard({ rank, label, sub, val, target, unit, color, bg, fill }: any) {
   const percent = Math.min(100, Math.round((val / target) * 100));
   
   return (
-    <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl border border-muted/10">
+    <Card className="border-none shadow-sm bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 group transition-all hover:shadow-md active:scale-[0.99]">
       <CardContent className="p-4 flex items-center gap-4">
-        <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center font-black text-sm shadow-sm shrink-0", bg, color)}>
+        <div className={cn("w-12 h-12 rounded-2xl flex items-center justify-center font-black text-lg shadow-inner shrink-0 transition-transform group-hover:scale-110", bg, color)}>
           {rank}
         </div>
         <div className="flex-1 min-w-0 space-y-1">
           <div className="flex justify-between items-baseline">
-            <h4 className="font-bold text-[13px] text-foreground truncate">{label}</h4>
-            <span className={cn("text-[9px] font-black uppercase", percent >= 100 ? "text-green-600" : "text-muted-foreground/40")}>
+            <h4 className="font-black text-[14px] text-foreground/90 truncate uppercase tracking-tight">{label}</h4>
+            <Badge variant="outline" className={cn("text-[8px] font-black uppercase h-4 px-1.5 border-none", percent >= 100 ? "bg-green-100 text-green-700" : "bg-muted/30 text-muted-foreground/40")}>
               {percent}% MET
-            </span>
+            </Badge>
           </div>
-          <p className="text-[9px] font-black text-muted-foreground/60 uppercase tracking-tight leading-none">{sub}</p>
-          <div className="pt-1.5 space-y-1">
-            <div className="h-1.5 w-full bg-muted/30 rounded-full overflow-hidden">
+          <p className="text-[9px] font-bold text-muted-foreground/60 uppercase tracking-widest leading-none">{sub}</p>
+          <div className="pt-2 space-y-1.5">
+            <div className="h-1.5 w-full bg-muted/20 rounded-full overflow-hidden">
               <div 
-                className={cn("h-full transition-all duration-1000 ease-out rounded-full", percent >= 100 ? "bg-green-500" : color.replace('text-', 'bg-'))} 
+                className={cn("h-full transition-all duration-1000 ease-out rounded-full", percent >= 100 ? "bg-green-500" : fill)} 
                 style={{ width: `${percent}%` }}
               />
             </div>
-            <div className="flex justify-between text-[8px] font-bold text-muted-foreground/40 uppercase">
-              <span>{val.toFixed(val < 1 ? 2 : 0)}{unit}</span>
-              <span>Target: {target}{unit}</span>
+            <div className="flex justify-between text-[8px] font-black text-muted-foreground/40 uppercase tracking-tighter">
+              <span>{val.toFixed(val < 1 && val > 0 ? 2 : 0)} {unit}</span>
+              <span>Target: {target} {unit}</span>
             </div>
           </div>
         </div>
       </CardContent>
+    </Card>
+  );
+}
+
+function TrendAnalysisCard({ data, dataKey, title, color }: { data: any[], dataKey: string, title: string, color: string }) {
+  return (
+    <Card className="border-none shadow-md bg-card rounded-[2rem] p-6 mx-1 mt-6 border border-muted/10 overflow-hidden relative">
+      <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+        <Activity className="w-24 h-24" />
+      </div>
+      <div className="relative z-10 space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="space-y-0.5">
+            <p className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground">INTEL DASHBOARD</p>
+            <h3 className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" style={{ color }} /> {title}
+            </h3>
+          </div>
+          <Badge variant="secondary" className="bg-muted/30 text-muted-foreground text-[8px] font-black uppercase h-5">WEEKLY AVG: {Math.round(data.reduce((a, b) => a + b[dataKey], 0) / 7)}%</Badge>
+        </div>
+
+        <div className="h-[140px] w-full mt-2">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={data} margin={{ top: 10, right: 5, left: -25, bottom: 0 }}>
+              <defs>
+                <linearGradient id={`color${dataKey}`} x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor={color} stopOpacity={0.2}/>
+                  <stop offset="95%" stopColor={color} stopOpacity={0}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.2} />
+              <XAxis 
+                dataKey="day" 
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 9, fontWeight: 800, fill: 'hsl(var(--muted-foreground))' }} 
+                dy={10}
+              />
+              <YAxis 
+                domain={[0, 100]}
+                axisLine={false} 
+                tickLine={false} 
+                tick={{ fontSize: 9, fontWeight: 800, fill: 'hsl(var(--muted-foreground))' }}
+              />
+              <Tooltip 
+                contentStyle={{ borderRadius: '16px', border: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.1)', fontSize: '10px', fontWeight: 'bold' }}
+                itemStyle={{ color }}
+                formatter={(value: number) => [`${value}% Fulfillment`, "Intelligence"]}
+              />
+              <Area 
+                type="monotone" 
+                dataKey={dataKey} 
+                stroke={color} 
+                strokeWidth={3} 
+                fillOpacity={1} 
+                fill={`url(#color${dataKey})`} 
+                animationDuration={2000}
+                dot={{ r: 4, fill: color, strokeWidth: 2, stroke: "#fff" }}
+                activeDot={{ r: 6, strokeWidth: 0 }}
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </div>
     </Card>
   );
 }
