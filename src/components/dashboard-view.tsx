@@ -50,6 +50,7 @@ interface DashboardViewProps {
   onViewTasks?: () => void;
   onViewCalculators?: (type: string) => void;
   onViewGoalSetting?: () => void;
+  onViewProgress?: () => void;
 }
 
 const MetricSphere = ({ type, icon: Icon }: { type: 'steps' | 'hydration' | 'calories' | 'streak', icon: any }) => {
@@ -118,7 +119,8 @@ export function DashboardView({
   onViewSteps,
   onViewTasks,
   onViewCalculators,
-  onViewGoalSetting
+  onViewGoalSetting,
+  onViewProgress
 }: DashboardViewProps) {
   const metricsRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
@@ -436,7 +438,8 @@ export function DashboardView({
                           <span className="text-[9px] font-black text-foreground uppercase tracking-tighter">250ml</span>
                           <button 
                             onClick={(e) => { e.stopPropagation(); onUpdateHydration(250); }}
-                            className="text-primary hover:text-primary/70 transition-colors"
+                            disabled={hydrationAmount >= 50000}
+                            className="text-primary hover:text-primary/70 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
@@ -610,7 +613,10 @@ export function DashboardView({
           onScroll={() => handleScroll(toolsRef, setActiveTool)}
           className="flex gap-3 overflow-x-auto pb-4 swipe-container snap-x snap-mandatory scroll-smooth"
         >
-          <Card className="min-w-[280px] flex-shrink-0 border-none shadow-sm bg-card overflow-hidden snap-center">
+          <Card 
+            onClick={onViewProgress}
+            className="min-w-[280px] flex-shrink-0 border-none shadow-sm bg-card overflow-hidden snap-center cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5"
+          >
             <CardContent className="p-4 space-y-4">
               <div className="flex justify-between items-start">
                 <div>

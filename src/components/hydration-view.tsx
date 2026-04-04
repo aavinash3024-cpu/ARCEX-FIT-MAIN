@@ -187,7 +187,8 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
               onClick={() => onUpdateMl(250)}
               variant="outline" 
               size="icon" 
-              className="absolute right-4 rounded-full h-12 w-12 border-blue-200 text-blue-500 hover:bg-blue-50 shadow-sm"
+              disabled={currentMl >= 50000}
+              className="absolute right-4 rounded-full h-12 w-12 border-blue-200 text-blue-500 hover:bg-blue-50 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Plus className="w-5 h-5" />
             </Button>
@@ -199,7 +200,7 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
               {currentMl} <span className="text-muted-foreground text-sm">/ {targetMl}ml</span>
             </p>
             <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest">
-              Achieve daily goal
+              {currentMl >= 50000 ? "Daily Safety Limit Reached" : "Achieve daily goal"}
             </p>
           </div>
         </CardContent>

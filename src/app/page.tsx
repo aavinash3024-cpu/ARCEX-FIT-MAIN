@@ -243,7 +243,7 @@ export default function PulseFlowApp() {
   };
 
   const updateHydration = (amount: number) => {
-    setHydrationAmount(prev => Math.max(0, prev + amount));
+    setHydrationAmount(prev => Math.min(50000, Math.max(0, prev + amount)));
   };
 
   const updateSteps = (amount: number) => {
@@ -293,6 +293,7 @@ export default function PulseFlowApp() {
             onViewTasks={() => setActiveTab('tasks')} 
             onViewCalculators={handleOpenCalculator}
             onViewGoalSetting={() => setActiveTab('goal-setting')}
+            onViewProgress={() => setActiveTab('rank')}
           />
         );
       case 'nutrition': 
@@ -368,6 +369,7 @@ export default function PulseFlowApp() {
           weightHistory={weightHistory}
           loggedMeals={loggedMeals}
           streakData={streakData}
+          onViewProgress={() => setActiveTab('rank')}
         />
       );
     }
