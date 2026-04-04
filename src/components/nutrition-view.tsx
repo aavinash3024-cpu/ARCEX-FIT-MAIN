@@ -1094,7 +1094,7 @@ function MicroCard({ label, sub, val, target, unit, color }: any) {
         <div className="flex-1 min-w-0 space-y-1">
           <div className="flex justify-between items-baseline">
             <h4 className="font-black text-xs text-foreground uppercase tracking-tight">{label}</h4>
-            <span className={cn("text-[9px] font-black uppercase tracking-tighter", isComplete ? "text-green-600" : "text-muted-foreground/40")}>
+            <span className={cn("text-[9px] font-black uppercase tracking-tighter", isComplete ? "text-green-600" : "text-foreground")}>
               {percent}% AVG
             </span>
           </div>
@@ -1106,7 +1106,7 @@ function MicroCard({ label, sub, val, target, unit, color }: any) {
                 style={{ width: `${percent}%`, backgroundColor: color }}
               />
             </div>
-            <div className="flex justify-between text-[7px] font-black text-muted-foreground/30 uppercase tracking-tighter">
+            <div className="flex justify-between text-[7px] font-black text-foreground uppercase tracking-tighter">
               <span>{val.toFixed(val < 1 && val > 0 ? 2 : 0)} {unit} AVG</span>
               <span>GOAL {target} {unit}</span>
             </div>
