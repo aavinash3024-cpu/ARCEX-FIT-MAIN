@@ -350,9 +350,32 @@ export function DashboardView({
                   <CardContent className="p-3 flex flex-col justify-between h-32">
                     <div className="flex justify-between items-start">
                       <div className="flex flex-col gap-1">
-                        <div className={`p-1.5 rounded-lg w-fit ${m.color}`}>
-                          {m.icon}
-                        </div>
+                        {isSteps ? (
+                          <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
+                            <div 
+                              className="absolute inset-0 rounded-full shadow-[0_3px_6px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.3)] flex items-center justify-center overflow-hidden"
+                              style={{
+                                background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)',
+                              }}
+                            >
+                              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.3)_0%,transparent_70%)] opacity-60" />
+                              <Footprints className="w-4 h-4 text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.3)] relative z-10" />
+                            </div>
+                            <div 
+                              className="absolute -inset-[1px] rounded-full opacity-30 pointer-events-none"
+                              style={{
+                                border: '1px solid transparent',
+                                backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #34d399, #065f46)',
+                                backgroundOrigin: 'border-box',
+                                backgroundClip: 'content-box, border-box',
+                              }}
+                            />
+                          </div>
+                        ) : (
+                          <div className={`p-1.5 rounded-lg w-fit ${m.color}`}>
+                            {m.icon}
+                          </div>
+                        )}
                         <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{m.label}</p>
                       </div>
                       {isStreak ? (
