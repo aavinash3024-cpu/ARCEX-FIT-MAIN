@@ -172,7 +172,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
     const savedRecent = localStorage.getItem('pulseflow_recent_meals');
     const savedFavorites = localStorage.getItem('pulseflow_saved_meals');
     const savedHistory = localStorage.getItem('pulseflow_all_meals_history');
-    const savedCredits = localStorage.getItem('pulseflow_meal_credits_v2'); // New key for 20 limit
+    const savedCredits = localStorage.getItem('pulseflow_meal_credits_v2');
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
     const savedCache = localStorage.getItem('pulseflow_food_cache');
     
@@ -197,7 +197,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
     }
   }, [recentMeals, savedMeals, allHistory, credits, foodCache, isLoaded]);
 
-  const tryLocalParse = (input: string) => {
+  const tryLocalParse = (input: string): LoggedMeal | null | "INVALID" => {
     const normalized = input.toLowerCase();
     const numMatch = normalized.match(/(\d+(?:\.\d+)?)/);
     const quantity = numMatch ? parseFloat(numMatch[0]) : 1;
@@ -251,7 +251,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
           }]
         } as LoggedMeal;
 
-        // Validation check for local cache hits too
         if (mealData.calories > 20000) {
           setCredits(prev => Math.max(0, prev - 1));
           toast({
@@ -259,7 +258,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
             title: "Invalid Meal",
             description: "Meals above 20,000 calories cannot be logged."
           });
-          return null;
+          return "INVALID";
         }
 
         return mealData;
@@ -271,14 +270,29 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   const handleLogMeal = async () => {
     if (!mealInput.trim()) return;
 
-    const cachedMatch = tryLocalParse(mealInput);
-    if (cachedMatch) {
-      setLoggedMeals(prev => [cachedMatch, ...prev]);
-      setAllHistory(prev => [cachedMatch, ...prev]);
-      setRecentMeals(prev => {
-        const filtered = prev.filter(m => m.name.toLowerCase() !== cachedMatch.name.toLowerCase());
-        return [cachedMatch, ...filtered].slice(0, 20);
+    if (credits <= 0) {
+      toast({
+        variant: "destructive",
+        title: "No Credits Left",
+        description: "You have reached your daily limit of 20 meals."
       });
+      return;
+    }
+
+    const cachedResult = tryLocalParse(mealInput);
+    if (cachedResult === "INVALID") {
+      setMealInput("");
+      return;
+    }
+    if (cachedResult) {
+      const meal = cachedResult as LoggedMeal;
+      setLoggedMeals(prev => [meal, ...prev]);
+      setAllHistory(prev => [meal, ...prev]);
+      setRecentMeals(prev => {
+        const filtered = prev.filter(m => m.name.toLowerCase() !== meal.name.toLowerCase());
+        return [meal, ...filtered].slice(0, 20);
+      });
+      setCredits(prev => Math.max(0, prev - 1));
       setMealInput("");
       return;
     }
@@ -289,10 +303,8 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       const today = new Date();
       const dateStr = format(today, 'yyyy-MM-dd');
       
-      // Consume credit regardless of outcome
       setCredits(prev => Math.max(0, prev - 1));
 
-      // 1. Validation: Calorie limit
       if (result.calories > 20000) {
         toast({
           variant: "destructive",
@@ -303,7 +315,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         return;
       }
 
-      // 2. Validation: Not a meal
       const isCoherentMeal = result.calories > 0 && result.items.length > 0 && result.name.length > 2;
       if (!isCoherentMeal) {
         toast({
@@ -393,7 +404,14 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   };
 
   const logExistingMeal = (meal: LoggedMeal) => {
-    if (credits <= 0) return;
+    if (credits <= 0) {
+      toast({
+        variant: "destructive",
+        title: "No Credits Left",
+        description: "You have reached your daily limit."
+      });
+      return;
+    }
     const today = new Date();
     const dateStr = format(today, 'yyyy-MM-dd');
     const newEntry: LoggedMeal = {
@@ -414,7 +432,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       setSavedMeals(prev => prev.filter(m => m.name.toLowerCase() !== meal.name.toLowerCase()));
       return;
     }
-    // Limit to 50 saved items
     setSavedMeals(prev => [meal, ...prev].slice(0, 50));
   };
 
