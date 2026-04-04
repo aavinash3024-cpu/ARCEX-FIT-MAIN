@@ -654,22 +654,27 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       </div>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card">
-        <div className="px-5 pt-5 pb-2">
-          <div className="flex items-center gap-3">
-            <NutritionSphere icon={Utensils} />
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center justify-between">
-                <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground/80">Meal Logging</h2>
-                {Object.keys(foodCache).length > 0 && (
-                  <Badge variant="outline" className="h-4 border-primary/20 text-primary text-[7px] font-black uppercase gap-1 px-1.5">
-                    <Zap className="w-2 h-2 fill-current" /> {Object.keys(foodCache).length} Learned
-                  </Badge>
-                )}
-              </div>
+        <div className="relative h-24 w-full">
+          <Image 
+            src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=800&auto=format&fit=crop"
+            alt="Nutrition Banner"
+            fill
+            className="object-cover"
+            data-ai-hint="healthy food banner"
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-card/90 to-transparent" />
+          <div className="absolute bottom-3 left-5 right-5 flex items-center justify-between">
+            <div className="space-y-0.5">
+              <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground">Meal Logging</h2>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                TODAY'S CREDITS: <span className={cn("font-black", credits <= 5 ? "text-destructive" : "text-primary")}>{credits}/25</span>
+                Credits: <span className={cn("font-black", credits <= 5 ? "text-destructive" : "text-primary")}>{credits}/25</span>
               </p>
             </div>
+            {Object.keys(foodCache).length > 0 && (
+              <Badge variant="outline" className="h-4 border-white/20 text-white bg-black/20 backdrop-blur-sm text-[7px] font-black uppercase gap-1 px-1.5 border-none">
+                <Zap className="w-2 h-2 fill-current" /> {Object.keys(foodCache).length} Learned
+              </Badge>
+            )}
           </div>
         </div>
 
