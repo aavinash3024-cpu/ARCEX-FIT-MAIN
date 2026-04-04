@@ -1039,6 +1039,11 @@ function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: 
     });
   }, []);
 
+  const trackedDaysCount = useMemo(() => {
+    const datesWithLogs = new Set(allHistory.map(m => m.dateStr));
+    return last7Days.filter(day => datesWithLogs.has(day.dateStr)).length;
+  }, [allHistory, last7Days]);
+
   const dateRangeStr = useMemo(() => {
     const start = subDays(new Date(), 6);
     const end = new Date();
@@ -1053,7 +1058,8 @@ function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: 
         return sum;
       });
 
-      const avg = dailyValues.reduce((a, b) => a + b, 0) / dailyValues.length;
+      const totalValue = dailyValues.reduce((a, b) => a + b, 0);
+      const avg = trackedDaysCount > 0 ? totalValue / trackedDaysCount : 0;
       const target = targets[m.id];
       const percentMet = Math.round((avg / target) * 100);
 
@@ -1067,7 +1073,7 @@ function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: 
         color: m.color
       };
     });
-  }, [allHistory, last7Days, micros, targets]);
+  }, [allHistory, last7Days, micros, targets, trackedDaysCount]);
 
   return (
     <Card className="border-none shadow-md bg-card rounded-3xl p-6 mx-1 mt-6 border border-muted/10 overflow-hidden relative">
@@ -1084,7 +1090,7 @@ function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: 
           </div>
           <div className="text-right">
             <p className="text-lg font-black text-primary leading-none">WEEKLY</p>
-            <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mt-1">DATA ANALYSIS</p>
+            <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mt-1">LOGGED DAYS ONLY</p>
           </div>
         </div>
 
@@ -1138,7 +1144,7 @@ function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: 
           <div className="flex items-center gap-3 bg-muted/10 p-3 rounded-xl">
             <Info className="w-3 h-3 text-muted-foreground/40 shrink-0" />
             <p className="text-[8px] font-bold text-muted-foreground/60 uppercase leading-relaxed">
-              Target requirements are calculated based on your biological markers (Age, Sex, Weight). Consistency over 7 days is prioritized for physiological adaptation.
+              Analysis based on your biological markers. Averages are calculated using only days where data was recorded.
             </p>
           </div>
         </div>
@@ -1178,9 +1184,11 @@ function MealHistoryView({ allHistory, goalData, onBack }: { allHistory: LoggedM
   const weeklyStats = useMemo(() => {
     const targetCal = goalData?.finalCalories || 2200;
     const totalIntake = chartData.reduce((acc, curr) => acc + curr.calories, 0);
-    const totalTarget = targetCal * 7;
-    const balance = totalIntake - totalTarget;
     const daysTracked = chartData.filter(d => d.calories > 0).length;
+    
+    // Use daysTracked for the target calculation instead of static 7 days
+    const totalTargetForLoggedDays = targetCal * daysTracked;
+    const balance = daysTracked > 0 ? totalIntake - totalTargetForLoggedDays : 0;
     const avgIntake = daysTracked > 0 ? Math.round(totalIntake / daysTracked) : 0;
 
     return { totalIntake, balance, avgIntake, daysTracked };
@@ -1218,7 +1226,7 @@ function MealHistoryView({ allHistory, goalData, onBack }: { allHistory: LoggedM
       <Card className="border-none shadow-md bg-card rounded-[1.5rem] p-5 space-y-4 mx-1">
         <div className="flex items-center justify-between">
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">WEEKLY BALANCE</p>
+            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">LOGGED DAYS BALANCE</p>
             <div className={cn("flex items-center gap-1.5", weeklyStats.balance <= 0 ? "text-green-600" : "text-orange-500")}>
               {weeklyStats.balance <= 0 ? <ArrowDownRight className="w-4 h-4" /> : <ArrowUpRight className="w-4 h-4" />}
               <span className="text-2xl font-black">{Math.abs(weeklyStats.balance).toLocaleString()}</span>
@@ -1226,7 +1234,7 @@ function MealHistoryView({ allHistory, goalData, onBack }: { allHistory: LoggedM
             </div>
           </div>
           <div className="text-right">
-            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">AVG INTAKE</p>
+            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">AVG ({weeklyStats.daysTracked} DAYS)</p>
             <p className="text-lg font-black">{weeklyStats.avgIntake.toLocaleString()} <span className="text-[8px] opacity-40">KCAL</span></p>
           </div>
         </div>
@@ -1490,14 +1498,14 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
         <>
           <div className="grid grid-cols-2 gap-3">
             <Card className="border-none shadow-sm bg-card p-4 space-y-1">
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Avg Calories</p>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Avg ({stats.daysTracked} Days)</p>
               <div className="flex items-baseline gap-1">
                 <span className="text-xl font-black">{stats.avgCalories}</span>
                 <span className="text-[8px] font-bold text-muted-foreground uppercase">Kcal</span>
               </div>
             </Card>
             <Card className="border-none shadow-sm bg-card p-4 space-y-1">
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Net {stats.netSurplusDeficit >= 0 ? 'Surplus' : 'Deficit'}</p>
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Daily Balance</p>
               <div className={cn("flex items-center gap-1", stats.netSurplusDeficit >= 0 ? "text-orange-500" : "text-green-600")}>
                 {stats.netSurplusDeficit >= 0 ? <ArrowUpRight className="w-3.5 h-3.5" /> : <ArrowDownRight className="w-3.5 h-3.5" />}
                 <span className="text-sm font-black">{Math.abs(stats.netSurplusDeficit)} kcal</span>
