@@ -925,6 +925,26 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
     return Array.from(new Set(periodMeals.map(m => m.dateStr))).length;
   }, [periodMeals]);
 
+  const todayTotals = useMemo(() => {
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const todayLogs = allHistory.filter(m => m.dateStr === todayStr);
+    return todayLogs.reduce((acc, meal) => ({
+      vitaminA: acc.vitaminA + (meal.vitaminA || 0),
+      omega3: acc.omega3 + (meal.omega3 || 0),
+      vitaminC: acc.vitaminC + (meal.vitaminC || 0),
+      zinc: acc.zinc + (meal.zinc || 0),
+      selenium: acc.selenium + (meal.selenium || 0),
+      magnesium: acc.magnesium + (meal.magnesium || 0),
+      vitaminD: acc.vitaminD + (meal.vitaminD || 0),
+      potassium: acc.potassium + (meal.potassium || 0),
+      iron: acc.iron + (meal.iron || 0),
+      calcium: acc.calcium + (meal.calcium || 0),
+    }), {
+      vitaminA: 0, omega3: 0, vitaminC: 0, zinc: 0, selenium: 0,
+      magnesium: 0, vitaminD: 0, potassium: 0, iron: 0, calcium: 0
+    });
+  }, [allHistory]);
+
   const userGender = goalData?.gender || 'male';
   const userAge = parseInt(goalData?.age) || 25;
 
@@ -943,52 +963,20 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
     };
   }, [userGender, userAge]);
 
-  const periodAverages = useMemo(() => {
-    const sums = periodMeals.reduce((acc, meal) => ({
-      vitaminA: acc.vitaminA + (meal.vitaminA || 0),
-      omega3: acc.omega3 + (meal.omega3 || 0),
-      vitaminC: acc.vitaminC + (meal.vitaminC || 0),
-      zinc: acc.zinc + (meal.zinc || 0),
-      selenium: acc.selenium + (meal.selenium || 0),
-      magnesium: acc.magnesium + (meal.magnesium || 0),
-      vitaminD: acc.vitaminD + (meal.vitaminD || 0),
-      potassium: acc.potassium + (meal.potassium || 0),
-      iron: acc.iron + (meal.iron || 0),
-      calcium: acc.calcium + (meal.calcium || 0),
-    }), {
-      vitaminA: 0, omega3: 0, vitaminC: 0, zinc: 0, selenium: 0,
-      magnesium: 0, vitaminD: 0, potassium: 0, iron: 0, calcium: 0
-    });
-
-    const divisor = Math.max(1, trackedDaysInPeriod);
-    return {
-      vitaminA: sums.vitaminA / divisor,
-      omega3: sums.omega3 / divisor,
-      vitaminC: sums.vitaminC / divisor,
-      zinc: sums.zinc / divisor,
-      selenium: sums.selenium / divisor,
-      magnesium: sums.magnesium / divisor,
-      vitaminD: sums.vitaminD / divisor,
-      potassium: sums.potassium / divisor,
-      iron: sums.iron / divisor,
-      calcium: sums.calcium / divisor,
-    };
-  }, [periodMeals, trackedDaysInPeriod]);
-
   const aesthetics = [
-    { id: 'vitaminA', label: "Vitamin A", sub: "Texture/Acne", val: periodAverages.vitaminA, target: targets.vitaminA, unit: "mcg", color: "#f97316" },
-    { id: 'omega3', label: "Omega-3", sub: "Hydration/Inflammation", val: periodAverages.omega3, target: targets.omega3, unit: "g", color: "#0ea5e9" },
-    { id: 'vitaminC', label: "Vitamin C", sub: "Collagen/Firmness", val: periodAverages.vitaminC, target: targets.vitaminC, unit: "mg", color: "#eab308" },
-    { id: 'zinc', label: "Zinc", sub: "Oil Control/Healing", val: periodAverages.zinc, target: targets.zinc, unit: "mg", color: "#6366f1" },
-    { id: 'selenium', label: "Selenium", sub: "UV Protection", val: periodAverages.selenium, target: targets.selenium, unit: "mcg", color: "#f43f5e" },
+    { id: 'vitaminA', label: "Vitamin A", sub: "Texture/Acne", val: todayTotals.vitaminA, target: targets.vitaminA, unit: "mcg", color: "#f97316" },
+    { id: 'omega3', label: "Omega-3", sub: "Hydration/Inflammation", val: todayTotals.omega3, target: targets.omega3, unit: "g", color: "#0ea5e9" },
+    { id: 'vitaminC', label: "Vitamin C", sub: "Collagen/Firmness", val: todayTotals.vitaminC, target: targets.vitaminC, unit: "mg", color: "#eab308" },
+    { id: 'zinc', label: "Zinc", sub: "Oil Control/Healing", val: todayTotals.zinc, target: targets.zinc, unit: "mg", color: "#6366f1" },
+    { id: 'selenium', label: "Selenium", sub: "UV Protection", val: todayTotals.selenium, target: targets.selenium, unit: "mcg", color: "#f43f5e" },
   ];
 
   const performance = [
-    { id: 'magnesium', label: "Magnesium", sub: "Repair/Relaxation", val: periodAverages.magnesium, target: targets.magnesium, unit: "mg", color: "#a855f7" },
-    { id: 'vitaminD', label: "Vitamin D", sub: "Power/Hormones", val: periodAverages.vitaminD, target: targets.vitaminD, unit: "mcg", color: "#f59e0b" },
-    { id: 'potassium', label: "Potassium", sub: "Signaling/Pump", val: periodAverages.potassium, target: targets.potassium, unit: "mg", color: "#10b981" },
-    { id: 'iron', label: "Iron", sub: "Stamina/Oxygen", val: periodAverages.iron, target: targets.iron, unit: "mg", color: "#ef4444" },
-    { id: 'calcium', label: "Calcium", sub: "Contraction/Firing", val: periodAverages.calcium, target: targets.calcium, unit: "mg", color: "#64748b" },
+    { id: 'magnesium', label: "Magnesium", sub: "Repair/Relaxation", val: todayTotals.magnesium, target: targets.magnesium, unit: "mg", color: "#a855f7" },
+    { id: 'vitaminD', label: "Vitamin D", sub: "Power/Hormones", val: todayTotals.vitaminD, target: targets.vitaminD, unit: "mcg", color: "#f59e0b" },
+    { id: 'potassium', label: "Potassium", sub: "Signaling/Pump", val: todayTotals.potassium, target: targets.potassium, unit: "mg", color: "#10b981" },
+    { id: 'iron', label: "Iron", sub: "Stamina/Oxygen", val: todayTotals.iron, target: targets.iron, unit: "mg", color: "#ef4444" },
+    { id: 'calcium', label: "Calcium", sub: "Contraction/Firing", val: todayTotals.calcium, target: targets.calcium, unit: "mg", color: "#64748b" },
   ];
 
   return (
@@ -1085,7 +1073,6 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
 
 function MicroCard({ label, sub, val, target, unit, color }: any) {
   const percent = Math.min(100, Math.round((val / target) * 100));
-  const isComplete = percent >= 100;
   
   return (
     <Card className="border-none bg-card overflow-hidden rounded-2xl border border-muted/10 group transition-all hover:bg-muted/5">
@@ -1094,8 +1081,8 @@ function MicroCard({ label, sub, val, target, unit, color }: any) {
         <div className="flex-1 min-w-0 space-y-1">
           <div className="flex justify-between items-baseline">
             <h4 className="font-black text-xs text-foreground uppercase tracking-tight">{label}</h4>
-            <span className={cn("text-[9px] font-black uppercase tracking-tighter", isComplete ? "text-green-600" : "text-foreground")}>
-              {percent}% AVG
+            <span className={cn("text-[9px] font-black uppercase tracking-tighter text-foreground")}>
+              {percent}%
             </span>
           </div>
           <p className="text-[8px] font-bold text-muted-foreground/60 uppercase tracking-widest leading-none">{sub}</p>
@@ -1106,8 +1093,8 @@ function MicroCard({ label, sub, val, target, unit, color }: any) {
                 style={{ width: `${percent}%`, backgroundColor: color }}
               />
             </div>
-            <div className="flex justify-between text-[7px] font-black text-foreground uppercase tracking-tighter">
-              <span>{val.toFixed(val < 1 && val > 0 ? 2 : 0)} {unit} AVG</span>
+            <div className="flex justify-between text-[10px] font-black text-foreground uppercase tracking-tighter">
+              <span>{val.toFixed(val < 1 && val > 0 ? 2 : 0)} {unit}</span>
               <span>GOAL {target} {unit}</span>
             </div>
           </div>
