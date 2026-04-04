@@ -862,8 +862,8 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               <HeartPulse className="w-5 h-5 text-amber-600" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Technical</p>
-              <p className="text-xs font-black uppercase text-foreground">Micro Analysis</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Technical</p>
+              <p className="text-xs font-bold text-foreground/80">Micro Analysis</p>
             </div>
           </CardContent>
         </Card>
@@ -877,8 +877,8 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               <TrendingUp className="w-5 h-5 text-primary" />
             </div>
             <div className="space-y-0.5">
-              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/60">Performance</p>
-              <p className="text-xs font-black uppercase text-foreground">Trends Analysis</p>
+              <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Performance</p>
+              <p className="text-xs font-bold text-foreground/80">Trends Analysis</p>
             </div>
           </CardContent>
         </Card>
