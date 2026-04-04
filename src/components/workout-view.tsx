@@ -1246,9 +1246,6 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
             <h3 className="text-sm font-black uppercase tracking-tighter text-foreground flex items-center gap-2">
               <Calendar className="w-4 h-4 text-primary" /> {activeDay} Routine
             </h3>
-            <Badge variant="secondary" className="bg-primary/10 text-primary text-[10px] h-5 px-2">
-              {(split[activeDay] || []).length} / 50 MOVES
-            </Badge>
           </div>
 
           <ScrollArea className="h-[160px] pr-2">
@@ -1285,8 +1282,14 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
 
       <section className="space-y-6 pt-4">
         <div className="px-2">
-          <h2 className="text-xl font-black uppercase tracking-tighter text-foreground">WORKOUT SPLIT ANALYSIS</h2>
-          <div className="flex justify-between items-baseline mt-4 mb-2">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="flex gap-1 shrink-0">
+              <div className="w-1.5 h-6 bg-primary rounded-full" />
+              <div className="w-1.5 h-6 bg-primary/30 rounded-full" />
+            </div>
+            <h2 className="text-xl font-black uppercase tracking-tighter text-foreground">WORKOUT SPLIT ANALYSIS</h2>
+          </div>
+          <div className="flex justify-between items-baseline mb-2">
             <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">MUSCLE COVERAGE</p>
             <span className="text-xs font-black text-primary">{report.globalCoverage}%</span>
           </div>
