@@ -48,6 +48,8 @@ import {
   ResponsiveContainer,
   Line,
   LineChart,
+  Bar,
+  BarChart,
   Legend
 } from 'recharts';
 import {
@@ -853,48 +855,41 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4">
-        <button 
-          onClick={() => setShowMicroAnalysis(true)}
-          className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
-        >
-          <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center">
-            <HeartPulse className="w-5 h-5 text-amber-600" />
-          </div>
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Micro Analysis</p>
-            <p className="text-xs font-bold text-foreground/80">Skin & Performance</p>
-          </div>
-        </button>
+      <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl mb-6">
+        <CardContent className="p-0">
+          <div className="grid grid-cols-3 divide-x divide-muted/10">
+            <button 
+              onClick={() => setShowMicroAnalysis(true)}
+              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
+            >
+              <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                <HeartPulse className="w-4 h-4 text-amber-600" />
+              </div>
+              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Micros</span>
+            </button>
+            
+            <button 
+              onClick={() => setShowMealHistory(true)}
+              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
+            >
+              <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
+                <History className="w-4 h-4 text-sky-600" />
+              </div>
+              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">History</span>
+            </button>
 
-        <button 
-          onClick={() => setShowMealHistory(true)}
-          className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
-        >
-          <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
-            <History className="w-5 h-5 text-sky-600" />
+            <button 
+              onClick={() => setShowTrends(true)}
+              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
+            >
+              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-primary" />
+              </div>
+              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Trends</span>
+            </button>
           </div>
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Meal History</p>
-            <p className="text-xs font-bold text-foreground/80">Logs</p>
-          </div>
-        </button>
-      </div>
-
-      <div className="pb-6">
-        <button 
-          onClick={() => setShowTrends(true)}
-          className="w-full border-none shadow-sm bg-card border border-muted/20 rounded-2xl p-5 flex flex-col items-start gap-3 active:scale-[0.99] transition-all"
-        >
-          <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-            <TrendingUp className="w-5 h-5 text-primary" />
-          </div>
-          <div className="space-y-0.5">
-            <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">Trends</p>
-            <p className="text-xs font-bold text-foreground/80">Intake</p>
-          </div>
-        </button>
-      </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }
@@ -1085,7 +1080,7 @@ function TodayMatrixCard({ data, title, micros }: { data: any[], title: string, 
 
         <div className="h-[200px] w-full -mx-2">
           <ResponsiveContainer width="100%" height="100%">
-            <LineChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+            <BarChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
               <XAxis 
                 dataKey="name" 
@@ -1102,23 +1097,21 @@ function TodayMatrixCard({ data, title, micros }: { data: any[], title: string, 
               />
               <Tooltip 
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', fontSize: '9px', fontWeight: '900', background: 'hsl(var(--card))' }}
-                cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '4 4' }}
+                cursor={{ fill: 'hsl(var(--primary))', opacity: 0.05 }}
               />
               
               {micros.map((m, i) => (
-                <Line 
+                <Bar 
                   key={m.id}
-                  type="monotone"
                   dataKey={m.id}
                   name={m.label}
-                  stroke={m.color}
-                  strokeWidth={2.5}
-                  dot={{ r: 3, strokeWidth: 2, fill: "hsl(var(--card))" }}
-                  activeDot={{ r: 5, strokeWidth: 0 }}
+                  fill={m.color}
+                  radius={[2, 2, 0, 0]}
+                  barSize={6}
                   animationDuration={1500}
                 />
               ))}
-            </LineChart>
+            </BarChart>
           </ResponsiveContainer>
         </div>
 
