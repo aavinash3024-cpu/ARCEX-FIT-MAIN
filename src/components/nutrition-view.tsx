@@ -794,6 +794,42 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       </Card>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
+        <CardContent className="p-0">
+          <div className="grid grid-cols-3 divide-x divide-muted/10">
+            <button 
+              onClick={() => setShowMicroAnalysis(true)}
+              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
+            >
+              <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
+                <HeartPulse className="w-4 h-4 text-amber-600" />
+              </div>
+              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Micros</span>
+            </button>
+            
+            <button 
+              onClick={() => setShowMealHistory(true)}
+              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
+            >
+              <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
+                <History className="w-4 h-4 text-sky-600" />
+              </div>
+              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">History</span>
+            </button>
+
+            <button 
+              onClick={() => setShowTrends(true)}
+              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
+            >
+              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
+                <TrendingUp className="w-4 h-4 text-primary" />
+              </div>
+              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Trends</span>
+            </button>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
         <div className="h-14 w-full relative">
           <Image 
             src={logHeaderImage?.imageUrl || "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=800&auto=format&fit=crop"} 
@@ -849,42 +885,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               )}
             </div>
           </ScrollArea>
-        </CardContent>
-      </Card>
-
-      <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl mb-6">
-        <CardContent className="p-0">
-          <div className="grid grid-cols-3 divide-x divide-muted/10">
-            <button 
-              onClick={() => setShowMicroAnalysis(true)}
-              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
-            >
-              <div className="w-8 h-8 bg-amber-100 rounded-lg flex items-center justify-center">
-                <HeartPulse className="w-4 h-4 text-amber-600" />
-              </div>
-              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Micros</span>
-            </button>
-            
-            <button 
-              onClick={() => setShowMealHistory(true)}
-              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
-            >
-              <div className="w-8 h-8 bg-sky-100 rounded-lg flex items-center justify-center">
-                <History className="w-4 h-4 text-sky-600" />
-              </div>
-              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">History</span>
-            </button>
-
-            <button 
-              onClick={() => setShowTrends(true)}
-              className="p-4 flex flex-col items-center gap-2 hover:bg-muted/5 transition-all"
-            >
-              <div className="w-8 h-8 bg-primary/10 rounded-lg flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-primary" />
-              </div>
-              <span className="text-[9px] font-black uppercase tracking-tighter text-muted-foreground">Trends</span>
-            </button>
-          </div>
         </CardContent>
       </Card>
     </div>
@@ -958,8 +958,8 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
 
       <Tabs defaultValue="aesthetics" className="w-full">
         <TabsList className="grid w-full grid-cols-2 h-11 bg-card/80 backdrop-blur-sm p-1.5 rounded-2xl shadow-sm border border-muted/20">
-          <TabsTrigger value="aesthetics" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Aesthetics (Skin)</TabsTrigger>
-          <TabsTrigger value="performance" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Performance (Gym)</TabsTrigger>
+          <TabsTrigger value="aesthetics" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Skin and Heal</TabsTrigger>
+          <TabsTrigger value="performance" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Gym and Recovery</TabsTrigger>
         </TabsList>
 
         <TabsContent value="aesthetics" className="space-y-4 mt-4">
@@ -972,7 +972,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
             allHistory={allHistory} 
             targets={targets} 
             micros={aesthetics} 
-            title="Aesthetics Matrix" 
+            title="Skin and Heal" 
           />
         </TabsContent>
 
@@ -986,7 +986,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
             allHistory={allHistory} 
             targets={targets} 
             micros={performance} 
-            title="Performance Matrix" 
+            title="Gym and Recovery" 
           />
         </TabsContent>
       </Tabs>
@@ -1039,6 +1039,12 @@ function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: 
     });
   }, []);
 
+  const dateRangeStr = useMemo(() => {
+    const start = subDays(new Date(), 6);
+    const end = new Date();
+    return `${format(start, 'MMM d')} - ${format(end, 'MMM d, yyyy')}`;
+  }, []);
+
   const tableData = useMemo(() => {
     return micros.map(m => {
       const dailyValues = last7Days.map(day => {
@@ -1071,7 +1077,7 @@ function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: 
       <div className="relative z-10 space-y-5">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">INTELLIGENCE SHEET</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">{dateRangeStr}</p>
             <h3 className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-primary" /> {title}
             </h3>
@@ -1427,13 +1433,18 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
     const totalMacros = totalProtein + totalCarbs + totalFat;
 
     const targetCal = goalData?.finalCalories || 2200;
+    const targetP = goalData?.protein || 150;
+    const targetC = goalData?.carbs || 250;
+    const targetF = goalData?.fats || 70;
+    const targetFI = goalData?.fiber || 30;
+
     const netSurplusDeficit = avgCalories - targetCal;
 
     const goalAchievements = {
-      protein: Math.min(100, Math.round(((totalProtein / daysWithLogs.length) / (goalData?.protein || 150)) * 100)),
-      carbs: Math.min(100, Math.round(((totalCarbs / daysWithLogs.length) / (goalData?.carbs || 250)) * 100)),
-      fat: Math.min(100, Math.round(((totalFat / daysWithLogs.length) / (goalData?.fats || 70)) * 100)),
-      fiber: Math.min(100, Math.round(((totalFiber / daysWithLogs.length) / (goalData?.fiber || 30)) * 100))
+      protein: Math.min(100, Math.round(((totalProtein / daysWithLogs.length) / targetP) * 100)),
+      carbs: Math.min(100, Math.round(((totalCarbs / daysWithLogs.length) / targetC) * 100)),
+      fat: Math.min(100, Math.round(((totalFat / daysWithLogs.length) / targetF) * 100)),
+      fiber: Math.min(100, Math.round(((totalFiber / daysWithLogs.length) / targetFI) * 100))
     };
 
     return {
