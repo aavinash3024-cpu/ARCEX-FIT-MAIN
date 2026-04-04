@@ -865,7 +865,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">TRACK</p>
               <p className="text-xs font-bold text-foreground/80">Micro Analysis</p>
             </div>
-            <ChevronRight className="absolute bottom-5 right-5 w-4 h-4 text-muted-foreground/20 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
           </CardContent>
         </Card>
 
@@ -881,7 +880,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60">TRACK</p>
               <p className="text-xs font-bold text-foreground/80">Trends Analysis</p>
             </div>
-            <ChevronRight className="absolute bottom-5 right-5 w-4 h-4 text-muted-foreground/20 group-hover:text-primary group-hover:translate-x-0.5 transition-all" />
           </CardContent>
         </Card>
       </div>
