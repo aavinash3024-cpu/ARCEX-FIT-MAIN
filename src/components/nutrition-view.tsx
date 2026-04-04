@@ -149,6 +149,18 @@ const MACRO_COLORS = {
   fiber: "#10b981"
 };
 
+const NutritionSphere = ({ icon: Icon }: { icon: any }) => (
+  <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
+    <div className="absolute inset-[-3px] rounded-full border border-primary/20 opacity-40 pointer-events-none" />
+    <div className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden shadow-[0_4px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.3)] bg-gradient-to-br from-primary to-primary/80">
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.4)_0%,transparent_65%)]" />
+      <div className="relative z-10 text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.3)]">
+        <Icon className="w-5 h-5" />
+      </div>
+    </div>
+  </div>
+);
+
 export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProps) {
   const [showSummary, setShowSummary] = useState(false);
   const [showMacroAnalysis, setShowMacroAnalysis] = useState(false);
@@ -406,8 +418,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
     return savedMeals.some(s => s.name.toLowerCase() === mealName.toLowerCase());
   };
 
-  const loggingIconImage = PlaceHolderImages.find(img => img.id === 'ai-analysis-meal');
-
   if (showMicroAnalysis) return <MicroAnalysisView allHistory={allHistory} loggedMeals={loggedMeals} goalData={goalData} onBack={() => setShowMicroAnalysis(false)} />;
 
   if (showMacroAnalysis) {
@@ -637,15 +647,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       <Card className="border-none shadow-sm overflow-hidden bg-card">
         <div className="px-5 pt-5 pb-2">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full overflow-hidden shrink-0 relative bg-muted shadow-sm">
-              <Image 
-                src={loggingIconImage?.imageUrl || "https://images.unsplash.com/photo-1512621776951-a57141f2eefd?q=80&w=400&auto=format&fit=crop"} 
-                alt="Meal Logging"
-                fill
-                className="object-cover"
-                data-ai-hint="gourmet salad"
-              />
-            </div>
+            <NutritionSphere icon={Utensils} />
             <div className="flex-1 min-w-0">
               <div className="flex items-center justify-between">
                 <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground/80">Meal Logging</h2>
@@ -824,7 +826,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                           </div>
                         </div>
                       </div>
-                      <Button onClick={() => deleteLoggedMeal(meal.id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
+                      <Button onClick={() => deleteLoggedMeal(id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                       <span className="absolute bottom-2 right-2 text-[7px] font-bold text-muted-foreground/30">{meal.time}</span>

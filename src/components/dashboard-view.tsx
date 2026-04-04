@@ -82,7 +82,7 @@ const MetricSphere = ({ type, icon: Icon }: { type: 'steps' | 'hydration' | 'cal
     <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
       {/* Outer Boundary Ring - Perfectly Centered */}
       <div 
-        className="absolute inset-[-2px] rounded-full border opacity-30 pointer-events-none" 
+        className="absolute inset-[-3px] rounded-full border opacity-30 pointer-events-none" 
         style={{ borderColor: config.border }}
       />
       
