@@ -1170,9 +1170,6 @@ function WeeklyMicroTable({ allHistory, targets, micros, title, refDate, period 
 
   return (
     <Card className="border-none shadow-md bg-card rounded-3xl p-6 mx-1 mt-4 border border-muted/10 overflow-hidden relative">
-      <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
-        <TableIcon className="w-20 h-20 text-muted-foreground" />
-      </div>
       <div className="relative z-10 space-y-5">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
@@ -1231,15 +1228,6 @@ function WeeklyMicroTable({ allHistory, targets, micros, title, refDate, period 
               ))}
             </tbody>
           </table>
-        </div>
-
-        <div className="pt-4 border-t border-muted/5">
-          <div className="flex items-center gap-3 bg-muted/10 p-3 rounded-xl">
-            <Info className="w-3 h-3 text-muted-foreground/40 shrink-0" />
-            <p className="text-[8px] font-bold text-muted-foreground/60 uppercase leading-relaxed">
-              Analysis based on your biological markers. {period} averages calculated using only days where data was recorded.
-            </p>
-          </div>
         </div>
       </div>
     </Card>
