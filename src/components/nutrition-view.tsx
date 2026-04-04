@@ -56,6 +56,7 @@ import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { parseMeal } from '@/ai/flows/parse-meal-flow';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
+import { useToast } from "@/hooks/use-toast";
 import { 
   format, 
   startOfWeek, 
@@ -149,28 +150,8 @@ const MACRO_COLORS = {
   fiber: "#10b981"
 };
 
-const NutritionSphere = ({ icon: Icon }: { icon: any }) => (
-  <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
-    {/* Centered Boundary Ring */}
-    <div className="absolute inset-[-3px] rounded-full border border-[#14b8a6]/30 opacity-40 pointer-events-none" />
-    
-    {/* 3D Sphere Body */}
-    <div 
-      className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden shadow-[0_4px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.3)]"
-      style={{ background: 'linear-gradient(135deg, #14b8a6 0%, #0891b2 100%)' }}
-    >
-      {/* Gloss Highlight */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.4)_0%,transparent_65%)]" />
-      
-      {/* Icon */}
-      <div className="relative z-10 text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.3)]">
-        <Icon className="w-5 h-5" />
-      </div>
-    </div>
-  </div>
-);
-
 export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProps) {
+  const { toast } = useToast();
   const [showSummary, setShowSummary] = useState(false);
   const [showMacroAnalysis, setShowMacroAnalysis] = useState(false);
   const [showMicroAnalysis, setShowMicroAnalysis] = useState(false);
@@ -178,7 +159,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
   const [mealInput, setMealInput] = useState("");
   const [isParsing, setIsParsing] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [credits, setCredits] = useState(25);
+  const [credits, setCredits] = useState(20);
   
   const [recentMeals, setRecentMeals] = useState<LoggedMeal[]>([]);
   const [savedMeals, setSavedMeals] = useState<LoggedMeal[]>([]);
@@ -191,7 +172,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
     const savedRecent = localStorage.getItem('pulseflow_recent_meals');
     const savedFavorites = localStorage.getItem('pulseflow_saved_meals');
     const savedHistory = localStorage.getItem('pulseflow_all_meals_history');
-    const savedCredits = localStorage.getItem('pulseflow_meal_credits');
+    const savedCredits = localStorage.getItem('pulseflow_meal_credits_v2'); // New key for 20 limit
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
     const savedCache = localStorage.getItem('pulseflow_food_cache');
     
@@ -201,6 +182,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
     if (savedGoal) setGoalData(JSON.parse(savedGoal));
     if (savedCache) setFoodCache(JSON.parse(savedCache));
     if (savedCredits !== null) setCredits(Number(savedCredits));
+    else setCredits(20);
     
     setIsLoaded(true);
   }, []);
@@ -210,7 +192,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       localStorage.setItem('pulseflow_recent_meals', JSON.stringify(recentMeals));
       localStorage.setItem('pulseflow_saved_meals', JSON.stringify(savedMeals));
       localStorage.setItem('pulseflow_all_meals_history', JSON.stringify(allHistory));
-      localStorage.setItem('pulseflow_meal_credits', credits.toString());
+      localStorage.setItem('pulseflow_meal_credits_v2', credits.toString());
       localStorage.setItem('pulseflow_food_cache', JSON.stringify(foodCache));
     }
   }, [recentMeals, savedMeals, allHistory, credits, foodCache, isLoaded]);
@@ -225,7 +207,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         const today = new Date();
         const dateStr = format(today, 'yyyy-MM-dd');
         
-        return {
+        const mealData = {
           id: Math.random().toString(36).substr(2, 9),
           type: getMealTypeByTime(),
           name: `${quantity > 1 ? quantity + ' ' : ''}${foodName.charAt(0).toUpperCase() + foodName.slice(1)}`,
@@ -268,6 +250,19 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
             calcium: Math.round((data.calcium || 0) * quantity),
           }]
         } as LoggedMeal;
+
+        // Validation check for local cache hits too
+        if (mealData.calories > 20000) {
+          setCredits(prev => Math.max(0, prev - 1));
+          toast({
+            variant: "destructive",
+            title: "Invalid Meal",
+            description: "Meals above 20,000 calories cannot be logged."
+          });
+          return null;
+        }
+
+        return mealData;
       }
     }
     return null;
@@ -282,7 +277,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       setAllHistory(prev => [cachedMatch, ...prev]);
       setRecentMeals(prev => {
         const filtered = prev.filter(m => m.name.toLowerCase() !== cachedMatch.name.toLowerCase());
-        return [cachedMatch, ...filtered].slice(0, 10);
+        return [cachedMatch, ...filtered].slice(0, 20);
       });
       setMealInput("");
       return;
@@ -293,6 +288,32 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       const result = await parseMeal({ description: mealInput });
       const today = new Date();
       const dateStr = format(today, 'yyyy-MM-dd');
+      
+      // Consume credit regardless of outcome
+      setCredits(prev => Math.max(0, prev - 1));
+
+      // 1. Validation: Calorie limit
+      if (result.calories > 20000) {
+        toast({
+          variant: "destructive",
+          title: "Invalid Meal",
+          description: "Meals above 20,000 calories cannot be logged."
+        });
+        setMealInput("");
+        return;
+      }
+
+      // 2. Validation: Not a meal
+      const isCoherentMeal = result.calories > 0 && result.items.length > 0 && result.name.length > 2;
+      if (!isCoherentMeal) {
+        toast({
+          variant: "destructive",
+          title: "Invalid Meal",
+          description: "This doesn't seem to be a meal. Please describe what you ate."
+        });
+        setMealInput("");
+        return;
+      }
       
       const newMeal: LoggedMeal = {
         id: Math.random().toString(36).substr(2, 9),
@@ -354,20 +375,25 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
       setLoggedMeals(prev => [newMeal, ...prev]);
       setAllHistory(prev => [newMeal, ...prev]);
-      setCredits(prev => Math.max(0, prev - 1));
       setRecentMeals(prev => {
         const filtered = prev.filter(m => m.name.toLowerCase() !== newMeal.name.toLowerCase());
-        return [newMeal, ...filtered].slice(0, 10);
+        return [newMeal, ...filtered].slice(0, 20);
       });
       setMealInput("");
     } catch (error) {
       console.error("Failed to parse meal", error);
+      toast({
+        variant: "destructive",
+        title: "Analysis Failed",
+        description: "Could not analyze meal. Try again."
+      });
     } finally {
       setIsParsing(false);
     }
   };
 
   const logExistingMeal = (meal: LoggedMeal) => {
+    if (credits <= 0) return;
     const today = new Date();
     const dateStr = format(today, 'yyyy-MM-dd');
     const newEntry: LoggedMeal = {
@@ -388,6 +414,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       setSavedMeals(prev => prev.filter(m => m.name.toLowerCase() !== meal.name.toLowerCase()));
       return;
     }
+    // Limit to 50 saved items
     setSavedMeals(prev => [meal, ...prev].slice(0, 50));
   };
 
@@ -667,7 +694,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
             <div className="space-y-0.5">
               <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground">Meal Logging</h2>
               <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                Credits: <span className={cn("font-black", credits <= 5 ? "text-destructive" : "text-primary")}>{credits}/25</span>
+                CREDITS LEFT: <span className={cn("font-black", credits <= 5 ? "text-destructive" : "text-primary")}>{credits}/20</span>
               </p>
             </div>
             {Object.keys(foodCache).length > 0 && (
@@ -808,8 +835,8 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between px-1">
             <div className="space-y-0.5">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">MEALS</h2>
-              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/30">DAILY LOGGING</p>
+              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">DAILY HISTORY</h2>
+              <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/30">LOGGED ITEMS</p>
             </div>
             <button 
               onClick={() => setShowSummary(true)} 
