@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -47,7 +48,8 @@ import {
   Tooltip, 
   ResponsiveContainer,
   Line,
-  LineChart
+  LineChart,
+  Legend
 } from 'recharts';
 import {
   Accordion,
@@ -510,7 +512,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
             <div className="space-y-1.5">
               <div className="flex justify-between items-end">
                 <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Macro Ratio (P:C:F)</p>
-                <p className="text-[10px] font-black text-primary">{ratios.p}:{ratios.c}:{ratios.f}</p>
+                <p className="text-10px font-black text-primary">{ratios.p}:{ratios.c}:{ratios.f}</p>
               </div>
               <div className="flex h-2 w-full rounded-full overflow-hidden bg-muted/20">
                 <div style={{ width: `${Math.min(100, (pKcal / Math.max(1, totalMacroKcal)) * 100)}%`, backgroundColor: MACRO_COLORS.protein }} className="h-full transition-all duration-1000 ease-out" />
@@ -899,7 +901,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 }
 
 function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allHistory: LoggedMeal[], loggedMeals: LoggedMeal[], goalData: any, onBack: () => void }) {
-  const userWeight = parseFloat(goalData?.weight) || 75;
   const userGender = goalData?.gender || 'male';
   const userAge = parseInt(goalData?.age) || 25;
 
@@ -916,7 +917,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
       iron: userGender === 'male' ? 8 : (userAge < 50 ? 18 : 8),
       calcium: userAge > 50 && userGender === 'female' ? 1200 : 1000,
     };
-  }, [userWeight, userGender, userAge]);
+  }, [userGender, userAge]);
 
   const totals = useMemo(() => {
     return loggedMeals.reduce((acc, meal) => ({
@@ -952,39 +953,34 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
     { key: 'calcium', label: "Calcium", sub: "Contraction/Firing", val: totals.calcium, target: targets.calcium, unit: "mg", color: "#64748b" },
   ];
 
-  const historyTrendData = useMemo(() => {
-    return [6, 5, 4, 3, 2, 1, 0].map(daysAgo => {
-      const date = subDays(new Date(), daysAgo);
-      const dateStr = format(date, 'yyyy-MM-dd');
-      const dayMeals = allHistory.filter(m => m.dateStr === dateStr);
-      
-      const dayData: any = {
-        day: format(date, 'EEE'),
-      };
+  const todayMatrixData = useMemo(() => {
+    const todayMeals = [...loggedMeals].sort((a, b) => a.timestamp - b.timestamp);
+    const dataPoints: any[] = [{ name: 'Start' }];
+    
+    // Initial point
+    aesthetics.forEach(m => dataPoints[0][m.key] = 0);
+    performance.forEach(m => dataPoints[0][m.key] = 0);
 
-      // Aesthetics breakdown
-      let aesTotalPercent = 0;
-      aesthetics.forEach(micro => {
-        const dayVal = dayMeals.reduce((sum, meal) => sum + ((meal as any)[micro.key] || 0), 0);
-        const p = Math.min(100, Math.round((dayVal / (targets as any)[micro.key]) * 100));
-        dayData[`aes_${micro.key}`] = p;
-        aesTotalPercent += p;
+    let cumulativeAes: any = {};
+    let cumulativePerf: any = {};
+    aesthetics.forEach(m => cumulativeAes[m.key] = 0);
+    performance.forEach(m => cumulativePerf[m.key] = 0);
+
+    todayMeals.forEach((meal, idx) => {
+      const point: any = { name: `Meal ${idx + 1}` };
+      aesthetics.forEach(m => {
+        cumulativeAes[m.key] += (meal as any)[m.key] || 0;
+        point[m.key] = Math.min(100, Math.round((cumulativeAes[m.key] / targets[m.key as keyof typeof targets]) * 100));
       });
-      dayData.aesthetics_avg = Math.round(aesTotalPercent / aesthetics.length);
-
-      // Performance breakdown
-      let perfTotalPercent = 0;
-      performance.forEach(micro => {
-        const dayVal = dayMeals.reduce((sum, meal) => sum + ((meal as any)[micro.key] || 0), 0);
-        const p = Math.min(100, Math.round((dayVal / (targets as any)[micro.key]) * 100));
-        dayData[`perf_${micro.key}`] = p;
-        perfTotalPercent += p;
+      performance.forEach(m => {
+        cumulativePerf[m.key] += (meal as any)[m.key] || 0;
+        point[m.key] = Math.min(100, Math.round((cumulativePerf[m.key] / targets[m.key as keyof typeof targets]) * 100));
       });
-      dayData.performance_avg = Math.round(perfTotalPercent / performance.length);
-
-      return dayData;
+      dataPoints.push(point);
     });
-  }, [allHistory, targets, aesthetics, performance]);
+
+    return dataPoints;
+  }, [loggedMeals, targets, aesthetics, performance]);
 
   return (
     <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
@@ -994,7 +990,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
         </Button>
         <div className="space-y-0.5">
           <h1 className="text-2xl font-bold font-headline leading-none">Micro Analysis</h1>
-          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Precision Intelligence</p>
+          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Today's Precision</p>
         </div>
       </div>
 
@@ -1007,30 +1003,26 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
         <TabsContent value="aesthetics" className="space-y-4 mt-4">
           <div className="grid gap-2 px-1">
             {aesthetics.map((item, idx) => (
-              <MicroCard key={idx} rank={idx + 1} {...item} />
+              <MicroCard key={idx} {...item} />
             ))}
           </div>
-          <TrendAnalysisCard 
-            data={historyTrendData} 
-            dataKey="aesthetics_avg" 
+          <TodayMatrixCard 
+            data={todayMatrixData} 
             title="Aesthetics Matrix" 
-            color="#f97316"
-            micros={aesthetics.map(m => ({ ...m, key: `aes_${m.key}` }))}
+            micros={aesthetics}
           />
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-4 mt-4">
           <div className="grid gap-2 px-1">
             {performance.map((item, idx) => (
-              <MicroCard key={idx} rank={idx + 1} {...item} />
+              <MicroCard key={idx} {...item} />
             ))}
           </div>
-          <TrendAnalysisCard 
-            data={historyTrendData} 
-            dataKey="performance_avg" 
+          <TodayMatrixCard 
+            data={todayMatrixData} 
             title="Performance Matrix" 
-            color="#10b981"
-            micros={performance.map(m => ({ ...m, key: `perf_${m.key}` }))}
+            micros={performance}
           />
         </TabsContent>
       </Tabs>
@@ -1038,17 +1030,14 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
   );
 }
 
-function MicroCard({ rank, label, sub, val, target, unit, color }: any) {
+function MicroCard({ label, sub, val, target, unit, color }: any) {
   const percent = Math.min(100, Math.round((val / target) * 100));
   const isComplete = percent >= 100;
   
   return (
     <Card className="border-none bg-card overflow-hidden rounded-2xl border border-muted/10 group transition-all hover:bg-muted/5">
       <CardContent className="p-4 flex items-center gap-4">
-        <div className="w-10 h-10 flex flex-col items-center justify-center shrink-0 border border-muted/20 rounded-xl bg-muted/5 shadow-inner">
-          <span className="text-[8px] font-black text-muted-foreground/40 leading-none">RANK</span>
-          <span className="text-sm font-black text-foreground/80">{rank}</span>
-        </div>
+        <div className="w-2 h-10 rounded-full shrink-0" style={{ backgroundColor: color, opacity: 0.3 }} />
         <div className="flex-1 min-w-0 space-y-1">
           <div className="flex justify-between items-baseline">
             <h4 className="font-black text-xs text-foreground uppercase tracking-tight">{label}</h4>
@@ -1063,11 +1052,6 @@ function MicroCard({ rank, label, sub, val, target, unit, color }: any) {
                 className={cn("h-full transition-all duration-1000 ease-out rounded-full shadow-[0_0_8px_rgba(0,0,0,0.1)]")} 
                 style={{ width: `${percent}%`, backgroundColor: color }}
               />
-              {isComplete && (
-                <div className="absolute right-0 top-0 bottom-0 px-1 flex items-center bg-green-500 rounded-r-full">
-                  <ShieldCheck className="w-2 h-2 text-white" />
-                </div>
-              )}
             </div>
             <div className="flex justify-between text-[7px] font-black text-muted-foreground/30 uppercase tracking-tighter">
               <span>{val.toFixed(val < 1 && val > 0 ? 2 : 0)} {unit}</span>
@@ -1080,9 +1064,7 @@ function MicroCard({ rank, label, sub, val, target, unit, color }: any) {
   );
 }
 
-function TrendAnalysisCard({ data, dataKey, title, color, micros }: { data: any[], dataKey: string, title: string, color: string, micros: any[] }) {
-  const avg = Math.round(data.reduce((a, b) => a + b[dataKey], 0) / data.length);
-
+function TodayMatrixCard({ data, title, micros }: { data: any[], title: string, micros: any[] }) {
   return (
     <Card className="border-none shadow-md bg-card rounded-3xl p-6 mx-1 mt-6 border border-muted/10 overflow-hidden relative">
       <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
@@ -1097,23 +1079,17 @@ function TrendAnalysisCard({ data, dataKey, title, color, micros }: { data: any[
             </h3>
           </div>
           <div className="text-right">
-            <p className="text-lg font-black text-primary leading-none">{avg}%</p>
-            <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mt-1">7D EFFICIENCY</p>
+            <p className="text-lg font-black text-primary leading-none">TODAY</p>
+            <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mt-1">INTAKE PRORESSION</p>
           </div>
         </div>
 
-        <div className="h-[160px] w-full -mx-2">
+        <div className="h-[200px] w-full -mx-2">
           <ResponsiveContainer width="100%" height="100%">
-            <AreaChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-              <defs>
-                <linearGradient id={`color${dataKey}`} x1="0" y1="0" x2="0" y2="1">
-                  <stop offset="5%" stopColor={color} stopOpacity={0.15}/>
-                  <stop offset="95%" stopColor={color} stopOpacity={0}/>
-                </linearGradient>
-              </defs>
+            <LineChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
               <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
               <XAxis 
-                dataKey="day" 
+                dataKey="name" 
                 axisLine={false} 
                 tickLine={false} 
                 tick={{ fontSize: 8, fontWeight: 900, fill: 'hsl(var(--muted-foreground))' }} 
@@ -1127,10 +1103,9 @@ function TrendAnalysisCard({ data, dataKey, title, color, micros }: { data: any[
               />
               <Tooltip 
                 contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', fontSize: '9px', fontWeight: '900', background: 'hsl(var(--card))' }}
-                cursor={{ stroke: color, strokeWidth: 1, strokeDasharray: '4 4' }}
+                cursor={{ stroke: 'hsl(var(--primary))', strokeWidth: 1, strokeDasharray: '4 4' }}
               />
               
-              {/* Individual Micro Lines */}
               {micros.map((m, i) => (
                 <Line 
                   key={m.key}
@@ -1138,34 +1113,20 @@ function TrendAnalysisCard({ data, dataKey, title, color, micros }: { data: any[
                   dataKey={m.key}
                   name={m.label}
                   stroke={m.color}
-                  strokeWidth={1.2}
-                  dot={false}
-                  opacity={0.4}
-                  activeDot={false}
+                  strokeWidth={2.5}
+                  dot={{ r: 3, strokeWidth: 2, fill: "hsl(var(--card))" }}
+                  activeDot={{ r: 5, strokeWidth: 0 }}
+                  animationDuration={1500}
                 />
               ))}
-
-              {/* Main Average Area */}
-              <Area 
-                type="monotone" 
-                dataKey={dataKey} 
-                name="Combined Score"
-                stroke={color} 
-                strokeWidth={3} 
-                fillOpacity={1} 
-                fill={`url(#color${dataKey})`} 
-                animationDuration={2000}
-                dot={{ r: 3, fill: color, strokeWidth: 1.5, stroke: "hsl(var(--card))" }}
-                activeDot={{ r: 5, strokeWidth: 0 }}
-              />
-            </AreaChart>
+            </LineChart>
           </ResponsiveContainer>
         </div>
 
-        <div className="grid grid-cols-5 gap-1 pt-2">
+        <div className="grid grid-cols-5 gap-1 pt-2 border-t border-muted/5">
           {micros.map((m, i) => (
-            <div key={i} className="flex flex-col items-center gap-1.5 opacity-60">
-              <div className="w-1 h-4 rounded-full" style={{ backgroundColor: m.color }} />
+            <div key={i} className="flex flex-col items-center gap-1.5 opacity-80">
+              <div className="w-full h-1 rounded-full" style={{ backgroundColor: m.color }} />
               <span className="text-[6px] font-black text-muted-foreground uppercase text-center leading-tight truncate w-full">{m.label}</span>
             </div>
           ))}
