@@ -36,7 +36,7 @@ import {
   Dumbbell,
   X,
   ShieldCheck,
-  ZapOff
+  Table as TableIcon
 } from "lucide-react";
 import { 
   AreaChart, 
@@ -46,11 +46,8 @@ import {
   CartesianGrid, 
   Tooltip, 
   ResponsiveContainer,
-  Line,
-  LineChart,
   Bar,
-  BarChart,
-  Legend
+  BarChart
 } from 'recharts';
 import {
   Accordion,
@@ -947,35 +944,6 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
     { id: 'calcium', label: "Calcium", sub: "Contraction/Firing", val: totals.calcium, target: targets.calcium, unit: "mg", color: "#64748b" },
   ];
 
-  const todayMatrixData = useMemo(() => {
-    const todayMeals = [...loggedMeals].sort((a, b) => a.timestamp - b.timestamp);
-    const dataPoints: any[] = [{ name: 'Start' }];
-    
-    // Initial point
-    aesthetics.forEach(m => dataPoints[0][m.id] = 0);
-    performance.forEach(m => dataPoints[0][m.id] = 0);
-
-    let cumulativeAes: any = {};
-    let cumulativePerf: any = {};
-    aesthetics.forEach(m => cumulativeAes[m.id] = 0);
-    performance.forEach(m => cumulativePerf[m.id] = 0);
-
-    todayMeals.forEach((meal, idx) => {
-      const point: any = { name: `Meal ${idx + 1}` };
-      aesthetics.forEach(m => {
-        cumulativeAes[m.id] += (meal as any)[m.id] || 0;
-        point[m.id] = Math.min(100, Math.round((cumulativeAes[m.id] / targets[m.id as keyof typeof targets]) * 100));
-      });
-      performance.forEach(m => {
-        cumulativePerf[m.id] += (meal as any)[m.id] || 0;
-        point[m.id] = Math.min(100, Math.round((cumulativePerf[m.id] / targets[m.id as keyof typeof targets]) * 100));
-      });
-      dataPoints.push(point);
-    });
-
-    return dataPoints;
-  }, [loggedMeals, targets, aesthetics, performance]);
-
   return (
     <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2 px-1">
@@ -1000,10 +968,11 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
               <MicroCard key={idx} {...item} />
             ))}
           </div>
-          <TodayMatrixCard 
-            data={todayMatrixData} 
+          <WeeklyMicroTable 
+            allHistory={allHistory} 
+            targets={targets} 
+            micros={aesthetics} 
             title="Aesthetics Matrix" 
-            micros={aesthetics}
           />
         </TabsContent>
 
@@ -1013,10 +982,11 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
               <MicroCard key={idx} {...item} />
             ))}
           </div>
-          <TodayMatrixCard 
-            data={todayMatrixData} 
+          <WeeklyMicroTable 
+            allHistory={allHistory} 
+            targets={targets} 
+            micros={performance} 
             title="Performance Matrix" 
-            micros={performance}
           />
         </TabsContent>
       </Tabs>
@@ -1058,70 +1028,113 @@ function MicroCard({ label, sub, val, target, unit, color }: any) {
   );
 }
 
-function TodayMatrixCard({ data, title, micros }: { data: any[], title: string, micros: any[] }) {
+function WeeklyMicroTable({ allHistory, targets, micros, title }: { allHistory: LoggedMeal[], targets: any, micros: any[], title: string }) {
+  const last7Days = useMemo(() => {
+    return [6, 5, 4, 3, 2, 1, 0].map(daysAgo => {
+      const d = subDays(new Date(), daysAgo);
+      return {
+        dateStr: format(d, 'yyyy-MM-dd'),
+        dayName: format(d, 'EEE')
+      };
+    });
+  }, []);
+
+  const tableData = useMemo(() => {
+    return micros.map(m => {
+      const dailyValues = last7Days.map(day => {
+        const dayMeals = allHistory.filter(meal => meal.dateStr === day.dateStr);
+        const sum = dayMeals.reduce((acc, meal) => acc + ((meal as any)[m.id] || 0), 0);
+        return sum;
+      });
+
+      const avg = dailyValues.reduce((a, b) => a + b, 0) / dailyValues.length;
+      const target = targets[m.id];
+      const percentMet = Math.round((avg / target) * 100);
+
+      return {
+        nutrient: m.label,
+        unit: m.unit,
+        target,
+        daily: dailyValues,
+        avg,
+        percentMet,
+        color: m.color
+      };
+    });
+  }, [allHistory, last7Days, micros, targets]);
+
   return (
     <Card className="border-none shadow-md bg-card rounded-3xl p-6 mx-1 mt-6 border border-muted/10 overflow-hidden relative">
-      <div className="absolute top-0 right-0 p-6 opacity-10 pointer-events-none">
-        <Activity className="w-20 h-20 text-muted-foreground" />
+      <div className="absolute top-0 right-0 p-6 opacity-5 pointer-events-none">
+        <TableIcon className="w-20 h-20 text-muted-foreground" />
       </div>
       <div className="relative z-10 space-y-5">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">INTELLIGENCE LOG</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">INTELLIGENCE SHEET</p>
             <h3 className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-primary" /> {title}
             </h3>
           </div>
           <div className="text-right">
-            <p className="text-lg font-black text-primary leading-none">TODAY</p>
-            <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mt-1">INTAKE PRORESSION</p>
+            <p className="text-lg font-black text-primary leading-none">WEEKLY</p>
+            <p className="text-[7px] font-black text-muted-foreground uppercase tracking-widest mt-1">DATA ANALYSIS</p>
           </div>
         </div>
 
-        <div className="h-[200px] w-full -mx-2">
-          <ResponsiveContainer width="100%" height="100%">
-            <BarChart data={data} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
-              <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
-              <XAxis 
-                dataKey="name" 
-                axisLine={false} 
-                tickLine={false} 
-                tick={{ fontSize: 8, fontWeight: 900, fill: 'hsl(var(--muted-foreground))' }} 
-                dy={10}
-              />
-              <YAxis 
-                domain={[0, 100]}
-                axisLine={false} 
-                tickLine={false} 
-                tick={{ fontSize: 8, fontWeight: 900, fill: 'hsl(var(--muted-foreground))' }}
-              />
-              <Tooltip 
-                contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 32px rgba(0,0,0,0.15)', fontSize: '9px', fontWeight: '900', background: 'hsl(var(--card))' }}
-                cursor={{ fill: 'hsl(var(--primary))', opacity: 0.05 }}
-              />
-              
-              {micros.map((m, i) => (
-                <Bar 
-                  key={m.id}
-                  dataKey={m.id}
-                  name={m.label}
-                  fill={m.color}
-                  radius={[2, 2, 0, 0]}
-                  barSize={6}
-                  animationDuration={1500}
-                />
+        <div className="overflow-x-auto -mx-6 px-6 swipe-container">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="border-b border-muted/10">
+                <th className="py-2 pr-4 text-[8px] font-black uppercase text-muted-foreground tracking-widest whitespace-nowrap">Nutrient</th>
+                {last7Days.map((day, i) => (
+                  <th key={i} className="py-2 px-3 text-[8px] font-black uppercase text-muted-foreground text-center">{day.dayName}</th>
+                ))}
+                <th className="py-2 px-3 text-[8px] font-black uppercase text-primary text-center bg-primary/5">Avg</th>
+                <th className="py-2 pl-4 text-[8px] font-black uppercase text-foreground text-right">% Met</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-muted/5">
+              {tableData.map((row, idx) => (
+                <tr key={idx} className="group hover:bg-muted/5 transition-colors">
+                  <td className="py-3 pr-4">
+                    <div className="flex items-center gap-2">
+                      <div className="w-1.5 h-3 rounded-full opacity-40" style={{ backgroundColor: row.color }} />
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-black text-foreground/80 uppercase tracking-tighter truncate">{row.nutrient}</p>
+                        <p className="text-[7px] font-bold text-muted-foreground uppercase leading-none">{row.unit}</p>
+                      </div>
+                    </div>
+                  </td>
+                  {row.daily.map((val, i) => (
+                    <td key={i} className="py-3 px-3 text-[10px] font-bold text-muted-foreground/60 text-center font-mono">
+                      {val > 0 ? val.toFixed(val < 1 ? 2 : 0) : '—'}
+                    </td>
+                  ))}
+                  <td className="py-3 px-3 text-[10px] font-black text-primary text-center bg-primary/5 font-mono">
+                    {row.avg.toFixed(row.avg < 1 ? 2 : 0)}
+                  </td>
+                  <td className="py-3 pl-4 text-right">
+                    <span className={cn(
+                      "text-[10px] font-black font-mono",
+                      row.percentMet >= 100 ? "text-green-600" : "text-foreground/70"
+                    )}>
+                      {row.percentMet}%
+                    </span>
+                  </td>
+                </tr>
               ))}
-            </BarChart>
-          </ResponsiveContainer>
+            </tbody>
+          </table>
         </div>
 
-        <div className="grid grid-cols-5 gap-1 pt-2 border-t border-muted/5">
-          {micros.map((m, i) => (
-            <div key={i} className="flex flex-col items-center gap-1.5 opacity-80">
-              <div className="w-full h-1 rounded-full" style={{ backgroundColor: m.color }} />
-              <span className="text-[6px] font-black text-muted-foreground uppercase text-center leading-tight truncate w-full">{m.label}</span>
-            </div>
-          ))}
+        <div className="pt-4 border-t border-muted/5">
+          <div className="flex items-center gap-3 bg-muted/10 p-3 rounded-xl">
+            <Info className="w-3 h-3 text-muted-foreground/40 shrink-0" />
+            <p className="text-[8px] font-bold text-muted-foreground/60 uppercase leading-relaxed">
+              Target requirements are calculated based on your biological markers (Age, Sex, Weight). Consistency over 7 days is prioritized for physiological adaptation.
+            </p>
+          </div>
         </div>
       </div>
     </Card>
