@@ -52,6 +52,57 @@ interface DashboardViewProps {
   onViewGoalSetting?: () => void;
 }
 
+const MetricSphere = ({ type, icon: Icon }: { type: 'steps' | 'hydration' | 'calories' | 'streak', icon: any }) => {
+  const configs = {
+    steps: {
+      bg: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+      border: '#10b981',
+      shadow: 'rgba(16, 185, 129, 0.2)'
+    },
+    hydration: {
+      bg: 'linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%)',
+      border: '#0ea5e9',
+      shadow: 'rgba(14, 165, 233, 0.2)'
+    },
+    calories: {
+      bg: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+      border: '#f59e0b',
+      shadow: 'rgba(245, 158, 11, 0.2)'
+    },
+    streak: {
+      bg: 'linear-gradient(135deg, #ef4444 0%, #b91c1c 100%)',
+      border: '#ef4444',
+      shadow: 'rgba(239, 68, 68, 0.2)'
+    }
+  };
+
+  const config = configs[type];
+
+  return (
+    <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
+      {/* Outer Boundary Ring - Perfectly Centered */}
+      <div 
+        className="absolute inset-[-2px] rounded-full border opacity-30 pointer-events-none" 
+        style={{ borderColor: config.border }}
+      />
+      
+      {/* Main 3D Sphere Body */}
+      <div 
+        className="absolute inset-0 rounded-full flex items-center justify-center overflow-hidden shadow-[0_3px_6px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.3)]"
+        style={{ background: config.bg }}
+      >
+        {/* Top Gloss Highlight for 3D depth */}
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.4)_0%,transparent_65%)]" />
+        
+        {/* The Icon */}
+        <div className="relative z-10 text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.3)]">
+          <Icon className="w-4 h-4" />
+        </div>
+      </div>
+    </div>
+  );
+};
+
 export function DashboardView({ 
   tasks, 
   onToggleTask, 
@@ -156,7 +207,7 @@ export function DashboardView({
       target: targetCal.toLocaleString(), 
       current: currentCal,
       targetVal: targetCal,
-      icon: <Flame className="w-4 h-4 text-orange-500" />, 
+      icon: Flame, 
       color: "bg-orange-50" 
     },
     { 
@@ -167,7 +218,7 @@ export function DashboardView({
       target: (goalData?.hydrationTargetLiters || 3.0).toFixed(1), 
       current: hydrationAmount / 1000,
       targetVal: goalData?.hydrationTargetLiters || 3.0,
-      icon: <Droplets className="w-4 h-4 text-sky-500" />, 
+      icon: Droplets, 
       color: "bg-sky-50" 
     },
     { 
@@ -178,7 +229,7 @@ export function DashboardView({
       target: "7", 
       current: streakData.count,
       targetVal: 7,
-      icon: <Zap className="w-4 h-4 text-yellow-500" />, 
+      icon: Zap, 
       color: "bg-yellow-50" 
     },
     { 
@@ -189,7 +240,7 @@ export function DashboardView({
       target: "10,000", 
       current: stepsCount,
       targetVal: 10000,
-      icon: <Footprints className="w-4 h-4 text-green-500" />, 
+      icon: Footprints, 
       color: "bg-green-50" 
     },
   ];
@@ -350,33 +401,14 @@ export function DashboardView({
                   <CardContent className="p-3 flex flex-col justify-between h-32">
                     <div className="flex justify-between items-start">
                       <div className="flex flex-col gap-1">
-                        {isSteps ? (
-                          <div className="relative w-8 h-8 flex items-center justify-center shrink-0">
-                            <div 
-                              className="absolute inset-0 rounded-full shadow-[0_3px_6px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.3)] flex items-center justify-center overflow-hidden"
-                              style={{
-                                background: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #064e3b 100%)',
-                              }}
-                            >
-                              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(255,255,255,0.3)_0%,transparent_70%)] opacity-60" />
-                              <Footprints className="w-4 h-4 text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.3)] relative z-10" />
-                            </div>
-                            <div 
-                              className="absolute -inset-[1px] rounded-full opacity-30 pointer-events-none"
-                              style={{
-                                border: '1px solid transparent',
-                                backgroundImage: 'linear-gradient(white, white), linear-gradient(135deg, #34d399, #065f46)',
-                                backgroundOrigin: 'border-box',
-                                backgroundClip: 'content-box, border-box',
-                              }}
-                            />
-                          </div>
+                        {isCalories || isHydration || isSteps ? (
+                          <MetricSphere type={m.id as any} icon={m.icon} />
                         ) : (
                           <div className={`p-1.5 rounded-lg w-fit ${m.color}`}>
-                            {m.icon}
+                            <m.icon className="w-4 h-4 text-yellow-500" />
                           </div>
                         )}
-                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">{m.label}</p>
+                        <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight mt-1">{m.label}</p>
                       </div>
                       {isStreak ? (
                         <span className="text-[9px] font-black text-primary uppercase tracking-tighter">{streakData.count} DAY STREAK</span>
