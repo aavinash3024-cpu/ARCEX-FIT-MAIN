@@ -51,12 +51,6 @@ import {
   Bar,
   BarChart
 } from 'recharts';
-import {
-  Accordion,
-  AccordionItem,
-  AccordionTrigger,
-  AccordionContent
-} from "@/accordion"; // Assuming standard import if UI exists
 import Image from "next/image";
 import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { parseMeal } from '@/ai/flows/parse-meal-flow';
@@ -75,7 +69,8 @@ import {
   subWeeks,
   addMonths,
   subMonths,
-  addDays
+  addDays,
+  eachDayOfInterval
 } from 'date-fns';
 
 interface MealItem {
@@ -1134,16 +1129,12 @@ function WeeklyMicroTable({ allHistory, targets, micros, title, refDate, period 
         };
       });
     } else {
-      // For monthly, showing all days is too wide, so we show the "Last 7 Days" of that month or just first 7
-      // For simplicity and user expectation, showing the selected week is better if the UI supports only 7 cols.
       const start = startOfMonth(refDate);
-      return [0, 1, 2, 3, 4, 5, 6].map(offset => {
-        const d = addDays(start, offset);
-        return {
-          dateStr: format(d, 'yyyy-MM-dd'),
-          dayName: format(d, 'd')
-        };
-      });
+      const end = endOfMonth(refDate);
+      return eachDayOfInterval({ start, end }).map(d => ({
+        dateStr: format(d, 'yyyy-MM-dd'),
+        dayName: format(d, 'd')
+      }));
     }
   }, [refDate, period]);
 
@@ -1185,7 +1176,7 @@ function WeeklyMicroTable({ allHistory, targets, micros, title, refDate, period 
       <div className="relative z-10 space-y-5">
         <div className="flex items-center justify-between">
           <div className="space-y-0.5">
-            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">{period === 'weekly' ? 'WEEKLY BREAKDOWN' : 'MONTH START SAMPLE'}</p>
+            <p className="text-[9px] font-black uppercase tracking-[0.2em] text-muted-foreground/60">{period === 'weekly' ? 'WEEKLY BREAKDOWN' : 'MONTHLY BREAKDOWN'}</p>
             <h3 className="text-sm font-black uppercase tracking-tight flex items-center gap-2">
               <ShieldCheck className="w-4 h-4 text-primary" /> {title}
             </h3>
