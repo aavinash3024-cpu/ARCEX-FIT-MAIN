@@ -82,20 +82,6 @@ const formatExerciseTime = (seconds: any) => {
   return `${m}m ${s}s`;
 };
 
-const WorkoutSphere = ({ icon: Icon, colorClass, bgClass }: { icon: any, colorClass: string, bgClass: string }) => (
-  <div className="relative w-10 h-10 flex items-center justify-center shrink-0">
-    <div className={cn("absolute inset-[-3px] rounded-full border opacity-40 pointer-events-none", colorClass.replace('text-', 'border-'))} />
-    <div 
-      className={cn("absolute inset-0 rounded-full flex items-center justify-center overflow-hidden shadow-[0_4px_8px_rgba(0,0,0,0.15),inset_0_1px_2px_rgba(255,255,255,0.3)]", bgClass)}
-    >
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_30%,rgba(255,255,255,0.4)_0%,transparent_65%)]" />
-      <div className="relative z-10 text-white drop-shadow-[0_1.5px_1.5px_rgba(0,0,0,0.3)]">
-        <Icon className="w-5 h-5" />
-      </div>
-    </div>
-  </div>
-);
-
 export function WorkoutView() {
   const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split' | 'history' | 'pr' | 'pr-detail'>('main');
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
@@ -425,7 +411,6 @@ export function WorkoutView() {
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
 
-      {/* Today's Workout - Redesigned to match Meal Logging card */}
       <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
         <div className="relative h-24 w-full">
           <Image 
@@ -507,7 +492,6 @@ export function WorkoutView() {
         </CardContent>
       </Card>
 
-      {/* Split Card */}
       <Card 
         onClick={() => setActiveSubView('split')}
         className="border-none shadow-sm bg-card overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400 rounded-lg flex items-center h-20 mx-1"
@@ -532,7 +516,6 @@ export function WorkoutView() {
         </div>
       </Card>
 
-      {/* PR Card */}
       <Card 
         onClick={() => setActiveSubView('pr')} 
         className="border-none shadow-sm bg-card border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all rounded-lg flex items-center h-20 mx-1"
@@ -557,7 +540,6 @@ export function WorkoutView() {
         </div>
       </Card>
 
-      {/* History and Library Grid */}
       <div className="grid grid-cols-2 gap-4 pb-6 mx-1">
         <Card 
           onClick={() => setActiveSubView('history')}
@@ -1322,7 +1304,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
                 onClick={() => setActiveMuscleReport(muscle)}
                 className={cn(
                   "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-                  activeMuscleReport === muscle ? "bg-primary text-white border-primary shadow-md" : "bg-card text-muted-foreground border-muted/20"
+                  activeMuscleReport === muscle ? "bg-primary text-white border-primary shadow-lg" : "bg-card text-muted-foreground border-muted/20"
                 )}
               >
                 {muscle}
@@ -1372,7 +1354,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
 
                   <div className="space-y-3">
                     <div className="flex items-center gap-2">
-                      <div className="w-1 h-3 bg-amber-500 rounded-full" />
+                      <div className="w-1 h-3 bg-primary rounded-full" />
                       <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">INDIRECTLY GETTING TRAINED BY</h4>
                     </div>
                     {currentMuscleReport.secondary.length === 0 ? (
@@ -1380,7 +1362,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
                     ) : (
                       <div className="flex flex-wrap gap-1.5 pl-3">
                         {currentMuscleReport.secondary.map((ex: any, i: number) => (
-                          <Badge key={i} variant="secondary" className="bg-orange-50 text-orange-600 text-[8px] font-bold uppercase">
+                          <Badge key={i} variant="secondary" className="bg-primary/10 text-primary text-[8px] font-bold uppercase">
                             {ex.name} ({ex.day.substring(0, 3)})
                           </Badge>
                         ))}
@@ -1390,7 +1372,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
 
                   <div className="space-y-3 pt-2">
                     <div className="flex items-center gap-2">
-                      <div className="w-1 h-3 bg-indigo-500 rounded-full" />
+                      <div className="w-1 h-3 bg-primary rounded-full" />
                       <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">MUSCLE STATUS</h4>
                     </div>
                     <div className="grid gap-2 pl-3">
@@ -1405,12 +1387,6 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
                               {isTrained ? <Check className="w-2.5 h-2.5" /> : <X className="w-2.5 h-2.5" />}
                               {zone}
                             </Badge>
-                            <span className={cn(
-                              "text-[8px] font-black uppercase tracking-widest",
-                              isTrained ? "text-green-600" : "text-destructive/40"
-                            )}>
-                              {isTrained ? "OPTIMIZED" : "NEGLECTED"}
-                            </span>
                           </div>
                         );
                       })}
