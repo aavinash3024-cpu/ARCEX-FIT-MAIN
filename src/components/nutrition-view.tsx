@@ -36,7 +36,9 @@ import {
   Dumbbell,
   X,
   ShieldCheck,
-  Table as TableIcon
+  Table as TableIcon,
+  CircleCheck,
+  AlertCircle
 } from "lucide-react";
 import { 
   AreaChart, 
@@ -1185,8 +1187,6 @@ function MealHistoryView({ allHistory, goalData, onBack }: { allHistory: LoggedM
     const targetCal = goalData?.finalCalories || 2200;
     const totalIntake = chartData.reduce((acc, curr) => acc + curr.calories, 0);
     const daysTracked = chartData.filter(d => d.calories > 0).length;
-    
-    // Use daysTracked for the target calculation instead of static 7 days
     const totalTargetForLoggedDays = targetCal * daysTracked;
     const balance = daysTracked > 0 ? totalIntake - totalTargetForLoggedDays : 0;
     const avgIntake = daysTracked > 0 ? Math.round(totalIntake / daysTracked) : 0;
@@ -1281,88 +1281,122 @@ function MealHistoryView({ allHistory, goalData, onBack }: { allHistory: LoggedM
         </div>
       </Card>
 
-      <div className="space-y-3 px-1">
+      <div className="space-y-4 px-1">
         {weekDays.map((day) => {
           const dateStr = format(day, 'yyyy-MM-dd');
           const dayMeals = allHistory.filter(m => m.dateStr === dateStr);
           const dailyCal = dayMeals.reduce((acc, m) => acc + m.calories, 0);
           const targetCal = goalData?.finalCalories || 2200;
           const diff = dailyCal - targetCal;
+          const hasLogs = dayMeals.length > 0;
+          const percentage = Math.min(100, Math.round((dailyCal / targetCal) * 100));
 
           return (
             <Accordion key={dateStr} type="single" collapsible className="w-full">
               <AccordionItem value={dateStr} className="border-none">
                 <Card className={cn(
-                  "border-none shadow-sm overflow-hidden bg-card rounded-[1.25rem] transition-all",
-                  dayMeals.length === 0 ? "opacity-40" : ""
+                  "border shadow-sm overflow-hidden bg-card rounded-2xl transition-all border-muted/20",
+                  !hasLogs && "opacity-40 grayscale"
                 )}>
                   <AccordionTrigger className="p-0 hover:no-underline [&[data-state=open]]:bg-muted/5 group [&>svg]:hidden">
-                    <div className="flex items-center justify-between w-full py-3 px-6">
-                      <div className="text-left">
-                        <h3 className="text-[13px] font-black text-foreground leading-tight">
-                          {format(day, 'EEEE, MMM d')}
-                        </h3>
-                        <p className={cn(
-                          "text-[9px] font-black uppercase mt-0.5",
-                          dayMeals.length > 0 ? "text-primary" : "text-muted-foreground"
-                        )}>
-                          {dayMeals.length > 0 ? `${dayMeals.length} MEALS LOGGED` : "NO DATA"}
-                        </p>
+                    <div className="flex w-full min-h-[80px]">
+                      {/* Left Date Block */}
+                      <div className={cn(
+                        "w-16 shrink-0 flex flex-col items-center justify-center border-r border-muted/10",
+                        hasLogs && (diff <= 0 ? "bg-green-50/50" : "bg-orange-50/50")
+                      )}>
+                        <p className="text-[10px] font-black text-muted-foreground uppercase leading-none mb-1">{format(day, 'EEE')}</p>
+                        <p className="text-xl font-black text-foreground leading-none">{format(day, 'd')}</p>
                       </div>
-                      <div className="text-right flex items-center gap-4">
-                        <div className="space-y-0.5">
-                          <p className="text-[11px] font-black text-foreground/80">{dailyCal.toLocaleString()} <span className="text-[8px] opacity-40">KCAL</span></p>
-                          {dailyCal > 0 && (
-                            <p className={cn("text-[7px] font-black uppercase", diff <= 0 ? "text-green-600" : "text-orange-500")}>
-                              {diff <= 0 ? 'UNDER' : 'OVER'} TARGET
-                            </p>
+
+                      {/* Main Info */}
+                      <div className="flex-1 p-4 flex flex-col justify-center gap-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex flex-col items-start">
+                            <span className="text-[11px] font-black text-foreground uppercase tracking-tight">
+                              {hasLogs ? `${dayMeals.length} Meals Logged` : "No Entry Recorded"}
+                            </span>
+                            <div className="flex items-baseline gap-1 mt-0.5">
+                              <span className="text-xs font-black text-foreground/60">{dailyCal.toLocaleString()}</span>
+                              <span className="text-[8px] font-bold text-muted-foreground uppercase">/ {targetCal} Kcal</span>
+                            </div>
+                          </div>
+                          
+                          {hasLogs && (
+                            <Badge variant="outline" className={cn(
+                              "text-[8px] h-5 font-black uppercase border-none gap-1",
+                              diff <= 0 ? "bg-green-100 text-green-700" : "bg-orange-100 text-orange-700"
+                            )}>
+                              {diff <= 0 ? <CircleCheck className="w-2.5 h-2.5" /> : <AlertCircle className="w-2.5 h-2.5" />}
+                              {diff <= 0 ? "Optimized" : "Surplus"}
+                            </Badge>
                           )}
                         </div>
-                        <ChevronRight className="w-4 h-4 text-muted-foreground/30 transition-transform duration-200 group-data-[state=open]:rotate-90" />
+
+                        {hasLogs && (
+                          <div className="w-full h-1 bg-muted/20 rounded-full overflow-hidden">
+                            <div 
+                              className={cn("h-full transition-all duration-700 ease-out", diff <= 0 ? "bg-green-500" : "bg-orange-500")}
+                              style={{ width: `${percentage}%` }}
+                            />
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Right Icon */}
+                      <div className="w-10 flex items-center justify-center border-l border-muted/5">
+                        <ChevronRight className="w-4 h-4 text-muted-foreground/30 transition-transform duration-300 group-data-[state=open]:rotate-90" />
                       </div>
                     </div>
                   </AccordionTrigger>
-                  <AccordionContent className="p-0">
-                    <div className="p-3 space-y-2 bg-muted/5 border-t border-muted/10">
+                  <AccordionContent className="p-0 border-t border-muted/10">
+                    <div className="bg-muted/5 divide-y divide-muted/10">
                       {dayMeals.length === 0 ? (
-                        <p className="text-center py-4 text-[9px] font-bold text-muted-foreground uppercase">No entries recorded</p>
+                        <p className="text-center py-8 text-[10px] font-bold text-muted-foreground/40 uppercase tracking-widest">
+                          Awaiting your nutritional logs
+                        </p>
                       ) : (
                         dayMeals.map(meal => (
-                          <Card key={meal.id} className="border border-muted/20 bg-card rounded-xl overflow-hidden shadow-sm">
-                            <CardContent className="p-3 space-y-2">
-                              <div className="flex justify-between items-start">
-                                <div className="space-y-0.5">
-                                  <p className="text-[8px] font-black text-primary uppercase tracking-widest">{meal.type}</p>
-                                  <h4 className="text-xs font-bold text-foreground/90">{meal.name}</h4>
+                          <div key={meal.id} className="p-4 space-y-3">
+                            <div className="flex justify-between items-start">
+                              <div className="flex items-center gap-3">
+                                <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
+                                  <Utensils className="w-4 h-4 text-primary" />
                                 </div>
-                                <div className="text-right">
-                                  <p className="text-[11px] font-black">{Math.round(meal.calories)} <span className="text-[8px] opacity-40 uppercase">Kcal</span></p>
-                                  <p className="text-[7px] font-bold text-muted-foreground uppercase">{meal.time}</p>
+                                <div>
+                                  <p className="text-[8px] font-black text-primary uppercase tracking-widest leading-none mb-1">{meal.type}</p>
+                                  <h4 className="text-[13px] font-bold text-foreground leading-tight">{meal.name}</h4>
                                 </div>
                               </div>
-                              
-                              {meal.items && meal.items.length > 0 && (
-                                <div className="border-l-2 border-muted/20 pl-2.5 py-0.5 space-y-1 my-1">
-                                  {meal.items.map((item, i) => (
-                                    <div key={i} className="flex justify-between items-center">
-                                      <span className="text-[9px] font-bold text-muted-foreground/80 uppercase truncate max-w-[180px]">
-                                        {item.quantity} {item.name}
-                                      </span>
-                                      <span className="text-[8px] font-black text-muted-foreground/40 uppercase">
-                                        {Math.round(item.calories)} kcal
-                                      </span>
-                                    </div>
-                                  ))}
-                                </div>
-                              )}
+                              <div className="text-right">
+                                <p className="text-[13px] font-black">{Math.round(meal.calories)} <span className="text-[8px] opacity-40 uppercase">Kcal</span></p>
+                                <p className="text-[8px] font-bold text-muted-foreground uppercase">{meal.time}</p>
+                              </div>
+                            </div>
+                            
+                            {meal.items && meal.items.length > 0 && (
+                              <div className="flex flex-wrap gap-2">
+                                {meal.items.map((item, i) => (
+                                  <Badge key={i} variant="outline" className="text-[8px] font-bold text-muted-foreground/80 py-0 h-4 border-muted/20">
+                                    {item.quantity} {item.name}
+                                  </Badge>
+                                ))}
+                              </div>
+                            )}
 
-                              <div className="flex gap-3 text-[9px] font-black uppercase tracking-tight pt-1 border-t border-muted/5">
-                                <span style={{ color: MACRO_COLORS.protein }}>P {Math.round(meal.protein)}G</span>
-                                <span style={{ color: MACRO_COLORS.carbs }}>C {Math.round(meal.carbs)}G</span>
-                                <span style={{ color: MACRO_COLORS.fat }}>F {Math.round(meal.fat)}G</span>
-                              </div>
-                            </CardContent>
-                          </Card>
+                            <div className="flex items-center gap-4 pt-1">
+                              {[
+                                { label: 'P', val: meal.protein, color: MACRO_COLORS.protein },
+                                { label: 'C', val: meal.carbs, color: MACRO_COLORS.carbs },
+                                { label: 'F', val: meal.fat, color: MACRO_COLORS.fat }
+                              ].map(m => (
+                                <div key={m.label} className="flex items-baseline gap-1">
+                                  <span className="text-[8px] font-black text-muted-foreground/40 uppercase">{m.label}</span>
+                                  <span className="text-[10px] font-black" style={{ color: m.color }}>{Math.round(m.val)}g</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
                         ))
                       )}
                     </div>
