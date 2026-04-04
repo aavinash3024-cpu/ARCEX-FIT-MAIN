@@ -1275,7 +1275,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
             disabled={(split[activeDay] || []).length >= 50}
             className="w-full h-12 rounded-xl border-2 border-dashed border-primary/20 bg-primary/5 hover:bg-primary/10 text-primary font-black text-[10px] uppercase tracking-widest gap-2"
           >
-            <Plus className="w-4 h-4" /> {(split[activeDay] || []).length >= 50 ? "Day Full (50 Max)" : "Add Exercises"}
+            <Plus className="w-4 h-4" /> Add Exercises
           </Button>
         </CardContent>
       </Card>
@@ -1283,10 +1283,6 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
       <section className="space-y-6 pt-4">
         <div className="px-2">
           <div className="flex items-center gap-3 mb-4">
-            <div className="flex gap-1 shrink-0">
-              <div className="w-1.5 h-6 bg-primary rounded-full" />
-              <div className="w-1.5 h-6 bg-primary/30 rounded-full" />
-            </div>
             <h2 className="text-xl font-black uppercase tracking-tighter text-foreground">WORKOUT SPLIT ANALYSIS</h2>
           </div>
           <div className="flex justify-between items-baseline mb-2">
@@ -1328,7 +1324,10 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
 
                 <div className="space-y-6">
                   <div className="space-y-3">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">DIRECTLY GETTING TRAINED BY</h4>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-3 bg-primary rounded-full" />
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">DIRECTLY GETTING TRAINED BY</h4>
+                    </div>
                     {Object.keys(currentMuscleReport.zones).length === 0 ? (
                       <p className="text-[10px] italic text-muted-foreground pl-3">No direct movements assigned.</p>
                     ) : (
@@ -1350,7 +1349,10 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
                   </div>
 
                   <div className="space-y-3">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">INDIRECTLY GETTING TRAINED BY</h4>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-3 bg-amber-500 rounded-full" />
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">INDIRECTLY GETTING TRAINED BY</h4>
+                    </div>
                     {currentMuscleReport.secondary.length === 0 ? (
                       <p className="text-[10px] italic text-muted-foreground pl-3">No secondary stimulation found.</p>
                     ) : (
@@ -1365,7 +1367,10 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
                   </div>
 
                   <div className="space-y-3 pt-2">
-                    <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">MUSCLE STATUS</h4>
+                    <div className="flex items-center gap-2">
+                      <div className="w-1 h-3 bg-indigo-500 rounded-full" />
+                      <h4 className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">MUSCLE STATUS</h4>
+                    </div>
                     <div className="grid gap-2 pl-3">
                       {currentMuscleReport.allZones.map((zone: string, i: number) => {
                         const isTrained = !!currentMuscleReport.zones[zone];
