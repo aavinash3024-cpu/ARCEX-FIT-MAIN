@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -250,7 +251,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         } as LoggedMeal;
 
         if (mealData.calories > 20000) {
-          setCredits(prev => Math.max(0, prev - 1));
           toast({
             variant: "destructive",
             title: "Invalid Meal",

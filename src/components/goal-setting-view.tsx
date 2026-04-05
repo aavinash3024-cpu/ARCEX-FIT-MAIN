@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -87,6 +88,17 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
     setIsInitialized(true);
   }, []);
 
+  // History sync for hardware back button
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && typeof event.state.goalStep === 'number') {
+        setStep(event.state.goalStep);
+      }
+    };
+    window.addEventListener('popstate', handlePopState);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
   const calculations = useMemo(() => {
     const w = parseFloat(weight) || 75;
     const h = parseFloat(height) || 175;
@@ -148,10 +160,14 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
       if (objective === 'gain') initialOffset = (weeklyRate * 1100);
       setCalAdj([Math.round(initialOffset)]);
     }
-    setStep(s => s + 1);
+    const newStep = step + 1;
+    window.history.pushState({ tab: 'goal-setting', goalStep: newStep }, '');
+    setStep(newStep);
   };
   
-  const prevStep = () => setStep(s => s - 1);
+  const prevStep = () => {
+    window.history.back();
+  };
 
   const savePlan = () => {
     const dataToSave = {
@@ -169,6 +185,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
   const handleEdit = () => {
     setIsSaved(false);
     setStep(1);
+    window.history.pushState({ tab: 'goal-setting', goalStep: 1 }, '');
   };
 
   const handleHeaderBack = () => {

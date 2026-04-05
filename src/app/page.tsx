@@ -43,17 +43,22 @@ export default function PulseFlowApp() {
 
   // Aggressive scroll reset on tab change
   useEffect(() => {
-    if (mainRef.current) {
-      mainRef.current.scrollTop = 0;
-      mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
-    }
-    // Also try standard window scroll just in case
-    window.scrollTo(0, 0);
+    const resetScroll = () => {
+      if (mainRef.current) {
+        mainRef.current.scrollTop = 0;
+        mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
+      }
+      window.scrollTo(0, 0);
+    };
+
+    resetScroll();
+    // Second pass to ensure layout shifts are captured
+    const raf = requestAnimationFrame(resetScroll);
+    return () => cancelAnimationFrame(raf);
   }, [activeTab]);
 
   // Back Button / History Support
   useEffect(() => {
-    // Disable browser scroll restoration to prevent snapping to bottom
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
     }
@@ -81,26 +86,6 @@ export default function PulseFlowApp() {
       setActiveTab(tab);
     }
   };
-
-  // Global Haptics Listener
-  useEffect(() => {
-    const handleGlobalClick = (e: MouseEvent) => {
-      const hapticsSetting = localStorage.getItem('pulseflow_haptics');
-      const isHapticsEnabled = hapticsSetting === null || hapticsSetting === 'true';
-      
-      if (!isHapticsEnabled) return;
-
-      const target = e.target as HTMLElement;
-      if (target.closest('button')) {
-        if (typeof navigator !== 'undefined' && navigator.vibrate) {
-          navigator.vibrate(8);
-        }
-      }
-    };
-
-    window.addEventListener('click', handleGlobalClick);
-    return () => window.removeEventListener('click', handleGlobalClick);
-  }, []);
 
   // Load data from localStorage on mount
   useEffect(() => {
@@ -137,7 +122,6 @@ export default function PulseFlowApp() {
       localStorage.setItem('pulseflow_hydration', '0');
       setStepsCount(0);
       localStorage.setItem('pulseflow_steps', '0');
-      // Replenish Meal Credits on New Day
       localStorage.setItem('pulseflow_meal_credits_v2', '20');
     } else {
       if (savedHydration) setHydrationAmount(Number(savedHydration));
@@ -462,7 +446,7 @@ export default function PulseFlowApp() {
         </div>
       </header>
 
-      <main ref={mainRef} className="flex-1 px-4 overflow-y-auto">
+      <main ref={mainRef} className="flex-1 px-4 overflow-y-auto swipe-container">
         {renderContent()}
       </main>
 
