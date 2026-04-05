@@ -38,27 +38,36 @@ User Profile/Goals:
 
 Today's Logged Meals:
 {{#each todayNutrition}}
-- {{{name}}}: {{{calories}}} kcal (P: {{{protein}}}g, C: {{{carbs}}}g, F: {{{fat}}}g)
+- {{{name}}}: {{{calories}}} kcal (P: {{{protein}}}g, C: {{{carbs}}}g, F: {{{fat}}}g, Fiber: {{{fiber}}}g)
 {{/each}}
 
 Query Type: {{{queryType}}}
 
 Instructions for Output:
-1. overall: Generate a "Daily Performance Report". 
-   - Total Intake: [Value] / [Goal] kcal
-   - Remaining Buffer: [Value] kcal
-   - Pace Status: [Ahead/Behind/Target]
-   - Compliance: [Percentage based on macros hit]
-2. macros: Provide a direct comparison.
-   - Protein: [Logged]g / [Target]g
-   - Carbs: [Logged]g / [Target]g
-   - Fats: [Logged]g / [Target]g
-   - Primary Deficit: [State which macro is missing most]
-3. micros: List the status of key performance micronutrients based on the meal types logged.
-   - Status: [List 3-4 specific micros from the logs and if they are sufficient for today]
-4. suggestion: Calculate the EXACT mathematical gap.
-   - Target Gap: [Rem. Calories] kcal, [Rem. Protein]g P, [Rem. Carbs]g C
-   - Elite Meal Suggestion: [Provide 1 specific meal name and its estimated macros that fills this gap precisely]
+Ensure every response starts with a clear [HEADER] segment. Use double line breaks between segments.
+
+1. overall: Generate a "DAILY PERFORMANCE REPORT". 
+   - INTENSITY STATUS: [Ahead/Behind/Target]
+   - CALORIC PRECISION: [Value] / [Goal] kcal
+   - REMAINING BUFFER: [Value] kcal
+   - PERFORMANCE SCORE: [Percentage based on macros hit]
+   - ADVISORY: [1 sentence blunt data-driven advice]
+
+2. macros: Provide a "MACRO RATIO SEGMENTATION".
+   - PROTEIN DELTA: [Logged]g / [Target]g ([+/- Difference])
+   - CARB DELTA: [Logged]g / [Target]g ([+/- Difference])
+   - FAT DELTA: [Logged]g / [Target]g ([+/- Difference])
+   - PRIMARY DEFICIT: [State which macro is missing most]
+
+3. micros: List "MICRONUTRIENT STATUS REPORT" for today.
+   - OPTIMIZED: [List specific micros like Vit A, Zinc, etc. from logs that are >80% of goal]
+   - CRITICAL GAPS: [List micros that are missing or low]
+   - RECOVERY IMPACT: [Blunt impact on gym/skin performance]
+
+4. suggestion: Provide a "MATHEMATICAL MEAL SUGGESTION".
+   - TARGET GAP: [Rem. Calories] kcal, [Rem. Protein]g P, [Rem. Carbs]g C
+   - ELITE SUGGESTION: [Provide 1 specific meal name and its estimated macros that fills this gap precisely]
+   - PREPARATION: [Very brief preparation note]
 
 Keep all responses in a structured bullet-point format. Use uppercase headers for sections.`,
 });
