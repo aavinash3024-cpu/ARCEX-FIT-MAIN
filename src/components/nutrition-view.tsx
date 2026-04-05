@@ -702,14 +702,16 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
       <Card className="border-none shadow-sm overflow-hidden bg-card">
         <div className="p-3 flex items-center gap-3">
-          <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 relative bg-muted/20 border border-muted/30">
-            <Image 
-              src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=400&auto=format&fit=crop"
-              alt="Nutrition Logo"
-              fill
-              className="object-cover"
-              data-ai-hint="healthy food avatar"
-            />
+          <div className="gradient-ring shrink-0">
+            <div className="w-9 h-9 rounded-full overflow-hidden relative bg-muted/20 border border-white/20">
+              <Image 
+                src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=400&auto=format&fit=crop"
+                alt="Nutrition Logo"
+                fill
+                className="object-cover"
+                data-ai-hint="healthy food avatar"
+              />
+            </div>
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
