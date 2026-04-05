@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
@@ -12,7 +11,9 @@ import {
   Activity,
   ArrowRight,
   TrendingUp,
-  Dumbbell
+  Dumbbell,
+  Trophy,
+  Timer
 } from "lucide-react";
 import { 
   LineChart, 
@@ -28,11 +29,20 @@ import { format, differenceInDays, parseISO } from 'date-fns';
 import { EXERCISES_DATA } from '@/lib/exercises-data';
 import { Badge } from "@/components/ui/badge";
 
+interface NutrientItem {
+  label: string;
+  val: number;
+  target: number;
+  unit: string;
+  color: string;
+}
+
 interface Message {
   role: 'user' | 'system';
   text: string;
   type?: string;
   chartData?: any[];
+  nutrientData?: NutrientItem[];
 }
 
 interface GuideViewProps {
@@ -42,6 +52,13 @@ interface GuideViewProps {
   weightHistory: any[];
   onBack: () => void;
 }
+
+const MACRO_COLORS = {
+  protein: "#FFC107",
+  carbs: "#42A5F5",
+  fat: "#FF7043",
+  fiber: "#10b981"
+};
 
 export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistory, onBack }: GuideViewProps) {
   const [messages, setMessages] = useState<Message[]>([
@@ -108,58 +125,55 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
     const hMarker = "■ ";
 
     if (type === 'overall') {
-      const accuracy = Math.round((totals.calories / targetCal) * 100);
-      const hydrationLiters = hydrationAmount / 1000;
-      
-      const micros = [
-        { label: 'Vit A', val: totals.vitaminA, target: microTargets.vitaminA, unit: 'mcg' },
-        { label: 'Omega-3', val: totals.omega3, target: microTargets.omega3, unit: 'g' },
-        { label: 'Vit C', val: totals.vitaminC, target: microTargets.vitaminC, unit: 'mg' },
-        { label: 'Zinc', val: totals.zinc, target: microTargets.zinc, unit: 'mg' },
-        { label: 'Selenium', val: totals.selenium, target: microTargets.selenium, unit: 'mcg' },
-        { label: 'Mag', val: totals.magnesium, target: microTargets.magnesium, unit: 'mg' },
-        { label: 'Vit D', val: totals.vitaminD, target: microTargets.vitaminD, unit: 'mcg' },
-        { label: 'Potassium', val: totals.potassium, target: microTargets.potassium, unit: 'mg' },
-        { label: 'Iron', val: totals.iron, target: microTargets.iron, unit: 'mg' },
-        { label: 'Calcium', val: totals.calcium, target: microTargets.calcium, unit: 'mg' },
+      const nutrientData: NutrientItem[] = [
+        { label: 'Calories', val: totals.calories, target: targetCal, unit: 'kcal', color: '#f59e0b' },
+        { label: 'Hydration', val: hydrationAmount / 1000, target: targetHydration, unit: 'L', color: '#0ea5e9' },
+        { label: 'Protein', val: totals.protein, target: targetP, unit: 'g', color: MACRO_COLORS.protein },
+        { label: 'Carbs', val: totals.carbs, target: targetC, unit: 'g', color: MACRO_COLORS.carbs },
+        { label: 'Fat', val: totals.fat, target: targetF, unit: 'g', color: MACRO_COLORS.fat },
+        { label: 'Fiber', val: totals.fiber, target: targetFI, unit: 'g', color: MACRO_COLORS.fiber },
       ];
 
-      const microList = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
-
       return {
-        text: `${hMarker}FULL NUTRITION ANALYSIS\n\n• Calories: ${Math.round(totals.calories)} / ${targetCal} kcal (${accuracy}%)\n• Hydration: ${hydrationLiters.toFixed(1)} / ${targetHydration.toFixed(1)} L\n\n${hMarker}MACRO BREAKDOWN\n• Protein: ${Math.round(totals.protein)}g / ${targetP}g\n• Carbs: ${Math.round(totals.carbs)}g / ${targetC}g\n• Fat: ${Math.round(totals.fat)}g / ${targetF}g\n• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g\n\n${hMarker}MICRO ANALYSIS\n${microList}\n\n${hMarker}SUMMARY\n${totals.calories < targetCal ? "You still have a calorie buffer. Focus on lean protein sources." : "You've reached your daily target. Transition to hydration and recovery."}`
+        text: `${hMarker}FULL NUTRITION ANALYSIS\n\nComprehensive breakdown of your energy, hydration, and primary macronutrient balance.`,
+        type: 'nutrition',
+        nutrientData
       };
     }
 
     if (type === 'macros') {
-      const pDiff = totals.protein - targetP;
-      const cDiff = totals.carbs - targetC;
-      const fDiff = totals.fat - targetF;
-      const fiDiff = totals.fiber - targetFI;
+      const nutrientData: NutrientItem[] = [
+        { label: 'Protein', val: totals.protein, target: targetP, unit: 'g', color: MACRO_COLORS.protein },
+        { label: 'Carbs', val: totals.carbs, target: targetC, unit: 'g', color: MACRO_COLORS.carbs },
+        { label: 'Fat', val: totals.fat, target: targetF, unit: 'g', color: MACRO_COLORS.fat },
+        { label: 'Fiber', val: totals.fiber, target: targetFI, unit: 'g', color: MACRO_COLORS.fiber },
+      ];
 
       return {
-        text: `${hMarker}MACRO & FIBER ANALYSIS\n\n• Protein: ${Math.round(totals.protein)}g / ${targetP}g (${pDiff > 0 ? '+' : ''}${Math.round(pDiff)}g)\n• Carbs: ${Math.round(totals.carbs)}g / ${targetC}g (${cDiff > 0 ? '+' : ''}${Math.round(cDiff)}g)\n• Fat: ${Math.round(totals.fat)}g / ${targetF}g (${fDiff > 0 ? '+' : ''}${Math.round(fDiff)}g)\n• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g (${fiDiff > 0 ? '+' : ''}${Math.round(fiDiff)}g)`
+        text: `${hMarker}MACRO & FIBER ANALYSIS\n\nSpecific audit of your muscle-building and recovery fuels.`,
+        type: 'nutrition',
+        nutrientData
       };
     }
 
     if (type === 'micros') {
-      const micros = [
-        { label: 'Vitamin A', val: totals.vitaminA, target: microTargets.vitaminA, unit: 'mcg' },
-        { label: 'Omega-3', val: totals.omega3, target: microTargets.omega3, unit: 'g' },
-        { label: 'Vitamin C', val: totals.vitaminC, target: microTargets.vitaminC, unit: 'mg' },
-        { label: 'Zinc', val: totals.zinc, target: microTargets.zinc, unit: 'mg' },
-        { label: 'Selenium', val: totals.selenium, target: microTargets.selenium, unit: 'mcg' },
-        { label: 'Magnesium', val: totals.magnesium, target: microTargets.magnesium, unit: 'mg' },
-        { label: 'Vitamin D', val: totals.vitaminD, target: microTargets.vitaminD, unit: 'mcg' },
-        { label: 'Potassium', val: totals.potassium, target: microTargets.potassium, unit: 'mg' },
-        { label: 'Iron', val: totals.iron, target: microTargets.iron, unit: 'mg' },
-        { label: 'Calcium', val: totals.calcium, target: microTargets.calcium, unit: 'mg' },
+      const nutrientData: NutrientItem[] = [
+        { label: 'Vitamin A', val: totals.vitaminA, target: microTargets.vitaminA, unit: 'mcg', color: "#f97316" },
+        { label: 'Omega-3', val: totals.omega3, target: microTargets.omega3, unit: 'g', color: "#0ea5e9" },
+        { label: 'Vitamin C', val: totals.vitaminC, target: microTargets.vitaminC, unit: 'mg', color: "#eab308" },
+        { label: 'Zinc', val: totals.zinc, target: microTargets.zinc, unit: 'mg', color: "#6366f1" },
+        { label: 'Selenium', val: totals.selenium, target: microTargets.selenium, unit: 'mcg', color: "#f43f5e" },
+        { label: 'Magnesium', val: totals.magnesium, target: microTargets.magnesium, unit: 'mg', color: "#a855f7" },
+        { label: 'Vitamin D', val: totals.vitaminD, target: microTargets.vitaminD, unit: 'mcg', color: "#f59e0b" },
+        { label: 'Potassium', val: totals.potassium, target: microTargets.potassium, unit: 'mg', color: "#10b981" },
+        { label: 'Iron', val: totals.iron, target: microTargets.iron, unit: 'mg', color: "#ef4444" },
+        { label: 'Calcium', val: totals.calcium, target: microTargets.calcium, unit: 'mg', color: "#64748b" },
       ];
 
-      const report = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
-
       return {
-        text: `${hMarker}FULL MICRO ANALYSIS\n\n${report}`
+        text: `${hMarker}FULL MICRO ANALYSIS\n\nDetailed status of critical micronutrients for skin aesthetics and performance.`,
+        type: 'nutrition',
+        nutrientData
       };
     }
 
@@ -271,7 +285,8 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
         role: 'system', 
         text: report.text, 
         type: report.type,
-        chartData: report.chartData
+        chartData: report.chartData,
+        nutrientData: report.nutrientData
       }]);
       setIsLoading(false);
     }, 800);
@@ -346,6 +361,40 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
               </div>
               <p className="font-medium whitespace-pre-wrap tracking-tight">{msg.text}</p>
               
+              {msg.type === 'nutrition' && msg.nutrientData && (
+                <div className="mt-4 space-y-6">
+                  {msg.nutrientData.map((item, idx) => {
+                    const percent = Math.min(100, Math.round((item.val / item.target) * 100));
+                    const diff = item.target - item.val;
+                    const isOver = diff < 0;
+                    
+                    return (
+                      <div key={idx} className="space-y-1">
+                        <div className="flex justify-between items-baseline">
+                          <span className="text-[11px] font-black uppercase tracking-tight text-foreground/80">{item.label}</span>
+                          <span className="text-[10px] font-bold text-foreground/60">{Math.round(item.val)} / {item.target} {item.unit}</span>
+                        </div>
+                        <div className="text-[9px] font-bold text-muted-foreground uppercase leading-none">
+                          {Math.abs(Math.round(diff))} {item.unit} {isOver ? 'over' : 'left'}
+                        </div>
+                        <div className="text-[9px] font-black text-primary uppercase mt-0.5">
+                          {percent}% Done
+                        </div>
+                        <div className="h-1.5 w-full bg-muted/20 rounded-full overflow-hidden mt-1">
+                          <div 
+                            className="h-full transition-all duration-700 ease-out" 
+                            style={{ 
+                              width: `${percent}%`, 
+                              backgroundColor: item.color 
+                            }} 
+                          />
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+
               {msg.type === 'weight' && msg.chartData && msg.chartData.length > 1 && (
                 <div className="mt-2 pt-2 border-t border-muted/10 h-40 w-full">
                   <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2">WEIGHT TRANSFORMATION (KG)</div>
@@ -384,7 +433,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
               {msg.type === 'workout' && msg.chartData && msg.chartData.length > 1 && (
                 <div className="mt-2 pt-2 border-t border-muted/10 w-full">
-                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2">
+                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2 text-center">
                     VOLUME TREND (KG)
                   </div>
                   <div className="h-40 w-full">
@@ -423,7 +472,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="flex justify-end mt-2">
+                  <div className="flex justify-center mt-2">
                     <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">EXERCISE COUNT (Ex)</div>
                   </div>
                 </div>
