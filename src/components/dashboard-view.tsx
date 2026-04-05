@@ -371,8 +371,7 @@ export function DashboardView({
           </div>
           <div className="space-y-1">
             <h3 className="font-bold text-sm flex items-center gap-2">
-              Your Personal Guide
-              <Badge variant="outline" className="text-[9px] h-4 border-white/20 text-white font-normal uppercase tracking-tighter">AI Pulse</Badge>
+              Your Personal Analyzer
             </h3>
             <p className="text-xs opacity-90 leading-relaxed">
               {goalData ? `You're targeting ${goalData.finalCalories} kcal today. Great pace towards your ${goalData.targetWeight}kg goal!` : "Set a goal to get personalized AI wellness insights."}
