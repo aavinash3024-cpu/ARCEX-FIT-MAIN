@@ -1,9 +1,9 @@
+
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { 
   ChevronLeft, 
   Sparkles, 
@@ -242,19 +242,19 @@ ${exercises.length > 0 ? exercises.map(e => `• ${e}`).join('\n') : '• No mov
   return (
     <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500 pb-24 font-sans">
       {/* Header */}
-      <div className="flex items-center gap-4 py-4 px-1 sticky top-0 bg-background/80 backdrop-blur-md z-10 border-b border-muted/10">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
-          <ChevronLeft className="w-5 h-5" />
+      <div className="flex items-center gap-4 py-6 px-4 sticky top-0 bg-background/95 backdrop-blur-md z-10 border-b border-muted/10">
+        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/40 w-10 h-10 shrink-0">
+          <ChevronLeft className="w-5 h-5 text-foreground/70" />
         </Button>
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-semibold uppercase tracking-tight text-foreground">Personal Analyzer</h1>
-            <Badge className="bg-primary/10 text-primary hover:bg-primary/10 text-[8px] font-bold uppercase tracking-wider h-4 border-none">Online</Badge>
+            <h1 className="text-base font-bold uppercase tracking-tight text-foreground/90">Personal Analyzer</h1>
+            <div className="bg-muted/50 px-1.5 py-0.5 rounded text-[7px] font-black text-muted-foreground uppercase tracking-widest leading-none">Online</div>
           </div>
-          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest opacity-60">Professional Report Assistant</p>
+          <p className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em] mt-0.5">Professional Report Assistant</p>
         </div>
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
-          <Sparkles className="w-4 h-4 text-primary" />
+        <div className="w-10 h-10 rounded-full bg-muted/30 flex items-center justify-center shrink-0">
+          <Sparkles className="w-4 h-4 text-muted-foreground/40" />
         </div>
       </div>
 
