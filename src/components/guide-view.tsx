@@ -76,7 +76,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
-  const headerImage = PlaceHolderImages.find(img => img.id === 'analyzer-bg');
+  const coachImage = PlaceHolderImages.find(img => img.id === 'gym-coach');
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -359,17 +359,17 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
   return (
     <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500 pb-24 font-sans">
       {/* Header */}
-      <div className="relative overflow-hidden pt-8 pb-10 px-4 border-b border-white/10 shrink-0">
+      <div className="relative overflow-hidden pt-10 pb-12 px-4 border-b border-white/10 shrink-0">
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
           <Image 
-            src={headerImage?.imageUrl || "https://images.unsplash.com/photo-1551288049-bbbda536339a?q=80&w=800&auto=format&fit=crop"} 
-            alt="Header Background"
+            src={coachImage?.imageUrl || "https://images.unsplash.com/photo-1594381898411-846e7d193883?q=80&w=800&auto=format&fit=crop"} 
+            alt="Coach Background"
             fill
-            className="object-cover opacity-30 grayscale"
-            data-ai-hint="fitness technology"
+            className="object-cover opacity-40 mix-blend-overlay"
+            data-ai-hint="fitness coach"
           />
-          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/90" />
+          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 to-primary/80" />
         </div>
 
         {/* Content */}
@@ -378,7 +378,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
             variant="ghost" 
             size="icon" 
             onClick={onBack} 
-            className="rounded-full bg-white/10 hover:bg-white/20 w-10 h-10 shrink-0 text-white border border-white/10"
+            className="rounded-full bg-white/10 hover:bg-white/20 w-10 h-10 shrink-0 text-white border border-white/10 backdrop-blur-sm"
           >
             <ChevronLeft className="w-5 h-5" />
           </Button>
@@ -392,7 +392,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
             </div>
             <p className="text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mt-0.5">Professional Report Assistant</p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 border border-white/10">
+          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 border border-white/10 backdrop-blur-sm">
             <Sparkles className="w-4 h-4 text-white/60" />
           </div>
         </div>
