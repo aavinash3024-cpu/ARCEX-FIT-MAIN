@@ -135,7 +135,12 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       const pKcal = totals.protein * 4;
       const cKcal = totals.carbs * 4;
       const fKcal = totals.fat * 9;
+      const totalKcal = Math.max(1, pKcal + cKcal + fKcal);
       
+      const pRatio = Math.round((pKcal / totalKcal) * 100);
+      const cRatio = Math.round((cKcal / totalKcal) * 100);
+      const fRatio = 100 - pRatio - cRatio;
+
       const macroPieData = [
         { name: 'Protein', value: Math.max(0.1, pKcal), color: MACRO_COLORS.protein },
         { name: 'Carbs', value: Math.max(0.1, cKcal), color: MACRO_COLORS.carbs },
@@ -156,7 +161,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       ];
 
       return {
-        text: `${hMarker}FULL NUTRITION ANALYSIS\n\nComprehensive metabolic overview including energy balance and micronutrient efficiency percentages.`,
+        text: `${hMarker}FULL NUTRITION ANALYSIS\n\nComprehensive metabolic overview. Your current diet ratio is ${pRatio}P:${cRatio}C:${fRatio}F.`,
         type: 'nutrition',
         reportSubtype: 'overall',
         macroPieData,
@@ -192,16 +197,16 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
     if (type === 'micros') {
       const nutrientData: NutrientItem[] = [
-        { label: 'Vitamin A', val: totals.vitaminA, target: microTargets.vitaminA, unit: 'mcg', color: "#f97316" },
-        { label: 'Omega-3', val: totals.omega3, target: microTargets.omega3, unit: 'g', color: "#0ea5e9" },
-        { label: 'Vitamin C', val: totals.vitaminC, target: microTargets.vitaminC, unit: 'mg', color: "#eab308" },
-        { label: 'Zinc', val: totals.zinc, target: microTargets.zinc, unit: 'mg', color: "#6366f1" },
-        { label: 'Selenium', val: totals.selenium, target: microTargets.selenium, unit: 'mcg', color: "#f43f5e" },
-        { label: 'Magnesium', val: totals.magnesium, target: microTargets.magnesium, unit: 'mg', color: "#a855f7" },
-        { label: 'Vitamin D', val: totals.vitaminD, target: microTargets.vitaminD, unit: 'mcg', color: "#f59e0b" },
-        { label: 'Potassium', val: totals.potassium, target: microTargets.potassium, unit: 'mg', color: "#10b981" },
-        { label: 'Iron', val: totals.iron, target: microTargets.iron, unit: 'mg', color: "#ef4444" },
-        { label: 'Calcium', val: totals.calcium, target: microTargets.calcium, unit: 'mg', color: "#64748b" },
+        { label: "Vitamin A", val: totals.vitaminA, target: microTargets.vitaminA, unit: "mcg", color: "#f97316" },
+        { label: "Omega-3", val: totals.omega3, target: microTargets.omega3, unit: "g", color: "#0ea5e9" },
+        { label: "Vitamin C", val: totals.vitaminC, target: microTargets.vitaminC, unit: "mg", color: "#eab308" },
+        { label: "Zinc", val: totals.zinc, target: microTargets.zinc, unit: "mg", color: "#6366f1" },
+        { label: "Selenium", val: totals.selenium, target: microTargets.selenium, unit: "mcg", color: "#f43f5e" },
+        { label: "Magnesium", val: totals.magnesium, target: microTargets.magnesium, unit: "mg", color: "#a855f7" },
+        { label: "Vitamin D", val: totals.vitaminD, target: microTargets.vitaminD, unit: "mcg", color: "#f59e0b" },
+        { label: "Potassium", val: totals.potassium, target: microTargets.potassium, unit: "mg", color: "#10b981" },
+        { label: "Iron", val: totals.iron, target: microTargets.iron, unit: "mg", color: "#ef4444" },
+        { label: "Calcium", val: totals.calcium, target: microTargets.calcium, unit: "mg", color: "#64748b" },
       ];
 
       return {
