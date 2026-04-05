@@ -41,15 +41,23 @@ export default function PulseFlowApp() {
   
   const mainRef = useRef<HTMLDivElement>(null);
 
-  // Scroll to top on tab change
+  // Aggressive scroll reset on tab change
   useEffect(() => {
     if (mainRef.current) {
       mainRef.current.scrollTop = 0;
+      mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
     }
+    // Also try standard window scroll just in case
+    window.scrollTo(0, 0);
   }, [activeTab]);
 
   // Back Button / History Support
   useEffect(() => {
+    // Disable browser scroll restoration to prevent snapping to bottom
+    if ('scrollRestoration' in window.history) {
+      window.history.scrollRestoration = 'manual';
+    }
+
     const handlePopState = (event: PopStateEvent) => {
       if (event.state && event.state.tab) {
         setActiveTab(event.state.tab);
@@ -60,7 +68,6 @@ export default function PulseFlowApp() {
 
     window.addEventListener('popstate', handlePopState);
     
-    // Set initial history state
     if (window.history.state === null) {
       window.history.replaceState({ tab: 'dashboard' }, '');
     }
@@ -100,13 +107,11 @@ export default function PulseFlowApp() {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const lastResetDate = localStorage.getItem('pulseflow_last_reset_date');
     
-    // Theme initialization
     const savedDarkMode = localStorage.getItem('pulseflow_dark_mode');
     if (savedDarkMode === 'true') {
       document.documentElement.classList.add('dark');
     }
 
-    // Check if we need to reset daily trackers for a new day
     const isNewDay = lastResetDate !== todayStr;
 
     const savedTasks = localStorage.getItem('pulseflow_tasks');
@@ -127,12 +132,13 @@ export default function PulseFlowApp() {
       }
     }
     
-    // Reset hydration if it's a new day
     if (isNewDay) {
       setHydrationAmount(0);
       localStorage.setItem('pulseflow_hydration', '0');
       setStepsCount(0);
       localStorage.setItem('pulseflow_steps', '0');
+      // Replenish Meal Credits on New Day
+      localStorage.setItem('pulseflow_meal_credits_v2', '20');
     } else {
       if (savedHydration) setHydrationAmount(Number(savedHydration));
       if (savedSteps) setStepsCount(Number(savedSteps));
@@ -170,7 +176,6 @@ export default function PulseFlowApp() {
       }
     }
 
-    // Reset logged meals if it's a new day
     if (isNewDay) {
       setLoggedMeals([]);
       localStorage.setItem('pulseflow_today_logged_meals', '[]');
@@ -182,10 +187,8 @@ export default function PulseFlowApp() {
       }
     }
 
-    // Mark today as the last reset date
     localStorage.setItem('pulseflow_last_reset_date', todayStr);
 
-    // Streak Logic
     if (savedStreak) {
       try {
         const data = JSON.parse(savedStreak);
@@ -218,7 +221,6 @@ export default function PulseFlowApp() {
     setIsLoaded(true);
   }, []);
 
-  // Save data to localStorage whenever it changes
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('pulseflow_tasks', JSON.stringify(tasks));
