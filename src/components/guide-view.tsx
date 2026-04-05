@@ -47,6 +47,7 @@ interface Message {
   reportSubtype?: 'overall' | 'standard';
   chartData?: any[];
   nutrientData?: NutrientItem[];
+  detailData?: NutrientItem[]; // Used for detailed macro bars in overall report
   macroPieData?: any[];
   microTableData?: { label: string; pct: number }[];
 }
@@ -163,6 +164,12 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
         nutrientData: [
           { label: 'Calories', val: totals.calories, target: targetCal, unit: 'kcal', color: '#f59e0b' },
           { label: 'Hydration', val: hydrationAmount / 1000, target: targetHydration, unit: 'L', color: '#0ea5e9' },
+        ],
+        detailData: [
+          { label: 'Protein', val: totals.protein, target: targetP, unit: 'g', color: MACRO_COLORS.protein },
+          { label: 'Carbs', val: totals.carbs, target: targetC, unit: 'g', color: MACRO_COLORS.carbs },
+          { label: 'Fat', val: totals.fat, target: targetF, unit: 'g', color: MACRO_COLORS.fat },
+          { label: 'Fiber', val: totals.fiber, target: targetFI, unit: 'g', color: MACRO_COLORS.fiber },
         ]
       };
     }
@@ -316,6 +323,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
         reportSubtype: report.reportSubtype as any,
         chartData: report.chartData,
         nutrientData: report.nutrientData,
+        detailData: (report as any).detailData,
         macroPieData: report.macroPieData,
         microTableData: report.microTableData
       }]);
@@ -396,14 +404,34 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                 <div className="mt-4 space-y-6">
                   {msg.reportSubtype === 'overall' ? (
                     <>
-                      {/* Fundamental Summary */}
-                      <div className="grid grid-cols-2 gap-2">
-                        {msg.nutrientData?.map((item, idx) => (
-                          <div key={idx} className="bg-muted/10 p-2.5 rounded-xl border border-muted/10 text-center">
-                            <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">{item.label}</p>
-                            <p className="text-sm font-black text-foreground">{Math.round(item.val)} <span className="text-[8px] text-muted-foreground">{item.unit}</span></p>
-                          </div>
-                        ))}
+                      {/* Fundamental Summary Bars (Calories & Hydration) */}
+                      <div className="space-y-4">
+                        {msg.nutrientData?.map((item, idx) => {
+                          const percent = Math.min(100, Math.round((item.val / item.target) * 100));
+                          const diff = item.target - item.val;
+                          const isOver = diff < 0;
+                          
+                          return (
+                            <div key={idx} className="space-y-1">
+                              <div className="flex justify-between items-baseline">
+                                <span className="text-[11px] font-black uppercase tracking-tight text-foreground/80">{item.label}</span>
+                                <span className="text-[10px] font-bold text-foreground/60">{Math.round(item.val)} / {item.target} {item.unit}</span>
+                              </div>
+                              <div className="text-[9px] font-bold text-muted-foreground uppercase leading-none">
+                                {Math.abs(Math.round(diff))} {item.unit} {isOver ? 'over' : 'left'}
+                              </div>
+                              <div className="text-[9px] font-black text-primary uppercase mt-0.5">
+                                {percent}% Done
+                              </div>
+                              <div className="h-1.5 w-full bg-muted/20 rounded-full overflow-hidden mt-1">
+                                <div 
+                                  className="h-full transition-all duration-700 ease-out" 
+                                  style={{ width: `${percent}%`, backgroundColor: item.color }} 
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
 
                       {/* Macro Pie Chart */}
@@ -440,6 +468,37 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                             </div>
                           ))}
                         </div>
+                      </div>
+
+                      {/* Macro Detail Bars (P, C, F, FI) below chart */}
+                      <div className="space-y-4 pt-2 border-t border-muted/5">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] text-center mb-2">MACRO PERFORMANCE DETAILS</p>
+                        {msg.detailData?.map((item, idx) => {
+                          const percent = Math.min(100, Math.round((item.val / item.target) * 100));
+                          const diff = item.target - item.val;
+                          const isOver = diff < 0;
+                          
+                          return (
+                            <div key={idx} className="space-y-1">
+                              <div className="flex justify-between items-baseline">
+                                <span className="text-[11px] font-black uppercase tracking-tight text-foreground/80">{item.label}</span>
+                                <span className="text-[10px] font-bold text-foreground/60">{Math.round(item.val)} / {item.target} {item.unit}</span>
+                              </div>
+                              <div className="text-[9px] font-bold text-muted-foreground uppercase leading-none">
+                                {Math.abs(Math.round(diff))} {item.unit} {isOver ? 'over' : 'left'}
+                              </div>
+                              <div className="text-[9px] font-black text-primary uppercase mt-0.5">
+                                {percent}% Done
+                              </div>
+                              <div className="h-1.5 w-full bg-muted/20 rounded-full overflow-hidden mt-1">
+                                <div 
+                                  className="h-full transition-all duration-700 ease-out" 
+                                  style={{ width: `${percent}%`, backgroundColor: item.color }} 
+                                />
+                              </div>
+                            </div>
+                          );
+                        })}
                       </div>
 
                       {/* Excel-Type Micro Table */}
