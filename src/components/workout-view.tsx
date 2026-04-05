@@ -540,7 +540,7 @@ export function WorkoutView() {
         </div>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4 pb-6 mx-1">
+      <div className="grid grid-cols-2 gap-4 mx-1">
         <Card 
           onClick={() => setActiveSubView('history')}
           className="border-none shadow-sm bg-card border border-muted/20 cursor-pointer hover:bg-muted/5 transition-all p-5 flex flex-col items-start gap-3 rounded-2xl active:scale-[0.99]"
