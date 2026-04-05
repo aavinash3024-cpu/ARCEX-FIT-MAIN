@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
@@ -10,14 +9,8 @@ import {
   Sparkles, 
   User, 
   Loader2, 
-  ArrowRight,
-  TrendingUp,
-  PieChart,
   Activity,
-  Zap,
-  Target,
-  Dumbbell,
-  Scale
+  ArrowRight
 } from "lucide-react";
 import { cn } from '@/lib/utils';
 import { format } from 'date-fns';
@@ -37,7 +30,7 @@ interface GuideViewProps {
 
 export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistory, onBack }: GuideViewProps) {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'system', text: "SYSTEM INITIALIZED: PulseFlow Performance Analyst Ready.\n\nSelect a Precision Module below to execute a real-time audit of your wellness data." }
+    { role: 'system', text: "Hello! I'm your Personal Analyzer. Select one of the options below to get a detailed report on your progress today." }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -99,13 +92,8 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
     if (type === 'overall') {
       const accuracy = Math.round((totals.calories / targetCal) * 100);
-      const score = Math.min(100, Math.round(((Math.min(totals.protein / targetP, 1) + Math.min(totals.carbs / targetC, 1) + Math.min(totals.fat / targetF, 1)) / 3) * 100));
       const hydrationLiters = hydrationAmount / 1000;
       
-      let status = "TARGET";
-      if (accuracy < 90) status = "BEHIND";
-      if (accuracy > 105) status = "AHEAD";
-
       const micros = [
         { label: 'Vit A', val: totals.vitaminA, target: microTargets.vitaminA, unit: 'mcg' },
         { label: 'Omega-3', val: totals.omega3, target: microTargets.omega3, unit: 'g' },
@@ -114,31 +102,29 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
         { label: 'Selenium', val: totals.selenium, target: microTargets.selenium, unit: 'mcg' },
         { label: 'Mag', val: totals.magnesium, target: microTargets.magnesium, unit: 'mg' },
         { label: 'Vit D', val: totals.vitaminD, target: microTargets.vitaminD, unit: 'mcg' },
-        { label: 'Potas', val: totals.potassium, target: microTargets.potassium, unit: 'mg' },
+        { label: 'Potassium', val: totals.potassium, target: microTargets.potassium, unit: 'mg' },
         { label: 'Iron', val: totals.iron, target: microTargets.iron, unit: 'mg' },
-        { label: 'Calc', val: totals.calcium, target: microTargets.calcium, unit: 'mg' },
+        { label: 'Calcium', val: totals.calcium, target: microTargets.calcium, unit: 'mg' },
       ];
 
       const microList = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
 
-      return `[SYSTEM PERFORMANCE AUDIT]
+      return `FULL NUTRITION ANALYSIS
 
-• ENERGY: ${Math.round(totals.calories)} / ${targetCal} kcal (${accuracy}%)
-• HYDRATION: ${hydrationLiters.toFixed(1)} / ${targetHydration.toFixed(1)} L
+• Calories: ${Math.round(totals.calories)} / ${targetCal} kcal (${accuracy}%)
+• Hydration: ${hydrationLiters.toFixed(1)} / ${targetHydration.toFixed(1)} L
 
-[MACRO ANALYSIS]
-• PROTEIN: ${Math.round(totals.protein)}g / ${targetP}g
-• CARBS: ${Math.round(totals.carbs)}g / ${targetC}g
-• FAT: ${Math.round(totals.fat)}g / ${targetF}g
-• FIBER: ${Math.round(totals.fiber)}g / ${targetFI}g
+MACRO BREAKDOWN
+• Protein: ${Math.round(totals.protein)}g / ${targetP}g
+• Carbs: ${Math.round(totals.carbs)}g / ${targetC}g
+• Fat: ${Math.round(totals.fat)}g / ${targetF}g
+• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g
 
-[MICRONUTRIENT STATUS]
+MICRO ANALYSIS
 ${microList}
 
-[ADVISORY]
-• PERFORMANCE SCORE: ${score}%
-• INTENSITY STATUS: ${status}
-• RECOMMENDATION: ${totals.calories < targetCal ? "Caloric buffer available. Focus on high-density protein." : "Intake limit reached. Prioritize water and recovery."}`;
+SUMMARY
+${totals.calories < targetCal ? "You still have a calorie buffer. Focus on lean protein." : "You've reached your intake limit. Focus on water and recovery."}`;
     }
 
     if (type === 'macros') {
@@ -147,45 +133,33 @@ ${microList}
       const fDiff = totals.fat - targetF;
       const fiDiff = totals.fiber - targetFI;
 
-      const deficits = [
-        { label: 'PROTEIN', val: (totals.protein / targetP) },
-        { label: 'CARBS', val: (totals.carbs / targetC) },
-        { label: 'FAT', val: (totals.fat / targetF) }
-      ].sort((a, b) => a.val - b.val);
+      return `MACRO & FIBER ANALYSIS
 
-      return `[MACRO & FIBER GAP ANALYSIS]
-
-• PROTEIN DELTA: ${Math.round(totals.protein)}g / ${targetP}g (${pDiff > 0 ? '+' : ''}${Math.round(pDiff)}g)
-• CARB DELTA: ${Math.round(totals.carbs)}g / ${targetC}g (${cDiff > 0 ? '+' : ''}${Math.round(cDiff)}g)
-• FAT DELTA: ${Math.round(totals.fat)}g / ${targetF}g (${fDiff > 0 ? '+' : ''}${Math.round(fDiff)}g)
-• FIBER DELTA: ${Math.round(totals.fiber)}g / ${targetFI}g (${fiDiff > 0 ? '+' : ''}${Math.round(fiDiff)}g)
-
-• PRIMARY GAP: ${deficits[0].label}
-• GAP STATUS: ${Math.round(deficits[0].val * 100)}% Fulfilled`;
+• Protein: ${Math.round(totals.protein)}g / ${targetP}g (${pDiff > 0 ? '+' : ''}${Math.round(pDiff)}g)
+• Carbs: ${Math.round(totals.carbs)}g / ${targetC}g (${cDiff > 0 ? '+' : ''}${Math.round(cDiff)}g)
+• Fat: ${Math.round(totals.fat)}g / ${targetF}g (${fDiff > 0 ? '+' : ''}${Math.round(fDiff)}g)
+• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g (${fiDiff > 0 ? '+' : ''}${Math.round(fiDiff)}g)`;
     }
 
     if (type === 'micros') {
       const micros = [
-        { label: 'Vit A', val: totals.vitaminA, target: microTargets.vitaminA, unit: 'mcg' },
+        { label: 'Vitamin A', val: totals.vitaminA, target: microTargets.vitaminA, unit: 'mcg' },
         { label: 'Omega-3', val: totals.omega3, target: microTargets.omega3, unit: 'g' },
-        { label: 'Vit C', val: totals.vitaminC, target: microTargets.vitaminC, unit: 'mg' },
+        { label: 'Vitamin C', val: totals.vitaminC, target: microTargets.vitaminC, unit: 'mg' },
         { label: 'Zinc', val: totals.zinc, target: microTargets.zinc, unit: 'mg' },
         { label: 'Selenium', val: totals.selenium, target: microTargets.selenium, unit: 'mcg' },
-        { label: 'Mag', val: totals.magnesium, target: microTargets.magnesium, unit: 'mg' },
-        { label: 'Vit D', val: totals.vitaminD, target: microTargets.vitaminD, unit: 'mcg' },
-        { label: 'Potas', val: totals.potassium, target: microTargets.potassium, unit: 'mg' },
+        { label: 'Magnesium', val: totals.magnesium, target: microTargets.magnesium, unit: 'mg' },
+        { label: 'Vitamin D', val: totals.vitaminD, target: microTargets.vitaminD, unit: 'mcg' },
+        { label: 'Potassium', val: totals.potassium, target: microTargets.potassium, unit: 'mg' },
         { label: 'Iron', val: totals.iron, target: microTargets.iron, unit: 'mg' },
-        { label: 'Calc', val: totals.calcium, target: microTargets.calcium, unit: 'mg' },
+        { label: 'Calcium', val: totals.calcium, target: microTargets.calcium, unit: 'mg' },
       ];
 
       const report = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
 
-      return `[MICRONUTRIENT STATUS REPORT]
+      return `FULL MICRO ANALYSIS
 
-${report}
-
-• CRITICAL GAPS: ${micros.filter(m => (m.val / m.target) < 0.5).length} detected.
-• AUDIT STATUS: Scan complete.`;
+${report}`;
     }
 
     if (type === 'weight') {
@@ -201,17 +175,15 @@ ${report}
         else progress = ((current - start) / (target - start)) * 100;
       }
 
-      return `[WEIGHT PROGRESS AUDIT]
+      return `WEIGHT PROGRESS REPORT
 
-• CURRENT WEIGHT: ${current.toFixed(1)} kg
-• STARTING WEIGHT: ${start.toFixed(1)} kg
-• TARGET WEIGHT: ${target.toFixed(1)} kg
+• Current: ${current.toFixed(1)} kg
+• Start: ${start.toFixed(1)} kg
+• Target: ${target.toFixed(1)} kg
 
-• TOTAL PROGRESS: ${Math.round(Math.max(0, progress))}%
-• GAP TO MILESTONE: ${diff} kg
-• OBJECTIVE: ${objective.toUpperCase()}
-
-• STATUS: Journey active. Consistency is the primary growth driver.`;
+• Total Progress: ${Math.round(Math.max(0, progress))}%
+• Remaining: ${diff} kg
+• Goal: ${objective.charAt(0).toUpperCase() + objective.slice(1)}`;
     }
 
     if (type === 'workout') {
@@ -232,19 +204,17 @@ ${report}
         });
       }
 
-      return `[WORKOUT PERFORMANCE AUDIT]
+      return `WORKOUT PROGRESS REPORT
 
-• SESSION STATUS: ${exercises.length > 0 ? 'ACTIVE' : 'AWAITING LOGS'}
-• TOTAL VOLUME: ${Math.round(totalVolume).toLocaleString()} kg
-• EXERCISES LOGGED: ${exercises.length}
+• Status: ${exercises.length > 0 ? 'Active' : 'No logs today'}
+• Total Volume: ${Math.round(totalVolume).toLocaleString()} kg
+• Exercises: ${exercises.length}
 
-[PRIMARY STIMULATION]
-${exercises.length > 0 ? exercises.map(e => `• ${e}`).join('\n') : '• No movements recorded for current timestamp.'}
-
-• ADVISORY: Focus on technical precision and progressive overload.`;
+MUSCLES TARGETED
+${exercises.length > 0 ? exercises.map(e => `• ${e}`).join('\n') : '• No movements logged yet today.'}`;
     }
 
-    return "ERROR: Module undefined.";
+    return "Error: Module undefined.";
   };
 
   const handleQuery = (label: string, value: string) => {
@@ -262,11 +232,11 @@ ${exercises.length > 0 ? exercises.map(e => `• ${e}`).join('\n') : '• No mov
   };
 
   const options = [
-    { label: "Overall System Audit", value: 'overall', icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-50' },
-    { label: "Macro & Fiber Analysis", value: 'macros', icon: PieChart, color: 'text-orange-500', bg: 'bg-orange-50' },
-    { label: "Full Micro Audit", value: 'micros', icon: Activity, color: 'text-purple-500', bg: 'bg-purple-50' },
-    { label: "Weight Progress", value: 'weight', icon: Scale, color: 'text-emerald-500', bg: 'bg-emerald-50' },
-    { label: "Workout Progress", value: 'workout', icon: Dumbbell, color: 'text-rose-500', bg: 'bg-rose-50' }
+    { label: "Full Nutrition Analysis", value: 'overall' },
+    { label: "Macro & Fiber Analysis", value: 'macros' },
+    { label: "Full Micro Analysis", value: 'micros' },
+    { label: "Weight Progress", value: 'weight' },
+    { label: "Workout Progress", value: 'workout' }
   ];
 
   return (
@@ -278,13 +248,13 @@ ${exercises.length > 0 ? exercises.map(e => `• ${e}`).join('\n') : '• No mov
         </Button>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <h1 className="text-lg font-black uppercase tracking-tight text-foreground">PulseFlow AI</h1>
-            <Badge className="bg-primary/10 text-primary hover:bg-primary/10 text-[7px] font-black uppercase tracking-[0.2em] h-4 border-none">Active</Badge>
+            <h1 className="text-lg font-semibold uppercase tracking-tight text-foreground">Personal Analyzer</h1>
+            <Badge className="bg-primary/10 text-primary hover:bg-primary/10 text-[8px] font-bold uppercase tracking-wider h-4 border-none">Online</Badge>
           </div>
-          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] opacity-60">Elite Performance Analyst</p>
+          <p className="text-[10px] font-medium text-muted-foreground uppercase tracking-widest opacity-60">Professional Report Assistant</p>
         </div>
-        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/5">
-          <Sparkles className="w-4 h-4 text-primary animate-pulse" />
+        <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center">
+          <Sparkles className="w-4 h-4 text-primary" />
         </div>
       </div>
 
@@ -302,66 +272,56 @@ ${exercises.length > 0 ? exercises.map(e => `• ${e}`).join('\n') : '• No mov
             )}
           >
             <div className={cn(
-              "max-w-[95%] rounded-[1.5rem] p-5 shadow-sm text-sm leading-relaxed",
+              "max-w-[90%] rounded-2xl p-4 shadow-sm text-sm leading-relaxed",
               msg.role === 'user' 
                 ? "bg-primary text-white rounded-tr-none" 
-                : "bg-card border border-muted/20 rounded-tl-none text-foreground/90 glass-card"
+                : "bg-card border border-muted/20 rounded-tl-none text-foreground/90"
             )}>
-              <div className="flex items-center gap-2 mb-3 opacity-40">
+              <div className="flex items-center gap-2 mb-2 opacity-40">
                 {msg.role === 'user' ? (
                   <User className="w-3 h-3 ml-auto order-2" />
                 ) : (
                   <Activity className="w-3 h-3 text-primary" />
                 )}
-                <span className="text-[8px] font-black uppercase tracking-widest">
-                  {msg.role === 'user' ? 'Identity Verification' : 'PRECISION SYSTEM AUDIT'}
+                <span className="text-[9px] font-bold uppercase tracking-widest">
+                  {msg.role === 'user' ? 'You' : 'Analysis Report'}
                 </span>
               </div>
-              <p className="font-bold whitespace-pre-wrap tracking-tight text-sm">{msg.text}</p>
+              <p className="font-medium whitespace-pre-wrap tracking-tight">{msg.text}</p>
             </div>
           </div>
         ))}
         {isLoading && (
           <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2">
-            <div className="bg-card border border-muted/20 rounded-[1.5rem] rounded-tl-none p-5 shadow-sm flex flex-col gap-3 glass-card">
-              <div className="flex items-center gap-3">
-                <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-primary">Scanning Data Streams...</span>
-              </div>
-              <div className="h-1 w-32 bg-muted/20 rounded-full overflow-hidden">
-                <div className="h-full bg-primary animate-progress w-full origin-left" />
-              </div>
+            <div className="bg-card border border-muted/20 rounded-2xl rounded-tl-none p-4 shadow-sm flex items-center gap-3">
+              <Loader2 className="w-4 h-4 animate-spin text-primary" />
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Analyzing data...</span>
             </div>
           </div>
         )}
       </div>
 
-      {/* Precision Modules Panel */}
-      <div className="px-2 mt-4 space-y-4">
-        <div className="flex items-center justify-between px-2">
-          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.25em]">Audit Modules</p>
-          <div className="h-px flex-1 mx-4 bg-muted/20" />
-        </div>
-        
-        <div className="grid grid-cols-2 gap-3 pb-4">
-          {options.map((opt) => (
-            <button
-              key={opt.value}
-              onClick={() => handleQuery(opt.label, opt.value)}
-              disabled={isLoading}
-              className="group relative text-left bg-card hover:bg-muted/5 border border-muted/20 p-4 rounded-[1.5rem] transition-all active:scale-[0.98] disabled:opacity-50 flex flex-col gap-3 overflow-hidden shadow-sm"
-            >
-              <div className="absolute -right-4 -top-4 w-12 h-12 bg-primary/5 rounded-full blur-xl group-hover:bg-primary/10 transition-all" />
-              <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center transition-all group-hover:scale-110", opt.bg, opt.color)}>
-                <opt.icon className="w-5 h-5" />
-              </div>
-              <span className="text-[10px] font-black uppercase tracking-tight text-foreground/70 leading-tight pr-4">
-                {opt.label}
-              </span>
-              <ArrowRight className="absolute bottom-4 right-4 w-3 h-3 text-muted-foreground/30 group-hover:text-primary transition-all group-hover:translate-x-1" />
-            </button>
-          ))}
-        </div>
+      {/* Options Menu */}
+      <div className="px-2 mt-4 space-y-3">
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-3">Select a report</p>
+        <Card className="border-none shadow-md bg-card rounded-2xl overflow-hidden border border-muted/10">
+          <CardContent className="p-0">
+            {options.map((opt, i) => (
+              <button
+                key={opt.value}
+                onClick={() => handleQuery(opt.label, opt.value)}
+                disabled={isLoading}
+                className={cn(
+                  "w-full p-4 flex items-center justify-between text-left transition-all active:bg-muted/10 disabled:opacity-50",
+                  i !== options.length - 1 && "border-b border-muted/5"
+                )}
+              >
+                <span className="text-sm font-semibold text-foreground/80">{opt.label}</span>
+                <ArrowRight className="w-4 h-4 text-muted-foreground/30" />
+              </button>
+            ))}
+          </CardContent>
+        </Card>
       </div>
     </div>
   );
