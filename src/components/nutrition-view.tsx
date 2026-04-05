@@ -96,7 +96,6 @@ interface MealItem {
 
 interface LoggedMeal {
   id: string;
-  type: string;
   name: string;
   calories: number;
   carbs: number;
@@ -209,7 +208,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         
         const mealData = {
           id: Math.random().toString(36).substr(2, 9),
-          type: getMealTypeByTime(),
           name: `${quantity > 1 ? quantity + ' ' : ''}${foodName.charAt(0).toUpperCase() + foodName.slice(1)}`,
           calories: Math.round(data.calories * quantity),
           protein: Math.round(data.protein * quantity),
@@ -328,7 +326,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       
       const newMeal: LoggedMeal = {
         id: Math.random().toString(36).substr(2, 9),
-        type: getMealTypeByTime(),
         name: result.name,
         calories: Math.round(result.calories),
         carbs: Math.round(result.carbs),
@@ -442,14 +439,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
   const deleteSavedMeal = (id: string) => {
     setSavedMeals(prev => prev.filter(m => m.id !== id));
-  };
-
-  const getMealTypeByTime = () => {
-    const hour = new Date().getHours();
-    if (hour < 11) return "Breakfast";
-    if (hour < 16) return "Lunch";
-    if (hour < 21) return "Dinner";
-    return "Snack";
   };
 
   const handleSpeech = () => {
@@ -608,6 +597,57 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
         <section className="space-y-3">
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
+             <History className="w-3.5 h-3.5 text-primary" /> Meal Breakdown
+          </h3>
+          <div className="space-y-2">
+            {loggedMeals.length === 0 ? (
+              <p className="text-center py-16 opacity-30 text-[10px] font-black uppercase tracking-widest">No entries recorded</p>
+            ) : (
+              loggedMeals.map(meal => (
+                <Card key={meal.id} className="border-none shadow-sm bg-card hover:bg-muted/5 transition-all">
+                  <CardContent className="p-4 relative">
+                    <div className="space-y-2 pr-4">
+                      <h4 className="font-bold text-sm text-foreground leading-tight">
+                        {meal.name}
+                      </h4>
+                      <div className="text-[10px] font-black text-foreground/60 leading-none uppercase tracking-tight">
+                        {Math.round(meal.calories)} KCAL {meal.isCached && <Badge variant="secondary" className="h-3 py-0 px-1 bg-green-50 text-green-600 border-none font-bold uppercase text-[6px] ml-1">Cached</Badge>}
+                      </div>
+                      
+                      {meal.items && meal.items.length > 0 && (
+                        <div className="border-l-2 border-muted/20 pl-3 py-1 space-y-1.5 my-2">
+                          {meal.items.map((item, i) => (
+                            <div key={i} className="flex justify-between items-center">
+                              <span className="text-[10px] font-bold text-muted-foreground/80 uppercase tracking-tight truncate max-w-[200px]">
+                                {item.quantity} {item.name}
+                              </span>
+                              <span className="text-[9px] font-black text-muted-foreground/40 uppercase whitespace-nowrap">
+                                {Math.round(item.calories)} kcal
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+
+                      <div className="flex flex-wrap gap-x-5 gap-y-1 text-[11px] font-black uppercase tracking-tight pt-1">
+                        <span style={{ color: MACRO_COLORS.protein }}>P {Math.round(meal.protein)}G</span>
+                        <span style={{ color: MACRO_COLORS.carbs }}>C {Math.round(meal.carbs)}G</span>
+                        <span style={{ color: MACRO_COLORS.fat }}>F {Math.round(meal.fat)}G</span>
+                        <span style={{ color: MACRO_COLORS.fiber }}>FI {Math.round(meal.fiber)}G</span>
+                      </div>
+                    </div>
+                    <span className="absolute bottom-2 right-4 text-[8px] font-bold text-muted-foreground/20 uppercase">
+                      {meal.time}
+                    </span>
+                  </CardContent>
+                </Card>
+              ))
+            )}
+          </div>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
             <BarChart3 className="w-3.5 h-3.5 text-primary" /> Top Macro Sources
           </h3>
           <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl">
@@ -649,57 +689,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               </Tabs>
             </CardContent>
           </Card>
-        </section>
-
-        <section className="space-y-3">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
-             <History className="w-3.5 h-3.5 text-primary" /> Meal Breakdown
-          </h3>
-          <div className="space-y-2">
-            {loggedMeals.length === 0 ? (
-              <p className="text-center py-16 opacity-30 text-[10px] font-black uppercase tracking-widest">No entries recorded</p>
-            ) : (
-              loggedMeals.map(meal => (
-                <Card key={meal.id} className="border-none shadow-sm bg-card hover:bg-muted/5 transition-all">
-                  <CardContent className="p-4 relative">
-                    <div className="space-y-2 pr-4">
-                      <h4 className="font-bold text-sm text-foreground leading-tight">
-                        <span className="text-primary uppercase text-[10px] mr-1">{meal.type}:</span> {meal.name}
-                      </h4>
-                      <div className="text-[10px] font-black text-foreground/60 leading-none uppercase tracking-tight">
-                        {Math.round(meal.calories)} KCAL {meal.isCached && <Badge variant="secondary" className="h-3 py-0 px-1 bg-green-50 text-green-600 border-none font-bold uppercase text-[6px] ml-1">Cached</Badge>}
-                      </div>
-                      
-                      {meal.items && meal.items.length > 0 && (
-                        <div className="border-l-2 border-muted/20 pl-3 py-1 space-y-1.5 my-2">
-                          {meal.items.map((item, i) => (
-                            <div key={i} className="flex justify-between items-center">
-                              <span className="text-[10px] font-bold text-muted-foreground/80 uppercase tracking-tight truncate max-w-[200px]">
-                                {item.quantity} {item.name}
-                              </span>
-                              <span className="text-[9px] font-black text-muted-foreground/40 uppercase whitespace-nowrap">
-                                {Math.round(item.calories)} kcal
-                              </span>
-                            </div>
-                          ))}
-                        </div>
-                      )}
-
-                      <div className="flex flex-wrap gap-x-5 gap-y-1 text-[11px] font-black uppercase tracking-tight pt-1">
-                        <span style={{ color: MACRO_COLORS.protein }}>P {Math.round(meal.protein)}G</span>
-                        <span style={{ color: MACRO_COLORS.carbs }}>C {Math.round(meal.carbs)}G</span>
-                        <span style={{ color: MACRO_COLORS.fat }}>F {Math.round(meal.fat)}G</span>
-                        <span style={{ color: MACRO_COLORS.fiber }}>FI {Math.round(meal.fiber)}G</span>
-                      </div>
-                    </div>
-                    <span className="absolute bottom-2 right-4 text-[8px] font-bold text-muted-foreground/20 uppercase">
-                      {meal.time}
-                    </span>
-                  </CardContent>
-                </Card>
-              ))
-            )}
-          </div>
         </section>
       </div>
     );
@@ -891,7 +880,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                       </div>
                       <div className="flex-1 p-2.5 flex flex-col justify-center min-w-0 pr-10">
                         <div className="min-w-0">
-                          <p className="text-[8px] font-black text-primary uppercase tracking-[0.15em] leading-none mb-1">{meal.type}</p>
                           <h4 className="font-bold text-[13px] text-foreground/90 truncate leading-tight">{meal.name}</h4>
                           <div className="text-[11px] font-bold text-foreground/60 tracking-tighter mt-0.5 flex items-center">
                             {meal.calories} kcal {meal.isCached && <Badge variant="secondary" className="h-3 py-0 px-1 bg-green-50 text-green-600 border-none font-bold uppercase text-[6px] ml-1">Local</Badge>}
