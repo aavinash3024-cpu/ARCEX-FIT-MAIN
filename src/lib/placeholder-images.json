@@ -65,6 +65,12 @@
       "description": "Premium Mediterranean vegetarian superfood salad",
       "imageUrl": "https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?q=80&w=800&auto=format&fit=crop",
       "imageHint": "premium salad"
+    },
+    {
+      "id": "analyzer-bg",
+      "description": "Abstract fitness and technology data background",
+      "imageUrl": "https://images.unsplash.com/photo-1551288049-bbbda536339a?q=80&w=800&auto=format&fit=crop",
+      "imageHint": "fitness technology"
     }
   ]
 }

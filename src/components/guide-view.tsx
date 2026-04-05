@@ -31,6 +31,8 @@ import { cn } from '@/lib/utils';
 import { format, differenceInDays, parseISO } from 'date-fns';
 import { EXERCISES_DATA } from '@/lib/exercises-data';
 import { Badge } from "@/components/ui/badge";
+import Image from "next/image";
+import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 interface NutrientItem {
   label: string;
@@ -73,6 +75,8 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const headerImage = PlaceHolderImages.find(img => img.id === 'analyzer-bg');
 
   useEffect(() => {
     if (scrollRef.current) {
@@ -355,22 +359,42 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
   return (
     <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500 pb-24 font-sans">
       {/* Header */}
-      <div className="flex items-center gap-4 py-6 px-4 sticky top-0 bg-background/95 backdrop-blur-md z-10 border-b border-muted/10">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/40 w-10 h-10 shrink-0">
-          <ChevronLeft className="w-5 h-5 text-foreground/70" />
-        </Button>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            <h1 className="text-base font-bold uppercase tracking-tight text-foreground/90">Personal Analyzer</h1>
-            <div className="flex items-center gap-1 bg-muted/50 px-1.5 py-0.5 rounded">
-              <span className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
-              <span className="text-[7px] font-black text-muted-foreground uppercase tracking-widest leading-none">Online</span>
-            </div>
-          </div>
-          <p className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em] mt-0.5">Professional Report Assistant</p>
+      <div className="relative overflow-hidden pt-8 pb-10 px-4 border-b border-white/10 shrink-0">
+        {/* Background Image & Overlay */}
+        <div className="absolute inset-0 z-0">
+          <Image 
+            src={headerImage?.imageUrl || "https://images.unsplash.com/photo-1551288049-bbbda536339a?q=80&w=800&auto=format&fit=crop"} 
+            alt="Header Background"
+            fill
+            className="object-cover opacity-30 grayscale"
+            data-ai-hint="fitness technology"
+          />
+          <div className="absolute inset-0 bg-gradient-to-br from-primary via-primary/95 to-primary/90" />
         </div>
-        <div className="w-10 h-10 rounded-full bg-muted/30 flex items-center justify-center shrink-0">
-          <Sparkles className="w-4 h-4 text-muted-foreground/40" />
+
+        {/* Content */}
+        <div className="relative z-10 flex items-center gap-4">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={onBack} 
+            className="rounded-full bg-white/10 hover:bg-white/20 w-10 h-10 shrink-0 text-white border border-white/10"
+          >
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-2">
+              <h1 className="text-base font-black uppercase tracking-tight text-white">Personal Analyzer</h1>
+              <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm px-1.5 py-0.5 rounded border border-white/10">
+                <span className="w-1 h-1 rounded-full bg-green-400 animate-pulse" />
+                <span className="text-[7px] font-black text-white uppercase tracking-widest leading-none">Online</span>
+              </div>
+            </div>
+            <p className="text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mt-0.5">Professional Report Assistant</p>
+          </div>
+          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 border border-white/10">
+            <Sparkles className="w-4 h-4 text-white/60" />
+          </div>
         </div>
       </div>
 
