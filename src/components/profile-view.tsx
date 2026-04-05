@@ -15,8 +15,6 @@ import {
   HelpCircle,
   ChevronRight,
   Trophy,
-  Scale,
-  Target,
   RefreshCw,
   MapPin,
   Calendar,
@@ -33,16 +31,8 @@ import {
   Zap,
   Save,
   CheckCircle2,
-  PieChart,
-  Droplets,
-  Footprints,
-  Activity,
   X,
   Star,
-  ArrowUpRight,
-  ArrowDownRight,
-  BarChart3,
-  Timer,
   AlertTriangle,
   Check
 } from "lucide-react";
@@ -54,7 +44,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
 import { Switch } from "@/components/ui/switch";
 import { 
   AlertDialog,
@@ -73,19 +62,11 @@ interface ProfileViewProps {
   onBack: () => void;
 }
 
-const MACRO_COLORS = {
-  protein: "#FFC107",
-  carbs: "#42A5F5",
-  fat: "#FF7043",
-  fiber: "#10b981"
-};
-
-type SubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'goals' | 'reset';
+type SubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'reset';
 
 export function ProfileView({ onBack }: ProfileViewProps) {
   const [activeSubView, setActiveSubView] = useState<SubView>('main');
   const [goalData, setGoalData] = useState<any>(null);
-  const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
@@ -113,16 +94,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
         if (data.age) setProfileAge(data.age.toString());
       } catch (e) {
         console.error("Failed to parse goal data", e);
-      }
-    }
-
-    // Load Weight History
-    const savedWeight = localStorage.getItem('pulseflow_weight_history');
-    if (savedWeight) {
-      try {
-        setWeightHistory(JSON.parse(savedWeight));
-      } catch (e) {
-        console.error("Failed to parse weight history", e);
       }
     }
 
@@ -198,7 +169,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   const handleResetApp = () => {
     setIsResetting(true);
     
-    // Define keys to remove (progress, logs, goals)
     const keysToRemove = [
       'pulseflow_goal_data',
       'pulseflow_tasks',
@@ -219,12 +189,11 @@ export function ProfileView({ onBack }: ProfileViewProps) {
       'pulseflow_last_reset_date'
     ];
 
-    // Remove the keys
     keysToRemove.forEach(key => localStorage.removeItem(key));
 
     setTimeout(() => {
       setIsResetting(false);
-      window.location.reload(); // Force reload to apply clean state
+      window.location.reload();
     }, 1500);
   };
 
@@ -236,37 +205,12 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     }
   };
 
-  const currentWeight = useMemo(() => {
-    if (weightHistory.length > 0) {
-      return weightHistory[weightHistory.length - 1].weight;
-    }
-    return goalData?.weight ? parseFloat(goalData.weight) : 0;
-  }, [weightHistory, goalData]);
-
-  const startWeight = goalData?.weight ? parseFloat(goalData.weight) : 0;
-  const targetWeight = goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 0;
-
-  const weightProgressPercent = useMemo(() => {
-    if (!startWeight || !targetWeight || startWeight === targetWeight) return 0;
-    const objective = goalData?.objective || 'loss';
-    let progress = 0;
-    if (objective === 'loss') {
-      if (currentWeight >= startWeight) return 0;
-      progress = ((startWeight - currentWeight) / (startWeight - targetWeight)) * 100;
-    } else {
-      if (currentWeight <= startWeight) return 0;
-      progress = ((currentWeight - startWeight) / (targetWeight - startWeight)) * 100;
-    }
-    return Math.min(100, Math.max(0, Math.round(progress)));
-  }, [startWeight, targetWeight, currentWeight, goalData]);
-
   const menuSections = [
     {
       title: "My Account",
       items: [
         { id: 'personal-info', icon: User, label: "Personal Information", subLabel: "Name, email, and identity", color: "text-blue-500", bg: "bg-blue-50" },
         { id: 'subscription', icon: CreditCard, label: "Subscription Plan", subLabel: "Elite Premium", color: "text-purple-500", bg: "bg-purple-50" },
-        { id: 'goals', icon: Target, label: "Goals", subLabel: "Active fitness objectives", color: "text-primary", bg: "bg-primary/5" },
         { id: 'reset', icon: RefreshCw, label: "Reset Progress", subLabel: "Fresh start, keep profile", color: "text-rose-500", bg: "bg-rose-50" },
       ]
     },
@@ -501,193 +445,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
     </div>
   );
 
-  const renderGoals = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
-      {goalData ? (
-        <div className="space-y-6">
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="border-none shadow-sm bg-card p-4 space-y-1">
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Weight Objective</p>
-              <div className="flex items-center gap-1">
-                <span className="text-sm font-black text-primary uppercase">{goalData.objective}</span>
-              </div>
-            </Card>
-            <Card className="border-none shadow-sm bg-card p-4 space-y-1">
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Total Progress</p>
-              <div className="flex items-center gap-1 text-green-600">
-                <ArrowUpRight className="w-3.5 h-3.5" />
-                <span className="text-sm font-black">{weightProgressPercent}%</span>
-              </div>
-            </Card>
-          </div>
-
-          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-3xl border border-muted/10">
-            <CardContent className="p-5 space-y-4">
-              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
-                <Scale className="w-3.5 h-3.5 text-primary" /> Body Milestone
-              </h3>
-              <div className="space-y-2.5">
-                <Progress value={weightProgressPercent} className="h-2.5 bg-muted rounded-full overflow-hidden" />
-                <div className="flex justify-between items-center text-[10px] font-black text-muted-foreground/60 uppercase px-1">
-                  <div className="text-left">
-                    <p className="text-[8px] opacity-50">START</p>
-                    <p>{startWeight}kg</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-[8px] opacity-50">CURRENT</p>
-                    <p className="text-primary">{currentWeight.toFixed(1)}kg</p>
-                  </div>
-                  <div className="text-right">
-                    <p className="text-[8px] opacity-50">GOAL</p>
-                    <p>{targetWeight}kg</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-3xl border border-muted/10">
-            <CardContent className="p-5 space-y-4">
-              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
-                <Calendar className="w-3.5 h-3.5 text-orange-400" /> Timeline Strategy
-              </h3>
-              <div className="grid grid-cols-2 gap-6">
-                <div className="space-y-1 border-l-2 border-muted/10 pl-3">
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Weekly Rate</p>
-                  <p className="text-sm font-black">{goalData.derivedWeeklyRate} kg</p>
-                  <p className="text-[8px] font-black text-primary/60 uppercase">Target Pace</p>
-                </div>
-                <div className="space-y-1 border-l-2 border-muted/10 pl-3">
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Est. Duration</p>
-                  <p className="text-sm font-black">{goalData.weeksToGoal} Weeks</p>
-                  <p className="text-[8px] font-black text-primary/60 uppercase">To Milestone</p>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="grid grid-cols-2 gap-3">
-            <Card className="border-none shadow-sm bg-card p-4 space-y-1">
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Daily Budget</p>
-              <div className="flex items-baseline gap-1">
-                <span className="text-xl font-black text-primary">{goalData.finalCalories}</span>
-                <span className="text-[8px] font-bold text-muted-foreground uppercase">Kcal</span>
-              </div>
-            </Card>
-            <Card className="border-none shadow-sm bg-card p-4 space-y-1">
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-tight">Maintenance</p>
-              <div className="flex items-baseline gap-1">
-                <span className="text-xl font-black text-foreground/40">{goalData.tdee}</span>
-                <span className="text-[8px] font-bold text-muted-foreground uppercase">TDEE</span>
-              </div>
-            </Card>
-          </div>
-
-          <Card className="border-none shadow-sm bg-card rounded-3xl border border-muted/10 overflow-hidden">
-            <CardContent className="p-5 space-y-4">
-              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
-                <PieChart className="w-3.5 h-3.5 text-primary" /> Strategy Split
-              </h3>
-              <div className="space-y-3">
-                <div className="flex h-3 w-full rounded-full overflow-hidden bg-muted/20">
-                  <div style={{ width: `${goalData.proteinPct}%`, backgroundColor: MACRO_COLORS.protein }} className="h-full" />
-                  <div style={{ width: `${goalData.carbPct}%`, backgroundColor: MACRO_COLORS.carbs }} className="h-full" />
-                  <div style={{ width: `${goalData.fatPct}%`, backgroundColor: MACRO_COLORS.fat }} className="h-full" />
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <div className="text-center">
-                    <p className="text-[7px] font-black text-muted-foreground uppercase">PROTEIN</p>
-                    <p className="text-xs font-black" style={{ color: MACRO_COLORS.protein }}>{goalData.proteinPct}%</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-[7px] font-black text-muted-foreground uppercase">CARBS</p>
-                    <p className="text-xs font-black" style={{ color: goalData.carbPct > 0 ? MACRO_COLORS.carbs : '#ccc' }}>{goalData.carbPct}%</p>
-                  </div>
-                  <div className="text-center">
-                    <p className="text-[7px] font-black text-muted-foreground uppercase">FATS</p>
-                    <p className="text-xs font-black" style={{ color: goalData.fatPct > 0 ? MACRO_COLORS.fat : '#ccc' }}>{goalData.fatPct}%</p>
-                  </div>
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-
-          <Card className="border-none shadow-sm bg-card rounded-3xl border border-muted/10">
-            <CardContent className="p-5 space-y-5">
-              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] flex items-center gap-2">
-                <BarChart3 className="w-3.5 h-3.5 text-primary" /> Target Metrics
-              </h3>
-              <div className="grid grid-cols-2 gap-x-6 gap-y-5">
-                {[
-                  { label: 'PROTEIN', val: goalData.protein, unit: 'G', color: MACRO_COLORS.protein },
-                  { label: 'CARBS', val: goalData.carbs, unit: 'G', color: MACRO_COLORS.carbs },
-                  { label: 'FATS', val: goalData.fats, unit: 'G', color: MACRO_COLORS.fat },
-                  { label: 'FIBER', val: goalData.fiber, unit: 'G', color: MACRO_COLORS.fiber }
-                ].map(m => (
-                  <div key={m.label} className="space-y-1.5">
-                    <div className="flex justify-between items-baseline">
-                      <p className="text-[8px] font-black uppercase text-muted-foreground/60">{m.label}</p>
-                      <span className="text-[10px] font-black" style={{ color: m.color }}>{m.val}{m.unit}</span>
-                    </div>
-                    <div className="h-1.5 w-full bg-muted/30 rounded-full overflow-hidden">
-                      <div className="h-full" style={{ width: '100%', backgroundColor: m.color }} />
-                    </div>
-                  </div>
-                ))}
-              </div>
-            </CardContent>
-          </Card>
-
-          <div className="space-y-3">
-            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-2">Activity Targets</h3>
-            <div className="flex items-center justify-between bg-card p-4 rounded-2xl border border-muted/10 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-blue-100 flex items-center justify-center">
-                  <Droplets className="w-5 h-5 text-blue-600" />
-                </div>
-                <div>
-                  <p className="text-xs font-black text-foreground/80 uppercase">Hydration</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Daily Target</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-black text-blue-600">{goalData.hydrationTargetLiters || "3.0"} L</p>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-between bg-card p-4 rounded-2xl border border-muted/10 shadow-sm">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-green-100 flex items-center justify-center">
-                  <Footprints className="w-5 h-5 text-green-600" />
-                </div>
-                <div>
-                  <p className="text-xs font-black text-foreground/80 uppercase">Movement</p>
-                  <p className="text-[8px] font-bold text-muted-foreground uppercase">Step Goal</p>
-                </div>
-              </div>
-              <div className="text-right">
-                <p className="text-sm font-black text-green-600">10,000</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <Card className="border-none shadow-md bg-card p-16 text-center space-y-5 rounded-[2.5rem] border border-muted/10">
-          <div className="w-20 h-20 bg-muted/5 rounded-full flex items-center justify-center mx-auto border border-muted/10">
-            <Target className="w-10 h-10 text-muted-foreground/30" />
-          </div>
-          <div className="space-y-2">
-            <h3 className="font-black text-xl tracking-tight">No Active Goals</h3>
-            <p className="text-xs text-muted-foreground font-medium leading-relaxed px-4">Setup your fitness journey to track weight, nutrition, and lifestyle progress.</p>
-          </div>
-          <Button variant="outline" className="rounded-2xl border-primary/20 text-primary font-black uppercase text-[11px] tracking-widest h-12 px-8">
-            Setup Goal Now
-          </Button>
-        </Card>
-      )}
-    </div>
-  );
-
   const renderReset = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
       <Card className="border-none shadow-xl bg-card rounded-[2.5rem] overflow-hidden border border-muted/10">
@@ -843,8 +600,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
            activeSubView === 'subscription' ? 'Subscription' :
            activeSubView === 'legal' ? 'Legal' :
            activeSubView === 'settings' ? 'Settings' : 
-           activeSubView === 'reset' ? 'Start Fresh' : 
-           activeSubView === 'goals' ? 'My Goals' : 'Profile'}
+           activeSubView === 'reset' ? 'Start Fresh' : 'Profile'}
         </h1>
       </div>
 
@@ -853,7 +609,6 @@ export function ProfileView({ onBack }: ProfileViewProps) {
       {activeSubView === 'subscription' && renderSubscription()}
       {activeSubView === 'legal' && renderLegal()}
       {activeSubView === 'settings' && renderSettings()}
-      {activeSubView === 'goals' && renderGoals()}
       {activeSubView === 'reset' && renderReset()}
     </div>
   );
