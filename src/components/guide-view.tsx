@@ -71,7 +71,7 @@ const MACRO_COLORS = {
 
 export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistory, onBack }: GuideViewProps) {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'system', text: "Hello! I'm your Personal Analyzer. Select one of the reports below to get a structured breakdown of your current performance." }
+    { role: 'system', text: "Hello! I'm your Personal Analyzer. Pick a report below to see how you're doing." }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -165,7 +165,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       ];
 
       return {
-        text: `${hMarker}FULL NUTRITION ANALYSIS\n\nComprehensive metabolic overview. Your current diet ratio is ${pRatio}P:${cRatio}C:${fRatio}F.`,
+        text: `${hMarker}FULL NUTRITION REPORT\n\nHere is a look at your eating today. Your diet ratio is ${pRatio}P:${cRatio}C:${fRatio}F.`,
         type: 'nutrition',
         reportSubtype: 'overall',
         macroPieData,
@@ -192,7 +192,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       ];
 
       return {
-        text: `${hMarker}MACRO & FIBER ANALYSIS\n\nSpecific audit of your muscle-building and recovery fuels.`,
+        text: `${hMarker}MACRO & FIBER REPORT\n\nCheck your protein, carbs, fat, and fiber for the day.`,
         type: 'nutrition',
         reportSubtype: 'standard',
         nutrientData
@@ -214,7 +214,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       ];
 
       return {
-        text: `${hMarker}FULL MICRO ANALYSIS\n\nDetailed status of critical micronutrients for skin aesthetics and performance.`,
+        text: `${hMarker}FULL MICRO REPORT\n\nCheck your vitamins and minerals for skin and performance.`,
         type: 'nutrition',
         reportSubtype: 'standard',
         nutrientData
@@ -248,7 +248,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       }));
 
       return {
-        text: `${hMarker}WEIGHT PROGRESS REPORT\n\n• Current: ${current.toFixed(1)} kg\n${historyNote}• Start: ${start.toFixed(1)} kg\n• Target: ${target.toFixed(1)} kg\n\n${hMarker}STRATEGY STATUS\n• Total Progress: ${Math.round(Math.max(0, progress))}%\n• Remaining: ${diff} kg\n• Goal: ${objective.charAt(0).toUpperCase() + objective.slice(1)}`,
+        text: `${hMarker}WEIGHT REPORT\n\n• Current: ${current.toFixed(1)} kg\n${historyNote}• Start: ${start.toFixed(1)} kg\n• Target: ${target.toFixed(1)} kg\n\n${hMarker}YOUR PROGRESS\n• Total Progress: ${Math.round(Math.max(0, progress))}%\n• Remaining: ${diff} kg\n• Goal: ${objective.charAt(0).toUpperCase() + objective.slice(1)}`,
         type: 'weight',
         chartData
       };
@@ -307,13 +307,13 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       })).filter(d => d.volume > 0);
 
       return {
-        text: `${hMarker}WORKOUT PROGRESS REPORT\n\n• Status: ${exerciseDetails.length > 0 ? 'Active' : 'No logs recorded for today'}\n• Total Volume: ${Math.round(totalVolume).toLocaleString()} kg\n• Exercises: ${exerciseDetails.length}\n\n${hMarker}MUSCLES TARGETED\n${muscleList || '• No exercises logged.'}\n\n${hMarker}EXERCISES PERFORMED\n${exerciseList || '• No logs today.'}`,
+        text: `${hMarker}WORKOUT REPORT\n\n• Status: ${exerciseDetails.length > 0 ? 'Active' : 'No logs for today'}\n• Total Lifted: ${Math.round(totalVolume).toLocaleString()} kg\n• Exercises: ${exerciseDetails.length}\n\n${hMarker}MUSCLES TRAINED\n${muscleList || '• None logged yet.'}\n\n${hMarker}EXERCISES DONE\n${exerciseList || '• No logs today.'}`,
         type: 'workout',
         chartData
       };
     }
 
-    return { text: "Error: Module undefined." };
+    return { text: "Error: Could not find report." };
   };
 
   const handleQuery = (label: string, value: string) => {
@@ -349,9 +349,9 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
   };
 
   const options = [
-    { label: "Full Nutrition Analysis", value: 'overall' },
-    { label: "Macro & Fiber Analysis", value: 'macros' },
-    { label: "Full Micro Analysis", value: 'micros' },
+    { label: "Full Nutrition Report", value: 'overall' },
+    { label: "Macro & Fiber Report", value: 'macros' },
+    { label: "Full Micro Report", value: 'micros' },
     { label: "Weight Progress", value: 'weight' },
     { label: "Workout Progress", value: 'workout' }
   ];
@@ -390,7 +390,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                 <span className="text-[6px] font-black text-white uppercase tracking-widest leading-none">Online</span>
               </div>
             </div>
-            <p className="text-[8px] font-bold text-white/60 uppercase tracking-[0.2em] mt-0.5">Professional Report Assistant</p>
+            <p className="text-[8px] font-bold text-white/60 uppercase tracking-[0.2em] mt-0.5">AI Analysis Assistant</p>
           </div>
           <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0 border border-white/10 backdrop-blur-sm">
             <Sparkles className="w-3.5 h-3.5 text-white/60" />
@@ -424,7 +424,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                   <Activity className="w-3 h-3 text-primary" />
                 )}
                 <span className="text-[9px] font-bold uppercase tracking-widest">
-                  {msg.role === 'user' ? 'You' : 'Analysis Report'}
+                  {msg.role === 'user' ? 'You' : 'Report'}
                 </span>
               </div>
               <p className="font-medium whitespace-pre-wrap tracking-tight">{msg.text}</p>
@@ -465,7 +465,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
                       {/* Macro Pie Chart */}
                       <div className="space-y-2">
-                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] text-center">MACRO RATIO DISTRIBUTION</p>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] text-center">MACRO DISTRIBUTION</p>
                         <div className="h-40 w-full">
                           <ResponsiveContainer width="100%" height="100%">
                             <PieChart>
@@ -501,7 +501,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
                       {/* Macro Excel-Type Table */}
                       <div className="space-y-2 pt-2 border-t border-muted/5">
-                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">MACRO PERFORMANCE AUDIT</p>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">MACRO DETAILS</p>
                         <div className="border border-muted/20 rounded-xl overflow-hidden shadow-inner">
                           <table className="w-full text-left border-collapse">
                             <thead className="bg-muted/30 border-b border-muted/20">
@@ -533,7 +533,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
                       {/* Excel-Type Micro Table */}
                       <div className="space-y-2 pt-2">
-                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">MICRO PERFORMANCE AUDIT</p>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">MICRO DETAILS</p>
                         <div className="border border-muted/20 rounded-xl overflow-hidden shadow-inner">
                           <table className="w-full text-left border-collapse">
                             <thead className="bg-muted/30 border-b border-muted/20">
@@ -595,7 +595,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
               {msg.type === 'weight' && msg.chartData && msg.chartData.length > 1 && (
                 <div className="mt-2 pt-2 border-t border-muted/10 h-40 w-full">
-                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2">WEIGHT TRANSFORMATION (KG)</div>
+                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2">WEIGHT TREND (KG)</div>
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={msg.chartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
@@ -682,7 +682,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
           <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2">
             <div className="bg-card border border-muted/20 rounded-2xl rounded-tl-none p-4 shadow-sm flex items-center gap-3">
               <Loader2 className="w-4 h-4 animate-spin text-primary" />
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Generating Performance Audit...</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Analyzing your data...</span>
             </div>
           </div>
         )}
@@ -690,7 +690,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
       {/* Options Menu - Compact & Full Width */}
       <div className="px-1 mt-auto space-y-2 mb-4">
-        <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-widest px-3">Select Report Module</p>
+        <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-widest px-3">Select Report</p>
         <Card className="border-none shadow-md bg-card rounded-2xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
             {options.map((opt, i) => (
