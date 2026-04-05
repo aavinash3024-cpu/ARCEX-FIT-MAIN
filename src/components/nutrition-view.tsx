@@ -702,7 +702,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
       <Card className="border-none shadow-sm overflow-hidden bg-card">
         <div className="p-3 flex items-center gap-3">
-          <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 relative bg-muted/20 border border-muted/10">
+          <div className="w-9 h-9 rounded-full overflow-hidden shrink-0 relative bg-muted/20 border border-muted/30">
             <Image 
               src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=400&auto=format&fit=crop"
               alt="Nutrition Logo"
@@ -855,7 +855,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between px-1">
             <div className="space-y-0.5">
-              <h2 className="text-[10px] font-black uppercase tracking-[0.2em] text-foreground">DAILY HISTORY</h2>
+              <h2 className="text-[10px] font-black uppercase tracking-tight text-foreground">DAILY HISTORY</h2>
               <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/30">LOGGED ITEMS</p>
             </div>
             <button 
