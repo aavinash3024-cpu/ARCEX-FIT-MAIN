@@ -318,7 +318,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       {/* Chat Area */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-2 space-y-6 py-6 swipe-container"
+        className="flex-1 overflow-y-auto px-2 space-y-4 py-6 swipe-container"
       >
         {messages.map((msg, i) => (
           <div 
@@ -347,17 +347,17 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
               <p className="font-medium whitespace-pre-wrap tracking-tight">{msg.text}</p>
               
               {msg.type === 'weight' && msg.chartData && msg.chartData.length > 1 && (
-                <div className="mt-4 pt-4 border-t border-muted/10 h-48 w-full">
-                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2">Weight Transformation (kg)</div>
+                <div className="mt-2 pt-2 border-t border-muted/10 h-40 w-full">
+                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Weight Transformation (kg)</div>
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={msg.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                    <LineChart data={msg.chartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
                       <XAxis 
                         dataKey="date" 
                         fontSize={8} 
                         fontWeight={700} 
                         tick={{ fill: 'currentColor', opacity: 0.5 }} 
-                        dy={10} 
+                        dy={2} 
                         ticks={[msg.chartData[0].date, msg.chartData[msg.chartData.length - 1].date]}
                       />
                       <YAxis 
@@ -383,20 +383,20 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
               )}
 
               {msg.type === 'workout' && msg.chartData && msg.chartData.length > 1 && (
-                <div className="mt-4 pt-4 border-t border-muted/10 w-full">
-                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2">
+                <div className="mt-2 pt-2 border-t border-muted/10 w-full">
+                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">
                     Volume Trend (kg)
                   </div>
-                  <div className="h-48 w-full">
+                  <div className="h-40 w-full">
                     <ResponsiveContainer width="100%" height="100%">
-                      <LineChart data={msg.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                      <LineChart data={msg.chartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                         <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
                         <XAxis 
                           dataKey="index" 
                           fontSize={8} 
                           fontWeight={700} 
                           tick={{ fill: 'currentColor', opacity: 0.5 }} 
-                          dy={10} 
+                          dy={2} 
                           ticks={[msg.chartData[0].index, msg.chartData[msg.chartData.length - 1].index]}
                         />
                         <YAxis 
@@ -423,7 +423,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="flex justify-end mt-1">
+                  <div className="flex justify-end -mt-1">
                     <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">EXERCISE COUNT (Ex)</div>
                   </div>
                 </div>
