@@ -55,7 +55,10 @@ import {
   isSameDay, 
   addDays,
   differenceInDays,
-  parseISO
+  parseISO,
+  eachDayOfInterval,
+  startOfMonth,
+  endOfMonth
 } from "date-fns";
 import {
   Accordion,
@@ -412,38 +415,41 @@ export function WorkoutView() {
       </div>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
-        <div className="relative h-24 w-full">
-          <Image 
-            src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=800&auto=format&fit=crop"
-            alt="Workout Banner"
-            fill
-            className="object-cover"
-            data-ai-hint="gym weights"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-card/90 to-transparent" />
-          <div className="absolute bottom-3 left-5 right-5 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground">Today's Session</h2>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                {todayName.toUpperCase()}: <span className="text-primary font-black">{todaysExercises.length} EXERCISES</span>
-              </p>
+        <div className="p-4 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 relative bg-muted/20 border border-muted/10 shadow-sm">
+            <Image 
+              src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=400&auto=format&fit=crop"
+              alt="Workout"
+              fill
+              className="object-cover"
+              data-ai-hint="gym weights"
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground">Today's Session</h2>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
+                  {todayName.toUpperCase()}: <span className="text-primary font-black">{todaysExercises.length} EXERCISES</span>
+                </p>
+              </div>
+              <Button 
+                variant="ghost" 
+                size="icon"
+                onClick={() => {
+                  setSearchQuery("");
+                  setMuscleFilter("ALL");
+                  document.dispatchEvent(new CustomEvent('open-extra-moves'));
+                }}
+                className="h-8 w-8 rounded-full bg-muted/50 text-foreground hover:bg-primary hover:text-white transition-colors border border-muted/10"
+              >
+                <Plus className="w-4 h-4" />
+              </Button>
             </div>
-            <Button 
-              variant="ghost" 
-              size="icon"
-              onClick={() => {
-                setSearchQuery("");
-                setMuscleFilter("ALL");
-                document.dispatchEvent(new CustomEvent('open-extra-moves'));
-              }}
-              className="h-8 w-8 rounded-full bg-black/20 backdrop-blur-sm text-white hover:bg-primary transition-colors border border-white/10"
-            >
-              <Plus className="w-4 h-4" />
-            </Button>
           </div>
         </div>
 
-        <CardContent className="p-4">
+        <CardContent className="p-4 pt-0">
           <ScrollArea className="h-[200px] pr-2">
             <div className="space-y-2.5 pb-2">
               {todaysExercises.length === 0 ? (
@@ -839,7 +845,7 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
 
 function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onViewDetail: (pr: any) => void }) {
   const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
-  const [activeType, setActiveType] = useState<'strength' | 'time'| 'strength'>('strength');
+  const [activeType, setActiveType] = useState<'strength' | 'time'>('strength');
   const [activeMuscle, setActiveMuscle] = useState<string>("CHEST");
 
   useEffect(() => {
