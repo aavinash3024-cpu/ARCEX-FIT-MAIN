@@ -10,14 +10,29 @@ import {
   User, 
   Loader2, 
   Activity,
-  ArrowRight
+  ArrowRight,
+  TrendingUp,
+  Dumbbell
 } from "lucide-react";
+import { 
+  LineChart, 
+  Line, 
+  XAxis, 
+  YAxis, 
+  CartesianGrid, 
+  Tooltip, 
+  ResponsiveContainer 
+} from 'recharts';
 import { cn } from '@/lib/utils';
-import { format } from 'date-fns';
+import { format, differenceInDays, parseISO } from 'date-fns';
+import { EXERCISES_DATA } from '@/lib/exercises-data';
+import { Badge } from "@/components/ui/badge";
 
 interface Message {
   role: 'user' | 'system';
   text: string;
+  type?: string;
+  chartData?: any[];
 }
 
 interface GuideViewProps {
@@ -109,7 +124,8 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
       const microList = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
 
-      return `FULL NUTRITION ANALYSIS
+      return {
+        text: `FULL NUTRITION ANALYSIS
 
 • Calories: ${Math.round(totals.calories)} / ${targetCal} kcal (${accuracy}%)
 • Hydration: ${hydrationLiters.toFixed(1)} / ${targetHydration.toFixed(1)} L
@@ -124,7 +140,8 @@ MICRO ANALYSIS
 ${microList}
 
 SUMMARY
-${totals.calories < targetCal ? "You still have a calorie buffer. Focus on lean protein." : "You've reached your intake limit. Focus on water and recovery."}`;
+${totals.calories < targetCal ? "You still have a calorie buffer. Focus on lean protein." : "You've reached your intake limit. Focus on water and recovery."}`
+      };
     }
 
     if (type === 'macros') {
@@ -133,12 +150,14 @@ ${totals.calories < targetCal ? "You still have a calorie buffer. Focus on lean 
       const fDiff = totals.fat - targetF;
       const fiDiff = totals.fiber - targetFI;
 
-      return `MACRO & FIBER ANALYSIS
+      return {
+        text: `MACRO & FIBER ANALYSIS
 
 • Protein: ${Math.round(totals.protein)}g / ${targetP}g (${pDiff > 0 ? '+' : ''}${Math.round(pDiff)}g)
 • Carbs: ${Math.round(totals.carbs)}g / ${targetC}g (${cDiff > 0 ? '+' : ''}${Math.round(cDiff)}g)
 • Fat: ${Math.round(totals.fat)}g / ${targetF}g (${fDiff > 0 ? '+' : ''}${Math.round(fDiff)}g)
-• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g (${fiDiff > 0 ? '+' : ''}${Math.round(fiDiff)}g)`;
+• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g (${fiDiff > 0 ? '+' : ''}${Math.round(fiDiff)}g)`
+      };
     }
 
     if (type === 'micros') {
@@ -157,9 +176,11 @@ ${totals.calories < targetCal ? "You still have a calorie buffer. Focus on lean 
 
       const report = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
 
-      return `FULL MICRO ANALYSIS
+      return {
+        text: `FULL MICRO ANALYSIS
 
-${report}`;
+${report}`
+      };
     }
 
     if (type === 'weight') {
@@ -168,6 +189,14 @@ ${report}`;
       const target = goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 0;
       const diff = Math.abs(current - target).toFixed(1);
       
+      let historyNote = "";
+      if (weightHistory.length > 1) {
+        const prevEntry = weightHistory[weightHistory.length - 2];
+        const days = differenceInDays(new Date(), new Date(prevEntry.date));
+        const dayText = days === 0 ? "Earlier today" : days === 1 ? "1 day ago" : `${days} days ago`;
+        historyNote = `• History: ${dayText} you were ${prevEntry.weight} kg\n`;
+      }
+
       const objective = goalData?.objective || 'maintenance';
       let progress = 0;
       if (start !== target) {
@@ -175,15 +204,24 @@ ${report}`;
         else progress = ((current - start) / (target - start)) * 100;
       }
 
-      return `WEIGHT PROGRESS REPORT
+      const chartData = weightHistory.map(h => ({
+        date: format(new Date(h.date), 'MMM d'),
+        weight: h.weight
+      }));
+
+      return {
+        text: `WEIGHT PROGRESS REPORT
 
 • Current: ${current.toFixed(1)} kg
-• Start: ${start.toFixed(1)} kg
+${historyNote}• Start: ${start.toFixed(1)} kg
 • Target: ${target.toFixed(1)} kg
 
 • Total Progress: ${Math.round(Math.max(0, progress))}%
 • Remaining: ${diff} kg
-• Goal: ${objective.charAt(0).toUpperCase() + objective.slice(1)}`;
+• Goal: ${objective.charAt(0).toUpperCase() + objective.slice(1)}`,
+        type: 'weight',
+        chartData
+      };
     }
 
     if (type === 'workout') {
@@ -192,29 +230,50 @@ ${report}`;
       const logs = savedLogs ? JSON.parse(savedLogs) : null;
       
       let totalVolume = 0;
-      const exercises = logs?.date === todayStr ? Object.keys(logs.data) : [];
+      const exerciseDetails: any[] = [];
+      const musclesSet = new Set<string>();
       
       if (logs?.date === todayStr) {
-        Object.values(logs.data).forEach((sets: any) => {
+        Object.entries(logs.data).forEach(([exName, sets]: [string, any]) => {
+          const exData = EXERCISES_DATA.find(e => e.name === exName);
+          if (exData) musclesSet.add(exData.muscle);
+          
+          let exVolume = 0;
           sets.forEach((s: any) => {
             if (s.type === 'strength') {
-              totalVolume += (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
+              const vol = (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
+              exVolume += vol;
+              totalVolume += vol;
             }
+          });
+          
+          exerciseDetails.push({
+            name: exName,
+            sets: sets.length,
+            volume: exVolume
           });
         });
       }
 
-      return `WORKOUT PROGRESS REPORT
+      const muscleList = Array.from(musclesSet).map(m => `• ${m}`).join('\n');
+      const exerciseList = exerciseDetails.map(d => `• ${d.name}: ${d.sets} sets (${d.volume.toLocaleString()} kg)`).join('\n');
 
-• Status: ${exercises.length > 0 ? 'Active' : 'No logs today'}
+      return {
+        text: `WORKOUT PROGRESS REPORT
+
+• Status: ${exerciseDetails.length > 0 ? 'Active' : 'No logs today'}
 • Total Volume: ${Math.round(totalVolume).toLocaleString()} kg
-• Exercises: ${exercises.length}
+• Exercises: ${exerciseDetails.length}
 
 MUSCLES TARGETED
-${exercises.length > 0 ? exercises.map(e => `• ${e}`).join('\n') : '• No movements logged yet today.'}`;
+${muscleList || '• No movements logged yet.'}
+
+EXERCISES PERFORMED
+${exerciseList || '• No logs today.'}`
+      };
     }
 
-    return "Error: Module undefined.";
+    return { text: "Error: Module undefined." };
   };
 
   const handleQuery = (label: string, value: string) => {
@@ -226,7 +285,12 @@ ${exercises.length > 0 ? exercises.map(e => `• ${e}`).join('\n') : '• No mov
 
     setTimeout(() => {
       const report = generateReport(value);
-      setMessages(prev => [...prev, { role: 'system', text: report }]);
+      setMessages(prev => [...prev, { 
+        role: 'system', 
+        text: report.text, 
+        type: report.type,
+        chartData: report.chartData
+      }]);
       setIsLoading(false);
     }, 800);
   };
@@ -249,7 +313,10 @@ ${exercises.length > 0 ? exercises.map(e => `• ${e}`).join('\n') : '• No mov
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2">
             <h1 className="text-base font-bold uppercase tracking-tight text-foreground/90">Personal Analyzer</h1>
-            <div className="bg-muted/50 px-1.5 py-0.5 rounded text-[7px] font-black text-muted-foreground uppercase tracking-widest leading-none">Online</div>
+            <div className="flex items-center gap-1 bg-muted/50 px-1.5 py-0.5 rounded">
+              <span className="w-1 h-1 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-[7px] font-black text-muted-foreground uppercase tracking-widest leading-none">Online</span>
+            </div>
           </div>
           <p className="text-[9px] font-bold text-muted-foreground/50 uppercase tracking-[0.2em] mt-0.5">Professional Report Assistant</p>
         </div>
@@ -267,8 +334,8 @@ ${exercises.length > 0 ? exercises.map(e => `• ${e}`).join('\n') : '• No mov
           <div 
             key={i} 
             className={cn(
-              "flex w-full animate-in fade-in slide-in-from-bottom-2",
-              msg.role === 'user' ? "justify-end" : "justify-start"
+              "flex flex-col w-full animate-in fade-in slide-in-from-bottom-2",
+              msg.role === 'user' ? "items-end" : "items-start"
             )}
           >
             <div className={cn(
@@ -288,6 +355,27 @@ ${exercises.length > 0 ? exercises.map(e => `• ${e}`).join('\n') : '• No mov
                 </span>
               </div>
               <p className="font-medium whitespace-pre-wrap tracking-tight">{msg.text}</p>
+              
+              {msg.type === 'weight' && msg.chartData && msg.chartData.length > 1 && (
+                <div className="mt-4 pt-4 border-t border-muted/10 h-32 w-full">
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={msg.chartData}>
+                      <Line 
+                        type="monotone" 
+                        dataKey="weight" 
+                        stroke="hsl(var(--primary))" 
+                        strokeWidth={2} 
+                        dot={{ r: 3, fill: "hsl(var(--primary))" }}
+                      />
+                      <XAxis dataKey="date" hide />
+                      <YAxis hide domain={['dataMin - 1', 'dataMax + 1']} />
+                      <Tooltip 
+                        contentStyle={{ borderRadius: '8px', fontSize: '10px', fontWeight: 'bold', border: 'none' }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
             </div>
           </div>
         ))}
