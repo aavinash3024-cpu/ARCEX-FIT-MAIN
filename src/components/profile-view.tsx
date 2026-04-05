@@ -34,7 +34,8 @@ import {
   X,
   Star,
   AlertTriangle,
-  Check
+  Check,
+  Scale
 } from "lucide-react";
 import { 
   Select,
@@ -45,6 +46,7 @@ import {
 } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
+import { Progress } from "@/components/ui/progress";
 import { 
   AlertDialog,
   AlertDialogAction,
@@ -67,6 +69,7 @@ type SubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' 
 export function ProfileView({ onBack }: ProfileViewProps) {
   const [activeSubView, setActiveSubView] = useState<SubView>('main');
   const [goalData, setGoalData] = useState<any>(null);
+  const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
 
@@ -94,6 +97,16 @@ export function ProfileView({ onBack }: ProfileViewProps) {
         if (data.age) setProfileAge(data.age.toString());
       } catch (e) {
         console.error("Failed to parse goal data", e);
+      }
+    }
+
+    // Load Weight History
+    const savedWeight = localStorage.getItem('pulseflow_weight_history');
+    if (savedWeight) {
+      try {
+        setWeightHistory(JSON.parse(savedWeight));
+      } catch (e) {
+        console.error("Failed to parse weight history", e);
       }
     }
 
@@ -138,6 +151,38 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   useEffect(() => {
     localStorage.setItem('pulseflow_notifications', notificationsEnabled.toString());
   }, [notificationsEnabled]);
+
+  const { startWeight, targetWeight, currentWeight, progressPercent } = useMemo(() => {
+    const sW = goalData?.weight ? parseFloat(goalData.weight) : 0;
+    const tW = goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 0;
+    const cW = weightHistory?.length > 0 
+      ? weightHistory[weightHistory.length - 1].weight 
+      : sW;
+
+    if (!sW || !tW || sW === tW) {
+      return { startWeight: sW, targetWeight: tW, currentWeight: cW, progressPercent: 0 };
+    }
+    
+    const objective = goalData?.objective || 'loss';
+    let progress = 0;
+    
+    if (objective === 'loss') {
+      if (cW >= sW) progress = 0;
+      else progress = ((sW - cW) / (sW - tW)) * 100;
+    } else if (objective === 'gain') {
+      if (cW <= sW) progress = 0;
+      else progress = ((cW - sW) / (tW - sW)) * 100;
+    } else {
+      progress = 100;
+    }
+    
+    return {
+      startWeight: sW,
+      targetWeight: tW,
+      currentWeight: cW,
+      progressPercent: Math.min(100, Math.max(0, Math.round(progress)))
+    };
+  }, [goalData, weightHistory]);
 
   const handleSaveProfile = () => {
     setIsSaving(true);
@@ -551,6 +596,29 @@ export function ProfileView({ onBack }: ProfileViewProps) {
             </div>
           </CardContent>
         </Card>
+
+        {goalData && (
+          <Card className="border-none shadow-sm bg-card rounded-[1.5rem] border border-muted/10 overflow-hidden">
+            <CardContent className="p-5 space-y-4">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Scale className="w-4 h-4 text-primary" />
+                  <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em]">Weight Goal</span>
+                </div>
+                <span className="text-xs font-black text-primary">{progressPercent}%</span>
+              </div>
+              
+              <div className="space-y-2">
+                <Progress value={progressPercent} className="h-1.5 bg-muted" />
+                <div className="flex justify-between items-center text-[8px] font-black text-muted-foreground uppercase tracking-widest">
+                  <span>Start: {startWeight.toFixed(1)}kg</span>
+                  <span className="text-primary">Current: {currentWeight.toFixed(1)}kg</span>
+                  <span>Goal: {targetWeight.toFixed(1)}kg</span>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       <div className="space-y-8 px-1 mt-6">
