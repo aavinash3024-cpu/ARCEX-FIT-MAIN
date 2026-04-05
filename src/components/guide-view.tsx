@@ -348,7 +348,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
               
               {msg.type === 'weight' && msg.chartData && msg.chartData.length > 1 && (
                 <div className="mt-2 pt-2 border-t border-muted/10 h-40 w-full">
-                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">Weight Transformation (kg)</div>
+                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2">WEIGHT TRANSFORMATION (KG)</div>
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={msg.chartData} margin={{ top: 5, right: 5, left: -25, bottom: 0 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
@@ -384,8 +384,8 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
               {msg.type === 'workout' && msg.chartData && msg.chartData.length > 1 && (
                 <div className="mt-2 pt-2 border-t border-muted/10 w-full">
-                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-1">
-                    Volume Trend (kg)
+                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2">
+                    VOLUME TREND (KG)
                   </div>
                   <div className="h-40 w-full">
                     <ResponsiveContainer width="100%" height="100%">
@@ -423,7 +423,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="flex justify-end -mt-1">
+                  <div className="flex justify-end mt-2">
                     <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">EXERCISE COUNT (Ex)</div>
                   </div>
                 </div>
