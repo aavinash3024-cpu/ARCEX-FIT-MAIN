@@ -242,8 +242,16 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
         return `${header}\n${sets}`;
       }).join('\n\n');
 
+      const chartData = exerciseDetails.map((d, i) => ({
+        index: i + 1,
+        volume: d.volume,
+        name: d.name
+      })).filter(d => d.volume > 0);
+
       return {
-        text: `${hMarker}WORKOUT PROGRESS REPORT\n\n• Status: ${exerciseDetails.length > 0 ? 'Active' : 'No logs recorded for today'}\n• Total Volume: ${Math.round(totalVolume).toLocaleString()} kg\n• Exercises: ${exerciseDetails.length}\n\n${hMarker}MUSCLES TARGETED\n${muscleList || '• No movements logged.'}\n\n${hMarker}EXERCISES PERFORMED\n${exerciseList || '• No logs today.'}`
+        text: `${hMarker}WORKOUT PROGRESS REPORT\n\n• Status: ${exerciseDetails.length > 0 ? 'Active' : 'No logs recorded for today'}\n• Total Volume: ${Math.round(totalVolume).toLocaleString()} kg\n• Exercises: ${exerciseDetails.length}\n\n${hMarker}MUSCLES TARGETED\n${muscleList || '• No movements logged.'}\n\n${hMarker}EXERCISES PERFORMED\n${exerciseList || '• No logs today.'}`,
+        type: 'workout',
+        chartData
       };
     }
 
@@ -340,6 +348,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
               
               {msg.type === 'weight' && msg.chartData && msg.chartData.length > 1 && (
                 <div className="mt-4 pt-4 border-t border-muted/10 h-48 w-full">
+                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2">Weight Transformation (kg)</div>
                   <ResponsiveContainer width="100%" height="100%">
                     <LineChart data={msg.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
                       <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
@@ -362,6 +371,49 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                       <Line 
                         type="monotone" 
                         dataKey="weight" 
+                        stroke="hsl(var(--primary))" 
+                        strokeWidth={2.5} 
+                        dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "#fff" }}
+                        activeDot={{ r: 6, strokeWidth: 0 }}
+                      />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+              )}
+
+              {msg.type === 'workout' && msg.chartData && msg.chartData.length > 1 && (
+                <div className="mt-4 pt-4 border-t border-muted/10 h-48 w-full">
+                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2 flex justify-between">
+                    <span>Volume Trend (kg)</span>
+                    <span>Exercise Flow</span>
+                  </div>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <LineChart data={msg.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
+                      <XAxis 
+                        dataKey="index" 
+                        fontSize={8} 
+                        fontWeight={700} 
+                        tick={{ fill: 'currentColor', opacity: 0.5 }} 
+                        dy={10} 
+                        ticks={[msg.chartData[0].index, msg.chartData[msg.chartData.length - 1].index]}
+                      />
+                      <YAxis 
+                        fontSize={8} 
+                        fontWeight={700} 
+                        tick={{ fill: 'currentColor', opacity: 0.5 }} 
+                      />
+                      <Tooltip 
+                        contentStyle={{ borderRadius: '8px', fontSize: '10px', fontWeight: 'bold', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                        formatter={(val: number) => [`${val.toLocaleString()} kg`, "Volume"]}
+                        labelFormatter={(index: any) => {
+                          const item = msg.chartData?.find(d => d.index === index);
+                          return item ? `${item.name} (Ex ${index})` : `Exercise ${index}`;
+                        }}
+                      />
+                      <Line 
+                        type="monotone" 
+                        dataKey="volume" 
                         stroke="hsl(var(--primary))" 
                         strokeWidth={2.5} 
                         dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "#fff" }}
