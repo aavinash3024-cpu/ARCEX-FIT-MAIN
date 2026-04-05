@@ -368,6 +368,7 @@ export default function PulseFlowApp() {
             goalData={goalData}
             loggedMeals={loggedMeals}
             hydrationAmount={hydrationAmount}
+            weightHistory={weightHistory}
             onBack={() => setActiveTab('dashboard')}
           />
         );

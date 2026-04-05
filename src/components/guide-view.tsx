@@ -16,9 +16,11 @@ import {
   Activity,
   Zap,
   Target,
-  X
+  Dumbbell,
+  Scale
 } from "lucide-react";
 import { cn } from '@/lib/utils';
+import { format } from 'date-fns';
 
 interface Message {
   role: 'user' | 'system';
@@ -29,10 +31,11 @@ interface GuideViewProps {
   goalData: any;
   loggedMeals: any[];
   hydrationAmount: number;
+  weightHistory: any[];
   onBack: () => void;
 }
 
-export function GuideView({ goalData, loggedMeals, hydrationAmount, onBack }: GuideViewProps) {
+export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistory, onBack }: GuideViewProps) {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'system', text: "SYSTEM INITIALIZED: PulseFlow Performance Analyst Ready.\n\nSelect a Precision Module below to execute a real-time audit of your wellness data." }
   ]);
@@ -103,15 +106,39 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, onBack }: Gu
       if (accuracy < 90) status = "BEHIND";
       if (accuracy > 105) status = "AHEAD";
 
-      return `[FULL SYSTEM AUDIT]
+      const micros = [
+        { label: 'Vit A', val: totals.vitaminA, target: microTargets.vitaminA, unit: 'mcg' },
+        { label: 'Omega-3', val: totals.omega3, target: microTargets.omega3, unit: 'g' },
+        { label: 'Vit C', val: totals.vitaminC, target: microTargets.vitaminC, unit: 'mg' },
+        { label: 'Zinc', val: totals.zinc, target: microTargets.zinc, unit: 'mg' },
+        { label: 'Selenium', val: totals.selenium, target: microTargets.selenium, unit: 'mcg' },
+        { label: 'Mag', val: totals.magnesium, target: microTargets.magnesium, unit: 'mg' },
+        { label: 'Vit D', val: totals.vitaminD, target: microTargets.vitaminD, unit: 'mcg' },
+        { label: 'Potas', val: totals.potassium, target: microTargets.potassium, unit: 'mg' },
+        { label: 'Iron', val: totals.iron, target: microTargets.iron, unit: 'mg' },
+        { label: 'Calc', val: totals.calcium, target: microTargets.calcium, unit: 'mg' },
+      ];
+
+      const microList = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
+
+      return `[SYSTEM PERFORMANCE AUDIT]
 
 • ENERGY: ${Math.round(totals.calories)} / ${targetCal} kcal (${accuracy}%)
-• HYDRATION: ${hydrationLiters.toFixed(1)} / ${targetHydration.toFixed(1)} Liters
-• MACROS: P ${Math.round(totals.protein)}g | C ${Math.round(totals.carbs)}g | F ${Math.round(totals.fat)}g
-• FIBER: ${Math.round(totals.fiber)} / ${targetFI}g
-• SYSTEM SCORE: ${score}%
-• PERFORMANCE STATUS: ${status}
-• ADVISORY: ${totals.calories < targetCal ? "Caloric buffer available. Focus on protein density." : "Limit intake to low-calorie micronutrient sources for remainder of day."}`;
+• HYDRATION: ${hydrationLiters.toFixed(1)} / ${targetHydration.toFixed(1)} L
+
+[MACRO ANALYSIS]
+• PROTEIN: ${Math.round(totals.protein)}g / ${targetP}g
+• CARBS: ${Math.round(totals.carbs)}g / ${targetC}g
+• FAT: ${Math.round(totals.fat)}g / ${targetF}g
+• FIBER: ${Math.round(totals.fiber)}g / ${targetFI}g
+
+[MICRONUTRIENT STATUS]
+${microList}
+
+[ADVISORY]
+• PERFORMANCE SCORE: ${score}%
+• INTENSITY STATUS: ${status}
+• RECOMMENDATION: ${totals.calories < targetCal ? "Caloric buffer available. Focus on high-density protein." : "Intake limit reached. Prioritize water and recovery."}`;
     }
 
     if (type === 'macros') {
@@ -126,27 +153,29 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, onBack }: Gu
         { label: 'FAT', val: (totals.fat / targetF) }
       ].sort((a, b) => a.val - b.val);
 
-      return `[MACRO & FIBER ANALYSIS]
+      return `[MACRO & FIBER GAP ANALYSIS]
 
-• PROTEIN: ${Math.round(totals.protein)}g / ${targetP}g (${pDiff > 0 ? '+' : ''}${Math.round(pDiff)}g)
-• CARBS: ${Math.round(totals.carbs)}g / ${targetC}g (${cDiff > 0 ? '+' : ''}${Math.round(cDiff)}g)
-• FAT: ${Math.round(totals.fat)}g / ${targetF}g (${fDiff > 0 ? '+' : ''}${Math.round(fDiff)}g)
-• FIBER: ${Math.round(totals.fiber)}g / ${targetFI}g (${fiDiff > 0 ? '+' : ''}${Math.round(fiDiff)}g)
-• PRIMARY GAP: ${deficits[0].label} (${Math.round(deficits[0].val * 100)}% met)`;
+• PROTEIN DELTA: ${Math.round(totals.protein)}g / ${targetP}g (${pDiff > 0 ? '+' : ''}${Math.round(pDiff)}g)
+• CARB DELTA: ${Math.round(totals.carbs)}g / ${targetC}g (${cDiff > 0 ? '+' : ''}${Math.round(cDiff)}g)
+• FAT DELTA: ${Math.round(totals.fat)}g / ${targetF}g (${fDiff > 0 ? '+' : ''}${Math.round(fDiff)}g)
+• FIBER DELTA: ${Math.round(totals.fiber)}g / ${targetFI}g (${fiDiff > 0 ? '+' : ''}${Math.round(fiDiff)}g)
+
+• PRIMARY GAP: ${deficits[0].label}
+• GAP STATUS: ${Math.round(deficits[0].val * 100)}% Fulfilled`;
     }
 
     if (type === 'micros') {
       const micros = [
-        { id: 'vitaminA', label: 'Vit A', val: totals.vitaminA, target: microTargets.vitaminA, unit: 'mcg' },
-        { id: 'omega3', label: 'Omega-3', val: totals.omega3, target: microTargets.omega3, unit: 'g' },
-        { id: 'vitaminC', label: 'Vit C', val: totals.vitaminC, target: microTargets.vitaminC, unit: 'mg' },
-        { id: 'zinc', label: 'Zinc', val: totals.zinc, target: microTargets.zinc, unit: 'mg' },
-        { id: 'selenium', label: 'Selenium', val: totals.selenium, target: microTargets.selenium, unit: 'mcg' },
-        { id: 'magnesium', label: 'Mag', val: totals.magnesium, target: microTargets.magnesium, unit: 'mg' },
-        { id: 'vitaminD', label: 'Vit D', val: totals.vitaminD, target: microTargets.vitaminD, unit: 'mcg' },
-        { id: 'potassium', label: 'Potas', val: totals.potassium, target: microTargets.potassium, unit: 'mg' },
-        { id: 'iron', label: 'Iron', val: totals.iron, target: microTargets.iron, unit: 'mg' },
-        { id: 'calcium', label: 'Calc', val: totals.calcium, target: microTargets.calcium, unit: 'mg' },
+        { label: 'Vit A', val: totals.vitaminA, target: microTargets.vitaminA, unit: 'mcg' },
+        { label: 'Omega-3', val: totals.omega3, target: microTargets.omega3, unit: 'g' },
+        { label: 'Vit C', val: totals.vitaminC, target: microTargets.vitaminC, unit: 'mg' },
+        { label: 'Zinc', val: totals.zinc, target: microTargets.zinc, unit: 'mg' },
+        { label: 'Selenium', val: totals.selenium, target: microTargets.selenium, unit: 'mcg' },
+        { label: 'Mag', val: totals.magnesium, target: microTargets.magnesium, unit: 'mg' },
+        { label: 'Vit D', val: totals.vitaminD, target: microTargets.vitaminD, unit: 'mcg' },
+        { label: 'Potas', val: totals.potassium, target: microTargets.potassium, unit: 'mg' },
+        { label: 'Iron', val: totals.iron, target: microTargets.iron, unit: 'mg' },
+        { label: 'Calc', val: totals.calcium, target: microTargets.calcium, unit: 'mg' },
       ];
 
       const report = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
@@ -155,34 +184,64 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, onBack }: Gu
 
 ${report}
 
-• AUDIT: ${micros.filter(m => (m.val / m.target) < 0.5).length} Critical gaps detected.`;
+• CRITICAL GAPS: ${micros.filter(m => (m.val / m.target) < 0.5).length} detected.
+• AUDIT STATUS: Scan complete.`;
     }
 
-    if (type === 'suggestion') {
-      const remCal = targetCal - totals.calories;
-      const remP = targetP - totals.protein;
-      const remC = targetC - totals.carbs;
-
-      let meal = "Grilled Salmon & Asparagus";
-      let prep = "Pan-sear 150g salmon, steam greens.";
-      let est = "350 kcal | 35g P | 5g C";
-
-      if (remP < 10 && remC > 40) {
-        meal = "Steel-Cut Oats with Berries";
-        prep = "Boil oats, top with fresh antioxidants.";
-        est = "300 kcal | 10g P | 55g C";
-      } else if (remP > 30) {
-        meal = "Double Chicken Power Bowl";
-        prep = "200g grilled breast with spinach base.";
-        est = "320 kcal | 45g P | 2g C";
+    if (type === 'weight') {
+      const current = weightHistory.length > 0 ? weightHistory[weightHistory.length - 1].weight : (goalData?.weight ? parseFloat(goalData.weight) : 0);
+      const start = goalData?.weight ? parseFloat(goalData.weight) : 0;
+      const target = goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 0;
+      const diff = Math.abs(current - target).toFixed(1);
+      
+      const objective = goalData?.objective || 'maintenance';
+      let progress = 0;
+      if (start !== target) {
+        if (objective === 'loss') progress = ((start - current) / (start - target)) * 100;
+        else progress = ((current - start) / (target - start)) * 100;
       }
 
-      return `[PRECISION MEAL SUGGESTION]
+      return `[WEIGHT PROGRESS AUDIT]
 
-• TARGET GAP: ${Math.max(0, Math.round(remCal))} kcal, ${Math.max(0, Math.round(remP))}g P
-• SUGGESTION: ${meal}
-• ESTIMATED: ${est}
-• PREPARATION: ${prep}`;
+• CURRENT WEIGHT: ${current.toFixed(1)} kg
+• STARTING WEIGHT: ${start.toFixed(1)} kg
+• TARGET WEIGHT: ${target.toFixed(1)} kg
+
+• TOTAL PROGRESS: ${Math.round(Math.max(0, progress))}%
+• GAP TO MILESTONE: ${diff} kg
+• OBJECTIVE: ${objective.toUpperCase()}
+
+• STATUS: Journey active. Consistency is the primary growth driver.`;
+    }
+
+    if (type === 'workout') {
+      const todayStr = format(new Date(), 'yyyy-MM-dd');
+      const savedLogs = localStorage.getItem('pulseflow_workout_logs');
+      const logs = savedLogs ? JSON.parse(savedLogs) : null;
+      
+      let totalVolume = 0;
+      const exercises = logs?.date === todayStr ? Object.keys(logs.data) : [];
+      
+      if (logs?.date === todayStr) {
+        Object.values(logs.data).forEach((sets: any) => {
+          sets.forEach((s: any) => {
+            if (s.type === 'strength') {
+              totalVolume += (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
+            }
+          });
+        });
+      }
+
+      return `[WORKOUT PERFORMANCE AUDIT]
+
+• SESSION STATUS: ${exercises.length > 0 ? 'ACTIVE' : 'AWAITING LOGS'}
+• TOTAL VOLUME: ${Math.round(totalVolume).toLocaleString()} kg
+• EXERCISES LOGGED: ${exercises.length}
+
+[PRIMARY STIMULATION]
+${exercises.length > 0 ? exercises.map(e => `• ${e}`).join('\n') : '• No movements recorded for current timestamp.'}
+
+• ADVISORY: Focus on technical precision and progressive overload.`;
     }
 
     return "ERROR: Module undefined.";
@@ -206,7 +265,8 @@ ${report}
     { label: "Overall System Audit", value: 'overall', icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-50' },
     { label: "Macro & Fiber Analysis", value: 'macros', icon: PieChart, color: 'text-orange-500', bg: 'bg-orange-50' },
     { label: "Full Micro Audit", value: 'micros', icon: Activity, color: 'text-purple-500', bg: 'bg-purple-50' },
-    { label: "Precision Meal Suggestion", value: 'suggestion', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-50' }
+    { label: "Weight Progress", value: 'weight', icon: Scale, color: 'text-emerald-500', bg: 'bg-emerald-50' },
+    { label: "Workout Progress", value: 'workout', icon: Dumbbell, color: 'text-rose-500', bg: 'bg-rose-50' }
   ];
 
   return (
@@ -221,7 +281,7 @@ ${report}
             <h1 className="text-lg font-black uppercase tracking-tight text-foreground">PulseFlow AI</h1>
             <Badge className="bg-primary/10 text-primary hover:bg-primary/10 text-[7px] font-black uppercase tracking-[0.2em] h-4 border-none">Active</Badge>
           </div>
-          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] opacity-60">Precision Analyst Engine</p>
+          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] opacity-60">Elite Performance Analyst</p>
         </div>
         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/5">
           <Sparkles className="w-4 h-4 text-primary animate-pulse" />
@@ -257,7 +317,7 @@ ${report}
                   {msg.role === 'user' ? 'Identity Verification' : 'PRECISION SYSTEM AUDIT'}
                 </span>
               </div>
-              <p className="font-bold whitespace-pre-wrap tracking-tight">{msg.text}</p>
+              <p className="font-bold whitespace-pre-wrap tracking-tight text-sm">{msg.text}</p>
             </div>
           </div>
         ))}
