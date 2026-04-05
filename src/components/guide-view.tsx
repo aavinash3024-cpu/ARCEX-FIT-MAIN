@@ -71,7 +71,7 @@ const MACRO_COLORS = {
 
 export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistory, onBack }: GuideViewProps) {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'system', text: "Hello! I'm your Personal Analyzer. Pick a report below to see how you're doing today." }
+    { role: 'system', text: "Hello! I'm your Personal Assistant. Pick a report below to see how you're doing today." }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -627,7 +627,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
               {msg.type === 'workout' && msg.chartData && msg.chartData.length > 1 && (
                 <div className="mt-2 pt-2 border-t border-muted/10 w-full">
-                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2 text-center">
+                  <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest mb-2 text-left">
                     VOLUME TREND (KG)
                   </div>
                   <div className="h-40 w-full">
@@ -666,7 +666,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="flex justify-center mt-2">
+                  <div className="flex justify-end mt-2">
                     <div className="text-[8px] font-black text-muted-foreground tracking-widest">
                       <span className="uppercase">EXERCISE COUNT (E</span>x)
                     </div>
