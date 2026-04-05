@@ -287,7 +287,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   ];
 
   const renderPersonalInfo = () => (
-    <div className="space-y-6 pb-24 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="px-1 space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Identity Details</h3>
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
@@ -381,7 +381,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   );
 
   const renderSubscription = () => (
-    <div className="space-y-6 pb-24 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
       <Card className="border-none bg-gradient-to-br from-purple-500 to-indigo-600 shadow-xl rounded-[2.5rem] overflow-hidden text-white relative">
         <div className="absolute top-0 right-0 p-8 opacity-10">
           <Trophy className="w-32 h-32" />
@@ -426,7 +426,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   );
 
   const renderLegal = () => (
-    <div className="space-y-6 pb-24 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="px-1 space-y-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Documentation</h3>
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
@@ -442,7 +442,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   );
 
   const renderSettings = () => (
-    <div className="space-y-8 pb-24 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="px-1 space-y-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Preferences</h3>
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
@@ -502,7 +502,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   );
 
   const renderGoals = () => (
-    <div className="space-y-6 pb-24 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
       {goalData ? (
         <div className="space-y-6">
           <div className="grid grid-cols-2 gap-3">
@@ -689,7 +689,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
   );
 
   const renderReset = () => (
-    <div className="space-y-6 pb-24 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
       <Card className="border-none shadow-xl bg-card rounded-[2.5rem] overflow-hidden border border-muted/10">
         <CardContent className="p-8 space-y-8">
           <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto border-4 border-white shadow-lg">
@@ -794,29 +794,9 @@ export function ProfileView({ onBack }: ProfileViewProps) {
             </div>
           </CardContent>
         </Card>
-
-        <Card className="border-none bg-card shadow-sm rounded-2xl overflow-hidden border border-muted/10">
-          <CardContent className="p-4 space-y-3">
-            <div className="flex items-center justify-between">
-              <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                <Scale className="w-3.5 h-3.5 text-primary" /> Weight Goal
-              </h3>
-              <span className="text-[10px] font-black text-primary">{weightProgressPercent}%</span>
-            </div>
-            
-            <div className="space-y-1.5">
-              <Progress value={weightProgressPercent} className="h-1.5 bg-muted" />
-              <div className="flex justify-between items-center text-[9px] font-black text-muted-foreground/60 uppercase">
-                <span>Start: {startWeight > 0 ? startWeight.toFixed(1) : "--"}kg</span>
-                <span className="text-primary">Current: {currentWeight > 0 ? currentWeight.toFixed(1) : "--"}kg</span>
-                <span>Goal: {targetWeight > 0 ? targetWeight.toFixed(1) : "--"}kg</span>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
       </div>
 
-      <div className="space-y-8 px-1 mt-6 pb-24">
+      <div className="space-y-8 px-1 mt-6">
         {menuSections.map((section, idx) => (
           <div key={idx} className="space-y-3">
             <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">
