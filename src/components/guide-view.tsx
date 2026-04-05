@@ -47,7 +47,7 @@ interface Message {
   reportSubtype?: 'overall' | 'standard';
   chartData?: any[];
   nutrientData?: NutrientItem[];
-  detailData?: NutrientItem[]; // Used for detailed macro bars in overall report
+  detailData?: NutrientItem[]; // Used for detailed macro bars/tables
   macroPieData?: any[];
   microTableData?: { label: string; pct: number }[];
 }
@@ -475,35 +475,36 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                         </div>
                       </div>
 
-                      {/* Macro Detail Bars (P, C, F, FI) below chart */}
-                      <div className="space-y-4 pt-2 border-t border-muted/5">
-                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] text-center mb-2">MACRO PERFORMANCE DETAILS</p>
-                        {msg.detailData?.map((item, idx) => {
-                          const percent = Math.min(100, Math.round((item.val / item.target) * 100));
-                          const diff = item.target - item.val;
-                          const isOver = diff < 0;
-                          
-                          return (
-                            <div key={idx} className="space-y-1">
-                              <div className="flex justify-between items-baseline">
-                                <span className="text-[11px] font-black uppercase tracking-tight text-foreground/80">{item.label}</span>
-                                <span className="text-[10px] font-bold text-foreground/60">{Math.round(item.val)} / {item.target} {item.unit}</span>
-                              </div>
-                              <div className="text-[9px] font-bold text-muted-foreground uppercase leading-none">
-                                {Math.abs(Math.round(diff))} {item.unit} {isOver ? 'over' : 'left'}
-                              </div>
-                              <div className="text-[9px] font-black text-primary uppercase mt-0.5">
-                                {percent}% Done
-                              </div>
-                              <div className="h-1.5 w-full bg-muted/20 rounded-full overflow-hidden mt-1">
-                                <div 
-                                  className="h-full transition-all duration-700 ease-out" 
-                                  style={{ width: `${percent}%`, backgroundColor: item.color }} 
-                                />
-                              </div>
-                            </div>
-                          );
-                        })}
+                      {/* Macro Excel-Type Table (Replaces Bars) */}
+                      <div className="space-y-2 pt-2 border-t border-muted/5">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">MACRO PERFORMANCE AUDIT</p>
+                        <div className="border border-muted/20 rounded-xl overflow-hidden shadow-inner">
+                          <table className="w-full text-left border-collapse">
+                            <thead className="bg-muted/30 border-b border-muted/20">
+                              <tr>
+                                <th className="p-2 text-[8px] font-black uppercase text-muted-foreground border-r border-muted/20">MACRO</th>
+                                <th className="p-2 text-[8px] font-black uppercase text-muted-foreground border-r border-muted/20 text-center">VALUE</th>
+                                <th className="p-2 text-[8px] font-black uppercase text-primary text-right">% MET</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {msg.detailData?.map((row, idx) => (
+                                <tr key={idx} className={cn("border-b border-muted/10 last:border-0", idx % 2 === 0 ? "bg-card" : "bg-muted/5")}>
+                                  <td className="p-2 text-[10px] font-bold text-foreground/70 uppercase border-r border-muted/20">{row.label}</td>
+                                  <td className="p-2 text-[10px] font-bold text-muted-foreground text-center border-r border-muted/20">
+                                    {Math.round(row.val)} / {row.target}{row.unit}
+                                  </td>
+                                  <td className={cn(
+                                    "p-2 text-[10px] font-black text-right font-mono",
+                                    Math.round((row.val / row.target) * 100) >= 100 ? "text-green-600" : "text-primary"
+                                  )}>
+                                    {Math.round((row.val / row.target) * 100)}%
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
                       </div>
 
                       {/* Excel-Type Micro Table */}
@@ -543,15 +544,15 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                       return (
                         <div key={idx} className="space-y-1">
                           <div className="flex justify-between items-baseline">
-                            <span className="text-[11px] font-black uppercase tracking-tight text-foreground/80">{item.label}</span>
+                            <h4 className="text-[11px] font-black uppercase tracking-tight text-foreground/80 leading-none">{item.label}</h4>
                             <span className="text-[10px] font-bold text-foreground/60">{Math.round(item.val)} / {item.target} {item.unit}</span>
                           </div>
-                          <div className="text-[9px] font-bold text-muted-foreground uppercase leading-none">
+                          <p className="text-[9px] font-bold text-muted-foreground uppercase leading-none">
                             {Math.abs(Math.round(diff))} {item.unit} {isOver ? 'over' : 'left'}
-                          </div>
-                          <div className="text-[9px] font-black text-primary uppercase mt-0.5">
+                          </p>
+                          <p className="text-[9px] font-black text-primary uppercase leading-none">
                             {percent}% Done
-                          </div>
+                          </p>
                           <div className="h-1.5 w-full bg-muted/20 rounded-full overflow-hidden mt-1">
                             <div 
                               className="h-full transition-all duration-700 ease-out" 
