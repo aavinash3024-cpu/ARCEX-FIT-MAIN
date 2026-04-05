@@ -507,7 +507,6 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                             <thead className="bg-muted/30 border-b border-muted/20">
                               <tr>
                                 <th className="p-2 text-[8px] font-black uppercase text-muted-foreground border-r border-muted/20">MACRO</th>
-                                <th className="p-2 text-[8px] font-black uppercase text-muted-foreground border-r border-muted/20 text-center">VALUE</th>
                                 <th className="p-2 text-[8px] font-black uppercase text-primary text-right">% MET</th>
                               </tr>
                             </thead>
@@ -515,9 +514,6 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                               {msg.detailData?.map((row, idx) => (
                                 <tr key={idx} className={cn("border-b border-muted/10 last:border-0", idx % 2 === 0 ? "bg-card" : "bg-muted/5")}>
                                   <td className="p-2 text-[10px] font-bold text-foreground/70 uppercase border-r border-muted/20">{row.label}</td>
-                                  <td className="p-2 text-[10px] font-bold text-muted-foreground text-center border-r border-muted/20">
-                                    {Math.round(row.val)} / {row.target}{row.unit}
-                                  </td>
                                   <td className={cn(
                                     "p-2 text-[10px] font-black text-right font-mono",
                                     Math.round((row.val / row.target) * 100) >= 100 ? "text-green-600" : "text-primary"
