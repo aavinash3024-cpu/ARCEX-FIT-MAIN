@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
   LayoutDashboard, 
   UtensilsCrossed, 
@@ -38,6 +38,42 @@ export default function PulseFlowApp() {
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [streakData, setStreakData] = useState({ count: 0, history: [] as string[] });
   const [isLoaded, setIsLoaded] = useState(false);
+  
+  const mainRef = useRef<HTMLDivElement>(null);
+
+  // Scroll to top on tab change
+  useEffect(() => {
+    if (mainRef.current) {
+      mainRef.current.scrollTop = 0;
+    }
+  }, [activeTab]);
+
+  // Back Button / History Support
+  useEffect(() => {
+    const handlePopState = (event: PopStateEvent) => {
+      if (event.state && event.state.tab) {
+        setActiveTab(event.state.tab);
+      } else {
+        setActiveTab('dashboard');
+      }
+    };
+
+    window.addEventListener('popstate', handlePopState);
+    
+    // Set initial history state
+    if (window.history.state === null) {
+      window.history.replaceState({ tab: 'dashboard' }, '');
+    }
+
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
+
+  const navigateTo = (tab: string) => {
+    if (tab !== activeTab) {
+      window.history.pushState({ tab }, '');
+      setActiveTab(tab);
+    }
+  };
 
   // Global Haptics Listener
   useEffect(() => {
@@ -259,7 +295,7 @@ export default function PulseFlowApp() {
       'BMR / TDEE': 'bmr'
     };
     setActiveCalculator(calcMap[type] || 'bmr');
-    setActiveTab('calculators');
+    navigateTo('calculators');
   };
 
   const handleLogWeight = (newEntry: { date: string, weight: number }) => {
@@ -290,13 +326,13 @@ export default function PulseFlowApp() {
             weightHistory={weightHistory}
             loggedMeals={loggedMeals}
             streakData={streakData}
-            onViewHydration={() => setActiveTab('hydration')} 
-            onViewSteps={() => setActiveTab('steps')}
-            onViewTasks={() => setActiveTab('tasks')} 
+            onViewHydration={() => navigateTo('hydration')} 
+            onViewSteps={() => navigateTo('steps')}
+            onViewTasks={() => navigateTo('tasks')} 
             onViewCalculators={handleOpenCalculator}
-            onViewGoalSetting={() => setActiveTab('goal-setting')}
-            onViewProgress={() => setActiveTab('rank')}
-            onViewGuide={() => setActiveTab('guide')}
+            onViewGoalSetting={() => navigateTo('goal-setting')}
+            onViewProgress={() => navigateTo('rank')}
+            onViewGuide={() => navigateTo('guide')}
           />
         );
       case 'nutrition': 
@@ -322,7 +358,7 @@ export default function PulseFlowApp() {
             currentMl={hydrationAmount}
             history={hydrationHistory}
             onUpdateMl={updateHydration}
-            onBack={() => setActiveTab('dashboard')} 
+            onBack={() => window.history.back()} 
           />
         );
       case 'steps': 
@@ -331,7 +367,7 @@ export default function PulseFlowApp() {
             currentSteps={stepsCount}
             history={stepsHistory}
             onUpdateSteps={updateSteps}
-            onBack={() => setActiveTab('dashboard')} 
+            onBack={() => window.history.back()} 
           />
         );
       case 'tasks': 
@@ -339,27 +375,27 @@ export default function PulseFlowApp() {
           <TasksView 
             tasks={tasks}
             setTasks={setTasks}
-            onBack={() => setActiveTab('dashboard')} 
+            onBack={() => window.history.back()} 
           />
         );
       case 'calculators':
         return (
           <CalculatorsView 
             initialType={activeCalculator}
-            onBack={() => setActiveTab('dashboard')}
+            onBack={() => window.history.back()}
           />
         );
       case 'goal-setting':
         return (
           <GoalSettingView 
-            onBack={() => setActiveTab('dashboard')}
+            onBack={() => window.history.back()}
             onGoalSaved={refreshGoalData}
           />
         );
       case 'profile':
         return (
           <ProfileView 
-            onBack={() => setActiveTab('dashboard')}
+            onBack={() => window.history.back()}
           />
         );
       case 'guide':
@@ -369,7 +405,7 @@ export default function PulseFlowApp() {
             loggedMeals={loggedMeals}
             hydrationAmount={hydrationAmount}
             weightHistory={weightHistory}
-            onBack={() => setActiveTab('dashboard')}
+            onBack={() => window.history.back()}
           />
         );
       default: return (
@@ -382,8 +418,8 @@ export default function PulseFlowApp() {
           weightHistory={weightHistory}
           loggedMeals={loggedMeals}
           streakData={streakData}
-          onViewProgress={() => setActiveTab('rank')}
-          onViewGuide={() => setActiveTab('guide')}
+          onViewProgress={() => navigateTo('rank')}
+          onViewGuide={() => navigateTo('guide')}
         />
       );
     }
@@ -401,7 +437,7 @@ export default function PulseFlowApp() {
       <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b relative">
         <div className="flex items-center">
           <button 
-            onClick={() => setActiveTab('profile')}
+            onClick={() => navigateTo('profile')}
             className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted/80 transition-colors"
           >
             <User className="w-4 h-4 text-foreground" />
@@ -424,7 +460,7 @@ export default function PulseFlowApp() {
         </div>
       </header>
 
-      <main className="flex-1 px-4 overflow-y-auto">
+      <main ref={mainRef} className="flex-1 px-4 overflow-y-auto">
         {renderContent()}
       </main>
 
@@ -435,7 +471,7 @@ export default function PulseFlowApp() {
           return (
             <button
               key={item.id}
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => navigateTo(item.id)}
               className={`flex flex-col items-center gap-0.5 transition-all duration-300 group flex-1 ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-primary/60'}`}
             >
               <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-primary/10' : 'group-hover:bg-muted'}`}>
