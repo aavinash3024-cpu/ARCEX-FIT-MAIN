@@ -701,27 +701,30 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       </div>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card">
-        <div className="relative h-24 w-full">
-          <Image 
-            src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=800&auto=format&fit=crop"
-            alt="Nutrition Banner"
-            fill
-            className="object-cover"
-            data-ai-hint="healthy food banner"
-          />
-          <div className="absolute inset-0 bg-gradient-to-t from-card/90 to-transparent" />
-          <div className="absolute bottom-3 left-5 right-5 flex items-center justify-between">
-            <div className="space-y-0.5">
-              <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground">Meal Logging</h2>
-              <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
-                CREDITS LEFT: <span className={cn("font-black", credits <= 5 ? "text-destructive" : "text-primary")}>{credits}/20</span>
-              </p>
+        <div className="p-5 flex items-center gap-4">
+          <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 relative bg-muted/20 border border-muted/10">
+            <Image 
+              src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=400&auto=format&fit=crop"
+              alt="Nutrition Logo"
+              fill
+              className="object-cover"
+              data-ai-hint="healthy food avatar"
+            />
+          </div>
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center justify-between">
+              <div className="space-y-0.5">
+                <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground">Meal Logging</h2>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
+                  CREDITS LEFT: <span className={cn("font-black", credits <= 5 ? "text-destructive" : "text-primary")}>{credits}/20</span>
+                </p>
+              </div>
+              {Object.keys(foodCache).length > 0 && (
+                <Badge variant="outline" className="h-4 border-muted/20 text-muted-foreground bg-muted/5 text-[7px] font-black uppercase gap-1 px-1.5">
+                  <Zap className="w-2 h-2 fill-current" /> {Object.keys(foodCache).length} Learned
+                </Badge>
+              )}
             </div>
-            {Object.keys(foodCache).length > 0 && (
-              <Badge variant="outline" className="h-4 border-white/20 text-white bg-black/20 backdrop-blur-sm text-[7px] font-black uppercase gap-1 px-1.5 border-none">
-                <Zap className="w-2 h-2 fill-current" /> {Object.keys(foodCache).length} Learned
-              </Badge>
-            )}
           </div>
         </div>
 
