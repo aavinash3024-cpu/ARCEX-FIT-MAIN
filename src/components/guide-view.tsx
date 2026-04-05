@@ -45,7 +45,7 @@ interface GuideViewProps {
 
 export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistory, onBack }: GuideViewProps) {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'system', text: "Hello! I'm your Personal Analyzer. Select one of the options below to get a detailed report on your progress today." }
+    { role: 'system', text: "Hello! I'm your Personal Analyzer. Select one of the reports below to get a structured breakdown of your current performance." }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -105,6 +105,9 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
     const targetFI = goalData?.fiber || 30;
     const targetHydration = goalData?.hydrationTargetLiters || 3.0;
 
+    const hMarker = "■ ";
+    const hLine = "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
+
     if (type === 'overall') {
       const accuracy = Math.round((totals.calories / targetCal) * 100);
       const hydrationLiters = hydrationAmount / 1000;
@@ -125,22 +128,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       const microList = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
 
       return {
-        text: `FULL NUTRITION ANALYSIS
-
-• Calories: ${Math.round(totals.calories)} / ${targetCal} kcal (${accuracy}%)
-• Hydration: ${hydrationLiters.toFixed(1)} / ${targetHydration.toFixed(1)} L
-
-MACRO BREAKDOWN
-• Protein: ${Math.round(totals.protein)}g / ${targetP}g
-• Carbs: ${Math.round(totals.carbs)}g / ${targetC}g
-• Fat: ${Math.round(totals.fat)}g / ${targetF}g
-• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g
-
-MICRO ANALYSIS
-${microList}
-
-SUMMARY
-${totals.calories < targetCal ? "You still have a calorie buffer. Focus on lean protein." : "You've reached your intake limit. Focus on water and recovery."}`
+        text: `${hMarker}FULL NUTRITION ANALYSIS\n${hLine}\n\n• Calories: ${Math.round(totals.calories)} / ${targetCal} kcal (${accuracy}%)\n• Hydration: ${hydrationLiters.toFixed(1)} / ${targetHydration.toFixed(1)} L\n\n${hMarker}MACRO BREAKDOWN\n${hLine}\n• Protein: ${Math.round(totals.protein)}g / ${targetP}g\n• Carbs: ${Math.round(totals.carbs)}g / ${targetC}g\n• Fat: ${Math.round(totals.fat)}g / ${targetF}g\n• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g\n\n${hMarker}MICRO ANALYSIS\n${hLine}\n${microList}\n\n${hMarker}SUMMARY\n${hLine}\n${totals.calories < targetCal ? "You still have a calorie buffer. Focus on lean protein sources." : "You've reached your daily target. Transition to hydration and recovery."}`
       };
     }
 
@@ -151,12 +139,7 @@ ${totals.calories < targetCal ? "You still have a calorie buffer. Focus on lean 
       const fiDiff = totals.fiber - targetFI;
 
       return {
-        text: `MACRO & FIBER ANALYSIS
-
-• Protein: ${Math.round(totals.protein)}g / ${targetP}g (${pDiff > 0 ? '+' : ''}${Math.round(pDiff)}g)
-• Carbs: ${Math.round(totals.carbs)}g / ${targetC}g (${cDiff > 0 ? '+' : ''}${Math.round(cDiff)}g)
-• Fat: ${Math.round(totals.fat)}g / ${targetF}g (${fDiff > 0 ? '+' : ''}${Math.round(fDiff)}g)
-• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g (${fiDiff > 0 ? '+' : ''}${Math.round(fiDiff)}g)`
+        text: `${hMarker}MACRO & FIBER ANALYSIS\n${hLine}\n\n• Protein: ${Math.round(totals.protein)}g / ${targetP}g (${pDiff > 0 ? '+' : ''}${Math.round(pDiff)}g)\n• Carbs: ${Math.round(totals.carbs)}g / ${targetC}g (${cDiff > 0 ? '+' : ''}${Math.round(cDiff)}g)\n• Fat: ${Math.round(totals.fat)}g / ${targetF}g (${fDiff > 0 ? '+' : ''}${Math.round(fDiff)}g)\n• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g (${fiDiff > 0 ? '+' : ''}${Math.round(fiDiff)}g)`
       };
     }
 
@@ -177,9 +160,7 @@ ${totals.calories < targetCal ? "You still have a calorie buffer. Focus on lean 
       const report = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
 
       return {
-        text: `FULL MICRO ANALYSIS
-
-${report}`
+        text: `${hMarker}FULL MICRO ANALYSIS\n${hLine}\n\n${report}`
       };
     }
 
@@ -193,7 +174,7 @@ ${report}`
       if (weightHistory.length > 1) {
         const prevEntry = weightHistory[weightHistory.length - 2];
         const days = differenceInDays(new Date(), new Date(prevEntry.date));
-        const dayText = days === 0 ? "Earlier today" : days === 1 ? "1 day ago" : `${days} days ago`;
+        const dayText = days === 0 ? "Earlier today" : days === 1 ? "Yesterday" : `${days} days ago`;
         historyNote = `• History: ${dayText} you were ${prevEntry.weight} kg\n`;
       }
 
@@ -210,15 +191,7 @@ ${report}`
       }));
 
       return {
-        text: `WEIGHT PROGRESS REPORT
-
-• Current: ${current.toFixed(1)} kg
-${historyNote}• Start: ${start.toFixed(1)} kg
-• Target: ${target.toFixed(1)} kg
-
-• Total Progress: ${Math.round(Math.max(0, progress))}%
-• Remaining: ${diff} kg
-• Goal: ${objective.charAt(0).toUpperCase() + objective.slice(1)}`,
+        text: `${hMarker}WEIGHT PROGRESS REPORT\n${hLine}\n\n• Current: ${current.toFixed(1)} kg\n${historyNote}• Start: ${start.toFixed(1)} kg\n• Target: ${target.toFixed(1)} kg\n\n${hMarker}STRATEGY STATUS\n${hLine}\n• Total Progress: ${Math.round(Math.max(0, progress))}%\n• Remaining: ${diff} kg\n• Goal: ${objective.charAt(0).toUpperCase() + objective.slice(1)}`,
         type: 'weight',
         chartData
       };
@@ -239,37 +212,39 @@ ${historyNote}• Start: ${start.toFixed(1)} kg
           if (exData) musclesSet.add(exData.muscle);
           
           let exVolume = 0;
-          sets.forEach((s: any) => {
+          const setBreakdown: string[] = [];
+          
+          sets.forEach((s: any, idx: number) => {
             if (s.type === 'strength') {
-              const vol = (parseFloat(s.weight) || 0) * (parseFloat(s.reps) || 0);
+              const weight = parseFloat(s.weight) || 0;
+              const reps = parseFloat(s.reps) || 0;
+              const vol = weight * reps;
               exVolume += vol;
               totalVolume += vol;
+              setBreakdown.push(`    Set ${idx + 1}: ${weight}kg x ${reps} (${vol.toLocaleString()} kg)`);
+            } else if (s.type === 'time') {
+              setBreakdown.push(`    Set ${idx + 1}: ${formatExerciseTime(s.time)}`);
             }
           });
           
           exerciseDetails.push({
             name: exName,
             sets: sets.length,
-            volume: exVolume
+            volume: exVolume,
+            breakdown: setBreakdown
           });
         });
       }
 
       const muscleList = Array.from(musclesSet).map(m => `• ${m}`).join('\n');
-      const exerciseList = exerciseDetails.map(d => `• ${d.name}: ${d.sets} sets (${d.volume.toLocaleString()} kg)`).join('\n');
+      const exerciseList = exerciseDetails.map(d => {
+        const header = `• ${d.name}: ${d.sets} sets (Total: ${d.volume.toLocaleString()} kg)`;
+        const sets = d.breakdown.join('\n');
+        return `${header}\n${sets}`;
+      }).join('\n\n');
 
       return {
-        text: `WORKOUT PROGRESS REPORT
-
-• Status: ${exerciseDetails.length > 0 ? 'Active' : 'No logs today'}
-• Total Volume: ${Math.round(totalVolume).toLocaleString()} kg
-• Exercises: ${exerciseDetails.length}
-
-MUSCLES TARGETED
-${muscleList || '• No movements logged yet.'}
-
-EXERCISES PERFORMED
-${exerciseList || '• No logs today.'}`
+        text: `${hMarker}WORKOUT PROGRESS REPORT\n${hLine}\n\n• Status: ${exerciseDetails.length > 0 ? 'Active' : 'No logs recorded for today'}\n• Total Volume: ${Math.round(totalVolume).toLocaleString()} kg\n• Movements: ${exerciseDetails.length}\n\n${hMarker}MUSCLES TARGETED\n${hLine}\n${muscleList || '• No movements logged.'}\n\n${hMarker}EXERCISES PERFORMED\n${hLine}\n${exerciseList || '• No logs today.'}`
       };
     }
 
@@ -293,6 +268,14 @@ ${exerciseList || '• No logs today.'}`
       }]);
       setIsLoading(false);
     }, 800);
+  };
+
+  const formatExerciseTime = (seconds: any) => {
+    const total = parseInt(seconds) || 0;
+    const m = Math.floor(total / 60);
+    const s = total % 60;
+    if (m === 0) return `${s}s`;
+    return `${m}m ${s}s`;
   };
 
   const options = [
@@ -357,20 +340,33 @@ ${exerciseList || '• No logs today.'}`
               <p className="font-medium whitespace-pre-wrap tracking-tight">{msg.text}</p>
               
               {msg.type === 'weight' && msg.chartData && msg.chartData.length > 1 && (
-                <div className="mt-4 pt-4 border-t border-muted/10 h-32 w-full">
+                <div className="mt-4 pt-4 border-t border-muted/10 h-48 w-full">
                   <ResponsiveContainer width="100%" height="100%">
-                    <LineChart data={msg.chartData}>
+                    <LineChart data={msg.chartData} margin={{ top: 10, right: 10, left: -20, bottom: 20 }}>
+                      <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
+                      <XAxis 
+                        dataKey="date" 
+                        fontSize={8} 
+                        fontWeight={700} 
+                        tick={{ fill: 'currentColor', opacity: 0.5 }} 
+                        dy={10} 
+                      />
+                      <YAxis 
+                        fontSize={8} 
+                        fontWeight={700} 
+                        tick={{ fill: 'currentColor', opacity: 0.5 }} 
+                        domain={['dataMin - 1', 'dataMax + 1']} 
+                      />
+                      <Tooltip 
+                        contentStyle={{ borderRadius: '8px', fontSize: '10px', fontWeight: 'bold', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                      />
                       <Line 
                         type="monotone" 
                         dataKey="weight" 
                         stroke="hsl(var(--primary))" 
-                        strokeWidth={2} 
-                        dot={{ r: 3, fill: "hsl(var(--primary))" }}
-                      />
-                      <XAxis dataKey="date" hide />
-                      <YAxis hide domain={['dataMin - 1', 'dataMax + 1']} />
-                      <Tooltip 
-                        contentStyle={{ borderRadius: '8px', fontSize: '10px', fontWeight: 'bold', border: 'none' }}
+                        strokeWidth={2.5} 
+                        dot={{ r: 4, fill: "hsl(var(--primary))", strokeWidth: 2, stroke: "#fff" }}
+                        activeDot={{ r: 6, strokeWidth: 0 }}
                       />
                     </LineChart>
                   </ResponsiveContainer>
@@ -383,7 +379,7 @@ ${exerciseList || '• No logs today.'}`
           <div className="flex justify-start animate-in fade-in slide-in-from-bottom-2">
             <div className="bg-card border border-muted/20 rounded-2xl rounded-tl-none p-4 shadow-sm flex items-center gap-3">
               <Loader2 className="w-4 h-4 animate-spin text-primary" />
-              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Analyzing data...</span>
+              <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">Generating Performance Audit...</span>
             </div>
           </div>
         )}
@@ -391,7 +387,7 @@ ${exerciseList || '• No logs today.'}`
 
       {/* Options Menu */}
       <div className="px-2 mt-4 space-y-3">
-        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-3">Select a report</p>
+        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-3">Select Report Module</p>
         <Card className="border-none shadow-md bg-card rounded-2xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
             {options.map((opt, i) => (
@@ -404,7 +400,10 @@ ${exerciseList || '• No logs today.'}`
                   i !== options.length - 1 && "border-b border-muted/5"
                 )}
               >
-                <span className="text-sm font-semibold text-foreground/80">{opt.label}</span>
+                <div className="flex items-center gap-3">
+                  <div className="w-1.5 h-6 bg-muted/20 rounded-full" />
+                  <span className="text-sm font-semibold text-foreground/80">{opt.label}</span>
+                </div>
                 <ArrowRight className="w-4 h-4 text-muted-foreground/30" />
               </button>
             ))}
