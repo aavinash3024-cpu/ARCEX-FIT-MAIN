@@ -358,8 +358,8 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
   return (
     <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500 pb-24 font-sans">
-      {/* Header */}
-      <div className="relative overflow-hidden pt-10 pb-12 px-4 border-b border-white/10 shrink-0">
+      {/* Compact Header */}
+      <div className="relative overflow-hidden pt-4 pb-4 px-4 border-b border-white/10 shrink-0">
         {/* Background Image & Overlay */}
         <div className="absolute inset-0 z-0">
           <Image 
@@ -378,30 +378,30 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
             variant="ghost" 
             size="icon" 
             onClick={onBack} 
-            className="rounded-full bg-white/10 hover:bg-white/20 w-10 h-10 shrink-0 text-white border border-white/10 backdrop-blur-sm"
+            className="rounded-full bg-white/10 hover:bg-white/20 w-9 h-9 shrink-0 text-white border border-white/10 backdrop-blur-sm"
           >
-            <ChevronLeft className="w-5 h-5" />
+            <ChevronLeft className="w-4 h-4" />
           </Button>
           <div className="flex-1 min-w-0">
             <div className="flex items-center gap-2">
-              <h1 className="text-base font-black uppercase tracking-tight text-white">Personal Analyzer</h1>
+              <h1 className="text-sm font-black uppercase tracking-tight text-white">Personal Analyzer</h1>
               <div className="flex items-center gap-1 bg-white/20 backdrop-blur-sm px-1.5 py-0.5 rounded border border-white/10">
                 <span className="w-1 h-1 rounded-full bg-green-400 animate-pulse" />
-                <span className="text-[7px] font-black text-white uppercase tracking-widest leading-none">Online</span>
+                <span className="text-[6px] font-black text-white uppercase tracking-widest leading-none">Online</span>
               </div>
             </div>
-            <p className="text-[9px] font-bold text-white/60 uppercase tracking-[0.2em] mt-0.5">Professional Report Assistant</p>
+            <p className="text-[8px] font-bold text-white/60 uppercase tracking-[0.2em] mt-0.5">Professional Report Assistant</p>
           </div>
-          <div className="w-10 h-10 rounded-full bg-white/10 flex items-center justify-center shrink-0 border border-white/10 backdrop-blur-sm">
-            <Sparkles className="w-4 h-4 text-white/60" />
+          <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0 border border-white/10 backdrop-blur-sm">
+            <Sparkles className="w-3.5 h-3.5 text-white/60" />
           </div>
         </div>
       </div>
 
-      {/* Chat Area */}
+      {/* Chat Area - Optimized for screen usage */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto px-2 space-y-4 py-6 swipe-container"
+        className="flex-1 overflow-y-auto px-1 space-y-3 py-4 swipe-container"
       >
         {messages.map((msg, i) => (
           <div 
@@ -412,7 +412,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
             )}
           >
             <div className={cn(
-              "max-w-[90%] rounded-2xl p-4 shadow-sm text-sm leading-relaxed",
+              "max-w-[95%] rounded-2xl p-4 shadow-sm text-sm leading-relaxed",
               msg.role === 'user' 
                 ? "bg-primary text-white rounded-tr-none" 
                 : "bg-card border border-muted/20 rounded-tl-none text-foreground/90"
@@ -499,7 +499,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                         </div>
                       </div>
 
-                      {/* Macro Excel-Type Table (Replaces Bars) */}
+                      {/* Macro Excel-Type Table */}
                       <div className="space-y-2 pt-2 border-t border-muted/5">
                         <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">MACRO PERFORMANCE AUDIT</p>
                         <div className="border border-muted/20 rounded-xl overflow-hidden shadow-inner">
@@ -688,9 +688,9 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
         )}
       </div>
 
-      {/* Options Menu */}
-      <div className="px-2 mt-4 space-y-3">
-        <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest px-3">Select Report Module</p>
+      {/* Options Menu - Compact & Full Width */}
+      <div className="px-1 mt-auto space-y-2 mb-4">
+        <p className="text-[9px] font-semibold text-muted-foreground uppercase tracking-widest px-3">Select Report Module</p>
         <Card className="border-none shadow-md bg-card rounded-2xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
             {options.map((opt, i) => (
@@ -699,15 +699,15 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                 onClick={() => handleQuery(opt.label, opt.value)}
                 disabled={isLoading}
                 className={cn(
-                  "w-full p-4 flex items-center justify-between text-left transition-all active:bg-muted/10 disabled:opacity-50",
+                  "w-full p-3 flex items-center justify-between text-left transition-all active:bg-muted/10 disabled:opacity-50",
                   i !== options.length - 1 && "border-b border-muted/5"
                 )}
               >
                 <div className="flex items-center gap-3">
-                  <div className="w-1.5 h-6 bg-muted/20 rounded-full" />
-                  <span className="text-sm font-semibold text-foreground/80">{opt.label}</span>
+                  <div className="w-1 h-5 bg-muted/20 rounded-full" />
+                  <span className="text-[13px] font-semibold text-foreground/80">{opt.label}</span>
                 </div>
-                <ArrowRight className="w-4 h-4 text-muted-foreground/30" />
+                <ArrowRight className="w-3.5 h-3.5 text-muted-foreground/30" />
               </button>
             ))}
           </CardContent>
