@@ -422,10 +422,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="flex justify-between items-end mt-4">
-                    <p className="text-[7px] font-bold text-muted-foreground/60 uppercase tracking-tighter max-w-[70%]">
-                      This graph visualizes your total volume intensity across the sequence of exercises performed.
-                    </p>
+                  <div className="flex justify-end mt-4">
                     <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Exercise Count (Ex)</div>
                   </div>
                 </div>
