@@ -20,6 +20,7 @@ import { TasksView, type Task } from '@/components/tasks-view';
 import { CalculatorsView } from '@/components/calculators-view';
 import { GoalSettingView } from '@/components/goal-setting-view';
 import { ProfileView } from '@/components/profile-view';
+import { GuideView } from '@/components/guide-view';
 import { Button } from '@/components/ui/button';
 import { format, isYesterday } from 'date-fns';
 
@@ -294,6 +295,7 @@ export default function PulseFlowApp() {
             onViewCalculators={handleOpenCalculator}
             onViewGoalSetting={() => setActiveTab('goal-setting')}
             onViewProgress={() => setActiveTab('rank')}
+            onViewGuide={() => setActiveTab('guide')}
           />
         );
       case 'nutrition': 
@@ -359,6 +361,14 @@ export default function PulseFlowApp() {
             onBack={() => setActiveTab('dashboard')}
           />
         );
+      case 'guide':
+        return (
+          <GuideView 
+            goalData={goalData}
+            loggedMeals={loggedMeals}
+            onBack={() => setActiveTab('dashboard')}
+          />
+        );
       default: return (
         <DashboardView 
           tasks={tasks} 
@@ -370,6 +380,7 @@ export default function PulseFlowApp() {
           loggedMeals={loggedMeals}
           streakData={streakData}
           onViewProgress={() => setActiveTab('rank')}
+          onViewGuide={() => setActiveTab('guide')}
         />
       );
     }

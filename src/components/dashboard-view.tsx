@@ -51,6 +51,7 @@ interface DashboardViewProps {
   onViewCalculators?: (type: string) => void;
   onViewGoalSetting?: () => void;
   onViewProgress?: () => void;
+  onViewGuide?: () => void;
 }
 
 const MetricSphere = ({ type, icon: Icon }: { type: 'steps' | 'hydration' | 'calories' | 'streak', icon: any }) => {
@@ -120,7 +121,8 @@ export function DashboardView({
   onViewTasks,
   onViewCalculators,
   onViewGoalSetting,
-  onViewProgress
+  onViewProgress,
+  onViewGuide
 }: DashboardViewProps) {
   const metricsRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
@@ -353,7 +355,10 @@ export function DashboardView({
 
   return (
     <div className="space-y-4 pb-20 pt-4">
-      <Card className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md">
+      <Card 
+        onClick={onViewGuide}
+        className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md cursor-pointer active:scale-[0.98] transition-all hover:shadow-lg"
+      >
         <CardContent className="p-5 flex items-center gap-4 min-h-[100px]">
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 shrink-0 relative bg-white/10">
             <Image 
