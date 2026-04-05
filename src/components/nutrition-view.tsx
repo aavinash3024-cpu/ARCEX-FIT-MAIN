@@ -522,22 +522,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       magnesium: 0, vitaminD: 0, potassium: 0, iron: 0, calcium: 0
     });
 
-    const userGender = goalData?.gender || 'male';
-    const userAge = parseInt(goalData?.age) || 25;
-
-    const microTargets = {
-      vitaminA: userGender === 'male' ? 900 : 700,
-      omega3: userGender === 'male' ? 1.6 : 1.1,
-      vitaminC: userGender === 'male' ? 90 : 75,
-      zinc: userGender === 'male' ? 11 : 8,
-      selenium: 55,
-      magnesium: userGender === 'male' ? 420 : 320,
-      vitaminD: userAge > 70 ? 20 : 15,
-      potassium: userGender === 'male' ? 3400 : 2600,
-      iron: userGender === 'male' ? 8 : (userAge < 50 ? 18 : 8),
-      calcium: userAge > 50 && userGender === 'female' ? 1200 : 1000,
-    };
-
     const targetCal = goalData?.finalCalories || 2200;
     const targetP = goalData?.protein || 150;
     const targetC = goalData?.carbs || 250;
@@ -562,19 +546,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       { label: 'C', val: Math.round(targetC - totals.carbs), color: MACRO_COLORS.carbs },
       { label: 'F', val: Math.round(targetF - totals.fat), color: MACRO_COLORS.fat },
       { label: 'FI', val: Math.round(targetFI - totals.fiber), color: MACRO_COLORS.fiber }
-    ];
-
-    const microsToDisplay = [
-      { label: "Vitamin A", val: totals.vitaminA, target: microTargets.vitaminA, unit: "mcg", color: "#f97316" },
-      { label: "Omega-3", val: totals.omega3, target: microTargets.omega3, unit: "g", color: "#0ea5e9" },
-      { label: "Vitamin C", val: totals.vitaminC, target: microTargets.vitaminC, unit: "mg", color: "#eab308" },
-      { label: "Zinc", val: totals.zinc, target: microTargets.zinc, unit: "mg", color: "#6366f1" },
-      { label: "Selenium", val: totals.selenium, target: microTargets.selenium, unit: "mcg", color: "#f43f5e" },
-      { label: "Magnesium", val: totals.magnesium, target: microTargets.magnesium, unit: "mg", color: "#a855f7" },
-      { label: "Vitamin D", val: totals.vitaminD, target: microTargets.vitaminD, unit: "mcg", color: "#f59e0b" },
-      { label: "Potassium", val: totals.potassium, target: microTargets.potassium, unit: "mg", color: "#10b981" },
-      { label: "Iron", val: totals.iron, target: microTargets.iron, unit: "mg", color: "#ef4444" },
-      { label: "Calcium", val: totals.calcium, target: microTargets.calcium, unit: "mg", color: "#64748b" },
     ];
 
     const allItems = loggedMeals.flatMap(m => m.items || []);
@@ -634,38 +605,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
             </div>
           </CardContent>
         </Card>
-
-        <section className="space-y-3">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
-            <HeartPulse className="w-3.5 h-3.5 text-amber-500" /> Micronutrient Performance
-          </h3>
-          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl border border-muted/10">
-            <CardContent className="p-4">
-              <div className="grid gap-4">
-                {microsToDisplay.map((micro, idx) => {
-                  const percent = Math.min(100, Math.round((micro.val / micro.target) * 100));
-                  return (
-                    <div key={idx} className="space-y-1.5">
-                      <div className="flex justify-between items-baseline">
-                        <span className="text-[10px] font-bold text-foreground/80 uppercase tracking-tight">{micro.label}</span>
-                        <div className="flex items-baseline gap-1">
-                          <span className="text-[10px] font-black" style={{ color: micro.color }}>{micro.val.toFixed(micro.val < 1 && micro.val > 0 ? 2 : 0)}{micro.unit}</span>
-                          <span className="text-[8px] font-bold text-muted-foreground uppercase tracking-tighter">/ {micro.target}{micro.unit}</span>
-                        </div>
-                      </div>
-                      <div className="h-1 w-full bg-muted/20 rounded-full overflow-hidden">
-                        <div 
-                          className="h-full transition-all duration-1000 ease-out"
-                          style={{ width: `${percent}%`, backgroundColor: micro.color }}
-                        />
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </CardContent>
-          </Card>
-        </section>
 
         <section className="space-y-3">
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
