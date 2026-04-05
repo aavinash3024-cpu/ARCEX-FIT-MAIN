@@ -701,7 +701,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
       </div>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card">
-        <div className="p-5 flex items-center gap-4">
+        <div className="p-3 flex items-center gap-3">
           <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 relative bg-muted/20 border border-muted/10">
             <Image 
               src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=400&auto=format&fit=crop"
@@ -730,7 +730,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
         <CardContent className="p-0">
           <Tabs value={logTab} onValueChange={setLogTab} className="w-full">
-            <div className="px-4 py-2">
+            <div className="px-3 py-1">
               <TabsList className="grid w-full grid-cols-3 h-10 bg-muted/50 p-1 rounded-xl">
                 <TabsTrigger value="log" className="text-[10px] font-bold uppercase tracking-tight gap-1.5 rounded-lg data-[state=active]:shadow-sm">
                   <Plus className="w-3.5 h-3.5" /> Log
@@ -744,7 +744,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               </TabsList>
             </div>
 
-            <TabsContent value="log" className="p-4 mt-0 space-y-4">
+            <TabsContent value="log" className="p-3 mt-0 space-y-3">
               <div className="relative group">
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                   <Sparkles className="w-4 h-4 text-primary/40 group-focus-within:text-primary transition-colors" />
@@ -1042,7 +1042,6 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
         </Button>
         <div className="space-y-0.5">
           <h1 className="text-2xl font-bold font-headline leading-none">Micro Analysis</h1>
-          <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Precision Tracking</p>
         </div>
       </div>
 
