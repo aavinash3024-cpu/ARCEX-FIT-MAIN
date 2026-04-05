@@ -113,8 +113,10 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
 
   const chartTicks = useMemo(() => {
     if (chartData.length === 0) return [];
-    if (chartData.length === 1) return [chartData[0].formattedDate];
-    return [chartData[0].formattedDate, chartData[chartData.length - 1].formattedDate];
+    const firstDate = chartData[0].formattedDate;
+    const lastDate = chartData[chartData.length - 1].formattedDate;
+    // Ensure ticks are unique to prevent Recharts key conflict
+    return firstDate === lastDate ? [firstDate] : [firstDate, lastDate];
   }, [chartData]);
 
   const sortedEntries = useMemo(() => {
