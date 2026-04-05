@@ -358,6 +358,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                         fontWeight={700} 
                         tick={{ fill: 'currentColor', opacity: 0.5 }} 
                         dy={10} 
+                        ticks={[msg.chartData[0].date, msg.chartData[msg.chartData.length - 1].date]}
                       />
                       <YAxis 
                         fontSize={8} 
@@ -422,8 +423,8 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                       </LineChart>
                     </ResponsiveContainer>
                   </div>
-                  <div className="flex justify-end mt-4">
-                    <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Exercise Count (Ex)</div>
+                  <div className="flex justify-end mt-1">
+                    <div className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">EXERCISE COUNT (Ex)</div>
                   </div>
                 </div>
               )}
