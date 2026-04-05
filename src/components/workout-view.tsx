@@ -415,20 +415,22 @@ export function WorkoutView() {
       </div>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
-        <div className="p-4 flex items-center gap-4">
-          <div className="w-12 h-12 rounded-full overflow-hidden shrink-0 relative bg-muted/20 border border-muted/10 shadow-sm">
-            <Image 
-              src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?q=80&w=400&auto=format&fit=crop"
-              alt="Workout"
-              fill
-              className="object-cover"
-              data-ai-hint="gym weights"
-            />
+        <div className="p-3 flex items-center gap-3">
+          <div className="gradient-ring shrink-0">
+            <div className="w-9 h-9 rounded-full overflow-hidden relative bg-muted/20 border border-white/20 shadow-sm">
+              <Image 
+                src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"
+                alt="Workout"
+                fill
+                className="object-cover"
+                data-ai-hint="gym equipment"
+              />
+            </div>
           </div>
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground">Today's Session</h2>
+                <h2 className="text-xs font-black uppercase tracking-tighter text-foreground">TODAYS WORKOUT</h2>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
                   {todayName.toUpperCase()}: <span className="text-primary font-black">{todaysExercises.length} EXERCISES</span>
                 </p>
