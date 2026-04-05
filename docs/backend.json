@@ -1,0 +1,1355 @@
+{
+  "entities": {
+    "User": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "User",
+      "type": "object",
+      "description": "Represents a user profile within the PulseFlow application.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the User entity."
+        },
+        "email": {
+          "type": "string",
+          "description": "The user's email address, used for communication.",
+          "format": "email"
+        },
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the user."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the user."
+        },
+        "dateOfBirth": {
+          "type": "string",
+          "description": "The user's date of birth.",
+          "format": "date"
+        },
+        "heightCm": {
+          "type": "number",
+          "description": "The user's height in centimeters."
+        },
+        "gender": {
+          "type": "string",
+          "description": "The user's self-declared gender (e.g., 'male', 'female', 'other')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the user account was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the user account was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "email",
+        "firstName",
+        "lastName",
+        "dateOfBirth",
+        "heightCm",
+        "gender",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "UserSetting": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "UserSetting",
+      "type": "object",
+      "description": "Stores personalized settings and targets for a user, such as daily caloric goals or preferred units.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the UserSetting entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User this setting belongs to. (Relationship: User 1:N UserSetting)"
+        },
+        "dailyCalorieTarget": {
+          "type": "number",
+          "description": "The user's target daily calorie intake."
+        },
+        "dailyProteinTargetGrams": {
+          "type": "number",
+          "description": "The user's target daily protein intake in grams."
+        },
+        "dailyCarbTargetGrams": {
+          "type": "number",
+          "description": "The user's target daily carbohydrate intake in grams."
+        },
+        "dailyFatTargetGrams": {
+          "type": "number",
+          "description": "The user's target daily fat intake in grams."
+        },
+        "dailyHydrationTargetMl": {
+          "type": "number",
+          "description": "The user's target daily hydration intake in milliliters."
+        },
+        "activityLevel": {
+          "type": "string",
+          "description": "The user's declared activity level (e.g., 'sedentary', 'light', 'moderate', 'active')."
+        },
+        "weightUnit": {
+          "type": "string",
+          "description": "The user's preferred unit for weight (e.g., 'kg', 'lb')."
+        },
+        "heightUnit": {
+          "type": "string",
+          "description": "The user's preferred unit for height (e.g., 'cm', 'inch')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the user settings were created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the user settings were last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "dailyCalorieTarget",
+        "dailyProteinTargetGrams",
+        "dailyCarbTargetGrams",
+        "dailyFatTargetGrams",
+        "dailyHydrationTargetMl",
+        "activityLevel",
+        "weightUnit",
+        "heightUnit",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "WeightEntry": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WeightEntry",
+      "type": "object",
+      "description": "Records a user's weight at a specific point in time to track progress.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WeightEntry entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who logged this weight entry. (Relationship: User 1:N WeightEntry)"
+        },
+        "weightKg": {
+          "type": "number",
+          "description": "The recorded weight in kilograms."
+        },
+        "loggedAt": {
+          "type": "string",
+          "description": "Timestamp when the weight was logged.",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes related to this weight entry."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the weight entry was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the weight entry was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "weightKg",
+        "loggedAt",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "HydrationLog": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "HydrationLog",
+      "type": "object",
+      "description": "Records a user's water intake at a specific point in time.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the HydrationLog entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who logged this hydration entry. (Relationship: User 1:N HydrationLog)"
+        },
+        "amountMl": {
+          "type": "number",
+          "description": "The amount of water consumed in milliliters."
+        },
+        "loggedAt": {
+          "type": "string",
+          "description": "Timestamp when the hydration was logged.",
+          "format": "date-time"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the hydration log was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the hydration log was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "amountMl",
+        "loggedAt",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Goal": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Goal",
+      "type": "object",
+      "description": "Represents a specific health or fitness goal set by the user or suggested by AI.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Goal entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who owns this goal. (Relationship: User 1:N Goal)"
+        },
+        "name": {
+          "type": "string",
+          "description": "A descriptive name for the goal (e.g., 'Lose 5kg', 'Run 5k')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the goal."
+        },
+        "targetValue": {
+          "type": "number",
+          "description": "The target value for the goal (e.g., 5 for 5kg weight loss)."
+        },
+        "currentValue": {
+          "type": "number",
+          "description": "The user's current progress towards the goal, updated periodically."
+        },
+        "unit": {
+          "type": "string",
+          "description": "The unit of measurement for the target and current values (e.g., 'kg', 'km', 'days')."
+        },
+        "startDate": {
+          "type": "string",
+          "description": "The date when the goal was started.",
+          "format": "date"
+        },
+        "endDate": {
+          "type": "string",
+          "description": "The target date for completing the goal.",
+          "format": "date"
+        },
+        "status": {
+          "type": "string",
+          "description": "The current status of the goal (e.g., 'active', 'completed', 'archived')."
+        },
+        "isSuggestedByAI": {
+          "type": "boolean",
+          "description": "Indicates if the goal was suggested by the AI tool."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the goal was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the goal was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "name",
+        "description",
+        "targetValue",
+        "currentValue",
+        "unit",
+        "startDate",
+        "endDate",
+        "status",
+        "isSuggestedByAI",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Task": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Task",
+      "type": "object",
+      "description": "Represents a daily task or action item for a user, potentially suggested by AI.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Task entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who owns this task. (Relationship: User 1:N Task)"
+        },
+        "name": {
+          "type": "string",
+          "description": "A short, descriptive name for the task (e.g., 'Drink 2L water', 'Complete workout')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the task."
+        },
+        "dueDate": {
+          "type": "string",
+          "description": "The date by which the task should be completed.",
+          "format": "date"
+        },
+        "isCompleted": {
+          "type": "boolean",
+          "description": "Indicates whether the task has been completed."
+        },
+        "completedAt": {
+          "type": "string",
+          "description": "Timestamp when the task was marked as completed.",
+          "format": "date-time"
+        },
+        "isSuggestedByAI": {
+          "type": "boolean",
+          "description": "Indicates if the task was suggested by the AI tool."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the task was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the task was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "name",
+        "description",
+        "dueDate",
+        "isCompleted",
+        "isSuggestedByAI",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "FoodItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "FoodItem",
+      "type": "object",
+      "description": "Represents a single food item with its nutritional information, either from a general library or user-defined.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the FoodItem entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the food item (e.g., 'Chicken Breast', 'Apple')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A brief description or source of the food item (e.g., 'USDA data', 'Homemade recipe')."
+        },
+        "caloriesPer100g": {
+          "type": "number",
+          "description": "The number of calories per 100 grams of the food item."
+        },
+        "proteinPer100g": {
+          "type": "number",
+          "description": "The amount of protein in grams per 100 grams of the food item."
+        },
+        "carbsPer100g": {
+          "type": "number",
+          "description": "The amount of carbohydrates in grams per 100 grams of the food item."
+        },
+        "fatPer100g": {
+          "type": "number",
+          "description": "The amount of fat in grams per 100 grams of the food item."
+        },
+        "isUserDefined": {
+          "type": "boolean",
+          "description": "Indicates if this food item was created by a user (true) or is part of a general library (false)."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who defined this food item, if 'isUserDefined' is true. (Relationship: User 1:N FoodItem)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the food item was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the food item was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "caloriesPer100g",
+        "proteinPer100g",
+        "carbsPer100g",
+        "fatPer100g",
+        "isUserDefined",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Meal": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Meal",
+      "type": "object",
+      "description": "Represents a meal consumed by a user, comprised of multiple food items.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Meal entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who consumed this meal. (Relationship: User 1:N Meal)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the meal (e.g., 'Breakfast', 'Lunch', 'Snack')."
+        },
+        "loggedAt": {
+          "type": "string",
+          "description": "Timestamp when the meal was consumed or logged.",
+          "format": "date-time"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes or observations about the meal."
+        },
+        "totalCalories": {
+          "type": "number",
+          "description": "The total calculated calories for this meal."
+        },
+        "totalProtein": {
+          "type": "number",
+          "description": "The total calculated protein in grams for this meal."
+        },
+        "totalCarbs": {
+          "type": "number",
+          "description": "The total calculated carbohydrates in grams for this meal."
+        },
+        "totalFat": {
+          "type": "number",
+          "description": "The total calculated fat in grams for this meal."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the meal entry was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the meal entry was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "name",
+        "loggedAt",
+        "totalCalories",
+        "totalProtein",
+        "totalCarbs",
+        "totalFat",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "MealItem": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "MealItem",
+      "type": "object",
+      "description": "Represents a specific food item included in a meal, along with its quantity.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the MealItem entity."
+        },
+        "mealId": {
+          "type": "string",
+          "description": "Reference to the Meal this item belongs to. (Relationship: Meal 1:N MealItem)"
+        },
+        "foodItemId": {
+          "type": "string",
+          "description": "Reference to the FoodItem being consumed. (Relationship: FoodItem 1:N MealItem)"
+        },
+        "quantityGrams": {
+          "type": "number",
+          "description": "The quantity of the food item consumed in grams."
+        },
+        "consumedCalories": {
+          "type": "number",
+          "description": "Calculated calories for this specific meal item quantity."
+        },
+        "consumedProtein": {
+          "type": "number",
+          "description": "Calculated protein in grams for this specific meal item quantity."
+        },
+        "consumedCarbs": {
+          "type": "number",
+          "description": "Calculated carbohydrates in grams for this specific meal item quantity."
+        },
+        "consumedFat": {
+          "type": "number",
+          "description": "Calculated fat in grams for this specific meal item quantity."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the meal item entry was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the meal item entry was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "mealId",
+        "foodItemId",
+        "quantityGrams",
+        "consumedCalories",
+        "consumedProtein",
+        "consumedCarbs",
+        "consumedFat",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "Exercise": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "Exercise",
+      "type": "object",
+      "description": "Defines a single type of physical exercise, either from a library or user-created.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the Exercise entity."
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the exercise (e.g., 'Barbell Squat', 'Push-up')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the exercise and its proper form."
+        },
+        "category": {
+          "type": "string",
+          "description": "The category of the exercise (e.g., 'Strength', 'Cardio', 'Flexibility')."
+        },
+        "muscleGroups": {
+          "type": "array",
+          "description": "An array of primary muscle groups targeted by the exercise (e.g., 'Quadriceps', 'Glutes').",
+          "items": {
+            "type": "string"
+          }
+        },
+        "equipmentNeeded": {
+          "type": "array",
+          "description": "An array of equipment required for the exercise (e.g., 'Barbell', 'Dumbbells', 'Bodyweight').",
+          "items": {
+            "type": "string"
+          }
+        },
+        "isUserDefined": {
+          "type": "boolean",
+          "description": "Indicates if this exercise was created by a user (true) or is part of a general library (false)."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who defined this exercise, if 'isUserDefined' is true. (Relationship: User 1:N Exercise)"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the exercise was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the exercise was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "name",
+        "description",
+        "category",
+        "muscleGroups",
+        "equipmentNeeded",
+        "isUserDefined",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "WorkoutProgram": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WorkoutProgram",
+      "type": "object",
+      "description": "Represents a structured workout routine or 'split' composed of multiple workout days.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WorkoutProgram entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who created or is following this program. (Relationship: User 1:N WorkoutProgram)"
+        },
+        "name": {
+          "type": "string",
+          "description": "The name of the workout program (e.g., 'Push Pull Legs', 'Full Body A/B')."
+        },
+        "description": {
+          "type": "string",
+          "description": "A detailed description of the workout program."
+        },
+        "durationWeeks": {
+          "type": "number",
+          "description": "The planned duration of the program in weeks."
+        },
+        "isActive": {
+          "type": "boolean",
+          "description": "Indicates if this program is currently active for the user."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the workout program was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the workout program was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "name",
+        "description",
+        "isActive",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "WorkoutDay": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WorkoutDay",
+      "type": "object",
+      "description": "Represents a specific day's workout within a larger WorkoutProgram.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WorkoutDay entity."
+        },
+        "workoutProgramId": {
+          "type": "string",
+          "description": "Reference to the WorkoutProgram this day belongs to. (Relationship: WorkoutProgram 1:N WorkoutDay)"
+        },
+        "dayOfWeek": {
+          "type": "string",
+          "description": "The day of the week this workout is typically performed (e.g., 'Monday', 'Rest Day')."
+        },
+        "name": {
+          "type": "string",
+          "description": "A name for this workout day (e.g., 'Leg Day', 'Upper Body A')."
+        },
+        "order": {
+          "type": "number",
+          "description": "The sequential order of this day within the workout program (e.g., 1, 2, 3)."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the workout day was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the workout day was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "workoutProgramId",
+        "dayOfWeek",
+        "name",
+        "order",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "ProgramExercise": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "ProgramExercise",
+      "type": "object",
+      "description": "Defines an exercise and its prescribed sets/reps within a specific WorkoutDay.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the ProgramExercise entity."
+        },
+        "workoutDayId": {
+          "type": "string",
+          "description": "Reference to the WorkoutDay this exercise belongs to. (Relationship: WorkoutDay 1:N ProgramExercise)"
+        },
+        "exerciseId": {
+          "type": "string",
+          "description": "Reference to the Exercise being performed. (Relationship: Exercise 1:N ProgramExercise)"
+        },
+        "sets": {
+          "type": "number",
+          "description": "The number of sets prescribed for this exercise."
+        },
+        "reps": {
+          "type": "string",
+          "description": "The prescribed repetitions (e.g., '8-12', '5x5', 'AMRAP')."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes for this exercise within the program (e.g., 'Drop set on last set')."
+        },
+        "order": {
+          "type": "number",
+          "description": "The sequential order of this exercise within the workout day."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the program exercise was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the program exercise was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "workoutDayId",
+        "exerciseId",
+        "sets",
+        "reps",
+        "order",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "WorkoutSession": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WorkoutSession",
+      "type": "object",
+      "description": "Represents an actual workout performed by a user, logging its details.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WorkoutSession entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who performed this workout. (Relationship: User 1:N WorkoutSession)"
+        },
+        "workoutProgramId": {
+          "type": "string",
+          "description": "Optional reference to the WorkoutProgram this session is part of. (Relationship: WorkoutProgram 1:N WorkoutSession)"
+        },
+        "workoutDayId": {
+          "type": "string",
+          "description": "Optional reference to the specific WorkoutDay this session is associated with within a program. (Relationship: WorkoutDay 1:N WorkoutSession)"
+        },
+        "name": {
+          "type": "string",
+          "description": "A descriptive name for the workout session (e.g., 'Monday Legs', 'Ad-hoc Cardio')."
+        },
+        "startTime": {
+          "type": "string",
+          "description": "The start time of the workout session.",
+          "format": "date-time"
+        },
+        "endTime": {
+          "type": "string",
+          "description": "The end time of the workout session.",
+          "format": "date-time"
+        },
+        "durationMinutes": {
+          "type": "number",
+          "description": "The total duration of the workout session in minutes."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes about the workout session (e.g., 'Felt strong today')."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the workout session was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the workout session was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "name",
+        "startTime",
+        "endTime",
+        "durationMinutes",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "WorkoutSet": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "WorkoutSet",
+      "type": "object",
+      "description": "Records details of a single set performed for an exercise within a WorkoutSession.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the WorkoutSet entity."
+        },
+        "workoutSessionId": {
+          "type": "string",
+          "description": "Reference to the WorkoutSession this set belongs to. (Relationship: WorkoutSession 1:N WorkoutSet)"
+        },
+        "exerciseId": {
+          "type": "string",
+          "description": "Reference to the Exercise this set is for. (Relationship: Exercise 1:N WorkoutSet)"
+        },
+        "setNumber": {
+          "type": "number",
+          "description": "The sequential number of the set within its exercise (e.g., 1, 2, 3)."
+        },
+        "repsAchieved": {
+          "type": "number",
+          "description": "The number of repetitions successfully completed in this set."
+        },
+        "weightKg": {
+          "type": "number",
+          "description": "The weight lifted for this set in kilograms."
+        },
+        "rpe": {
+          "type": "number",
+          "description": "Rating of Perceived Exertion for this set (scale 1-10)."
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes about the set (e.g., 'Struggled on last rep')."
+        },
+        "isWarmup": {
+          "type": "boolean",
+          "description": "Indicates if this set was a warm-up set."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the workout set was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the workout set was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "workoutSessionId",
+        "exerciseId",
+        "setNumber",
+        "repsAchieved",
+        "weightKg",
+        "isWarmup",
+        "createdAt",
+        "updatedAt"
+      ]
+    },
+    "PersonalRecord": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "title": "PersonalRecord",
+      "type": "object",
+      "description": "Stores a user's best performance for a specific exercise.",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Unique identifier for the PersonalRecord entity."
+        },
+        "userId": {
+          "type": "string",
+          "description": "Reference to the User who achieved this personal record. (Relationship: User 1:N PersonalRecord)"
+        },
+        "exerciseId": {
+          "type": "string",
+          "description": "Reference to the Exercise for which this record was set. (Relationship: Exercise 1:N PersonalRecord)"
+        },
+        "recordType": {
+          "type": "string",
+          "description": "The type of record (e.g., 'Max Weight', 'Max Reps', 'Fastest Time')."
+        },
+        "value": {
+          "type": "number",
+          "description": "The actual value of the record (e.g., 100 for 100kg, 12 for 12 reps)."
+        },
+        "unit": {
+          "type": "string",
+          "description": "The unit of measurement for the record value (e.g., 'kg', 'reps', 'seconds')."
+        },
+        "dateAchieved": {
+          "type": "string",
+          "description": "The date when this personal record was achieved.",
+          "format": "date"
+        },
+        "workoutSessionId": {
+          "type": "string",
+          "description": "Optional reference to the WorkoutSession during which this PR was achieved. (Relationship: WorkoutSession 1:N PersonalRecord)"
+        },
+        "notes": {
+          "type": "string",
+          "description": "Optional notes related to this personal record."
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "Timestamp when the personal record was created.",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "description": "Timestamp when the personal record was last updated.",
+          "format": "date-time"
+        }
+      },
+      "required": [
+        "id",
+        "userId",
+        "exerciseId",
+        "recordType",
+        "value",
+        "unit",
+        "dateAchieved",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "auth": {
+    "providers": [
+      "password",
+      "anonymous"
+    ]
+  },
+  "firestore": {
+    "structure": [
+      {
+        "path": "/users/{userId}",
+        "definition": {
+          "entityName": "User",
+          "schema": {
+            "$ref": "#/backend/entities/User"
+          },
+          "description": "Stores individual user profiles. Access is restricted to the user whose ID matches the document ID (userId).",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/settings",
+        "definition": {
+          "entityName": "UserSetting",
+          "schema": {
+            "$ref": "#/backend/entities/UserSetting"
+          },
+          "description": "Stores personalized settings for a specific user (e.g., daily targets, preferred units). This is a 1:1 relationship with the user, with a fixed document ID 'settings'. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/weightEntries/{weightEntryId}",
+        "definition": {
+          "entityName": "WeightEntry",
+          "schema": {
+            "$ref": "#/backend/entities/WeightEntry"
+          },
+          "description": "Records historical weight entries for a specific user. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "weightEntryId",
+              "description": "The unique ID of the weight entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/hydrationLogs/{hydrationLogId}",
+        "definition": {
+          "entityName": "HydrationLog",
+          "schema": {
+            "$ref": "#/backend/entities/HydrationLog"
+          },
+          "description": "Records historical hydration intake for a specific user. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "hydrationLogId",
+              "description": "The unique ID of the hydration log entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/goals/{goalId}",
+        "definition": {
+          "entityName": "Goal",
+          "schema": {
+            "$ref": "#/backend/entities/Goal"
+          },
+          "description": "Stores personalized goals for a specific user. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "goalId",
+              "description": "The unique ID of the goal."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/tasks/{taskId}",
+        "definition": {
+          "entityName": "Task",
+          "schema": {
+            "$ref": "#/backend/entities/Task"
+          },
+          "description": "Stores daily tasks or action items for a specific user. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "taskId",
+              "description": "The unique ID of the task."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/foodItems/{foodItemId}",
+        "definition": {
+          "entityName": "FoodItem",
+          "schema": {
+            "$ref": "#/backend/entities/FoodItem"
+          },
+          "description": "Stores global, publicly accessible food items with nutritional information (e.g., a general food library). These items have 'isUserDefined' set to false. Public read access is allowed.",
+          "params": [
+            {
+              "name": "foodItemId",
+              "description": "The unique ID of the global food item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/userFoodItems/{userFoodItemId}",
+        "definition": {
+          "entityName": "FoodItem",
+          "schema": {
+            "$ref": "#/backend/entities/FoodItem"
+          },
+          "description": "Stores food items defined by a specific user. These items have 'isUserDefined' set to true and include the 'userId' field matching the path. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "userFoodItemId",
+              "description": "The unique ID of the user-defined food item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/meals/{mealId}",
+        "definition": {
+          "entityName": "Meal",
+          "schema": {
+            "$ref": "#/backend/entities/Meal"
+          },
+          "description": "Stores meal entries logged by a specific user. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "mealId",
+              "description": "The unique ID of the meal entry."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/meals/{mealId}/mealItems/{mealItemId}",
+        "definition": {
+          "entityName": "MealItem",
+          "schema": {
+            "$ref": "#/backend/entities/MealItem"
+          },
+          "description": "Stores individual food items included in a specific meal. Includes denormalized 'userId' field for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "mealId",
+              "description": "The unique ID of the parent meal."
+            },
+            {
+              "name": "mealItemId",
+              "description": "The unique ID of the meal item."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/exercises/{exerciseId}",
+        "definition": {
+          "entityName": "Exercise",
+          "schema": {
+            "$ref": "#/backend/entities/Exercise"
+          },
+          "description": "Stores global, publicly accessible exercises (e.g., a general exercise library). These items have 'isUserDefined' set to false. Public read access is allowed.",
+          "params": [
+            {
+              "name": "exerciseId",
+              "description": "The unique ID of the global exercise."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/userExercises/{userExerciseId}",
+        "definition": {
+          "entityName": "Exercise",
+          "schema": {
+            "$ref": "#/backend/entities/Exercise"
+          },
+          "description": "Stores exercises defined by a specific user. These items have 'isUserDefined' set to true and include the 'userId' field matching the path. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "userExerciseId",
+              "description": "The unique ID of the user-defined exercise."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/workoutPrograms/{programId}",
+        "definition": {
+          "entityName": "WorkoutProgram",
+          "schema": {
+            "$ref": "#/backend/entities/WorkoutProgram"
+          },
+          "description": "Stores workout programs created by or assigned to a specific user. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "programId",
+              "description": "The unique ID of the workout program."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/workoutPrograms/{programId}/workoutDays/{workoutDayId}",
+        "definition": {
+          "entityName": "WorkoutDay",
+          "schema": {
+            "$ref": "#/backend/entities/WorkoutDay"
+          },
+          "description": "Stores specific workout days within a user's workout program. Includes denormalized 'userId' field for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "programId",
+              "description": "The unique ID of the parent workout program."
+            },
+            {
+              "name": "workoutDayId",
+              "description": "The unique ID of the workout day."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/workoutPrograms/{programId}/workoutDays/{workoutDayId}/programExercises/{programExerciseId}",
+        "definition": {
+          "entityName": "ProgramExercise",
+          "schema": {
+            "$ref": "#/backend/entities/ProgramExercise"
+          },
+          "description": "Defines an exercise and its prescribed sets/reps within a specific workout day. Includes denormalized 'userId' and 'workoutProgramId' fields for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "programId",
+              "description": "The unique ID of the parent workout program."
+            },
+            {
+              "name": "workoutDayId",
+              "description": "The unique ID of the parent workout day."
+            },
+            {
+              "name": "programExerciseId",
+              "description": "The unique ID of the program exercise."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/workoutSessions/{sessionId}",
+        "definition": {
+          "entityName": "WorkoutSession",
+          "schema": {
+            "$ref": "#/backend/entities/WorkoutSession"
+          },
+          "description": "Stores records of actual workout sessions performed by a specific user. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "sessionId",
+              "description": "The unique ID of the workout session."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/workoutSessions/{sessionId}/workoutSets/{setId}",
+        "definition": {
+          "entityName": "WorkoutSet",
+          "schema": {
+            "$ref": "#/backend/entities/WorkoutSet"
+          },
+          "description": "Records details of individual sets performed within a user's workout session. Includes denormalized 'userId' field for authorization independence.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "sessionId",
+              "description": "The unique ID of the parent workout session."
+            },
+            {
+              "name": "setId",
+              "description": "The unique ID of the workout set."
+            }
+          ]
+        }
+      },
+      {
+        "path": "/users/{userId}/personalRecords/{recordId}",
+        "definition": {
+          "entityName": "PersonalRecord",
+          "schema": {
+            "$ref": "#/backend/entities/PersonalRecord"
+          },
+          "description": "Stores personal best performance records for a specific user. Access is restricted to the owning user.",
+          "params": [
+            {
+              "name": "userId",
+              "description": "The unique ID of the user, matching request.auth.uid."
+            },
+            {
+              "name": "recordId",
+              "description": "The unique ID of the personal record."
+            }
+          ]
+        }
+      }
+    ],
+    "reasoning": "The Firestore structure for PulseFlow is designed to prioritize security, scalability, and debuggability, adhering strictly to the core design principles.\n\nAuthorization Independence: This is achieved primarily through pervasive path-based ownership and denormalization of authorization context.\n1.  Path-Based Ownership: For all user-specific and private data (e.g., /users/{userId}/weightEntries/{weightEntryId}, /users/{userId}/meals/{mealId}), the userId is directly embedded in the path. This allows Firestore Security Rules to directly compare request.auth.uid with the {userId} wildcard in the path (request.auth.uid == userId) without requiring any get() operations. This eliminates expensive and complex hierarchical authorization dependencies, making rules atomic and easier to reason about.\n2.  Denormalization of Authorization Context: For subcollections whose access inherently depends on their parent's ownership, the relevant userId (and sometimes workoutProgramId for ProgramExercise) is explicitly denormalized and copied into each document within the subcollection. For example:\n    *   MealItem documents will include the userId of their parent Meal's owner.\n    *   WorkoutDay documents will include the userId of their parent WorkoutProgram's owner.\n    *   ProgramExercise documents will include the userId of their grandparent User and the workoutProgramId of their parent WorkoutProgram.\n    *   WorkoutSet documents will include the userId of their parent WorkoutSession's owner.\n    This ensures that even if accessing a deeply nested document, the full authorization context (userId) is available within the document itself and its direct path, again removing the need for get() calls in security rules.\n\nSupport for QAPs (Query Against Paths) / Secure Listing:\nThe structural segregation and path-based ownership directly enable secure list operations.\n1.  Homogeneous Security Posture: Collections are designed so that all documents within a given collection path share the same security requirements.\n    *   Publicly accessible data (e.g., /foodItems, /exercises global libraries) are segregated into top-level collections, allowing for simple allow read; rules for any authenticated (or even unauthenticated, if business logic allows) user.\n    *   Private, user-owned data (e.g., /users/{userId}/weightEntries, /users/{userId}/meals) resides in subcollections directly under the user's path. This means a user can only list *their own* documents within these subcollections (match /users/{userId}/{collectionName}/{docId} { allow list: if request.auth.uid == userId; }).\n2.  Structural Segregation for Different Access Levels: User-defined food items and exercises (/users/{userId}/userFoodItems, /users/{userId}/userExercises) are separated from the global libraries (/foodItems, /exercises). This prevents accidental exposure of private user-created content and simplifies rules. A user querying /foodItems gets public data, while querying /users/{userId}/userFoodItems gets their private, user-specific data.\nThis design inherently fulfills the QAP principle by ensuring that any list operation initiated by a client will only return data that the request.auth.uid is explicitly authorized to access, based on the collection path and the denormalized userId fields."
+  }
+}
