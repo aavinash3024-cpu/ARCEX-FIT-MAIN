@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -366,6 +367,7 @@ export default function PulseFlowApp() {
           <GuideView 
             goalData={goalData}
             loggedMeals={loggedMeals}
+            hydrationAmount={hydrationAmount}
             onBack={() => setActiveTab('dashboard')}
           />
         );

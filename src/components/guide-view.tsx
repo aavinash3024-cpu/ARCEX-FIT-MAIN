@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
@@ -27,17 +28,11 @@ interface Message {
 interface GuideViewProps {
   goalData: any;
   loggedMeals: any[];
+  hydrationAmount: number;
   onBack: () => void;
 }
 
-const MACRO_COLORS = {
-  protein: "#FFC107",
-  carbs: "#42A5F5",
-  fat: "#FF7043",
-  fiber: "#10b981"
-};
-
-export function GuideView({ goalData, loggedMeals, onBack }: GuideViewProps) {
+export function GuideView({ goalData, loggedMeals, hydrationAmount, onBack }: GuideViewProps) {
   const [messages, setMessages] = useState<Message[]>([
     { role: 'system', text: "SYSTEM INITIALIZED: PulseFlow Performance Analyst Ready.\n\nSelect a Precision Module below to execute a real-time audit of your wellness data." }
   ]);
@@ -96,29 +91,34 @@ export function GuideView({ goalData, loggedMeals, onBack }: GuideViewProps) {
     const targetP = goalData?.protein || 150;
     const targetC = goalData?.carbs || 250;
     const targetF = goalData?.fats || 70;
+    const targetFI = goalData?.fiber || 30;
+    const targetHydration = goalData?.hydrationTargetLiters || 3.0;
 
     if (type === 'overall') {
-      const diff = targetCal - totals.calories;
       const accuracy = Math.round((totals.calories / targetCal) * 100);
       const score = Math.min(100, Math.round(((Math.min(totals.protein / targetP, 1) + Math.min(totals.carbs / targetC, 1) + Math.min(totals.fat / targetF, 1)) / 3) * 100));
+      const hydrationLiters = hydrationAmount / 1000;
       
       let status = "TARGET";
       if (accuracy < 90) status = "BEHIND";
       if (accuracy > 105) status = "AHEAD";
 
-      return `[DAILY PERFORMANCE REPORT]
+      return `[FULL SYSTEM AUDIT]
 
-• INTENSITY STATUS: ${status}
-• CALORIC PRECISION: ${Math.round(totals.calories)} / ${targetCal} kcal (${accuracy}%)
-• REMAINING BUFFER: ${Math.max(0, Math.round(diff))} kcal
-• PERFORMANCE SCORE: ${score}%
-• ADVISORY: ${diff > 0 ? "Maintain current volume to hit caloric target precisely." : "Caloric ceiling breached; pivot to low-density greens for remainder of day."}`;
+• ENERGY: ${Math.round(totals.calories)} / ${targetCal} kcal (${accuracy}%)
+• HYDRATION: ${hydrationLiters.toFixed(1)} / ${targetHydration.toFixed(1)} Liters
+• MACROS: P ${Math.round(totals.protein)}g | C ${Math.round(totals.carbs)}g | F ${Math.round(totals.fat)}g
+• FIBER: ${Math.round(totals.fiber)} / ${targetFI}g
+• SYSTEM SCORE: ${score}%
+• PERFORMANCE STATUS: ${status}
+• ADVISORY: ${totals.calories < targetCal ? "Caloric buffer available. Focus on protein density." : "Limit intake to low-calorie micronutrient sources for remainder of day."}`;
     }
 
     if (type === 'macros') {
       const pDiff = totals.protein - targetP;
       const cDiff = totals.carbs - targetC;
       const fDiff = totals.fat - targetF;
+      const fiDiff = totals.fiber - targetFI;
 
       const deficits = [
         { label: 'PROTEIN', val: (totals.protein / targetP) },
@@ -126,35 +126,36 @@ export function GuideView({ goalData, loggedMeals, onBack }: GuideViewProps) {
         { label: 'FAT', val: (totals.fat / targetF) }
       ].sort((a, b) => a.val - b.val);
 
-      return `[MACRO RATIO SEGMENTATION]
+      return `[MACRO & FIBER ANALYSIS]
 
-• PROTEIN DELTA: ${Math.round(totals.protein)}g / ${targetP}g (${pDiff > 0 ? '+' : ''}${Math.round(pDiff)}g)
-• CARB DELTA: ${Math.round(totals.carbs)}g / ${targetC}g (${cDiff > 0 ? '+' : ''}${Math.round(cDiff)}g)
-• FAT DELTA: ${Math.round(totals.fat)}g / ${targetF}g (${fDiff > 0 ? '+' : ''}${Math.round(fDiff)}g)
-• PRIMARY DEFICIT: ${deficits[0].label} (${Math.round(deficits[0].val * 100)}% Complete)`;
+• PROTEIN: ${Math.round(totals.protein)}g / ${targetP}g (${pDiff > 0 ? '+' : ''}${Math.round(pDiff)}g)
+• CARBS: ${Math.round(totals.carbs)}g / ${targetC}g (${cDiff > 0 ? '+' : ''}${Math.round(cDiff)}g)
+• FAT: ${Math.round(totals.fat)}g / ${targetF}g (${fDiff > 0 ? '+' : ''}${Math.round(fDiff)}g)
+• FIBER: ${Math.round(totals.fiber)}g / ${targetFI}g (${fiDiff > 0 ? '+' : ''}${Math.round(fiDiff)}g)
+• PRIMARY GAP: ${deficits[0].label} (${Math.round(deficits[0].val * 100)}% met)`;
     }
 
     if (type === 'micros') {
       const micros = [
-        { id: 'vitaminA', label: 'Vit A', val: totals.vitaminA, target: microTargets.vitaminA },
-        { id: 'omega3', label: 'Omega-3', val: totals.omega3, target: microTargets.omega3 },
-        { id: 'vitaminC', label: 'Vit C', val: totals.vitaminC, target: microTargets.vitaminC },
-        { id: 'zinc', label: 'Zinc', val: totals.zinc, target: microTargets.zinc },
-        { id: 'magnesium', label: 'Mag', val: totals.magnesium, target: microTargets.magnesium },
-        { id: 'vitaminD', label: 'Vit D', val: totals.vitaminD, target: microTargets.vitaminD },
-        { id: 'potassium', label: 'Potas', val: totals.potassium, target: microTargets.potassium },
-        { id: 'iron', label: 'Iron', val: totals.iron, target: microTargets.iron },
-        { id: 'calcium', label: 'Calc', val: totals.calcium, target: microTargets.calcium },
+        { id: 'vitaminA', label: 'Vit A', val: totals.vitaminA, target: microTargets.vitaminA, unit: 'mcg' },
+        { id: 'omega3', label: 'Omega-3', val: totals.omega3, target: microTargets.omega3, unit: 'g' },
+        { id: 'vitaminC', label: 'Vit C', val: totals.vitaminC, target: microTargets.vitaminC, unit: 'mg' },
+        { id: 'zinc', label: 'Zinc', val: totals.zinc, target: microTargets.zinc, unit: 'mg' },
+        { id: 'selenium', label: 'Selenium', val: totals.selenium, target: microTargets.selenium, unit: 'mcg' },
+        { id: 'magnesium', label: 'Mag', val: totals.magnesium, target: microTargets.magnesium, unit: 'mg' },
+        { id: 'vitaminD', label: 'Vit D', val: totals.vitaminD, target: microTargets.vitaminD, unit: 'mcg' },
+        { id: 'potassium', label: 'Potas', val: totals.potassium, target: microTargets.potassium, unit: 'mg' },
+        { id: 'iron', label: 'Iron', val: totals.iron, target: microTargets.iron, unit: 'mg' },
+        { id: 'calcium', label: 'Calc', val: totals.calcium, target: microTargets.calcium, unit: 'mg' },
       ];
 
-      const optimized = micros.filter(m => (m.val / m.target) >= 0.8).map(m => m.label).join(", ");
-      const gaps = micros.filter(m => (m.val / m.target) < 0.5).map(m => m.label).join(", ");
+      const report = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
 
       return `[MICRONUTRIENT STATUS REPORT]
 
-• OPTIMIZED: ${optimized || "None identified"}
-• CRITICAL GAPS: ${gaps || "No critical voids detected"}
-• RECOVERY IMPACT: ${gaps.includes("Mag") || gaps.includes("Vit D") ? "High risk of delayed muscle recovery and hormonal stagnation." : "Optimal micro-profile for current workload."}`;
+${report}
+
+• AUDIT: ${micros.filter(m => (m.val / m.target) < 0.5).length} Critical gaps detected.`;
     }
 
     if (type === 'suggestion') {
@@ -176,10 +177,10 @@ export function GuideView({ goalData, loggedMeals, onBack }: GuideViewProps) {
         est = "320 kcal | 45g P | 2g C";
       }
 
-      return `[MATHEMATICAL MEAL SUGGESTION]
+      return `[PRECISION MEAL SUGGESTION]
 
-• TARGET GAP: ${Math.max(0, Math.round(remCal))} kcal, ${Math.max(0, Math.round(remP))}g P, ${Math.max(0, Math.round(remC))}g C
-• ELITE SUGGESTION: ${meal}
+• TARGET GAP: ${Math.max(0, Math.round(remCal))} kcal, ${Math.max(0, Math.round(remP))}g P
+• SUGGESTION: ${meal}
 • ESTIMATED: ${est}
 • PREPARATION: ${prep}`;
     }
@@ -194,7 +195,6 @@ export function GuideView({ goalData, loggedMeals, onBack }: GuideViewProps) {
     setMessages(prev => [...prev, userMsg]);
     setIsLoading(true);
 
-    // Rule-based logic is instant, but we add a small delay for "Elite Analyst" feel
     setTimeout(() => {
       const report = generateReport(value);
       setMessages(prev => [...prev, { role: 'system', text: report }]);
@@ -203,14 +203,14 @@ export function GuideView({ goalData, loggedMeals, onBack }: GuideViewProps) {
   };
 
   const options = [
-    { label: "Overall nutrition performance", value: 'overall', icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-50' },
-    { label: "Macro analysis performance", value: 'macros', icon: PieChart, color: 'text-orange-500', bg: 'bg-orange-50' },
-    { label: "Micro analysis performance", value: 'micros', icon: Activity, color: 'text-purple-500', bg: 'bg-purple-50' },
-    { label: "What should I eat next?", value: 'suggestion', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-50' }
+    { label: "Overall System Audit", value: 'overall', icon: TrendingUp, color: 'text-blue-500', bg: 'bg-blue-50' },
+    { label: "Macro & Fiber Analysis", value: 'macros', icon: PieChart, color: 'text-orange-500', bg: 'bg-orange-50' },
+    { label: "Full Micro Audit", value: 'micros', icon: Activity, color: 'text-purple-500', bg: 'bg-purple-50' },
+    { label: "Precision Meal Suggestion", value: 'suggestion', icon: Zap, color: 'text-amber-500', bg: 'bg-amber-50' }
   ];
 
   return (
-    <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500 pb-24">
+    <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500 pb-24 font-sans">
       {/* Header */}
       <div className="flex items-center gap-4 py-4 px-1 sticky top-0 bg-background/80 backdrop-blur-md z-10 border-b border-muted/10">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
@@ -221,7 +221,7 @@ export function GuideView({ goalData, loggedMeals, onBack }: GuideViewProps) {
             <h1 className="text-lg font-black uppercase tracking-tight text-foreground">PulseFlow AI</h1>
             <Badge className="bg-primary/10 text-primary hover:bg-primary/10 text-[7px] font-black uppercase tracking-[0.2em] h-4 border-none">Active</Badge>
           </div>
-          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] opacity-60">Elite Performance Analyst</p>
+          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.3em] opacity-60">Precision Analyst Engine</p>
         </div>
         <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center border border-primary/5">
           <Sparkles className="w-4 h-4 text-primary animate-pulse" />
@@ -242,7 +242,7 @@ export function GuideView({ goalData, loggedMeals, onBack }: GuideViewProps) {
             )}
           >
             <div className={cn(
-              "max-w-[95%] rounded-[1.5rem] p-5 shadow-sm text-xs leading-relaxed",
+              "max-w-[95%] rounded-[1.5rem] p-5 shadow-sm text-sm leading-relaxed",
               msg.role === 'user' 
                 ? "bg-primary text-white rounded-tr-none" 
                 : "bg-card border border-muted/20 rounded-tl-none text-foreground/90 glass-card"
@@ -254,10 +254,10 @@ export function GuideView({ goalData, loggedMeals, onBack }: GuideViewProps) {
                   <Activity className="w-3 h-3 text-primary" />
                 )}
                 <span className="text-[8px] font-black uppercase tracking-widest">
-                  {msg.role === 'user' ? 'Identity Verification' : 'SYSTEM AUDIT REPORT'}
+                  {msg.role === 'user' ? 'Identity Verification' : 'PRECISION SYSTEM AUDIT'}
                 </span>
               </div>
-              <p className="font-bold whitespace-pre-wrap font-mono tracking-tight">{msg.text}</p>
+              <p className="font-bold whitespace-pre-wrap tracking-tight">{msg.text}</p>
             </div>
           </div>
         ))}
@@ -266,7 +266,7 @@ export function GuideView({ goalData, loggedMeals, onBack }: GuideViewProps) {
             <div className="bg-card border border-muted/20 rounded-[1.5rem] rounded-tl-none p-5 shadow-sm flex flex-col gap-3 glass-card">
               <div className="flex items-center gap-3">
                 <Loader2 className="w-4 h-4 animate-spin text-primary" />
-                <span className="text-[9px] font-black uppercase tracking-widest text-primary">Executing Precision Audit...</span>
+                <span className="text-[9px] font-black uppercase tracking-widest text-primary">Scanning Data Streams...</span>
               </div>
               <div className="h-1 w-32 bg-muted/20 rounded-full overflow-hidden">
                 <div className="h-full bg-primary animate-progress w-full origin-left" />
@@ -279,7 +279,7 @@ export function GuideView({ goalData, loggedMeals, onBack }: GuideViewProps) {
       {/* Precision Modules Panel */}
       <div className="px-2 mt-4 space-y-4">
         <div className="flex items-center justify-between px-2">
-          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.25em]">Precision Modules</p>
+          <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.25em]">Audit Modules</p>
           <div className="h-px flex-1 mx-4 bg-muted/20" />
         </div>
         
