@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -319,13 +318,24 @@ export default function PulseFlowApp() {
             onViewGoalSetting={() => navigateTo('goal-setting')}
             onViewProgress={() => navigateTo('rank')}
             onViewGuide={() => navigateTo('guide')}
+            onViewNutritionSummary={() => navigateTo('nutrition-summary')}
           />
         );
       case 'nutrition': 
         return (
           <NutritionView 
+            key="nutrition-main"
             loggedMeals={loggedMeals}
             setLoggedMeals={setLoggedMeals}
+          />
+        );
+      case 'nutrition-summary':
+        return (
+          <NutritionView 
+            key="nutrition-summary"
+            loggedMeals={loggedMeals}
+            setLoggedMeals={setLoggedMeals}
+            initialShowSummary={true}
           />
         );
       case 'workout': return <WorkoutView />;
@@ -406,6 +416,7 @@ export default function PulseFlowApp() {
           streakData={streakData}
           onViewProgress={() => navigateTo('rank')}
           onViewGuide={() => navigateTo('guide')}
+          onViewNutritionSummary={() => navigateTo('nutrition-summary')}
         />
       );
     }
@@ -453,7 +464,7 @@ export default function PulseFlowApp() {
       <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card/90 backdrop-blur-xl border-t px-6 py-2 flex justify-between items-center z-50">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeTab === item.id;
+          const isActive = activeTab === item.id || (item.id === 'nutrition' && activeTab === 'nutrition-summary');
           return (
             <button
               key={item.id}

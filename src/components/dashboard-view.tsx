@@ -52,6 +52,7 @@ interface DashboardViewProps {
   onViewGoalSetting?: () => void;
   onViewProgress?: () => void;
   onViewGuide?: () => void;
+  onViewNutritionSummary?: () => void;
 }
 
 const MetricSphere = ({ type, icon: Icon }: { type: 'steps' | 'hydration' | 'calories' | 'streak', icon: any }) => {
@@ -122,7 +123,8 @@ export function DashboardView({
   onViewCalculators,
   onViewGoalSetting,
   onViewProgress,
-  onViewGuide
+  onViewGuide,
+  onViewNutritionSummary
 }: DashboardViewProps) {
   const metricsRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
@@ -403,7 +405,16 @@ export function DashboardView({
               const showDetails = isHydration || isSteps;
 
               return (
-                <Card key={idx} className="min-w-[260px] flex-shrink-0 border-none shadow-sm bg-card snap-center">
+                <Card 
+                  key={idx} 
+                  onClick={() => {
+                    if (isCalories) onViewNutritionSummary?.();
+                  }}
+                  className={cn(
+                    "min-w-[260px] flex-shrink-0 border-none shadow-sm bg-card snap-center",
+                    isCalories && "cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5"
+                  )}
+                >
                   <CardContent className="p-3 flex flex-col justify-between h-32">
                     <div className="flex justify-between items-start">
                       <div className="flex flex-col gap-1">
@@ -529,7 +540,10 @@ export function DashboardView({
         </div>
       </section>
 
-      <Card className="border-none shadow-sm overflow-hidden bg-card">
+      <Card 
+        onClick={onViewNutritionSummary}
+        className="border-none shadow-sm overflow-hidden bg-card cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5"
+      >
         <CardContent className="p-5 space-y-5">
           <div className="flex items-center justify-start">
             <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
@@ -590,7 +604,7 @@ export function DashboardView({
 
           <div className="space-y-1.5">
             <Progress value={progressPercent} className="h-1.5 bg-muted" />
-            <div className="flex justify-between items-center text-[9px] font-bold text-muted-foreground">
+            <div className="flex justify-between items-center text-[8px] font-bold text-muted-foreground">
               <span>{startWeight > 0 ? startWeight.toFixed(1) : "---"} kg</span>
               <span className="text-primary">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"} kg</span>
               <span>{targetWeight > 0 ? targetWeight.toFixed(1) : "---"} kg</span>
@@ -695,60 +709,62 @@ export function DashboardView({
         </div>
       </section>
 
-      <Card className="border-none shadow-sm overflow-hidden bg-card">
-        <CardContent className="p-5 space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
-              <ListTodo className="w-3.5 h-3.5 text-primary" />
-              Today's Tasks
-            </h3>
-            <span className="text-[10px] font-bold text-muted-foreground uppercase">{stats.done}/{stats.total} done</span>
-          </div>
-          <div className="space-y-3">
-            {todaysTasks.length === 0 ? (
-              <div className="text-center py-6 opacity-30">
-                <p className="text-[10px] font-black uppercase tracking-widest">No tasks for today</p>
-              </div>
-            ) : (
-              <>
-                {todaysTasks.slice(0, 2).map((task) => (
-                  <div key={task.id} className="relative flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-muted/20 shadow-sm group overflow-hidden">
-                    <div className={cn("absolute left-0 top-0 bottom-0 w-1", priorityBgColor[task.priority])} />
-                    <div className="flex items-center gap-3 pl-2">
-                      <Checkbox 
-                        checked={task.completed} 
-                        onCheckedChange={() => onToggleTask(task.id)}
-                        className="h-4 w-4 rounded-md border-2 border-primary/20 data-[state=checked]:bg-primary"
-                      />
-                      <div className="flex flex-col">
-                        <span className={`text-xs font-bold ${task.completed ? 'text-muted-foreground line-through decoration-muted-foreground/30' : 'text-foreground/80'}`}>
-                          {task.title}
-                        </span>
+      <section className="pb-6">
+        <Card className="border-none shadow-sm overflow-hidden bg-card">
+          <CardContent className="p-5 space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-2 uppercase tracking-tight">
+                <ListTodo className="w-3.5 h-3.5 text-primary" />
+                Today's Tasks
+              </h3>
+              <span className="text-[10px] font-bold text-muted-foreground uppercase">{stats.done}/{stats.total} done</span>
+            </div>
+            <div className="space-y-3">
+              {todaysTasks.length === 0 ? (
+                <div className="text-center py-6 opacity-30">
+                  <p className="text-[10px] font-black uppercase tracking-widest">No tasks for today</p>
+                </div>
+              ) : (
+                <>
+                  {todaysTasks.slice(0, 2).map((task) => (
+                    <div key={task.id} className="relative flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-muted/20 shadow-sm group overflow-hidden">
+                      <div className={cn("absolute left-0 top-0 bottom-0 w-1", priorityBgColor[task.priority])} />
+                      <div className="flex items-center gap-3 pl-2">
+                        <Checkbox 
+                          checked={task.completed} 
+                          onCheckedChange={() => onToggleTask(task.id)}
+                          className="h-4 w-4 rounded-md border-2 border-primary/20 data-[state=checked]:bg-primary"
+                        />
+                        <div className="flex flex-col">
+                          <span className={`text-xs font-bold ${task.completed ? 'text-muted-foreground line-through decoration-muted-foreground/30' : 'text-foreground/80'}`}>
+                            {task.title}
+                          </span>
+                        </div>
                       </div>
+                      <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
                     </div>
-                    <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
-                  </div>
-                ))}
-              </>
-            )}
-          </div>
-          <div className="pt-3 border-t border-muted/20 flex items-center justify-between">
-            <div className="flex-1">
-              {todaysTasks.length > 2 && (
-                <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.1em]">
-                  + {todaysTasks.length - 2} more tasks
-                </p>
+                  ))}
+                </>
               )}
             </div>
-            <button 
-              onClick={() => onViewTasks?.()}
-              className="text-[9px] font-black text-primary uppercase flex items-center gap-1 hover:opacity-70 transition-all"
-            >
-              See More <ChevronRight className="w-3 h-3" />
-            </button>
-          </div>
-        </CardContent>
-      </Card>
+            <div className="pt-3 border-t border-muted/20 flex items-center justify-between">
+              <div className="flex-1">
+                {todaysTasks.length > 2 && (
+                  <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-[0.1em]">
+                    + {todaysTasks.length - 2} more tasks
+                  </p>
+                )}
+              </div>
+              <button 
+                onClick={() => onViewTasks?.()}
+                className="text-[9px] font-black text-primary uppercase flex items-center gap-1 hover:opacity-70 transition-all"
+              >
+                See More <ChevronRight className="w-3 h-3" />
+              </button>
+            </div>
+          </CardContent>
+        </Card>
+      </section>
     </div>
   );
 }

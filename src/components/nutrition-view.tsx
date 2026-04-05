@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -141,6 +140,7 @@ interface CachedFoodItem {
 interface NutritionViewProps {
   loggedMeals: LoggedMeal[];
   setLoggedMeals: React.Dispatch<React.SetStateAction<LoggedMeal[]>>;
+  initialShowSummary?: boolean;
 }
 
 const MACRO_COLORS = {
@@ -150,9 +150,9 @@ const MACRO_COLORS = {
   fiber: "#10b981"
 };
 
-export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProps) {
+export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary = false }: NutritionViewProps) {
   const { toast } = useToast();
-  const [showSummary, setShowSummary] = useState(false);
+  const [showSummary, setShowSummary] = useState(initialShowSummary);
   const [showMacroAnalysis, setShowMacroAnalysis] = useState(false);
   const [showMicroAnalysis, setShowMicroAnalysis] = useState(false);
   const [logTab, setLogTab] = useState("log");
