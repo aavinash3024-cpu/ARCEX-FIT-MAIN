@@ -106,7 +106,6 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
     const targetHydration = goalData?.hydrationTargetLiters || 3.0;
 
     const hMarker = "■ ";
-    const hLine = "▬▬▬▬▬▬▬▬▬▬▬▬▬▬▬";
 
     if (type === 'overall') {
       const accuracy = Math.round((totals.calories / targetCal) * 100);
@@ -128,7 +127,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       const microList = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
 
       return {
-        text: `${hMarker}FULL NUTRITION ANALYSIS\n${hLine}\n\n• Calories: ${Math.round(totals.calories)} / ${targetCal} kcal (${accuracy}%)\n• Hydration: ${hydrationLiters.toFixed(1)} / ${targetHydration.toFixed(1)} L\n\n${hMarker}MACRO BREAKDOWN\n${hLine}\n• Protein: ${Math.round(totals.protein)}g / ${targetP}g\n• Carbs: ${Math.round(totals.carbs)}g / ${targetC}g\n• Fat: ${Math.round(totals.fat)}g / ${targetF}g\n• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g\n\n${hMarker}MICRO ANALYSIS\n${hLine}\n${microList}\n\n${hMarker}SUMMARY\n${hLine}\n${totals.calories < targetCal ? "You still have a calorie buffer. Focus on lean protein sources." : "You've reached your daily target. Transition to hydration and recovery."}`
+        text: `${hMarker}FULL NUTRITION ANALYSIS\n\n• Calories: ${Math.round(totals.calories)} / ${targetCal} kcal (${accuracy}%)\n• Hydration: ${hydrationLiters.toFixed(1)} / ${targetHydration.toFixed(1)} L\n\n${hMarker}MACRO BREAKDOWN\n• Protein: ${Math.round(totals.protein)}g / ${targetP}g\n• Carbs: ${Math.round(totals.carbs)}g / ${targetC}g\n• Fat: ${Math.round(totals.fat)}g / ${targetF}g\n• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g\n\n${hMarker}MICRO ANALYSIS\n${microList}\n\n${hMarker}SUMMARY\n${totals.calories < targetCal ? "You still have a calorie buffer. Focus on lean protein sources." : "You've reached your daily target. Transition to hydration and recovery."}`
       };
     }
 
@@ -139,7 +138,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       const fiDiff = totals.fiber - targetFI;
 
       return {
-        text: `${hMarker}MACRO & FIBER ANALYSIS\n${hLine}\n\n• Protein: ${Math.round(totals.protein)}g / ${targetP}g (${pDiff > 0 ? '+' : ''}${Math.round(pDiff)}g)\n• Carbs: ${Math.round(totals.carbs)}g / ${targetC}g (${cDiff > 0 ? '+' : ''}${Math.round(cDiff)}g)\n• Fat: ${Math.round(totals.fat)}g / ${targetF}g (${fDiff > 0 ? '+' : ''}${Math.round(fDiff)}g)\n• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g (${fiDiff > 0 ? '+' : ''}${Math.round(fiDiff)}g)`
+        text: `${hMarker}MACRO & FIBER ANALYSIS\n\n• Protein: ${Math.round(totals.protein)}g / ${targetP}g (${pDiff > 0 ? '+' : ''}${Math.round(pDiff)}g)\n• Carbs: ${Math.round(totals.carbs)}g / ${targetC}g (${cDiff > 0 ? '+' : ''}${Math.round(cDiff)}g)\n• Fat: ${Math.round(totals.fat)}g / ${targetF}g (${fDiff > 0 ? '+' : ''}${Math.round(fDiff)}g)\n• Fiber: ${Math.round(totals.fiber)}g / ${targetFI}g (${fiDiff > 0 ? '+' : ''}${Math.round(fiDiff)}g)`
       };
     }
 
@@ -160,7 +159,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       const report = micros.map(m => `• ${m.label}: ${m.val.toFixed(m.val < 1 && m.val > 0 ? 2 : 0)}${m.unit} / ${m.target}${m.unit}`).join('\n');
 
       return {
-        text: `${hMarker}FULL MICRO ANALYSIS\n${hLine}\n\n${report}`
+        text: `${hMarker}FULL MICRO ANALYSIS\n\n${report}`
       };
     }
 
@@ -191,7 +190,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       }));
 
       return {
-        text: `${hMarker}WEIGHT PROGRESS REPORT\n${hLine}\n\n• Current: ${current.toFixed(1)} kg\n${historyNote}• Start: ${start.toFixed(1)} kg\n• Target: ${target.toFixed(1)} kg\n\n${hMarker}STRATEGY STATUS\n${hLine}\n• Total Progress: ${Math.round(Math.max(0, progress))}%\n• Remaining: ${diff} kg\n• Goal: ${objective.charAt(0).toUpperCase() + objective.slice(1)}`,
+        text: `${hMarker}WEIGHT PROGRESS REPORT\n\n• Current: ${current.toFixed(1)} kg\n${historyNote}• Start: ${start.toFixed(1)} kg\n• Target: ${target.toFixed(1)} kg\n\n${hMarker}STRATEGY STATUS\n• Total Progress: ${Math.round(Math.max(0, progress))}%\n• Remaining: ${diff} kg\n• Goal: ${objective.charAt(0).toUpperCase() + objective.slice(1)}`,
         type: 'weight',
         chartData
       };
@@ -244,7 +243,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       }).join('\n\n');
 
       return {
-        text: `${hMarker}WORKOUT PROGRESS REPORT\n${hLine}\n\n• Status: ${exerciseDetails.length > 0 ? 'Active' : 'No logs recorded for today'}\n• Total Volume: ${Math.round(totalVolume).toLocaleString()} kg\n• Movements: ${exerciseDetails.length}\n\n${hMarker}MUSCLES TARGETED\n${hLine}\n${muscleList || '• No movements logged.'}\n\n${hMarker}EXERCISES PERFORMED\n${hLine}\n${exerciseList || '• No logs today.'}`
+        text: `${hMarker}WORKOUT PROGRESS REPORT\n\n• Status: ${exerciseDetails.length > 0 ? 'Active' : 'No logs recorded for today'}\n• Total Volume: ${Math.round(totalVolume).toLocaleString()} kg\n• Exercises: ${exerciseDetails.length}\n\n${hMarker}MUSCLES TARGETED\n${muscleList || '• No movements logged.'}\n\n${hMarker}EXERCISES PERFORMED\n${exerciseList || '• No logs today.'}`
       };
     }
 
