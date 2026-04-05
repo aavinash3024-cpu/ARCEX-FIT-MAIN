@@ -22,7 +22,10 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer 
+  ResponsiveContainer,
+  PieChart,
+  Pie,
+  Cell
 } from 'recharts';
 import { cn } from '@/lib/utils';
 import { format, differenceInDays, parseISO } from 'date-fns';
@@ -41,8 +44,11 @@ interface Message {
   role: 'user' | 'system';
   text: string;
   type?: string;
+  reportSubtype?: 'overall' | 'standard';
   chartData?: any[];
   nutrientData?: NutrientItem[];
+  macroPieData?: any[];
+  microTableData?: { label: string; pct: number }[];
 }
 
 interface GuideViewProps {
@@ -125,19 +131,39 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
     const hMarker = "■ ";
 
     if (type === 'overall') {
-      const nutrientData: NutrientItem[] = [
-        { label: 'Calories', val: totals.calories, target: targetCal, unit: 'kcal', color: '#f59e0b' },
-        { label: 'Hydration', val: hydrationAmount / 1000, target: targetHydration, unit: 'L', color: '#0ea5e9' },
-        { label: 'Protein', val: totals.protein, target: targetP, unit: 'g', color: MACRO_COLORS.protein },
-        { label: 'Carbs', val: totals.carbs, target: targetC, unit: 'g', color: MACRO_COLORS.carbs },
-        { label: 'Fat', val: totals.fat, target: targetF, unit: 'g', color: MACRO_COLORS.fat },
-        { label: 'Fiber', val: totals.fiber, target: targetFI, unit: 'g', color: MACRO_COLORS.fiber },
+      const pKcal = totals.protein * 4;
+      const cKcal = totals.carbs * 4;
+      const fKcal = totals.fat * 9;
+      
+      const macroPieData = [
+        { name: 'Protein', value: Math.max(0.1, pKcal), color: MACRO_COLORS.protein },
+        { name: 'Carbs', value: Math.max(0.1, cKcal), color: MACRO_COLORS.carbs },
+        { name: 'Fat', value: Math.max(0.1, fKcal), color: MACRO_COLORS.fat },
+      ];
+
+      const microTableData = [
+        { label: 'Vitamin A', pct: Math.round((totals.vitaminA / microTargets.vitaminA) * 100) },
+        { label: 'Omega-3', pct: Math.round((totals.omega3 / microTargets.omega3) * 100) },
+        { label: 'Vitamin C', pct: Math.round((totals.vitaminC / microTargets.vitaminC) * 100) },
+        { label: 'Zinc', pct: Math.round((totals.zinc / microTargets.zinc) * 100) },
+        { label: 'Selenium', pct: Math.round((totals.selenium / microTargets.selenium) * 100) },
+        { label: 'Magnesium', pct: Math.round((totals.magnesium / microTargets.magnesium) * 100) },
+        { label: 'Vitamin D', pct: Math.round((totals.vitaminD / microTargets.vitaminD) * 100) },
+        { label: 'Potassium', pct: Math.round((totals.potassium / microTargets.potassium) * 100) },
+        { label: 'Iron', pct: Math.round((totals.iron / microTargets.iron) * 100) },
+        { label: 'Calcium', pct: Math.round((totals.calcium / microTargets.calcium) * 100) },
       ];
 
       return {
-        text: `${hMarker}FULL NUTRITION ANALYSIS\n\nComprehensive breakdown of your energy, hydration, and primary macronutrient balance.`,
+        text: `${hMarker}FULL NUTRITION ANALYSIS\n\nComprehensive metabolic overview including energy balance and micronutrient efficiency percentages.`,
         type: 'nutrition',
-        nutrientData
+        reportSubtype: 'overall',
+        macroPieData,
+        microTableData,
+        nutrientData: [
+          { label: 'Calories', val: totals.calories, target: targetCal, unit: 'kcal', color: '#f59e0b' },
+          { label: 'Hydration', val: hydrationAmount / 1000, target: targetHydration, unit: 'L', color: '#0ea5e9' },
+        ]
       };
     }
 
@@ -152,6 +178,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       return {
         text: `${hMarker}MACRO & FIBER ANALYSIS\n\nSpecific audit of your muscle-building and recovery fuels.`,
         type: 'nutrition',
+        reportSubtype: 'standard',
         nutrientData
       };
     }
@@ -173,6 +200,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       return {
         text: `${hMarker}FULL MICRO ANALYSIS\n\nDetailed status of critical micronutrients for skin aesthetics and performance.`,
         type: 'nutrition',
+        reportSubtype: 'standard',
         nutrientData
       };
     }
@@ -285,8 +313,11 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
         role: 'system', 
         text: report.text, 
         type: report.type,
+        reportSubtype: report.reportSubtype as any,
         chartData: report.chartData,
-        nutrientData: report.nutrientData
+        nutrientData: report.nutrientData,
+        macroPieData: report.macroPieData,
+        microTableData: report.microTableData
       }]);
       setIsLoading(false);
     }, 800);
@@ -361,37 +392,115 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
               </div>
               <p className="font-medium whitespace-pre-wrap tracking-tight">{msg.text}</p>
               
-              {msg.type === 'nutrition' && msg.nutrientData && (
+              {msg.type === 'nutrition' && (
                 <div className="mt-4 space-y-6">
-                  {msg.nutrientData.map((item, idx) => {
-                    const percent = Math.min(100, Math.round((item.val / item.target) * 100));
-                    const diff = item.target - item.val;
-                    const isOver = diff < 0;
-                    
-                    return (
-                      <div key={idx} className="space-y-1">
-                        <div className="flex justify-between items-baseline">
-                          <span className="text-[11px] font-black uppercase tracking-tight text-foreground/80">{item.label}</span>
-                          <span className="text-[10px] font-bold text-foreground/60">{Math.round(item.val)} / {item.target} {item.unit}</span>
+                  {msg.reportSubtype === 'overall' ? (
+                    <>
+                      {/* Fundamental Summary */}
+                      <div className="grid grid-cols-2 gap-2">
+                        {msg.nutrientData?.map((item, idx) => (
+                          <div key={idx} className="bg-muted/10 p-2.5 rounded-xl border border-muted/10 text-center">
+                            <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">{item.label}</p>
+                            <p className="text-sm font-black text-foreground">{Math.round(item.val)} <span className="text-[8px] text-muted-foreground">{item.unit}</span></p>
+                          </div>
+                        ))}
+                      </div>
+
+                      {/* Macro Pie Chart */}
+                      <div className="space-y-2">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] text-center">MACRO RATIO DISTRIBUTION</p>
+                        <div className="h-40 w-full">
+                          <ResponsiveContainer width="100%" height="100%">
+                            <PieChart>
+                              <Pie
+                                data={msg.macroPieData}
+                                cx="50%"
+                                cy="50%"
+                                innerRadius={40}
+                                outerRadius={60}
+                                paddingAngle={5}
+                                dataKey="value"
+                              >
+                                {msg.macroPieData?.map((entry, index) => (
+                                  <Cell key={`cell-${index}`} fill={entry.color} />
+                                ))}
+                              </Pie>
+                              <Tooltip 
+                                contentStyle={{ borderRadius: '8px', fontSize: '10px', fontWeight: 'bold', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                formatter={(val: number) => [`${Math.round(val)} kcal`, 'Energy']}
+                              />
+                            </PieChart>
+                          </ResponsiveContainer>
                         </div>
-                        <div className="text-[9px] font-bold text-muted-foreground uppercase leading-none">
-                          {Math.abs(Math.round(diff))} {item.unit} {isOver ? 'over' : 'left'}
-                        </div>
-                        <div className="text-[9px] font-black text-primary uppercase mt-0.5">
-                          {percent}% Done
-                        </div>
-                        <div className="h-1.5 w-full bg-muted/20 rounded-full overflow-hidden mt-1">
-                          <div 
-                            className="h-full transition-all duration-700 ease-out" 
-                            style={{ 
-                              width: `${percent}%`, 
-                              backgroundColor: item.color 
-                            }} 
-                          />
+                        <div className="flex justify-center gap-4">
+                          {msg.macroPieData?.map((item, i) => (
+                            <div key={i} className="flex items-center gap-1.5">
+                              <div className="w-2 h-2 rounded-full" style={{ backgroundColor: item.color }} />
+                              <span className="text-[8px] font-black text-muted-foreground uppercase">{item.name}</span>
+                            </div>
+                          ))}
                         </div>
                       </div>
-                    );
-                  })}
+
+                      {/* Excel-Type Micro Table */}
+                      <div className="space-y-2 pt-2">
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em]">MICRO PERFORMANCE AUDIT</p>
+                        <div className="border border-muted/20 rounded-xl overflow-hidden shadow-inner">
+                          <table className="w-full text-left border-collapse">
+                            <thead className="bg-muted/30 border-b border-muted/20">
+                              <tr>
+                                <th className="p-2 text-[8px] font-black uppercase text-muted-foreground border-r border-muted/20">NUTRIENT</th>
+                                <th className="p-2 text-[8px] font-black uppercase text-primary text-right">% GOAL</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {msg.microTableData?.map((row, idx) => (
+                                <tr key={idx} className={cn("border-b border-muted/10 last:border-0", idx % 2 === 0 ? "bg-card" : "bg-muted/5")}>
+                                  <td className="p-2 text-[10px] font-bold text-foreground/70 uppercase border-r border-muted/20">{row.label}</td>
+                                  <td className={cn(
+                                    "p-2 text-[10px] font-black text-right font-mono",
+                                    row.pct >= 80 ? "text-green-600" : row.pct >= 50 ? "text-amber-500" : "text-muted-foreground"
+                                  )}>
+                                    {row.pct}%
+                                  </td>
+                                </tr>
+                              ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+                    </>
+                  ) : (
+                    msg.nutrientData?.map((item, idx) => {
+                      const percent = Math.min(100, Math.round((item.val / item.target) * 100));
+                      const diff = item.target - item.val;
+                      const isOver = diff < 0;
+                      
+                      return (
+                        <div key={idx} className="space-y-1">
+                          <div className="flex justify-between items-baseline">
+                            <span className="text-[11px] font-black uppercase tracking-tight text-foreground/80">{item.label}</span>
+                            <span className="text-[10px] font-bold text-foreground/60">{Math.round(item.val)} / {item.target} {item.unit}</span>
+                          </div>
+                          <div className="text-[9px] font-bold text-muted-foreground uppercase leading-none">
+                            {Math.abs(Math.round(diff))} {item.unit} {isOver ? 'over' : 'left'}
+                          </div>
+                          <div className="text-[9px] font-black text-primary uppercase mt-0.5">
+                            {percent}% Done
+                          </div>
+                          <div className="h-1.5 w-full bg-muted/20 rounded-full overflow-hidden mt-1">
+                            <div 
+                              className="h-full transition-all duration-700 ease-out" 
+                              style={{ 
+                                width: `${percent}%`, 
+                                backgroundColor: item.color 
+                              }} 
+                            />
+                          </div>
+                        </div>
+                      );
+                    })
+                  )}
                 </div>
               )}
 
