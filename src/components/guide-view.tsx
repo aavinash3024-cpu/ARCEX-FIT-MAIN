@@ -71,7 +71,7 @@ const MACRO_COLORS = {
 
 export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistory, onBack }: GuideViewProps) {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'system', text: "Hello! I'm your Personal Analyzer. Pick a report below to see how you're doing." }
+    { role: 'system', text: "Hello! I'm your Personal Analyzer. Pick a report below to see how you're doing today." }
   ]);
   const [isLoading, setIsLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -424,7 +424,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                   <Activity className="w-3 h-3 text-primary" />
                 )}
                 <span className="text-[9px] font-bold uppercase tracking-widest">
-                  {msg.role === 'user' ? 'You' : 'Report'}
+                  {msg.role === 'user' ? 'You' : 'Assistant'}
                 </span>
               </div>
               <p className="font-medium whitespace-pre-wrap tracking-tight">{msg.text}</p>
