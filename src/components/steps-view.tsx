@@ -75,7 +75,7 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
   const strokeDashoffset = circumference - (percentage / 100) * circumference;
 
   return (
-    <div className="space-y-4 pb-20 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       {/* Header */}
       <div className="flex items-center gap-4 pt-2">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">

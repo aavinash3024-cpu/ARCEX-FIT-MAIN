@@ -98,7 +98,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
   const stats = getStats();
 
   return (
-    <div className="space-y-4 pb-20 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
@@ -106,7 +106,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
         <h1 className="text-2xl font-bold font-headline">Daily Tasks</h1>
       </div>
 
-      <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20">
+      <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
         <Button variant="ghost" size="icon" onClick={() => setSelectedDate(addDays(selectedDate, -1))} className="rounded-full hover:bg-muted">
           <ChevronLeft className="w-5 h-5 text-primary" />
         </Button>

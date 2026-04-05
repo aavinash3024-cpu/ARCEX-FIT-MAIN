@@ -228,7 +228,7 @@ export function WorkoutView() {
 
   if (selectedExercise) {
     return (
-      <div className="space-y-4 pb-20 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
           <Button variant="ghost" size="icon" onClick={() => setSelectedExercise(null)} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
@@ -298,7 +298,7 @@ export function WorkoutView() {
 
   if (activeSubView === 'library') {
     return (
-      <div className="space-y-4 pb-20 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
           <Button variant="ghost" size="icon" onClick={() => setActiveSubView('main')} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
@@ -406,7 +406,7 @@ export function WorkoutView() {
   }
 
   return (
-    <div className="space-y-4 pb-20 pt-4">
+    <div className="space-y-4 pb-24 pt-4">
       <div className="px-1">
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
@@ -839,7 +839,7 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
 
 function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onViewDetail: (pr: any) => void }) {
   const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
-  const [activeType, setActiveType] = useState<'strength' | 'time'>('strength');
+  const [activeType, setActiveType] = useState<'strength' | 'time'| 'strength'>('strength');
   const [activeMuscle, setActiveMuscle] = useState<string>("CHEST");
 
   useEffect(() => {
@@ -916,7 +916,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
   }, [history, activeMuscle, activeType]);
 
   return (
-    <div className="space-y-4 pb-20 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2 px-1">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
@@ -1010,7 +1010,7 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
   const daysText = daysAgo === 0 ? "Achieved Today" : `${daysAgo} Day${daysAgo === 1 ? '' : 's'} Ago`;
 
   return (
-    <div className="space-y-6 pb-20 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-6 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2 px-1">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
@@ -1221,7 +1221,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
   const currentMuscleReport = report.muscleStats[activeMuscleReport] || null;
 
   return (
-    <div className="space-y-4 pb-20 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
@@ -1541,7 +1541,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
   const handleNextWeek = () => setRefDate(prev => addWeeks(prev, 1));
 
   return (
-    <div className="space-y-4 pb-20 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />

@@ -354,7 +354,7 @@ export function DashboardView({
   }, [streakData]);
 
   return (
-    <div className="space-y-4 pb-20 pt-4">
+    <div className="space-y-4 pb-24 pt-4">
       <Card 
         onClick={onViewGuide}
         className="border-none bg-gradient-to-br from-primary/90 to-primary text-primary-foreground overflow-hidden shadow-md cursor-pointer active:scale-[0.98] transition-all hover:shadow-lg"
