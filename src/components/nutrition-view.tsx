@@ -714,7 +714,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <h2 className="text-xs font-black uppercase tracking-[0.15em] text-foreground">Meal Logging</h2>
+                <h2 className="text-xs font-black uppercase tracking-tight text-foreground">Meal Logging</h2>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
                   CREDITS LEFT: <span className={cn("font-black", credits <= 5 ? "text-destructive" : "text-primary")}>{credits}/20</span>
                 </p>
@@ -730,7 +730,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
 
         <CardContent className="p-0">
           <Tabs value={logTab} onValueChange={setLogTab} className="w-full">
-            <div className="px-3 py-1">
+            <div className="px-2 py-1">
               <TabsList className="grid w-full grid-cols-3 h-10 bg-muted/50 p-1 rounded-xl">
                 <TabsTrigger value="log" className="text-[10px] font-bold uppercase tracking-tight gap-1.5 rounded-lg data-[state=active]:shadow-sm">
                   <Plus className="w-3.5 h-3.5" /> Log
@@ -744,7 +744,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
               </TabsList>
             </div>
 
-            <TabsContent value="log" className="p-3 mt-0 space-y-3">
+            <TabsContent value="log" className="p-2 mt-0 space-y-3">
               <div className="relative group">
                 <div className="absolute inset-y-0 left-3 flex items-center pointer-events-none">
                   <Sparkles className="w-4 h-4 text-primary/40 group-focus-within:text-primary transition-colors" />
@@ -759,9 +759,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals }: NutritionViewProp
                 <div className="absolute inset-y-0 right-2 flex items-center gap-1">
                   <Button onClick={handleSpeech} size="icon" variant="ghost" className={`w-8 h-8 rounded-full transition-colors ${isListening ? 'text-primary bg-primary/10' : 'text-muted-foreground'}`}>
                     <Mic className="w-4 h-4" />
-                  </Button>
-                  <Button size="icon" variant="ghost" className="w-8 h-8 rounded-full text-muted-foreground">
-                    <Camera className="w-4 h-4" />
                   </Button>
                 </div>
               </div>
