@@ -4,7 +4,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { ChevronLeft, Bell, Trash2, Check, Clock, Sparkles, Target, Zap, Utensils } from "lucide-react";
+import { ChevronLeft, Bell, Trash2, Check, Clock, Sparkles } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 interface Notification {
@@ -64,24 +64,6 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
     setNotifications(prev => prev.filter(n => n.id !== id));
   };
 
-  const getIcon = (type: string) => {
-    switch (type) {
-      case 'goal': return Target;
-      case 'workout': return Zap;
-      case 'nutrition': return Utensils;
-      default: return Bell;
-    }
-  };
-
-  const getIconColor = (type: string) => {
-    switch (type) {
-      case 'goal': return 'text-amber-500 bg-amber-50';
-      case 'workout': return 'text-primary bg-primary/10';
-      case 'nutrition': return 'text-green-500 bg-green-50';
-      default: return 'text-blue-500 bg-blue-50';
-    }
-  };
-
   return (
     <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center justify-between px-1">
@@ -106,7 +88,6 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
           </div>
         ) : (
           notifications.map((n) => {
-            const Icon = getIcon(n.type);
             return (
               <Card key={n.id} className={cn(
                 "border-none shadow-sm transition-all overflow-hidden relative",
@@ -114,8 +95,11 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
               )}>
                 {!n.isRead && <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary" />}
                 <CardContent className="p-4 flex items-start gap-4">
-                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0", getIconColor(n.type))}>
-                    <Icon className="w-5 h-5" />
+                  <div className={cn(
+                    "w-10 h-10 rounded-xl flex items-center justify-center shrink-0",
+                    !n.isRead ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground/40"
+                  )}>
+                    <Bell className="w-5 h-5" />
                   </div>
                   <div className="flex-1 min-w-0 space-y-1">
                     <div className="flex justify-between items-start">
