@@ -22,6 +22,7 @@ import { CalculatorsView } from '@/components/calculators-view';
 import { GoalSettingView } from '@/components/goal-setting-view';
 import { ProfileView } from '@/components/profile-view';
 import { GuideView } from '@/components/guide-view';
+import { NotificationsView } from '@/components/notifications-view';
 import { Button } from '@/components/ui/button';
 import { format, isYesterday } from 'date-fns';
 
@@ -42,8 +43,6 @@ export default function PulseFlowApp() {
   const mainRef = useRef<HTMLDivElement>(null);
 
   // GLOBAL SCROLL RESET MECHANISM
-  // This watches for ANY structural changes inside the main container (tab changes, internal sub-view swaps, step changes)
-  // and snaps the scroll back to top instantly.
   useEffect(() => {
     const mainElement = mainRef.current;
     if (!mainElement) return;
@@ -57,7 +56,6 @@ export default function PulseFlowApp() {
     };
 
     const observer = new MutationObserver((mutations) => {
-      // Trigger reset if any element nodes are added/removed in the subtree
       const hasStructuralChange = mutations.some(m => 
         m.type === 'childList' && 
         (m.addedNodes.length > 0 || m.removedNodes.length > 0)
@@ -65,13 +63,11 @@ export default function PulseFlowApp() {
 
       if (hasStructuralChange) {
         resetScroll();
-        // Force secondary resets to handle layout shifts after React finishes rendering
         requestAnimationFrame(resetScroll);
         setTimeout(resetScroll, 0);
       }
     });
 
-    // Subtree: true is critical to catch transitions deep within nested views (Summary, Library, Settings, etc.)
     observer.observe(mainElement, { childList: true, subtree: true });
 
     return () => observer.disconnect();
@@ -426,6 +422,12 @@ export default function PulseFlowApp() {
             onBack={() => window.history.back()}
           />
         );
+      case 'notifications':
+        return (
+          <NotificationsView 
+            onBack={() => window.history.back()}
+          />
+        );
       default: return (
         <DashboardView 
           tasks={tasks} 
@@ -472,7 +474,12 @@ export default function PulseFlowApp() {
           <Button variant="ghost" size="icon" className="rounded-full bg-muted/50 w-9 h-9">
             <Crown className="w-4 h-4 text-amber-500" />
           </Button>
-          <Button variant="ghost" size="icon" className="rounded-full bg-muted/50 w-9 h-9 relative">
+          <Button 
+            onClick={() => navigateTo('notifications')}
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full bg-muted/50 w-9 h-9 relative"
+          >
             <Bell className="w-4 h-4" />
             <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-accent rounded-full border border-background"></span>
           </Button>
