@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -40,21 +41,35 @@ export default function PulseFlowApp() {
   
   const mainRef = useRef<HTMLDivElement>(null);
 
-  // Aggressive scroll reset on tab change
+  // Global Scroll Reset Observer
+  // This watches for any structural changes inside the main container (page transitions)
+  // and snaps the scroll back to top automatically.
   useEffect(() => {
+    const mainElement = mainRef.current;
+    if (!mainElement) return;
+
     const resetScroll = () => {
-      if (mainRef.current) {
-        mainRef.current.scrollTop = 0;
-        mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
+      if (mainElement) {
+        mainElement.scrollTop = 0;
+        mainElement.scrollTo({ top: 0, behavior: 'instant' });
       }
       window.scrollTo(0, 0);
     };
 
-    resetScroll();
-    // Second pass to ensure layout shifts are captured
-    const raf = requestAnimationFrame(resetScroll);
-    return () => cancelAnimationFrame(raf);
-  }, [activeTab]);
+    const observer = new MutationObserver((mutations) => {
+      // Check if nodes were added or removed (indicates a view switch)
+      const hasStructuralChange = mutations.some(m => m.type === 'childList');
+      if (hasStructuralChange) {
+        resetScroll();
+        // Secondary safety reset for async layout shifts
+        requestAnimationFrame(resetScroll);
+      }
+    });
+
+    observer.observe(mainElement, { childList: true, subtree: false });
+
+    return () => observer.disconnect();
+  }, []);
 
   // Back Button / History Support
   useEffect(() => {
@@ -309,6 +324,7 @@ export default function PulseFlowApp() {
             onUpdateSteps={updateSteps}
             goalData={goalData}
             weightHistory={weightHistory}
+            goalWeight={goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 0}
             loggedMeals={loggedMeals}
             streakData={streakData}
             onViewHydration={() => navigateTo('hydration')} 
