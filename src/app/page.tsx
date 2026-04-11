@@ -41,9 +41,9 @@ export default function PulseFlowApp() {
   
   const mainRef = useRef<HTMLDivElement>(null);
 
-  // Global Scroll Reset Observer
-  // This watches for any structural changes inside the main container (page transitions)
-  // or internal view swaps (marked by animate-in) and snaps the scroll back to top.
+  // GLOBAL SCROLL RESET MECHANISM
+  // This watches for ANY structural changes inside the main container (tab changes, internal sub-view swaps, step changes)
+  // and snaps the scroll back to top instantly.
   useEffect(() => {
     const mainElement = mainRef.current;
     if (!mainElement) return;
@@ -57,24 +57,21 @@ export default function PulseFlowApp() {
     };
 
     const observer = new MutationObserver((mutations) => {
-      // Detect either a main tab change (direct child of main) 
-      // or an internal sub-view transition (marked by animate-in class)
-      const isMajorChange = mutations.some(m => 
-        m.target === mainElement || 
-        Array.from(m.addedNodes).some(node => 
-          node.nodeType === 1 && (node as HTMLElement).classList.contains('animate-in')
-        )
+      // Trigger reset if any element nodes are added/removed in the subtree
+      const hasStructuralChange = mutations.some(m => 
+        m.type === 'childList' && 
+        (m.addedNodes.length > 0 || m.removedNodes.length > 0)
       );
 
-      if (isMajorChange) {
+      if (hasStructuralChange) {
         resetScroll();
-        // Force secondary resets to handle async layout shifts and heavy component rendering
+        // Force secondary resets to handle layout shifts after React finishes rendering
         requestAnimationFrame(resetScroll);
-        setTimeout(resetScroll, 50);
+        setTimeout(resetScroll, 0);
       }
     });
 
-    // Subtree: true allows us to catch transitions deep within the view components
+    // Subtree: true is critical to catch transitions deep within nested views (Summary, Library, Settings, etc.)
     observer.observe(mainElement, { childList: true, subtree: true });
 
     return () => observer.disconnect();
