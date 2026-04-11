@@ -709,7 +709,7 @@ export function DashboardView({
         </div>
       </section>
 
-      <section className="pb-6">
+      <section>
         <Card className="border-none shadow-sm overflow-hidden bg-card">
           <CardContent className="p-5 space-y-4">
             <div className="flex items-center justify-between">

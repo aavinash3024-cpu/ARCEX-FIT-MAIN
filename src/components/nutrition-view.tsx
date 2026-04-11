@@ -597,6 +597,51 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
 
         <section className="space-y-3">
           <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
+            <BarChart3 className="w-3.5 h-3.5 text-primary" /> Top Macro Sources
+          </h3>
+          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl">
+            <CardContent className="p-0">
+              <Tabs defaultValue="protein" className="w-full">
+                <TabsList className="grid w-full grid-cols-4 h-9 bg-muted/30 p-1 rounded-none">
+                  <TabsTrigger value="protein" className="text-[9px] font-black uppercase tracking-tight">P</TabsTrigger>
+                  <TabsTrigger value="carbs" className="text-[9px] font-black uppercase tracking-tight">C</TabsTrigger>
+                  <TabsTrigger value="fat" className="text-[9px] font-black uppercase tracking-tight">F</TabsTrigger>
+                  <TabsTrigger value="fiber" className="text-[9px] font-black uppercase tracking-tight">FI</TabsTrigger>
+                </TabsList>
+                {(['protein', 'carbs', 'fat', 'fiber'] as const).map(macro => {
+                  const sortedItems = [...allItems]
+                    .sort((a, b) => b[macro] - a[macro])
+                    .filter(item => item[macro] > 0)
+                    .slice(0, 5);
+
+                  return (
+                    <TabsContent key={macro} value={macro} className="p-3 mt-0">
+                      <div className="space-y-2">
+                        {sortedItems.length === 0 ? (
+                          <p className="text-[9px] text-center py-6 text-muted-foreground uppercase font-bold tracking-widest opacity-40">No items found</p>
+                        ) : (
+                          sortedItems.map((item, idx) => (
+                            <div key={idx} className="flex justify-between items-center bg-muted/5 p-2 rounded-lg border border-muted/10">
+                              <span className="text-[10px] font-bold text-foreground/70 uppercase truncate max-w-[180px]">
+                                {item.quantity} {item.name}
+                              </span>
+                              <span className="text-[10px] font-black uppercase whitespace-nowrap" style={{ color: MACRO_COLORS[macro] }}>
+                                {item[macro]}g
+                              </span>
+                            </div>
+                          ))
+                        )}
+                      </div>
+                    </TabsContent>
+                  );
+                })}
+              </Tabs>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
              <History className="w-3.5 h-3.5 text-primary" /> Meal Breakdown
           </h3>
           <div className="space-y-2">
@@ -644,51 +689,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
               ))
             )}
           </div>
-        </section>
-
-        <section className="space-y-3">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground px-2 flex items-center gap-2">
-            <BarChart3 className="w-3.5 h-3.5 text-primary" /> Top Macro Sources
-          </h3>
-          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl">
-            <CardContent className="p-0">
-              <Tabs defaultValue="protein" className="w-full">
-                <TabsList className="grid w-full grid-cols-4 h-9 bg-muted/30 p-1 rounded-none">
-                  <TabsTrigger value="protein" className="text-[9px] font-black uppercase tracking-tight">P</TabsTrigger>
-                  <TabsTrigger value="carbs" className="text-[9px] font-black uppercase tracking-tight">C</TabsTrigger>
-                  <TabsTrigger value="fat" className="text-[9px] font-black uppercase tracking-tight">F</TabsTrigger>
-                  <TabsTrigger value="fiber" className="text-[9px] font-black uppercase tracking-tight">FI</TabsTrigger>
-                </TabsList>
-                {(['protein', 'carbs', 'fat', 'fiber'] as const).map(macro => {
-                  const sortedItems = [...allItems]
-                    .sort((a, b) => b[macro] - a[macro])
-                    .filter(item => item[macro] > 0)
-                    .slice(0, 5);
-
-                  return (
-                    <TabsContent key={macro} value={macro} className="p-3 mt-0">
-                      <div className="space-y-2">
-                        {sortedItems.length === 0 ? (
-                          <p className="text-[9px] text-center py-6 text-muted-foreground uppercase font-bold tracking-widest opacity-40">No items found</p>
-                        ) : (
-                          sortedItems.map((item, idx) => (
-                            <div key={idx} className="flex justify-between items-center bg-muted/5 p-2 rounded-lg border border-muted/10">
-                              <span className="text-[10px] font-bold text-foreground/70 uppercase truncate max-w-[180px]">
-                                {item.quantity} {item.name}
-                              </span>
-                              <span className="text-[10px] font-black uppercase whitespace-nowrap" style={{ color: MACRO_COLORS[macro] }}>
-                                {item[macro]}g
-                              </span>
-                            </div>
-                          ))
-                        )}
-                      </div>
-                    </TabsContent>
-                  );
-                })}
-              </Tabs>
-            </CardContent>
-          </Card>
         </section>
       </div>
     );
