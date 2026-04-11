@@ -937,6 +937,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
 }
 
 function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allHistory: LoggedMeal[], loggedMeals: LoggedMeal[], goalData: any, onBack: () => void }) {
+  const [showDetails, setShowDetails] = useState(false);
   const [period, setPeriod] = useState<'weekly' | 'monthly'>('weekly');
   const [refDate, setRefDate] = useState(new Date());
 
@@ -1033,6 +1034,87 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
     { id: 'calcium', label: "Calcium", sub: "Contraction/Firing", val: todayTotals.calcium, target: targets.calcium, unit: "mg", color: "#64748b" },
   ];
 
+  if (showDetails) {
+    return (
+      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+        <div className="flex items-center gap-4 pt-2 px-1">
+          <Button variant="ghost" size="icon" onClick={() => setShowDetails(false)} className="rounded-full bg-muted/50 w-9 h-9">
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          <div className="space-y-0.5">
+            <h1 className="text-2xl font-bold font-headline leading-none">Detailed Analysis</h1>
+            <p className="text-[10px] font-black text-primary uppercase tracking-widest">Historical Performance</p>
+          </div>
+        </div>
+
+        <Tabs defaultValue="aesthetics" className="w-full">
+          <TabsList className="grid w-full grid-cols-2 h-11 bg-card/80 backdrop-blur-sm p-1.5 rounded-2xl shadow-sm border border-muted/20">
+            <TabsTrigger value="aesthetics" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Skin and Heal</TabsTrigger>
+            <TabsTrigger value="performance" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Gym and Recovery</TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="aesthetics" className="space-y-4 mt-4">
+            <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
+              <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full hover:bg-muted">
+                <ChevronLeft className="w-5 h-5 text-primary" />
+              </Button>
+              <div className="flex flex-col items-center">
+                <span className="text-[11px] font-black text-foreground uppercase tracking-tight">
+                  {periodLabel}
+                </span>
+                <div className="flex gap-2 mt-1">
+                   <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Week</button>
+                   <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Month</button>
+                </div>
+              </div>
+              <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full hover:bg-muted">
+                <ChevronRight className="w-5 h-5 text-primary" />
+              </Button>
+            </div>
+
+            <WeeklyMicroTable 
+              allHistory={allHistory} 
+              targets={targets} 
+              micros={aesthetics} 
+              title="Skin and Heal" 
+              refDate={refDate}
+              period={period}
+            />
+          </TabsContent>
+
+          <TabsContent value="performance" className="space-y-4 mt-4">
+            <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
+              <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full hover:bg-muted">
+                <ChevronLeft className="w-5 h-5 text-primary" />
+              </Button>
+              <div className="flex flex-col items-center">
+                <span className="text-[11px] font-black text-foreground uppercase tracking-tight">
+                  {periodLabel}
+                </span>
+                <div className="flex gap-2 mt-1">
+                   <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Week</button>
+                   <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Month</button>
+                </div>
+              </div>
+              <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full hover:bg-muted">
+                <ChevronRight className="w-5 h-5 text-primary" />
+              </Button>
+            </div>
+
+            <WeeklyMicroTable 
+              allHistory={allHistory} 
+              targets={targets} 
+              micros={performance} 
+              title="Gym and Recovery" 
+              refDate={refDate}
+              period={period}
+            />
+          </TabsContent>
+        </Tabs>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2 px-1">
@@ -1056,33 +1138,14 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
               <MicroCard key={idx} {...item} />
             ))}
           </div>
-          
-          <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mt-6 mx-1">
-            <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full hover:bg-muted">
-              <ChevronLeft className="w-5 h-5 text-primary" />
-            </Button>
-            <div className="flex flex-col items-center">
-              <span className="text-[11px] font-black text-foreground uppercase tracking-tight">
-                {periodLabel}
-              </span>
-              <div className="flex gap-2 mt-1">
-                 <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Week</button>
-                 <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Month</button>
-              </div>
-            </div>
-            <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full hover:bg-muted">
-              <ChevronRight className="w-5 h-5 text-primary" />
+          <div className="px-1 mt-4">
+            <Button 
+              onClick={() => setShowDetails(true)}
+              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
+            >
+              Check Detailed Analysis <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-
-          <WeeklyMicroTable 
-            allHistory={allHistory} 
-            targets={targets} 
-            micros={aesthetics} 
-            title="Skin and Heal" 
-            refDate={refDate}
-            period={period}
-          />
         </TabsContent>
 
         <TabsContent value="performance" className="space-y-4 mt-4">
@@ -1091,33 +1154,14 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
               <MicroCard key={idx} {...item} />
             ))}
           </div>
-
-          <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mt-6 mx-1">
-            <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full hover:bg-muted">
-              <ChevronLeft className="w-5 h-5 text-primary" />
-            </Button>
-            <div className="flex flex-col items-center">
-              <span className="text-[11px] font-black text-foreground uppercase tracking-tight">
-                {periodLabel}
-              </span>
-              <div className="flex gap-2 mt-1">
-                 <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Week</button>
-                 <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Month</button>
-              </div>
-            </div>
-            <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full hover:bg-muted">
-              <ChevronRight className="w-5 h-5 text-primary" />
+          <div className="px-1 mt-4">
+            <Button 
+              onClick={() => setShowDetails(true)}
+              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
+            >
+              Check Detailed Analysis <ChevronRight className="w-4 h-4" />
             </Button>
           </div>
-
-          <WeeklyMicroTable 
-            allHistory={allHistory} 
-            targets={targets} 
-            micros={performance} 
-            title="Gym and Recovery" 
-            refDate={refDate}
-            period={period}
-          />
         </TabsContent>
       </Tabs>
     </div>
