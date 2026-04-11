@@ -43,7 +43,7 @@ export default function PulseFlowApp() {
 
   // Global Scroll Reset Observer
   // This watches for any structural changes inside the main container (page transitions)
-  // and snaps the scroll back to top automatically.
+  // or internal view swaps (marked by animate-in) and snaps the scroll back to top.
   useEffect(() => {
     const mainElement = mainRef.current;
     if (!mainElement) return;
@@ -57,16 +57,25 @@ export default function PulseFlowApp() {
     };
 
     const observer = new MutationObserver((mutations) => {
-      // Check if nodes were added or removed (indicates a view switch)
-      const hasStructuralChange = mutations.some(m => m.type === 'childList');
-      if (hasStructuralChange) {
+      // Detect either a main tab change (direct child of main) 
+      // or an internal sub-view transition (marked by animate-in class)
+      const isMajorChange = mutations.some(m => 
+        m.target === mainElement || 
+        Array.from(m.addedNodes).some(node => 
+          node.nodeType === 1 && (node as HTMLElement).classList.contains('animate-in')
+        )
+      );
+
+      if (isMajorChange) {
         resetScroll();
-        // Secondary safety reset for async layout shifts
+        // Force secondary resets to handle async layout shifts and heavy component rendering
         requestAnimationFrame(resetScroll);
+        setTimeout(resetScroll, 50);
       }
     });
 
-    observer.observe(mainElement, { childList: true, subtree: false });
+    // Subtree: true allows us to catch transitions deep within the view components
+    observer.observe(mainElement, { childList: true, subtree: true });
 
     return () => observer.disconnect();
   }, []);

@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -102,7 +103,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
     const wa = parseFloat(waist);
     const hi = parseFloat(hip);
 
-    if (isNaN(h) || iNsNaN(n) || isNaN(wa) || isNaN(w)) return;
+    if (isNaN(h) || isNaN(n) || isNaN(wa) || isNaN(w)) return;
 
     let bf = 0;
     if (gender === 'male') {
