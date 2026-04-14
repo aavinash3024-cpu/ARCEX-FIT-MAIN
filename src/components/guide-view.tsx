@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
@@ -200,16 +201,16 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
     if (type === 'micros') {
       const nutrientData: NutrientItem[] = [
-        { label: "Vitamin A", val: todayTotals.vitaminA, target: microTargets.vitaminA, unit: "mcg", color: "#f97316" },
-        { label: "Omega-3", val: todayTotals.omega3, target: microTargets.omega3, unit: "g", color: "#0ea5e9" },
-        { label: "Vitamin C", val: todayTotals.vitaminC, target: microTargets.vitaminC, unit: "mg", color: "#eab308" },
-        { label: "Zinc", val: todayTotals.zinc, target: microTargets.zinc, unit: "mg", color: "#6366f1" },
-        { label: "Selenium", val: todayTotals.selenium, target: microTargets.selenium, unit: "mcg", color: "#f43f5e" },
-        { label: "Magnesium", val: todayTotals.magnesium, target: microTargets.magnesium, unit: "mg", color: "#a855f7" },
-        { label: "Vitamin D", val: todayTotals.vitaminD, target: microTargets.vitaminD, unit: "mcg", color: "#f59e0b" },
-        { label: "Potassium", val: todayTotals.potassium, target: microTargets.potassium, unit: "mg", color: "#10b981" },
-        { label: "Iron", val: todayTotals.iron, target: microTargets.iron, unit: "mg", color: "#ef4444" },
-        { label: "Calcium", val: todayTotals.calcium, target: microTargets.calcium, unit: "mg", color: "#64748b" },
+        { label: "Vitamin A", val: totals.vitaminA, target: microTargets.vitaminA, unit: "mcg", color: "#f97316" },
+        { label: "Omega-3", val: totals.omega3, target: microTargets.omega3, unit: "g", color: "#0ea5e9" },
+        { label: "Vitamin C", val: totals.vitaminC, target: microTargets.vitaminC, unit: "mg", color: "#eab308" },
+        { label: "Zinc", val: totals.zinc, target: microTargets.zinc, unit: "mg", color: "#6366f1" },
+        { label: "Selenium", val: totals.selenium, target: microTargets.selenium, unit: "mcg", color: "#f43f5e" },
+        { label: "Magnesium", val: totals.magnesium, target: microTargets.magnesium, unit: "mg", color: "#a855f7" },
+        { label: "Vitamin D", val: totals.vitaminD, target: microTargets.vitaminD, unit: "mcg", color: "#f59e0b" },
+        { label: "Potassium", val: totals.potassium, target: microTargets.potassium, unit: "mg", color: "#10b981" },
+        { label: "Iron", val: totals.iron, target: microTargets.iron, unit: "mg", color: "#ef4444" },
+        { label: "Calcium", val: totals.calcium, target: microTargets.calcium, unit: "mg", color: "#64748b" },
       ];
 
       return {
@@ -306,7 +307,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
       })).filter(d => d.volume > 0);
 
       return {
-        text: `${hMarker}WORKOUT ANALYSIS\n\n• Status: ${exerciseDetails.length > 0 ? 'Active' : 'No logs for today'}\n• Total Lifted: ${Math.round(totalVolume).toLocaleString()} kg\n• Exercises: ${exerciseDetails.length}\n\n${hMarker}MUSCLES TRAINED\n${muscleList || '• None logged yet.'}\n\n${hMarker}EXERCISES DONE\n${exerciseList || '• No logs today.'}`,
+        text: `${hMarker}WORKOUT ANALYSIS\n\n• Status: ${exerciseDetails.length > 0 ? 'Active' : 'No logs for today'}\n• Total Volume: ${Math.round(totalVolume).toLocaleString()} kg\n• Exercises: ${exerciseDetails.length}\n\n${hMarker}MUSCLES TRAINED\n${muscleList || '• None logged yet.'}\n\n${hMarker}EXERCISES DONE\n${exerciseList || '• No logs today.'}`,
         type: 'workout',
         chartData
       };
@@ -356,7 +357,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
   ];
 
   return (
-    <div className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500 pb-24 font-sans">
+    <div data-view="guide" className="flex flex-col h-full animate-in fade-in slide-in-from-right-4 duration-500 pb-24 font-sans">
       {/* Compact Header */}
       <div className="relative overflow-hidden pt-4 pb-4 px-4 border-b border-white/10 shrink-0">
         {/* Background Image & Overlay */}

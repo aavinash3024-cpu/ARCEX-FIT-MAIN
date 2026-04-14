@@ -56,6 +56,10 @@ export default function PulseFlowApp() {
     };
 
     const observer = new MutationObserver((mutations) => {
+      // Check if we are in the guide view - if so, skip the top reset to allow smooth chat auto-scroll
+      const isGuideActive = mainElement.querySelector('[data-view="guide"]');
+      if (isGuideActive) return;
+
       const hasStructuralChange = mutations.some(m => 
         m.type === 'childList' && 
         (m.addedNodes.length > 0 || m.removedNodes.length > 0)
