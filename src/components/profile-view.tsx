@@ -373,6 +373,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
 
   const renderSubscription = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
+      {/* Current Status Card */}
       <Card className="border-none bg-gradient-to-br from-purple-500 to-indigo-600 shadow-xl rounded-[2.5rem] overflow-hidden text-white relative">
         <div className="absolute top-0 right-0 p-8 opacity-10">
           <Trophy className="w-32 h-32" />
@@ -410,8 +411,47 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
           </div>
         </CardContent>
       </Card>
-      <Button variant="outline" className="w-full h-14 rounded-2xl border-2 border-indigo-100 text-indigo-600 font-black uppercase text-[11px] tracking-widest hover:bg-indigo-50">
-        Manage Subscription
+
+      {/* Subscription Plans */}
+      <div className="space-y-4">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Choose Your Strategy</h3>
+        <div className="grid gap-3">
+          {[
+            { id: 'monthly', name: 'Monthly', price: '229', period: 'Month', description: 'Standard billing cycle' },
+            { id: 'half-year', name: 'Half Year', price: '699', period: '6 Months', description: 'Optimal choice', popular: true },
+            { id: 'yearly', name: 'Yearly', price: '1099', period: 'Year', description: 'Elite commitment', saving: 'Best Value' },
+          ].map((plan) => (
+            <Card key={plan.id} className={cn(
+              "border-none shadow-md rounded-[1.5rem] overflow-hidden border border-muted/10 transition-all active:scale-[0.98] cursor-pointer group",
+              plan.popular ? "bg-primary/5 ring-2 ring-primary/20" : "bg-card"
+            )}>
+              <CardContent className="p-5 flex items-center justify-between">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2">
+                    <h4 className="font-black text-sm uppercase tracking-tight text-foreground/80">{plan.name}</h4>
+                    {plan.popular && (
+                      <Badge className="bg-primary text-white border-none font-black uppercase text-[7px] px-1.5 h-4">Most Popular</Badge>
+                    )}
+                    {plan.saving && (
+                      <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50 font-black uppercase text-[7px] px-1.5 h-4">{plan.saving}</Badge>
+                    )}
+                  </div>
+                  <p className="text-[10px] font-bold text-muted-foreground uppercase">{plan.description}</p>
+                </div>
+                <div className="text-right">
+                  <div className="flex items-baseline justify-end gap-0.5">
+                    <span className="text-xl font-black text-foreground">{plan.price}</span>
+                  </div>
+                  <p className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">/ {plan.period}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      </div>
+
+      <Button variant="outline" className="w-full h-14 rounded-2xl border-2 border-indigo-100 text-indigo-600 font-black uppercase text-[11px] tracking-widest hover:bg-indigo-50 mt-2">
+        Manage Active Subscription
       </Button>
     </div>
   );
