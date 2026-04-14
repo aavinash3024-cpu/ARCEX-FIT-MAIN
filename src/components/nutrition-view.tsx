@@ -862,7 +862,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
             </div>
             <button 
               onClick={() => setShowSummary(true)} 
-              className="text-[9px] font-bold text-primary uppercase flex items-center hover:opacity-70 transition-opacity"
+              className="text-[9px] font-bold text-black uppercase flex items-center hover:opacity-70 transition-opacity"
             >
               View Summary <ChevronRight className="w-3 h-3 ml-0.5" />
             </button>
@@ -1141,7 +1141,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
           <div className="px-1 mt-4">
             <Button 
               onClick={() => setShowDetails(true)}
-              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
+              className="w-full h-12 rounded-xl bg-black hover:bg-black/90 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-black/20 transition-all active:scale-[0.98] gap-2"
             >
               Check Detailed Analysis <ChevronRight className="w-4 h-4" />
             </Button>
@@ -1157,7 +1157,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
           <div className="px-1 mt-4">
             <Button 
               onClick={() => setShowDetails(true)}
-              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
+              className="w-full h-12 rounded-xl bg-black hover:bg-black/90 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-black/20 transition-all active:scale-[0.98] gap-2"
             >
               Check Detailed Analysis <ChevronRight className="w-4 h-4" />
             </Button>
