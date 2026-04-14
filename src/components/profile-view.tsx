@@ -387,7 +387,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
               <Trophy className="w-4 h-4 text-amber-400" />
               <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/60">Elite Member</p>
             </div>
-            <h2 className="text-xl font-black tracking-tighter">PULSEFLOW PREMIUM</h2>
+            <h2 className="text-xl font-black tracking-tighter">ARCEX PREMIUM</h2>
           </div>
           
           {/* Gold Metallic Chip */}
