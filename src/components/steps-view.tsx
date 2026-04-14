@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo } from 'react';
@@ -211,7 +210,15 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
                 />
                 <Tooltip 
                   cursor={{ fill: 'hsl(var(--muted))', opacity: 0.2 }}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', fontSize: '10px', fontWeight: 'bold' }}
+                  contentStyle={{ 
+                    borderRadius: '12px', 
+                    border: '1px solid hsl(var(--border))', 
+                    backgroundColor: 'hsl(var(--card))', 
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)', 
+                    fontSize: '10px', 
+                    fontWeight: 'bold' 
+                  }}
+                  labelStyle={{ color: 'hsl(var(--foreground))' }}
                   formatter={(value: number) => [value.toLocaleString(), "Steps"]}
                 />
                 <Bar 
@@ -233,41 +240,43 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
       </Card>
 
       {/* 3. Stats Summary */}
-      <div className="grid grid-cols-2 gap-4">
-        <Card className="border-none shadow-sm bg-card">
-          <CardContent className="p-4 space-y-1 text-center">
-            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Weekly Avg</p>
-            <p className="text-lg font-black text-primary">{avgSteps.toLocaleString()}</p>
-            <p className="text-[8px] font-bold text-muted-foreground uppercase">Steps / Day</p>
-          </CardContent>
-        </Card>
-        <Card className="border-none shadow-sm bg-card">
-          <CardContent className="p-4 space-y-1 text-center">
-            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Week Total</p>
-            <p className="text-lg font-black text-foreground">{totalWeekSteps.toLocaleString()}</p>
-            <p className="text-[8px] font-bold text-muted-foreground uppercase">Total Volume</p>
+      <div className="space-y-4">
+        <div className="grid grid-cols-2 gap-4">
+          <Card className="border-none shadow-sm bg-card">
+            <CardContent className="p-4 space-y-1 text-center">
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Weekly Avg</p>
+              <p className="text-lg font-black text-primary">{avgSteps.toLocaleString()}</p>
+              <p className="text-[8px] font-bold text-muted-foreground uppercase">Steps / Day</p>
+            </CardContent>
+          </Card>
+          <Card className="border-none shadow-sm bg-card">
+            <CardContent className="p-4 space-y-1 text-center">
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Week Total</p>
+              <p className="text-lg font-black text-foreground">{totalWeekSteps.toLocaleString()}</p>
+              <p className="text-[8px] font-bold text-muted-foreground uppercase">Total Volume</p>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Card className="border-none shadow-sm bg-green-50/50 border border-green-100">
+          <CardContent className="p-4 flex justify-between items-center">
+            <div className="flex items-center gap-3">
+              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                <CheckCircle2 className="w-4 h-4 text-green-600" />
+              </div>
+              <div className="space-y-0.5">
+                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none">Activity Health</p>
+                <p className="text-xs font-bold text-foreground">{goalsMet} / 7 Days Met</p>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[8px] font-black uppercase">
+                Consistent
+              </div>
+            </div>
           </CardContent>
         </Card>
       </div>
-
-      <Card className="border-none shadow-sm bg-green-50/50 border border-green-100">
-        <CardContent className="p-4 flex justify-between items-center">
-          <div className="flex items-center gap-3">
-            <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-              <CheckCircle2 className="w-4 h-4 text-green-600" />
-            </div>
-            <div className="space-y-0.5">
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none">Activity Health</p>
-              <p className="text-xs font-bold text-foreground">{goalsMet} / 7 Days Met</p>
-            </div>
-          </div>
-          <div className="text-right">
-            <div className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[8px] font-black uppercase">
-              Consistent
-            </div>
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 }

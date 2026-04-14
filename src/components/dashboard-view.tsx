@@ -488,7 +488,11 @@ export function DashboardView({
                             <Progress 
                               value={Math.min(percentage, 100)} 
                               className="h-1.5 w-full" 
-                              indicatorClassName={isCalories ? "bg-gradient-to-r from-[#F59202] to-[#FFB84D]" : isSteps ? "bg-green-500" : ""}
+                              indicatorClassName={
+                                isCalories ? "bg-gradient-to-r from-[#F59202] to-[#FFB84D]" : 
+                                isSteps ? "bg-green-500" : 
+                                isHydration ? "bg-blue-500" : ""
+                              }
                             />
                             
                             {isCalories && (

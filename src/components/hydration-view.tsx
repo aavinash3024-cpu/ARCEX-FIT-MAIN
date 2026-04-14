@@ -240,7 +240,15 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
                 />
                 <Tooltip 
                   cursor={{ stroke: '#3b82f6', strokeWidth: 1 }}
-                  contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 24px rgba(0,0,0,0.1)', fontSize: '10px', fontWeight: 'bold' }}
+                  contentStyle={{ 
+                    borderRadius: '12px', 
+                    border: '1px solid hsl(var(--border))', 
+                    backgroundColor: 'hsl(var(--card))', 
+                    boxShadow: '0 8px 24px rgba(0,0,0,0.15)', 
+                    fontSize: '10px', 
+                    fontWeight: 'bold' 
+                  }}
+                  labelStyle={{ color: 'hsl(var(--foreground))' }}
                   formatter={(value: number) => [`${value} liter`, "Intake"]}
                 />
                 <Area 

@@ -224,8 +224,18 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
                       tick={{ fontSize: 9, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }}
                     />
                     <Tooltip 
-                       contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 8px 16px rgba(0,0,0,0.08)', fontSize: '10px', fontWeight: 'bold' }}
+                       contentStyle={{ 
+                         borderRadius: '12px', 
+                         border: '1px solid hsl(var(--border))', 
+                         backgroundColor: 'hsl(var(--card))', 
+                         boxShadow: '0 8px 16px rgba(0,0,0,0.15)', 
+                         fontSize: '10px', 
+                         fontWeight: 'bold',
+                         color: 'hsl(var(--foreground))'
+                       }}
+                       labelStyle={{ color: 'hsl(var(--foreground))' }}
                        itemStyle={{ color: 'hsl(var(--primary))' }}
+                       cursor={{ stroke: 'hsl(var(--muted-foreground))', strokeWidth: 1, opacity: 0.5 }}
                     />
                     <Area 
                       type="monotone" 

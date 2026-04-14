@@ -479,7 +479,15 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                                 ))}
                               </Pie>
                               <Tooltip 
-                                contentStyle={{ borderRadius: '8px', fontSize: '10px', fontWeight: 'bold', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                                contentStyle={{ 
+                                  borderRadius: '8px', 
+                                  fontSize: '10px', 
+                                  fontWeight: 'bold', 
+                                  border: '1px solid hsl(var(--border))', 
+                                  backgroundColor: 'hsl(var(--card))',
+                                  boxShadow: '0 4px 12px rgba(0,0,0,0.1)' 
+                                }}
+                                labelStyle={{ color: 'hsl(var(--foreground))' }}
                                 formatter={(val: number) => [`${Math.round(val)} kcal`, 'Energy']}
                               />
                             </PieChart>
@@ -606,7 +614,15 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                         domain={['dataMin - 1', 'dataMax + 1']} 
                       />
                       <Tooltip 
-                        contentStyle={{ borderRadius: '8px', fontSize: '10px', fontWeight: 'bold', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                        contentStyle={{ 
+                          borderRadius: '8px', 
+                          fontSize: '10px', 
+                          fontWeight: 'bold', 
+                          border: '1px solid hsl(var(--border))', 
+                          backgroundColor: 'hsl(var(--card))',
+                          boxShadow: '0 4px 12px rgba(0,0,0,0.1)' 
+                        }}
+                        labelStyle={{ color: 'hsl(var(--foreground))' }}
                       />
                       <Line 
                         type="monotone" 
@@ -644,7 +660,15 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                           tick={{ fill: 'currentColor', opacity: 0.5 }} 
                         />
                         <Tooltip 
-                          contentStyle={{ borderRadius: '8px', fontSize: '10px', fontWeight: 'bold', border: 'none', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}
+                          contentStyle={{ 
+                            borderRadius: '8px', 
+                            fontSize: '10px', 
+                            fontWeight: 'bold', 
+                            border: '1px solid hsl(var(--border))', 
+                            backgroundColor: 'hsl(var(--card))',
+                            boxShadow: '0 4px 12px rgba(0,0,0,0.1)' 
+                          }}
+                          labelStyle={{ color: 'hsl(var(--foreground))' }}
                           formatter={(val: number) => [`${val.toLocaleString()} kg`, "Volume"]}
                           labelFormatter={(index: any) => {
                             const item = msg.chartData?.find(d => d.index === index);

@@ -888,7 +888,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
                           </div>
                         </div>
                       </div>
-                      <Button onClick={() => deleteLoggedMeal(id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
+                      <Button onClick={() => deleteLoggedMeal(meal.id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                       <span className="absolute bottom-2 right-2 text-[7px] font-bold text-muted-foreground/30">{meal.time}</span>
@@ -1141,7 +1141,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
           <div className="px-1 mt-4">
             <Button 
               onClick={() => setShowDetails(true)}
-              className="w-full h-12 rounded-xl bg-black hover:bg-black/90 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-black/20 transition-all active:scale-[0.98] gap-2"
+              className="w-full h-12 rounded-xl bg-foreground hover:bg-foreground/90 text-background font-black text-[10px] uppercase tracking-widest shadow-lg shadow-foreground/20 transition-all active:scale-[0.98] gap-2"
             >
               Check Detailed Analysis <ChevronRight className="w-4 h-4" />
             </Button>
@@ -1157,7 +1157,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
           <div className="px-1 mt-4">
             <Button 
               onClick={() => setShowDetails(true)}
-              className="w-full h-12 rounded-xl bg-black hover:bg-black/90 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-black/20 transition-all active:scale-[0.98] gap-2"
+              className="w-full h-12 rounded-xl bg-foreground hover:bg-foreground/90 text-background font-black text-[10px] uppercase tracking-widest shadow-lg shadow-foreground/20 transition-all active:scale-[0.98] gap-2"
             >
               Check Detailed Analysis <ChevronRight className="w-4 h-4" />
             </Button>
