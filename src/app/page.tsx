@@ -34,7 +34,7 @@ export default function PulseFlowApp() {
   
   const [activeTab, setActiveTab] = useState('dashboard');
   const [activeCalculator, setActiveCalculator] = useState<'bmr' | '1rm' | 'bodyfat'>('bmr');
-  const [tasks, setTasks] = useState<Task[]>([]);
+  const [tasks, setTask] = useState<Task[]>([]);
   const [hydrationAmount, setHydrationAmount] = useState(0);
   const [hydrationHistory, setHydrationHistory] = useState<Record<string, number>>({});
   const [stepsCount, setStepsCount] = useState(0);
@@ -61,7 +61,6 @@ export default function PulseFlowApp() {
 
     const resetScroll = () => {
       if (mainElement) {
-        // Skip scroll reset for specific views like Guide or History expansion
         const isGuideActive = mainElement.querySelector('[data-view="guide"]');
         if (isGuideActive) return;
 
@@ -72,10 +71,9 @@ export default function PulseFlowApp() {
     };
 
     const observer = new MutationObserver((mutations) => {
-      // Logic to skip reset on minor structural changes (like Accordion expansion)
       const isHistoryActive = mutations.some(m => {
         const target = m.target as HTMLElement;
-        return target.closest && target.closest('.accordion-content');
+        return target.closest && (target.closest('.accordion-content') || target.closest('.progress-history-list'));
       });
       if (isHistoryActive) return;
 
@@ -148,7 +146,7 @@ export default function PulseFlowApp() {
     
     if (savedTasks) {
       try {
-        setTasks(JSON.parse(savedTasks));
+        setTask(JSON.parse(savedTasks));
       } catch (e) {
         console.error("Failed to parse saved tasks", e);
       }
@@ -300,7 +298,7 @@ export default function PulseFlowApp() {
   };
 
   const toggleTask = (id: string) => {
-    setTasks(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+    setTask(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
   };
 
   const updateHydration = (amount: number) => {
@@ -354,7 +352,6 @@ export default function PulseFlowApp() {
             onUpdateSteps={updateSteps}
             goalData={goalData}
             weightHistory={weightHistory}
-            goalWeight={goalData?.targetWeight ? parseFloat(goalData.targetWeight) : 0}
             loggedMeals={loggedMeals}
             streakData={streakData}
             onViewHydration={() => navigateTo('hydration')} 
@@ -416,7 +413,7 @@ export default function PulseFlowApp() {
         return (
           <TasksView 
             tasks={tasks}
-            setTasks={setTasks}
+            setTasks={setTask}
             onBack={() => window.history.back()} 
           />
         );
@@ -503,7 +500,7 @@ export default function PulseFlowApp() {
         <div className="flex items-center">
           <button 
             onClick={() => navigateTo('profile')}
-            className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted/80 transition-all border border-neutral-700 shadow-sm"
+            className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center transition-all border border-neutral-700 shadow-sm"
           >
             <User className="w-4 h-4 text-foreground" />
           </button>
@@ -550,16 +547,16 @@ export default function PulseFlowApp() {
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 group flex-1 justify-center max-w-[110px]",
                 isActive 
-                  ? "bg-primary/10 text-primary" 
+                  ? "bg-primary/10 text-black" 
                   : "text-muted-foreground hover:bg-muted"
               )}
             >
               <Icon 
                 className={cn("w-4 h-4 shrink-0")} 
-                style={isActive ? { stroke: 'url(#icon-gradient)' } : {}}
+                style={isActive ? { stroke: 'url(#icon-gradient)', fill: 'none' } : {}}
               />
               <span className={cn(
-                "text-[10px] font-black uppercase tracking-tight transition-all",
+                "text-[10px] font-black uppercase tracking-tight transition-all text-black",
                 isActive ? "opacity-100 ml-1" : "opacity-0 w-0 h-0 overflow-hidden"
               )}>
                 {item.label}

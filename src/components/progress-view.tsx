@@ -115,7 +115,6 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
     if (chartData.length === 0) return [];
     const firstDate = chartData[0].formattedDate;
     const lastDate = chartData[chartData.length - 1].formattedDate;
-    // Ensure ticks are unique to prevent Recharts key conflict
     return firstDate === lastDate ? [firstDate] : [firstDate, lastDate];
   }, [chartData]);
 
@@ -174,7 +173,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm bg-primary/95 text-primary-foreground overflow-hidden rounded-[1rem]">
+        <Card className="border-none shadow-sm bg-[#6b85a3] text-white overflow-hidden rounded-[1rem]">
            <CardContent className="p-3 px-4 flex items-center justify-between">
               <div className="space-y-0.5">
                  <p className="text-[7px] font-black uppercase tracking-[0.2em] opacity-70">Your Milestone</p>
@@ -299,7 +298,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
               <History className="w-3.5 h-3.5" /> Log History
             </h3>
           </div>
-          <div className="space-y-2">
+          <div className="space-y-2 progress-history-list">
             {sortedEntries.length === 0 ? (
               <div className="text-center py-8 opacity-20">
                 <p className="text-[10px] font-black uppercase tracking-widest">No entries yet</p>

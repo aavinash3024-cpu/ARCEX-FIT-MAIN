@@ -604,7 +604,7 @@ export function DashboardView({
           </div>
 
           <div className="space-y-1.5">
-            <Progress value={progressPercent} className="h-1.5 bg-muted" indicatorClassName="bg-[#7EBCE6]" />
+            <Progress value={progressPercent} className="h-1.5 bg-muted" indicatorClassName="bg-[#6b85a3]" />
             <div className="flex justify-between items-center text-[8px] font-bold text-muted-foreground">
               <span>{startWeight > 0 ? startWeight.toFixed(1) : "---"} kg</span>
               <span className="text-primary">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"} kg</span>
