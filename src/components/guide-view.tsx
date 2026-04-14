@@ -368,7 +368,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
             className="object-cover opacity-40 mix-blend-overlay"
             data-ai-hint="fitness coach"
           />
-          <div className="absolute inset-0 bg-[#148F77]/90" />
+          <div className="absolute inset-0" style={{ background: 'linear-gradient(to right, #065A54, #08A391)', opacity: 0.9 }} />
         </div>
 
         {/* Content */}

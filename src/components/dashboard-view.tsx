@@ -359,7 +359,8 @@ export function DashboardView({
     <div className="space-y-4 pb-24 pt-4">
       <Card 
         onClick={onViewGuide}
-        className="border-none bg-[#148F77] text-white overflow-hidden shadow-md cursor-pointer active:scale-[0.98] transition-all hover:shadow-lg"
+        className="border-none text-white overflow-hidden shadow-md cursor-pointer active:scale-[0.98] transition-all hover:shadow-lg"
+        style={{ background: 'linear-gradient(to right, #065A54, #08A391)' }}
       >
         <CardContent className="p-5 flex items-center gap-4 min-h-[100px]">
           <div className="w-12 h-12 rounded-full overflow-hidden border-2 border-white/20 shrink-0 relative bg-white/10">
