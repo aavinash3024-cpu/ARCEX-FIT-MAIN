@@ -670,7 +670,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
               </div>
               
               <div className="flex-1 min-w-0">
-                <h2 className="text-lg font-black text-foreground tracking-tighter truncate">{profileName}</h2>
+                <h2 className="text-base font-black text-foreground tracking-tighter truncate">{profileName}</h2>
                 <div className="space-y-0.5 mt-0.5">
                   <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                     {profileAge} Yrs • {profileGender?.toUpperCase()}
