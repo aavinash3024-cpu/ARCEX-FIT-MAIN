@@ -490,11 +490,20 @@ export default function PulseFlowApp() {
 
   return (
     <div className="min-h-screen max-w-lg mx-auto bg-background flex flex-col relative shadow-xl border-x">
+      <svg width="0" height="0" className="absolute">
+        <defs>
+          <linearGradient id="icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+            <stop offset="0%" stopColor="#59D9A2" />
+            <stop offset="100%" stopColor="#7EBCE6" />
+          </linearGradient>
+        </defs>
+      </svg>
+
       <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b relative">
         <div className="flex items-center">
           <button 
             onClick={() => navigateTo('profile')}
-            className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted/80 transition-all border border-primary ring-1 ring-primary/20 shadow-sm"
+            className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted/80 transition-all border border-neutral-700 shadow-sm"
           >
             <User className="w-4 h-4 text-foreground" />
           </button>
@@ -541,11 +550,14 @@ export default function PulseFlowApp() {
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 group flex-1 justify-center max-w-[110px]",
                 isActive 
-                  ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20" 
+                  ? "bg-primary/10 text-primary" 
                   : "text-muted-foreground hover:bg-muted"
               )}
             >
-              <Icon className={cn("w-4 h-4 shrink-0", isActive && "fill-current")} />
+              <Icon 
+                className={cn("w-4 h-4 shrink-0")} 
+                style={isActive ? { stroke: 'url(#icon-gradient)' } : {}}
+              />
               <span className={cn(
                 "text-[10px] font-black uppercase tracking-tight transition-all",
                 isActive ? "opacity-100 ml-1" : "opacity-0 w-0 h-0 overflow-hidden"

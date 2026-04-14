@@ -359,7 +359,7 @@ export function DashboardView({
     <div className="space-y-4 pb-24 pt-4">
       <Card 
         onClick={onViewGuide}
-        className="border-none text-white overflow-hidden shadow-md cursor-pointer transition-all hover:shadow-lg"
+        className="border-none text-white overflow-hidden shadow-md cursor-pointer transition-all"
         style={{ background: 'linear-gradient(to right, #065A54, #08A391)' }}
       >
         <CardContent className="p-5 flex items-center gap-4 min-h-[100px]">
@@ -516,7 +516,7 @@ export function DashboardView({
                                 if (isHydration) onViewHydration?.();
                                 if (isSteps) onViewSteps?.();
                               }}
-                              className="flex items-center gap-0.5 text-[8px] font-black text-black uppercase shrink-0 hover:opacity-70 transition-opacity"
+                              className="flex items-center gap-0.5 text-[8px] font-black text-black uppercase shrink-0"
                             >
                               Details <ChevronRight className="w-2.5 h-2.5" />
                             </button>
@@ -604,7 +604,7 @@ export function DashboardView({
           </div>
 
           <div className="space-y-1.5">
-            <Progress value={progressPercent} className="h-1.5 bg-muted" />
+            <Progress value={progressPercent} className="h-1.5 bg-muted" indicatorClassName="bg-[#7EBCE6]" />
             <div className="flex justify-between items-center text-[8px] font-bold text-muted-foreground">
               <span>{startWeight > 0 ? startWeight.toFixed(1) : "---"} kg</span>
               <span className="text-primary">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"} kg</span>
@@ -618,7 +618,7 @@ export function DashboardView({
             </p>
             <button 
               onClick={onViewGoalSetting}
-              className="text-[9px] font-black text-black uppercase flex items-center gap-1 hover:opacity-70 transition-all"
+              className="text-[9px] font-black text-black uppercase flex items-center gap-1"
             >
               Details <ArrowRight className="w-3 h-3" />
             </button>
@@ -689,7 +689,7 @@ export function DashboardView({
                   <button 
                     key={idx} 
                     onClick={() => onViewCalculators?.(calc.label)}
-                    className="p-2 bg-primary/5 rounded-xl text-center transition-colors border border-primary/10"
+                    className="p-2 bg-primary/5 rounded-xl text-center border border-primary/10"
                   >
                     <p className="text-[9px] font-black uppercase text-primary leading-tight">{calc.label}</p>
                     <p className="text-[7px] font-bold text-muted-foreground/60 uppercase">{calc.description}</p>
@@ -758,7 +758,7 @@ export function DashboardView({
               </div>
               <button 
                 onClick={() => onViewTasks?.()}
-                className="text-[9px] font-black text-black uppercase flex items-center gap-1 hover:opacity-70 transition-all"
+                className="text-[9px] font-black text-black uppercase flex items-center gap-1"
               >
                 See More <ChevronRight className="w-3 h-3" />
               </button>
