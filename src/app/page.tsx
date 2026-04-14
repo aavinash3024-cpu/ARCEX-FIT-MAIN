@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -9,7 +8,8 @@ import {
   LineChart as ChartIcon,
   Bell,
   User,
-  Crown
+  Crown,
+  Loader2
 } from 'lucide-react';
 import { DashboardView } from '@/components/dashboard-view';
 import { NutritionView } from '@/components/nutrition-view';
@@ -25,8 +25,12 @@ import { GuideView } from '@/components/guide-view';
 import { NotificationsView } from '@/components/notifications-view';
 import { Button } from '@/components/ui/button';
 import { format, isYesterday } from 'date-fns';
+import { useAuth, useUser, initiateAnonymousSignIn } from '@/firebase';
 
 export default function PulseFlowApp() {
+  const { auth } = useAuth();
+  const { user, isUserLoading } = useUser();
+  
   const [activeTab, setActiveTab] = useState('dashboard');
   const [activeCalculator, setActiveCalculator] = useState<'bmr' | '1rm' | 'bodyfat'>('bmr');
   const [tasks, setTasks] = useState<Task[]>([]);
@@ -42,6 +46,13 @@ export default function PulseFlowApp() {
   
   const mainRef = useRef<HTMLDivElement>(null);
 
+  // Initialize Anonymous Auth
+  useEffect(() => {
+    if (!isUserLoading && !user && auth) {
+      initiateAnonymousSignIn(auth);
+    }
+  }, [user, isUserLoading, auth]);
+
   // GLOBAL SCROLL RESET MECHANISM
   useEffect(() => {
     const mainElement = mainRef.current;
@@ -49,6 +60,10 @@ export default function PulseFlowApp() {
 
     const resetScroll = () => {
       if (mainElement) {
+        // Skip scroll reset for specific views like Guide or History expansion
+        const isGuideActive = mainElement.querySelector('[data-view="guide"]');
+        if (isGuideActive) return;
+
         mainElement.scrollTop = 0;
         mainElement.scrollTo({ top: 0, behavior: 'instant' });
       }
@@ -56,9 +71,12 @@ export default function PulseFlowApp() {
     };
 
     const observer = new MutationObserver((mutations) => {
-      // Check if we are in the guide view - if so, skip the top reset to allow smooth chat auto-scroll
-      const isGuideActive = mainElement.querySelector('[data-view="guide"]');
-      if (isGuideActive) return;
+      // Logic to skip reset on minor structural changes (like Accordion expansion)
+      const isHistoryActive = mutations.some(m => {
+        const target = m.target as HTMLElement;
+        return target.closest && target.closest('.accordion-content');
+      });
+      if (isHistoryActive) return;
 
       const hasStructuralChange = mutations.some(m => 
         m.type === 'childList' && 
@@ -67,8 +85,6 @@ export default function PulseFlowApp() {
 
       if (hasStructuralChange) {
         resetScroll();
-        requestAnimationFrame(resetScroll);
-        setTimeout(resetScroll, 0);
       }
     });
 
@@ -316,7 +332,14 @@ export default function PulseFlowApp() {
   };
 
   const renderContent = () => {
-    if (!isLoaded) return <div className="flex-1 flex items-center justify-center opacity-20"><p className="text-[10px] font-black uppercase tracking-widest">Loading Your Flow...</p></div>;
+    if (!isLoaded || isUserLoading) {
+      return (
+        <div className="flex-1 flex flex-col items-center justify-center space-y-4 opacity-40">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+          <p className="text-[10px] font-black uppercase tracking-[0.2em]">Initializing Cloud Flow...</p>
+        </div>
+      );
+    }
 
     switch(activeTab) {
       case 'dashboard': 
