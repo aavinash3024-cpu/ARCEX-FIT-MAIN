@@ -693,7 +693,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
                 onClick={() => handleQuery(opt.label, opt.value)}
                 disabled={isLoading}
                 className={cn(
-                  "w-full p-3 flex items-center justify-between text-left transition-all active:bg-muted/10 disabled:opacity-50",
+                  "w-full p-3 flex items-center justify-between text-left transition-all disabled:opacity-50",
                   i !== options.length - 1 && "border-b border-muted/5"
                 )}
               >

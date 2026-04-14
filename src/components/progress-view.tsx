@@ -306,7 +306,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
               </div>
             ) : (
               sortedEntries.map((entry, idx) => (
-                <Card key={idx} className="border-none shadow-sm bg-card hover:bg-muted/5 transition-colors group">
+                <Card key={idx} className="border-none shadow-sm bg-card transition-colors group">
                   <CardContent className="p-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                       <div className="w-9 h-9 rounded-xl bg-primary/5 flex items-center justify-center">

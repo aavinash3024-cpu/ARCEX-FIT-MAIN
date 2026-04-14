@@ -359,7 +359,7 @@ export function DashboardView({
     <div className="space-y-4 pb-24 pt-4">
       <Card 
         onClick={onViewGuide}
-        className="border-none text-white overflow-hidden shadow-md cursor-pointer active:scale-[0.98] transition-all hover:shadow-lg"
+        className="border-none text-white overflow-hidden shadow-md cursor-pointer transition-all hover:shadow-lg"
         style={{ background: 'linear-gradient(to right, #065A54, #08A391)' }}
       >
         <CardContent className="p-5 flex items-center gap-4 min-h-[100px]">
@@ -413,7 +413,7 @@ export function DashboardView({
                   }}
                   className={cn(
                     "min-w-[260px] flex-shrink-0 border-none shadow-sm bg-card snap-center",
-                    isCalories && "cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5"
+                    isCalories && "cursor-pointer transition-all"
                   )}
                 >
                   <CardContent className="p-3 flex flex-col justify-between h-32">
@@ -543,7 +543,7 @@ export function DashboardView({
 
       <Card 
         onClick={onViewNutritionSummary}
-        className="border-none shadow-sm overflow-hidden bg-card cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5"
+        className="border-none shadow-sm overflow-hidden bg-card cursor-pointer transition-all"
       >
         <CardContent className="p-5 space-y-5">
           <div className="flex items-center justify-start">
@@ -634,7 +634,7 @@ export function DashboardView({
         >
           <Card 
             onClick={onViewProgress}
-            className="min-w-[280px] flex-shrink-0 border-none shadow-sm bg-card overflow-hidden snap-center cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5"
+            className="min-w-[280px] flex-shrink-0 border-none shadow-sm bg-card overflow-hidden snap-center cursor-pointer transition-all"
           >
             <CardContent className="p-4 space-y-4">
               <div className="flex justify-between items-start">
@@ -689,7 +689,7 @@ export function DashboardView({
                   <button 
                     key={idx} 
                     onClick={() => onViewCalculators?.(calc.label)}
-                    className="p-2 bg-primary/5 rounded-xl text-center hover:bg-primary/10 transition-colors border border-primary/10"
+                    className="p-2 bg-primary/5 rounded-xl text-center transition-colors border border-primary/10"
                   >
                     <p className="text-[9px] font-black uppercase text-primary leading-tight">{calc.label}</p>
                     <p className="text-[7px] font-bold text-muted-foreground/60 uppercase">{calc.description}</p>

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -457,7 +456,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
             },
           ].map((plan) => (
             <Card key={plan.id} className={cn(
-              "border-none shadow-md rounded-[1.5rem] overflow-hidden border transition-all active:scale-[0.98] cursor-pointer group",
+              "border-none shadow-md rounded-[1.5rem] overflow-hidden border transition-all cursor-pointer group",
               plan.popular ? "bg-primary/5 ring-2 ring-primary/20" : "bg-card border-muted/10"
             )}>
               <CardContent className="p-0">
@@ -721,7 +720,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
                   <button 
                     key={i} 
                     onClick={() => setActiveSubView(item.id as ProfileSubView)}
-                    className="w-full p-4 flex items-center justify-between hover:bg-muted/5 transition-all text-left group border-b border-muted/5 last:border-0"
+                    className="w-full p-4 flex items-center justify-between transition-all text-left group border-b border-muted/5 last:border-0"
                   >
                     <div className="flex items-center gap-4">
                       <div className={cn("w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm shrink-0", item.bg, item.color)}>
@@ -772,7 +771,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
 
 function LegalItem({ icon: Icon, label, color, bg }: { icon: any, label: string, color?: string, bg?: string }) {
   return (
-    <button className="w-full p-4 flex items-center justify-between hover:bg-muted/5 transition-all text-left group border-b border-muted/5 last:border-0">
+    <button className="w-full p-4 flex items-center justify-between transition-all text-left group border-b border-muted/5 last:border-0">
       <div className="flex items-center gap-4">
         <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shadow-sm", bg || "bg-green-50", color || "text-green-600")}>
           <Icon className="w-4 h-4" />
@@ -786,7 +785,7 @@ function LegalItem({ icon: Icon, label, color, bg }: { icon: any, label: string,
 
 function SettingsButton({ icon: Icon, label, subLabel, color, bg }: { icon: any, label: string, subLabel: string, color?: string, bg?: string }) {
   return (
-    <button className="w-full p-4 flex items-center justify-between hover:bg-muted/5 transition-all text-left group border-b border-muted/5 last:border-0">
+    <button className="w-full p-4 flex items-center justify-between transition-all text-left group border-b border-muted/5 last:border-0">
       <div className="flex items-center gap-4">
         <div className={cn("w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm", bg || "bg-muted/30", color || "text-muted-foreground")}>
           <Icon className="w-5 h-5" />

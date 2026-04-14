@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -74,7 +73,7 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
           <h1 className="text-2xl font-bold font-headline">Notifications</h1>
         </div>
         {notifications.some(n => !n.isRead) && (
-          <Button variant="ghost" size="sm" onClick={markAllRead} className="text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/5">
+          <Button variant="ghost" size="sm" onClick={markAllRead} className="text-[10px] font-black uppercase tracking-widest text-primary">
             Mark all read
           </Button>
         )}

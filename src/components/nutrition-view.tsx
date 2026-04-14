@@ -581,7 +581,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
 
             <div className="grid grid-cols-4 gap-2">
               {macroStatuses.map((macro, idx) => (
-                <div key={idx} className="bg-muted/5 rounded-2xl p-2 flex flex-col items-center justify-center border border-muted/10 shadow-sm transition-all hover:bg-muted/10">
+                <div key={idx} className="bg-muted/5 rounded-2xl p-2 flex flex-col items-center justify-center border border-muted/10 shadow-sm transition-all">
                   <span className="text-[9px] font-black text-muted-foreground/60 uppercase">{macro.label}</span>
                   <span className="text-xs font-black mt-0.5" style={{ color: macro.color }}>
                     {Math.abs(macro.val)}g
@@ -649,7 +649,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
               <p className="text-center py-16 opacity-30 text-[10px] font-black uppercase tracking-widest">No entries recorded</p>
             ) : (
               loggedMeals.map(meal => (
-                <Card key={meal.id} className="border-none shadow-sm bg-card hover:bg-muted/5 transition-all">
+                <Card key={meal.id} className="border-none shadow-sm bg-card transition-all">
                   <CardContent className="p-4 relative">
                     <div className="space-y-2 pr-4">
                       <h4 className="font-bold text-sm text-foreground leading-tight">
@@ -874,7 +874,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
                 <p className="text-center py-12 text-[10px] font-bold text-muted-foreground uppercase opacity-30">No entries today</p>
               ) : (
                 loggedMeals.map((meal) => (
-                  <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-muted/20 hover:bg-muted/30 transition-all group relative">
+                  <Card key={meal.id} className="border-none shadow-sm overflow-hidden bg-muted/20 transition-all group relative">
                     <CardContent className="p-0 flex min-h-[72px]">
                       <div className="w-1.5 bg-primary/40 shrink-0" />
                       <div className="w-12 bg-card/50 shrink-0 flex items-center justify-center">
@@ -904,7 +904,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
       <div className="grid grid-cols-2 gap-4">
         <Card 
           onClick={() => setShowMicroAnalysis(true)}
-          className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5 group shadow-none"
+          className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer transition-all group shadow-none"
         >
           <CardContent className="p-5 flex flex-col items-start gap-3 relative">
             <div className="w-10 h-10 bg-amber-100 rounded-xl flex items-center justify-center shadow-sm">
@@ -919,7 +919,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
 
         <Card 
           onClick={() => setShowMacroAnalysis(true)}
-          className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer active:scale-[0.98] transition-all hover:bg-muted/5 group shadow-none"
+          className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer transition-all group shadow-none"
         >
           <CardContent className="p-5 flex flex-col items-start gap-3 relative">
             <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center shadow-sm">
@@ -1055,7 +1055,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
 
           <TabsContent value="aesthetics" className="space-y-4 mt-4">
             <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
-              <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full hover:bg-muted">
+              <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full">
                 <ChevronLeft className="w-5 h-5 text-primary" />
               </Button>
               <div className="flex flex-col items-center">
@@ -1063,11 +1063,11 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
                   {periodLabel}
                 </span>
                 <div className="flex gap-2 mt-1">
-                   <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Week</button>
-                   <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Month</button>
+                   <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-primary text-white" : "text-muted-foreground")}>Week</button>
+                   <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-primary text-white" : "text-muted-foreground")}>Month</button>
                 </div>
               </div>
-              <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full hover:bg-muted">
+              <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full">
                 <ChevronRight className="w-5 h-5 text-primary" />
               </Button>
             </div>
@@ -1084,7 +1084,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
 
           <TabsContent value="performance" className="space-y-4 mt-4">
             <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
-              <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full hover:bg-muted">
+              <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full">
                 <ChevronLeft className="w-5 h-5 text-primary" />
               </Button>
               <div className="flex flex-col items-center">
@@ -1092,11 +1092,11 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
                   {periodLabel}
                 </span>
                 <div className="flex gap-2 mt-1">
-                   <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Week</button>
-                   <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-primary text-white" : "text-muted-foreground hover:bg-muted/50")}>Month</button>
+                   <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-primary text-white" : "text-muted-foreground")}>Week</button>
+                   <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-primary text-white" : "text-muted-foreground")}>Month</button>
                 </div>
               </div>
-              <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full hover:bg-muted">
+              <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full">
                 <ChevronRight className="w-5 h-5 text-primary" />
               </Button>
             </div>
@@ -1172,7 +1172,7 @@ function MicroCard({ label, sub, val, target, unit, color }: any) {
   const percent = Math.min(100, Math.round((val / target) * 100));
   
   return (
-    <Card className="border-none bg-card overflow-hidden rounded-2xl border border-muted/10 group transition-all hover:bg-muted/5">
+    <Card className="border-none bg-card overflow-hidden rounded-2xl border border-muted/10 group transition-all">
       <CardContent className="p-4 flex items-center gap-4">
         <div className="w-2 h-10 rounded-full shrink-0" style={{ backgroundColor: color, opacity: 0.3 }} />
         <div className="flex-1 min-w-0 space-y-1">
@@ -1282,7 +1282,7 @@ function WeeklyMicroTable({ allHistory, targets, micros, title, refDate, period 
             </thead>
             <tbody className="divide-y divide-muted/5">
               {tableData.map((row, idx) => (
-                <tr key={idx} className="group hover:bg-muted/5 transition-colors">
+                <tr key={idx} className="transition-colors">
                   <td className="py-3 pr-4">
                     <div className="flex items-center gap-2">
                       <div className="w-1.5 h-3 rounded-full opacity-40" style={{ backgroundColor: row.color }} />
@@ -1414,7 +1414,7 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
   return (
     <div className="space-y-4">
       <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20">
-        <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full hover:bg-muted">
+        <Button variant="ghost" size="icon" onClick={handlePrev} className="rounded-full">
           <ChevronLeft className="w-5 h-5 text-primary" />
         </Button>
         <div className="flex flex-col items-center">
@@ -1425,7 +1425,7 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
             {period === 'weekly' ? 'WEEK' : 'MONTH'}
           </span>
         </div>
-        <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full hover:bg-muted">
+        <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full">
           <ChevronRight className="w-5 h-5 text-primary" />
         </Button>
       </div>

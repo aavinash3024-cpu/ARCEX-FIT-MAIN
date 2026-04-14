@@ -362,7 +362,7 @@ export function WorkoutView() {
               <button 
                 key={idx} 
                 onClick={() => setSelectedExercise(ex)}
-                className="flex items-center justify-between p-4 bg-card rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
+                className="flex items-center justify-between p-4 bg-card rounded-2xl border border-muted/20 transition-all text-left group active:scale-[0.98]"
               >
                 <div className="min-w-0 pr-4">
                   <h4 className="font-bold text-[13px] text-foreground/90 truncate">{ex.name}</h4>
@@ -471,7 +471,7 @@ export function WorkoutView() {
                         setMinInput("");
                         setSecInput("");
                       }}
-                      className="w-full text-left bg-muted/20 p-3 rounded-xl border border-muted/10 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all hover:border-primary/20"
+                      className="w-full text-left bg-muted/20 p-3 rounded-xl border border-muted/10 shadow-sm relative group cursor-pointer active:scale-[0.98] transition-all"
                     >
                       <div className="flex justify-between items-start">
                         <div className="space-y-1">
@@ -502,7 +502,7 @@ export function WorkoutView() {
 
       <Card 
         onClick={() => setActiveSubView('split')}
-        className="border-none shadow-sm bg-card overflow-hidden group cursor-pointer active:scale-[0.99] transition-all border-l-4 border-l-purple-400 rounded-lg flex items-center h-20 mx-1"
+        className="border-none shadow-sm bg-card overflow-hidden group cursor-pointer transition-all border-l-4 border-l-purple-400 rounded-lg flex items-center h-20 mx-1"
       >
         <div className="shrink-0 w-20 h-full relative">
           <Image 
@@ -526,7 +526,7 @@ export function WorkoutView() {
 
       <Card 
         onClick={() => setActiveSubView('pr')} 
-        className="border-none shadow-sm bg-card border-l-4 border-l-primary overflow-hidden group cursor-pointer active:scale-[0.99] transition-all rounded-lg flex items-center h-20 mx-1"
+        className="border-none shadow-sm bg-card border-l-4 border-l-primary overflow-hidden group cursor-pointer transition-all rounded-lg flex items-center h-20 mx-1"
       >
         <div className="shrink-0 w-20 h-full relative">
           <Image 
@@ -551,7 +551,7 @@ export function WorkoutView() {
       <div className="grid grid-cols-2 gap-4 mx-1">
         <Card 
           onClick={() => setActiveSubView('history')}
-          className="border-none shadow-sm bg-card border border-muted/20 cursor-pointer hover:bg-muted/5 transition-all p-5 flex flex-col items-start gap-3 rounded-2xl active:scale-[0.99]"
+          className="border-none shadow-sm bg-card border border-muted/20 cursor-pointer transition-all p-5 flex flex-col items-start gap-3 rounded-2xl active:scale-[0.99]"
         >
           <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
             <History className="w-5 h-5 text-sky-600" />
@@ -938,7 +938,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
             onClick={() => setActiveType('strength')}
             className={cn(
               "flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-              activeType === 'strength' ? "bg-primary text-white shadow-lg" : "text-muted-foreground hover:bg-muted/5"
+              activeType === 'strength' ? "bg-primary text-white shadow-lg" : "text-muted-foreground"
             )}
           >
             Rep Based
@@ -947,7 +947,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
             onClick={() => setActiveType('time')}
             className={cn(
               "flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-              activeType === 'time' ? "bg-primary text-white shadow-lg" : "text-muted-foreground hover:bg-muted/5"
+              activeType === 'time' ? "bg-primary text-white shadow-lg" : "text-muted-foreground"
             )}
           >
             Time Based
@@ -980,7 +980,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
               <button 
                 key={idx} 
                 onClick={() => onViewDetail(ex)}
-                className="flex items-center justify-between p-3 bg-card rounded-2xl border border-muted/20 hover:border-primary/20 hover:bg-primary/5 transition-all text-left group active:scale-[0.98]"
+                className="flex items-center justify-between p-3 bg-card rounded-2xl border border-muted/20 transition-all text-left group active:scale-[0.98]"
               >
                 <div className="flex items-center gap-4 overflow-hidden">
                   <div className="shrink-0 w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center">
@@ -1070,7 +1070,7 @@ function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => v
             const rankColors = ['#f59e0b', '#94a3b8', '#92400e'];
             
             return (
-              <Card key={idx} className="border-none shadow-sm bg-card hover:bg-muted/5 group transition-all rounded-2xl overflow-hidden border border-muted/10">
+              <Card key={idx} className="border-none shadow-sm bg-card transition-all rounded-2xl overflow-hidden border border-muted/10">
                 <CardContent className="p-0 flex items-stretch">
                   <div className={cn("w-1.5 shrink-0", !isTop3 && "bg-muted/20")} style={{ backgroundColor: isTop3 ? rankColors[idx] : undefined }} />
                   
@@ -1558,7 +1558,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
       </div>
 
       <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
-        <Button variant="ghost" size="icon" onClick={handlePrevWeek} className="rounded-full hover:bg-muted">
+        <Button variant="ghost" size="icon" onClick={handlePrevWeek} className="rounded-full">
           <ChevronLeft className="w-5 h-5 text-primary" />
         </Button>
         <div className="flex flex-col items-center">
@@ -1569,7 +1569,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
             WEEKLY TIMELINE
           </span>
         </div>
-        <Button variant="ghost" size="icon" onClick={handleNextWeek} className="rounded-full hover:bg-muted">
+        <Button variant="ghost" size="icon" onClick={handleNextWeek} className="rounded-full">
           <ChevronRight className="w-5 h-5 text-primary" />
         </Button>
       </div>
@@ -1634,7 +1634,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
                   "border-none shadow-sm overflow-hidden bg-card rounded-[1.25rem] transition-all",
                   exerciseNames.length === 0 ? "opacity-40" : ""
                 )}>
-                  <AccordionTrigger className="p-0 hover:no-underline [&[data-state=open]]:bg-muted/5 group [&>svg]:hidden">
+                  <AccordionTrigger className="p-0 hover:no-underline group [&>svg]:hidden">
                     <div className="flex items-center justify-between w-full py-3 px-6">
                       <div className="text-left">
                         <h3 className="text-[13px] font-black text-foreground leading-tight">
