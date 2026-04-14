@@ -15,7 +15,8 @@ import {
   Scale,
   Calendar,
   History,
-  Trash2
+  Trash2,
+  Target
 } from "lucide-react";
 import { 
   XAxis, 
@@ -35,6 +36,8 @@ import {
   DialogFooter,
 } from "@/components/ui/dialog";
 import { format, subDays } from 'date-fns';
+import { Progress } from "@/components/ui/progress";
+import { cn } from "@/lib/utils";
 
 interface ProgressViewProps {
   goalData?: any;
@@ -138,18 +141,22 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
       <h1 className="text-2xl font-bold font-headline mb-2 px-1">Progress</h1>
 
       <div className="space-y-4 animate-in fade-in duration-500">
-        <Card className="border-none shadow-sm bg-card overflow-hidden">
-          <CardContent className="p-5 space-y-6">
+        {/* Combined & Restructured JOURNEY CARD */}
+        <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl mx-1">
+          <CardContent className="p-6 space-y-6">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">Current Status</p>
+                <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">Current Weight</p>
                 <div className="flex items-baseline gap-1">
-                  <h2 className="text-3xl font-black text-foreground">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"}</h2>
+                  <h2 className="text-4xl font-black text-foreground tracking-tighter">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"}</h2>
                   <span className="text-sm font-bold text-muted-foreground uppercase">kg</span>
                 </div>
               </div>
               {weightChange !== 0 && (
-                <Badge className={weightChange < 0 ? "bg-green-100 text-green-700 hover:bg-green-100 border-none px-3 py-1 gap-1 text-[10px] font-black uppercase" : "bg-orange-100 text-orange-700 hover:bg-orange-100 border-none px-3 py-1 gap-1 text-[10px] font-black uppercase"}>
+                <Badge className={cn(
+                  "border-none px-3 py-1 gap-1 text-[10px] font-black uppercase",
+                  weightChange < 0 ? "bg-green-100 text-green-700 hover:bg-green-100" : "bg-orange-100 text-orange-700 hover:bg-orange-100"
+                )}>
                   {weightChange < 0 ? <TrendingDown className="w-3 h-3" /> : <ArrowUpRight className="w-3 h-3" />}
                   {Math.abs(weightChange)}kg {weightChange < 0 ? 'Loss' : 'Gain'}
                 </Badge>
@@ -157,41 +164,39 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
             </div>
 
             <div className="grid grid-cols-3 gap-3">
-              <div className="text-center p-3 bg-muted/20 rounded-2xl border border-muted/30">
-                 <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1">Start</p>
-                 <p className="font-black text-sm">{startWeight > 0 ? startWeight.toFixed(1) : "---"} <span className="text-[8px] opacity-40">kg</span></p>
+              <div className="text-center p-3 bg-muted/10 rounded-2xl border border-muted/20">
+                 <p className="text-[8px] text-muted-foreground uppercase font-black tracking-widest mb-1">Starting</p>
+                 <p className="font-black text-xs">{startWeight > 0 ? startWeight.toFixed(1) : "---"} <span className="text-[7px] opacity-40 uppercase">kg</span></p>
               </div>
-              <div className="text-center p-3 bg-muted/20 rounded-2xl border border-muted/30">
-                 <p className="text-[9px] text-muted-foreground uppercase font-black tracking-widest mb-1">Goal</p>
-                 <p className="font-black text-sm">{targetWeight > 0 ? targetWeight.toFixed(1) : "---"} <span className="text-[8px] opacity-40">kg</span></p>
+              <div className="text-center p-3 bg-muted/10 rounded-2xl border border-muted/20">
+                 <p className="text-[8px] text-muted-foreground uppercase font-black tracking-widest mb-1">Target</p>
+                 <p className="font-black text-xs">{targetWeight > 0 ? targetWeight.toFixed(1) : "---"} <span className="text-[7px] opacity-40 uppercase">kg</span></p>
               </div>
               <div className="text-center p-3 bg-primary/5 rounded-2xl border border-primary/10">
-                 <p className="text-[9px] text-primary uppercase font-black tracking-widest mb-1">Left</p>
-                 <p className="font-black text-sm text-primary">{targetWeight > 0 ? Math.abs(currentWeight - targetWeight).toFixed(1) : "---"} <span className="text-[8px] opacity-40">kg</span></p>
+                 <p className="text-[8px] text-primary uppercase font-black tracking-widest mb-1">To Go</p>
+                 <p className="font-black text-xs text-primary">{targetWeight > 0 ? Math.abs(currentWeight - targetWeight).toFixed(1) : "---"} <span className="text-[7px] opacity-40 uppercase">kg</span></p>
               </div>
+            </div>
+
+            <div className="pt-4 border-t border-muted/10 space-y-3">
+              <div className="flex justify-between items-end">
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Active Milestone</p>
+                  <h4 className="font-black text-xs text-foreground uppercase tracking-tight flex items-center gap-1.5">
+                    <Target className="w-3 h-3 text-primary" /> Reach {targetWeight > 0 ? targetWeight.toFixed(1) : "---"} kg
+                  </h4>
+                </div>
+                <div className="text-right">
+                  <span className="text-lg font-black text-[#6b85a3]">{progressPercent}%</span>
+                  <p className="text-[7px] font-black uppercase text-muted-foreground opacity-60 tracking-widest">Done</p>
+                </div>
+              </div>
+              <Progress value={progressPercent} className="h-1.5 bg-muted" indicatorClassName="bg-[#6b85a3]" />
             </div>
           </CardContent>
         </Card>
 
-        <Card className="border-none shadow-sm bg-[#6b85a3] text-white overflow-hidden rounded-[1rem]">
-           <CardContent className="p-3 px-4 flex items-center justify-between">
-              <div className="space-y-0.5">
-                 <p className="text-[7px] font-black uppercase tracking-[0.2em] opacity-70">Your Milestone</p>
-                 <h4 className="font-black text-[11px] uppercase tracking-tight">Reach {targetWeight > 0 ? targetWeight.toFixed(1) : "---"} kg</h4>
-              </div>
-              <div className="flex items-center gap-3">
-                 <div className="text-right">
-                    <span className="text-lg font-black">{progressPercent}%</span>
-                    <p className="text-[6px] font-black uppercase opacity-60">Complete</p>
-                 </div>
-                 <div className="w-7 h-7 rounded-full bg-white/10 flex items-center justify-center border border-white/10 shrink-0">
-                   <ArrowUpRight className="w-3.5 h-3.5 text-accent" />
-                 </div>
-              </div>
-           </CardContent>
-        </Card>
-
-        <Card className="border-none shadow-sm overflow-hidden bg-card">
+        <Card className="border-none shadow-sm overflow-hidden bg-card mx-1">
           <CardContent className="p-5 space-y-4">
             <div className="flex items-center justify-between">
               <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em] flex items-center gap-2">
@@ -252,7 +257,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
 
         <Dialog open={isLogOpen} onOpenChange={setIsLogOpen}>
           <DialogTrigger asChild>
-            <Button className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2">
+            <Button className="w-[calc(100%-8px)] mx-1 h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[11px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2">
               <Plus className="w-4 h-4" /> Log New Weight Entry
             </Button>
           </DialogTrigger>
@@ -298,7 +303,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
               <History className="w-3.5 h-3.5" /> Log History
             </h3>
           </div>
-          <div className="space-y-2 progress-history-list">
+          <div className="space-y-2 progress-history-list px-1">
             {sortedEntries.length === 0 ? (
               <div className="text-center py-8 opacity-20">
                 <p className="text-[10px] font-black uppercase tracking-widest">No entries yet</p>
@@ -325,8 +330,7 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
                         {entry.weight.toFixed(1)} <span className="text-[9px] text-muted-foreground">kg</span>
                       </p>
                       <Button 
-                        variant="ghost" 
-                        size="icon" 
+                        variant="ghost" size="icon" 
                         className="h-8 w-8 text-muted-foreground/30 hover:text-destructive transition-colors rounded-full"
                         onClick={() => onDeleteWeight(entry.date)}
                       >
