@@ -141,57 +141,52 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
       <h1 className="text-2xl font-bold font-headline mb-2 px-1">Progress</h1>
 
       <div className="space-y-4 animate-in fade-in duration-500">
-        {/* Combined & Restructured JOURNEY CARD */}
+        {/* Compacted Current Weight Card */}
         <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl mx-1">
-          <CardContent className="p-6 space-y-6">
+          <CardContent className="p-4 space-y-4">
             <div className="flex justify-between items-start">
-              <div className="space-y-1">
+              <div className="space-y-0.5">
                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">Current Weight</p>
                 <div className="flex items-baseline gap-1">
-                  <h2 className="text-4xl font-black text-foreground tracking-tighter">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"}</h2>
-                  <span className="text-sm font-bold text-muted-foreground uppercase">kg</span>
+                  <h2 className="text-3xl font-black text-foreground tracking-tighter">{currentWeight > 0 ? currentWeight.toFixed(1) : "---"}</h2>
+                  <span className="text-xs font-bold text-muted-foreground uppercase">kg</span>
                 </div>
               </div>
               {weightChange !== 0 && (
                 <Badge className={cn(
-                  "border-none px-3 py-1 gap-1 text-[10px] font-black uppercase",
+                  "border-none px-2 py-0.5 gap-1 text-[9px] font-black uppercase",
                   weightChange < 0 ? "bg-green-100 text-green-700 hover:bg-green-100" : "bg-orange-100 text-orange-700 hover:bg-orange-100"
                 )}>
-                  {weightChange < 0 ? <TrendingDown className="w-3 h-3" /> : <ArrowUpRight className="w-3 h-3" />}
-                  {Math.abs(weightChange)}kg {weightChange < 0 ? 'Loss' : 'Gain'}
+                  {weightChange < 0 ? <TrendingDown className="w-2.5 h-2.5" /> : <ArrowUpRight className="w-2.5 h-2.5" />}
+                  {Math.abs(weightChange)}kg
                 </Badge>
               )}
             </div>
 
-            <div className="grid grid-cols-3 gap-3">
-              <div className="text-center p-3 bg-muted/10 rounded-2xl border border-muted/20">
-                 <p className="text-[8px] text-muted-foreground uppercase font-black tracking-widest mb-1">Starting</p>
-                 <p className="font-black text-xs">{startWeight > 0 ? startWeight.toFixed(1) : "---"} <span className="text-[7px] opacity-40 uppercase">kg</span></p>
+            <div className="grid grid-cols-3 gap-2">
+              <div className="text-center p-2 bg-muted/5 rounded-xl border border-muted/10">
+                 <p className="text-[7px] text-muted-foreground uppercase font-black tracking-widest mb-0.5">Start</p>
+                 <p className="font-black text-[10px]">{startWeight > 0 ? startWeight.toFixed(1) : "---"}</p>
               </div>
-              <div className="text-center p-3 bg-muted/10 rounded-2xl border border-muted/20">
-                 <p className="text-[8px] text-muted-foreground uppercase font-black tracking-widest mb-1">Target</p>
-                 <p className="font-black text-xs">{targetWeight > 0 ? targetWeight.toFixed(1) : "---"} <span className="text-[7px] opacity-40 uppercase">kg</span></p>
+              <div className="text-center p-2 bg-muted/5 rounded-xl border border-muted/10">
+                 <p className="text-[7px] text-muted-foreground uppercase font-black tracking-widest mb-0.5">Goal</p>
+                 <p className="font-black text-[10px]">{targetWeight > 0 ? targetWeight.toFixed(1) : "---"}</p>
               </div>
-              <div className="text-center p-3 bg-primary/5 rounded-2xl border border-primary/10">
-                 <p className="text-[8px] text-primary uppercase font-black tracking-widest mb-1">To Go</p>
-                 <p className="font-black text-xs text-primary">{targetWeight > 0 ? Math.abs(currentWeight - targetWeight).toFixed(1) : "---"} <span className="text-[7px] opacity-40 uppercase">kg</span></p>
+              <div className="text-center p-2 bg-primary/5 rounded-xl border border-primary/10">
+                 <p className="text-[7px] text-primary uppercase font-black tracking-widest mb-0.5">Left</p>
+                 <p className="font-black text-[10px] text-primary">{targetWeight > 0 ? Math.abs(currentWeight - targetWeight).toFixed(1) : "---"}</p>
               </div>
             </div>
 
-            <div className="pt-4 border-t border-muted/10 space-y-3">
-              <div className="flex justify-between items-end">
-                <div className="space-y-0.5">
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Active Milestone</p>
-                  <h4 className="font-black text-xs text-foreground uppercase tracking-tight flex items-center gap-1.5">
-                    <Target className="w-3 h-3 text-primary" /> Reach {targetWeight > 0 ? targetWeight.toFixed(1) : "---"} kg
-                  </h4>
+            <div className="pt-3 border-t border-muted/10 space-y-2">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center gap-1.5">
+                  <Target className="w-3 h-3 text-primary" />
+                  <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Active Progress</span>
                 </div>
-                <div className="text-right">
-                  <span className="text-lg font-black text-[#6b85a3]">{progressPercent}%</span>
-                  <p className="text-[7px] font-black uppercase text-muted-foreground opacity-60 tracking-widest">Done</p>
-                </div>
+                <span className="text-[10px] font-black text-[#6b85a3]">{progressPercent}%</span>
               </div>
-              <Progress value={progressPercent} className="h-1.5 bg-muted" indicatorClassName="bg-[#6b85a3]" />
+              <Progress value={progressPercent} className="h-1 bg-muted" indicatorClassName="bg-[#6b85a3]" />
             </div>
           </CardContent>
         </Card>

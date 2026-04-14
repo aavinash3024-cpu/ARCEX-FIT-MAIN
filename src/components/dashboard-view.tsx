@@ -597,10 +597,6 @@ export function DashboardView({
               </h3>
               <p className="text-[9px] text-muted-foreground font-medium uppercase tracking-tight">Active Milestone</p>
             </div>
-            <div className="absolute right-8 text-right">
-              <span className="text-lg font-black text-primary">{progressPercent}%</span>
-              <p className="text-[8px] font-bold text-muted-foreground uppercase">Done</p>
-            </div>
           </div>
 
           <div className="space-y-1.5">
