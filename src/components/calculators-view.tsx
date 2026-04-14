@@ -144,10 +144,10 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
       </div>
 
       <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as CalculatorType)} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-11 bg-card/80 backdrop-blur-sm p-1.5 rounded-2xl shadow-sm border border-muted/20">
-          <TabsTrigger value="bmr" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Energy</TabsTrigger>
-          <TabsTrigger value="1rm" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Power</TabsTrigger>
-          <TabsTrigger value="bodyfat" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-primary data-[state=active]:text-white">Body</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 h-11 bg-muted/30 backdrop-blur-sm p-1 rounded-2xl shadow-inner border border-muted/20">
+          <TabsTrigger value="bmr" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-white/90 data-[state=active]:text-black data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-md">Energy</TabsTrigger>
+          <TabsTrigger value="1rm" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-white/90 data-[state=active]:text-black data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-md">Power</TabsTrigger>
+          <TabsTrigger value="bodyfat" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-white/90 data-[state=active]:text-black data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-md">Body</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bmr" className="space-y-4 pt-4">

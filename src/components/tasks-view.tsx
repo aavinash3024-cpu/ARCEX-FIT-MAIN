@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState } from 'react';
@@ -165,7 +166,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
                 <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                   SET PRIORITY
                 </label>
-                <div className="grid grid-cols-3 gap-1 bg-muted/10 p-1 rounded-xl">
+                <div className="grid grid-cols-3 gap-1 bg-muted/30 p-1 rounded-xl shadow-inner border border-muted/20">
                   {(['low', 'medium', 'high'] as Priority[]).map((p) => (
                     <button
                       key={p}
@@ -173,10 +174,9 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
                       disabled={filteredTasks.length >= 100}
                       className={cn(
                         "py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
-                        priorityTextColor[p],
                         selectedPriority === p 
-                          ? "bg-background shadow-sm scale-[1.02] border border-primary/5" 
-                          : "opacity-40 hover:opacity-100",
+                          ? "bg-white/90 text-black shadow-md backdrop-blur-md" 
+                          : cn("opacity-40 hover:opacity-100", priorityTextColor[p]),
                         "disabled:opacity-20"
                       )}
                     >

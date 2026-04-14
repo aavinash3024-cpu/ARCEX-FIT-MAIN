@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -331,7 +332,7 @@ export function WorkoutView() {
                 className={cn(
                   "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
                   muscleFilter === m 
-                    ? "bg-primary text-white border-primary shadow-md" 
+                    ? "bg-white/90 text-black border-white/20 shadow-md backdrop-blur-md" 
                     : "bg-card text-muted-foreground border-muted/20"
                 )}
               >
@@ -516,7 +517,7 @@ export function WorkoutView() {
         <div className="flex-1 px-4 flex items-center justify-between min-w-0">
           <div className="space-y-0.5">
             <h3 className="text-[10px] font-black text-purple-600 uppercase tracking-tight flex items-center gap-1.5">
-              <Layout className="w-3 h-3" /> My Workout Split
+              <Layout className="w-3" /> My Workout Split
             </h3>
             <p className="text-xs font-bold text-foreground/90 leading-tight">Create Routine</p>
           </div>
@@ -540,7 +541,7 @@ export function WorkoutView() {
         <div className="flex-1 px-4 flex items-center justify-between min-w-0">
           <div className="space-y-0.5">
             <h3 className="text-[10px] font-black text-primary uppercase tracking-tight flex items-center gap-1.5">
-              <Trophy className="w-3 h-3" /> Personal Records
+              <Trophy className="w-3" /> Personal Records
             </h3>
             <p className="text-xs font-bold text-foreground/90 leading-tight">Your recent milestones</p>
           </div>
@@ -791,7 +792,7 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
               className={cn(
                 "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
                 muscleFilter === m 
-                  ? "bg-primary text-white border-primary shadow-md" 
+                  ? "bg-white/90 text-black border-white/20 shadow-md backdrop-blur-md" 
                   : "bg-card text-muted-foreground border-muted/20"
               )}
             >
@@ -933,12 +934,12 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between bg-card p-2 rounded-2xl shadow-sm border border-muted/20 mx-1">
+        <div className="flex items-center justify-between bg-muted/30 p-1.5 rounded-2xl shadow-inner border border-muted/20 mx-1">
           <button 
             onClick={() => setActiveType('strength')}
             className={cn(
               "flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-              activeType === 'strength' ? "bg-primary text-white shadow-lg" : "text-muted-foreground"
+              activeType === 'strength' ? "bg-white/90 text-black shadow-md backdrop-blur-md" : "text-muted-foreground"
             )}
           >
             Rep Based
@@ -947,7 +948,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
             onClick={() => setActiveType('time')}
             className={cn(
               "flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-              activeType === 'time' ? "bg-primary text-white shadow-lg" : "text-muted-foreground"
+              activeType === 'time' ? "bg-white/90 text-black shadow-md backdrop-blur-md" : "text-muted-foreground"
             )}
           >
             Time Based
@@ -961,7 +962,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
               onClick={() => setActiveMuscle(muscle)}
               className={cn(
                 "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-                activeMuscle === muscle ? "bg-primary text-white border-primary shadow-lg" : "bg-card text-muted-foreground border-muted/20"
+                activeMuscle === muscle ? "bg-white/90 text-black border-white/20 shadow-md backdrop-blur-md" : "bg-card text-muted-foreground border-muted/20"
               )}
             >
               {muscle}
@@ -1244,7 +1245,9 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
             onClick={() => setActiveDay(day)}
             className={cn(
               "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-              activeDay === day ? "bg-primary text-white border-primary shadow-lg" : "bg-card text-muted-foreground border-muted/20"
+              activeDay === day 
+                ? "bg-white/90 text-black border-white/20 shadow-md backdrop-blur-md" 
+                : "bg-card text-muted-foreground border-muted/20"
             )}
           >
             {day.substring(0, 3)}
@@ -1263,7 +1266,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
           <ScrollArea className="h-[160px] pr-2">
             <div className="space-y-2 pb-2">
               {(split[activeDay] || []).length === 0 ? (
-                <div className="text-center py-12 border-2 border-dashed border-muted/20 rounded-2xl opacity-30">
+                <div className="text-center py-12 border-2 border-dashed border-muted/20 rounded-xl opacity-30">
                   <p className="text-[10px] font-black uppercase tracking-widest">No moves planned</p>
                 </div>
               ) : (
@@ -1312,7 +1315,9 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
                 onClick={() => setActiveMuscleReport(muscle)}
                 className={cn(
                   "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-                  activeMuscleReport === muscle ? "bg-primary text-white border-primary shadow-lg" : "bg-card text-muted-foreground border-muted/20"
+                  activeMuscleReport === muscle 
+                    ? "bg-white/90 text-black border-white/20 shadow-md backdrop-blur-md" 
+                    : "bg-card text-muted-foreground border-muted/20"
                 )}
               >
                 {muscle}
@@ -1427,7 +1432,9 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
                   onClick={() => setMuscleFilter(m)} 
                   className={cn(
                     "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all shrink-0", 
-                    muscleFilter === m ? "bg-primary text-white border-primary" : "bg-card text-muted-foreground border-muted/20"
+                    muscleFilter === m 
+                      ? "bg-white/90 text-black border-white/20 shadow-md backdrop-blur-md" 
+                      : "bg-card text-muted-foreground border-muted/20"
                   )}
                 >
                   {m}
