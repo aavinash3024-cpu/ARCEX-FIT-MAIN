@@ -656,28 +656,28 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
   const renderMain = () => (
     <>
       <div className="px-1 space-y-4">
-        <Card className="border-none bg-card shadow-sm rounded-[2.5rem] overflow-hidden border border-white/20 relative">
+        <Card className="border-none bg-card shadow-sm rounded-[2rem] overflow-hidden border border-white/20 relative">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-card to-transparent pointer-events-none" />
-          <CardContent className="p-6 relative z-10">
-            <div className="flex items-center gap-5">
+          <CardContent className="p-4 relative z-10">
+            <div className="flex items-center gap-4">
               <div className="relative shrink-0">
-                <div className="w-20 h-20 rounded-full bg-[#6b85a3] flex items-center justify-center shadow-xl border-4 border-white relative z-10">
-                  <span className="text-2xl font-black text-white">{profileName.charAt(0)}</span>
+                <div className="w-16 h-16 rounded-full bg-[#6b85a3] flex items-center justify-center shadow-xl border-4 border-white relative z-10">
+                  <span className="text-xl font-black text-white">{profileName.charAt(0)}</span>
                 </div>
-                <div className="absolute -bottom-1 -right-1 z-20 bg-[#6b85a3] text-white p-1.5 rounded-full border-2 border-white shadow-lg">
-                  <Trophy className="w-2.5 h-2.5" />
+                <div className="absolute -bottom-0.5 -right-0.5 z-20 bg-[#6b85a3] text-white p-1 rounded-full border-2 border-white shadow-lg">
+                  <Trophy className="w-2 h-2" />
                 </div>
               </div>
               
               <div className="flex-1 min-w-0">
-                <h2 className="text-xl font-black text-foreground tracking-tighter truncate">{profileName}</h2>
+                <h2 className="text-lg font-black text-foreground tracking-tighter truncate">{profileName}</h2>
                 <div className="space-y-0.5 mt-0.5">
-                  <p className="text-[11px] font-black text-muted-foreground uppercase tracking-widest">
+                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                     {profileAge} Yrs • {profileGender?.toUpperCase()}
                   </p>
-                  <p className="text-[10px] font-bold text-muted-foreground/60 tracking-tight truncate">{profileEmail}</p>
+                  <p className="text-[9px] font-bold text-muted-foreground/60 tracking-tight truncate">{profileEmail}</p>
                 </div>
-                <Badge variant="secondary" className="mt-2 bg-primary/10 text-primary hover:bg-primary/10 text-[8px] font-black uppercase tracking-widest px-2 h-4 border-none">
+                <Badge variant="secondary" className="mt-1.5 bg-primary/10 text-primary hover:bg-primary/10 text-[7px] font-black uppercase tracking-widest px-2 h-3.5 border-none">
                   Premium Member
                 </Badge>
               </div>
