@@ -539,16 +539,16 @@ export default function PulseFlowApp() {
               key={item.id}
               onClick={() => navigateTo(item.id)}
               className={cn(
-                "flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 group flex-1 justify-center max-w-[100px]",
+                "flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 group flex-1 justify-center max-w-[110px]",
                 isActive 
                   ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20" 
                   : "text-muted-foreground hover:bg-muted"
               )}
             >
-              <Icon className={cn("w-3 h-3 shrink-0", isActive && "fill-current")} />
+              <Icon className={cn("w-5 h-5 shrink-0", isActive && "fill-current")} />
               <span className={cn(
-                "text-[10px] font-black uppercase tracking-tight transition-all",
-                isActive ? "opacity-100" : "opacity-0 w-0 h-0 overflow-hidden"
+                "text-xs font-black uppercase tracking-tight transition-all",
+                isActive ? "opacity-100 ml-1" : "opacity-0 w-0 h-0 overflow-hidden"
               )}>
                 {item.label}
               </span>
