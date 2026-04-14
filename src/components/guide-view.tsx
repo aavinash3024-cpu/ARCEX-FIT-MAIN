@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useRef, useEffect, useMemo } from 'react';
@@ -369,7 +368,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
             className="object-cover opacity-40 mix-blend-overlay"
             data-ai-hint="fitness coach"
           />
-          <div className="absolute inset-0 bg-gradient-to-r from-primary/95 to-primary/80" />
+          <div className="absolute inset-0 bg-[#148F77]/90" />
         </div>
 
         {/* Content */}
