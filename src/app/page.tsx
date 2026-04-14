@@ -26,6 +26,7 @@ import { NotificationsView } from '@/components/notifications-view';
 import { Button } from '@/components/ui/button';
 import { format, isYesterday } from 'date-fns';
 import { useAuth, useUser, initiateAnonymousSignIn } from '@/firebase';
+import { cn } from '@/lib/utils';
 
 export default function PulseFlowApp() {
   const { auth } = useAuth();
@@ -493,7 +494,7 @@ export default function PulseFlowApp() {
         <div className="flex items-center">
           <button 
             onClick={() => navigateTo('profile')}
-            className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted/80 transition-all border border-primary/40 ring-1 ring-primary/10 shadow-sm"
+            className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center hover:bg-muted/80 transition-all border border-primary ring-1 ring-primary/20 shadow-sm"
           >
             <User className="w-4 h-4 text-foreground" />
           </button>
@@ -520,7 +521,7 @@ export default function PulseFlowApp() {
             className="rounded-full bg-muted/50 w-9 h-9 relative"
           >
             <Bell className="w-4 h-4" />
-            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-accent rounded-full border border-background"></span>
+            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-primary rounded-full border border-background"></span>
           </Button>
         </div>
       </header>
@@ -529,7 +530,7 @@ export default function PulseFlowApp() {
         {renderContent()}
       </main>
 
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card/90 backdrop-blur-xl border-t px-6 py-2 flex justify-between items-center z-50">
+      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card/90 backdrop-blur-xl border-t px-4 py-3 flex justify-between items-center z-50">
         {navItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id || (item.id === 'nutrition' && activeTab === 'nutrition-summary');
@@ -537,14 +538,23 @@ export default function PulseFlowApp() {
             <button
               key={item.id}
               onClick={() => navigateTo(item.id)}
-              className={`flex flex-col items-center gap-0.5 transition-all duration-300 group flex-1 ${isActive ? 'text-primary' : 'text-muted-foreground hover:text-primary/60'}`}
+              className={cn(
+                "flex items-center gap-2 px-3 py-1.5 rounded-full transition-all duration-300 group flex-1 justify-center max-w-[100px]",
+                isActive 
+                  ? "bg-primary text-primary-foreground shadow-sm shadow-primary/20" 
+                  : "text-muted-foreground hover:bg-muted"
+              )}
             >
-              <div className={`p-1.5 rounded-xl transition-all ${isActive ? 'bg-primary/10' : 'group-hover:bg-muted'}`}>
-                <Icon className={`w-5 h-5 ${isActive ? 'fill-primary/20' : ''}`} />
-              </div>
-              <span className={`text-[9px] font-bold uppercase tracking-tight transition-all ${isActive ? 'opacity-100 scale-100' : 'opacity-0 scale-90 h-0 overflow-hidden group-hover:opacity-40 group-hover:h-auto'}`}>
+              <Icon className={cn("w-3 h-3 shrink-0", isActive && "fill-current")} />
+              <span className={cn(
+                "text-[10px] font-black uppercase tracking-tight transition-all",
+                isActive ? "opacity-100" : "opacity-0 w-0 h-0 overflow-hidden"
+              )}>
                 {item.label}
               </span>
+              {!isActive && (
+                <span className="sr-only">{item.label}</span>
+              )}
             </button>
           );
         })}
