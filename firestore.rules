@@ -5,229 +5,185 @@ service cloud.firestore {
     /**
      * PulseFlow Security Rules
      *
-     * Core Philosophy: 
-     * This ruleset enforces a strict user-ownership model. Every piece of user-generated data 
-     * is nested under a path containing the user's unique ID (/users/{userId}), providing 
-     * immediate and performant authorization checks.
+     * Core Philosophy:
+     * This ruleset enforces a strict user-ownership model where all personal health data is
+     * private to the authenticated user. It utilizes Structural Segregation to separate 
+     * public system resources (like global food and exercise databases) from private user data.
      *
      * Data Structure:
-     * - /users/{userId}: Root profile and container for all private data.
-     * - /foodItems & /exercises: Global, read-only libraries for general use.
-     * - Subcollections (e.g., /weightEntries, /meals, /workoutSessions): Private user logs.
+     * Most data is hierarchically nested under /userProfiles/{userId}/ to leverage path-based
+     * authorization. Global references are stored in root collections /foodItems and /exercises.
      *
      * Key Security Decisions:
-     * - Path-Based Authorization: We rely on the {userId} wildcard in the path to authorize 
-     *   access, ensuring a user can only read or write to their own data tree.
-     * - Denormalization: Critical identifiers (like userId) are stored within documents to 
-     *   ensure authorization independence and support secure listing without extra database lookups.
-     * - Structural Segregation: Global libraries are kept separate from user-defined items 
-     *   to allow for public reading while maintaining strict privacy for personal additions.
-     * - Prototyping Flexibility: While authorization (who can access) is strictly enforced, 
-     *   data schema validation is omitted to allow for rapid frontend iteration.
+     * - Authorization Independence: Critical IDs (userId, creatorId) are denormalized onto 
+     *   documents to allow for fast, local authorization checks without cross-document reads.
+     * - Public Read/Private Write: System-wide libraries are readable by anyone but 
+     *   restricted from client-side writes to maintain data integrity.
+     * - Relational Integrity: On creation and update, rules verify that internal document 
+     *   fields match the URL path parameters to prevent data being written into the wrong scope.
      */
 
     // --- Helper Functions ---
 
-    /**
-     * @description Checks if the request is from an authenticated user.
-     */
+    /** Checks if the request is from an authenticated user. */
     function isSignedIn() {
       return request.auth != null;
     }
 
-    /**
-     * @description Checks if the authenticated user's UID matches the provided userId.
-     */
+    /** Checks if the authenticated user's UID matches the provided userId. */
     function isOwner(userId) {
       return isSignedIn() && request.auth.uid == userId;
     }
 
-    /**
-     * @description Verifies ownership and ensures the document exists for destructive operations.
-     */
+    /** Checks if the user is the owner and the document exists (for updates/deletes). */
     function isExistingOwner(userId) {
       return resource != null && isOwner(userId);
     }
 
-    /**
-     * @description Helper to check if a specific field remains unchanged during an update.
-     */
-    function isUnchanged(field) {
-      return request.resource.data[field] == resource.data[field];
+    /** Validates that the internal ID field matches the path parameter. */
+    function idMatchesPath(idField, pathId) {
+      return idField == pathId;
+    }
+
+    /** Validates that a field remains unchanged during an update. */
+    function isImmutable(fieldName) {
+      return request.resource.data[fieldName] == resource.data[fieldName];
     }
 
     // --- Collection Rules ---
 
     /**
-     * @description Rules for user profile documents.
-     * @path /users/{userId}
-     * @allow Authenticated user (create) where UID matches document ID.
-     * @deny Any user (update) trying to modify a different user's profile.
-     * @principle Self-creation and strict ownership of the root user document.
+     * @description Rules for the root user profile. Users can only manage their own profile.
+     * @path /userProfiles/{userId}
+     * @allow (get, update) if UID matches userId.
+     * @deny (create) if UID does not match userId.
+     * @principle Ownership and Relational Integrity.
      */
-    match /users/{userId} {
+    match /userProfiles/{userId} {
       allow get, list: if isOwner(userId);
-      allow create: if isOwner(userId) && request.resource.data.id == userId;
-      allow update: if isExistingOwner(userId) && isUnchanged('id');
+      allow create: if isOwner(userId) && idMatchesPath(request.resource.data.id, userId);
+      allow update: if isExistingOwner(userId) && isImmutable('id');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Subcollection for user-specific metrics, goals, tasks, and workout splits.
+     * @path /userProfiles/{userId}/[subcollection]/{id}
+     * @allow (all) if the authenticated user is the path owner.
+     * @deny (all) if the user attempts to access another user's subcollection.
+     * @principle Scoped access based on parent user ID.
+     */
+    match /userProfiles/{userId}/dailyMetrics/{metricId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && idMatchesPath(request.resource.data.userId, userId);
+      allow update: if isExistingOwner(userId) && isImmutable('userId');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    match /userProfiles/{userId}/goals/{goalId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && idMatchesPath(request.resource.data.userId, userId);
+      allow update: if isExistingOwner(userId) && isImmutable('userId');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    match /userProfiles/{userId}/tasks/{taskId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && idMatchesPath(request.resource.data.userId, userId);
+      allow update: if isExistingOwner(userId) && isImmutable('userId');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    match /userProfiles/{userId}/personalRecords/{prId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && idMatchesPath(request.resource.data.userId, userId);
+      allow update: if isExistingOwner(userId) && isImmutable('userId');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    match /userProfiles/{userId}/workoutSplits/{splitId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && idMatchesPath(request.resource.data.userId, userId);
+      allow update: if isExistingOwner(userId) && isImmutable('userId');
       allow delete: if isExistingOwner(userId);
 
-      /**
-       * @description Personalized user settings (1:1 with user).
-       * @path /users/{userId}/settings/settings
-       */
-      match /settings/{settingId} {
+      match /splitDays/{dayId} {
         allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
-      }
-
-      /**
-       * @description User-specific health and activity logs.
-       * @path /users/{userId}/weightEntries, /users/{userId}/hydrationLogs, /users/{userId}/goals, /users/{userId}/tasks
-       */
-      match /weightEntries/{id} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
-      }
-      
-      match /hydrationLogs/{id} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
-      }
-
-      match /goals/{id} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
-      }
-
-      match /tasks/{id} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
-      }
-
-      /**
-       * @description Private user-defined items (Food and Exercises).
-       * @path /users/{userId}/userFoodItems, /users/{userId}/userExercises
-       */
-      match /userFoodItems/{id} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
-      }
-
-      match /userExercises/{id} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
-      }
-
-      /**
-       * @description Nutrition tracking: Meals and nested items.
-       * @path /users/{userId}/meals/{mealId}
-       */
-      match /meals/{mealId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
-
-        match /mealItems/{itemId} {
-          allow get, list: if isOwner(userId);
-          allow create: if isOwner(userId) && request.resource.data.mealId == mealId;
-          allow update: if isExistingOwner(userId) && isUnchanged('mealId');
-          allow delete: if isExistingOwner(userId);
-        }
-      }
-
-      /**
-       * @description Workout Programs and structured routines.
-       * @path /users/{userId}/workoutPrograms/{programId}
-       */
-      match /workoutPrograms/{programId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
-
-        match /workoutDays/{dayId} {
-          allow get, list: if isOwner(userId);
-          allow create: if isOwner(userId) && request.resource.data.workoutProgramId == programId;
-          allow update: if isExistingOwner(userId) && isUnchanged('workoutProgramId');
-          allow delete: if isExistingOwner(userId);
-
-          match /programExercises/{exerciseId} {
-            allow get, list: if isOwner(userId);
-            allow create: if isOwner(userId) && request.resource.data.workoutDayId == dayId;
-            allow update: if isExistingOwner(userId) && isUnchanged('workoutDayId');
-            allow delete: if isExistingOwner(userId);
-          }
-        }
-      }
-
-      /**
-       * @description Actual workout execution: Sessions and Sets.
-       * @path /users/{userId}/workoutSessions/{sessionId}
-       */
-      match /workoutSessions/{sessionId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
-        allow delete: if isExistingOwner(userId);
-
-        match /workoutSets/{setId} {
-          allow get, list: if isOwner(userId);
-          allow create: if isOwner(userId) && request.resource.data.workoutSessionId == sessionId;
-          allow update: if isExistingOwner(userId) && isUnchanged('workoutSessionId');
-          allow delete: if isExistingOwner(userId);
-        }
-      }
-
-      /**
-       * @description Personal records and achievements.
-       * @path /users/{userId}/personalRecords/{recordId}
-       */
-      match /personalRecords/{recordId} {
-        allow get, list: if isOwner(userId);
-        allow create: if isOwner(userId) && request.resource.data.userId == userId;
-        allow update: if isExistingOwner(userId) && isUnchanged('userId');
+        allow create: if isOwner(userId) && idMatchesPath(request.resource.data.workoutSplitId, splitId);
+        allow update: if isExistingOwner(userId) && isImmutable('workoutSplitId');
         allow delete: if isExistingOwner(userId);
       }
     }
 
     /**
-     * @description Global food library.
-     * @path /foodItems/{foodItemId}
-     * @allow Any user (get, list) to view the global library.
-     * @deny Any user (create, update, delete) from modifying the global library.
-     * @principle Public read access for shared resources with locked writes.
+     * @description Deeply nested nutritional and workout data.
+     * @path /userProfiles/{userId}/dailyMetrics/{metricId}/[meals|workouts]
+     * @allow (all) if authenticated user matches the root userId.
+     * @principle Multi-level path ownership.
      */
-    match /foodItems/{foodItemId} {
+    match /userProfiles/{userId}/dailyMetrics/{metricId}/meals/{mealId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && idMatchesPath(request.resource.data.dailyMetricId, metricId);
+      allow update: if isExistingOwner(userId) && isImmutable('dailyMetricId');
+      allow delete: if isExistingOwner(userId);
+
+      match /mealEntries/{entryId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && idMatchesPath(request.resource.data.mealId, mealId);
+        allow update: if isExistingOwner(userId) && isImmutable('mealId');
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+    match /userProfiles/{userId}/dailyMetrics/{metricId}/workouts/{workoutId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && idMatchesPath(request.resource.data.dailyMetricId, metricId);
+      allow update: if isExistingOwner(userId) && isImmutable('dailyMetricId');
+      allow delete: if isExistingOwner(userId);
+
+      match /workoutExercises/{exerciseId} {
+        allow get, list: if isOwner(userId);
+        allow create: if isOwner(userId) && idMatchesPath(request.resource.data.workoutId, workoutId);
+        allow update: if isExistingOwner(userId) && isImmutable('workoutId');
+        allow delete: if isExistingOwner(userId);
+      }
+    }
+
+    /**
+     * @description User-created custom food items and exercises.
+     * @path /userProfiles/{userId}/userFoodItems/{id}
+     * @allow (all) if the creatorId matches the authenticated user.
+     * @principle Ownership of custom library items.
+     */
+    match /userProfiles/{userId}/userFoodItems/{foodId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && idMatchesPath(request.resource.data.creatorId, userId);
+      allow update: if isExistingOwner(userId) && isImmutable('creatorId');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    match /userProfiles/{userId}/userExercises/{exerciseId} {
+      allow get, list: if isOwner(userId);
+      allow create: if isOwner(userId) && idMatchesPath(request.resource.data.creatorId, userId);
+      allow update: if isExistingOwner(userId) && isImmutable('creatorId');
+      allow delete: if isExistingOwner(userId);
+    }
+
+    /**
+     * @description Global system libraries for food and exercises.
+     * @path /foodItems/{id}
+     * @allow (read) for all users.
+     * @deny (write) for all users (Admin only via Backend).
+     * @principle Public consumption with restricted creation.
+     */
+    match /foodItems/{foodId} {
       allow get, list: if true;
-      allow create, update, delete: if false;
+      allow create, update, delete: if false; // TODO: Admin authorization logic
     }
 
-    /**
-     * @description Global exercise library.
-     * @path /exercises/{exerciseId}
-     * @allow Any user (get, list) to view the global library.
-     * @deny Any user (create, update, delete) from modifying the global library.
-     * @principle Public read access for shared resources with locked writes.
-     */
     match /exercises/{exerciseId} {
       allow get, list: if true;
-      allow create, update, delete: if false;
+      allow create, update, delete: if false; // TODO: Admin authorization logic
     }
-
   }
 }
