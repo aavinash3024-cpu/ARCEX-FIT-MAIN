@@ -516,7 +516,7 @@ export function DashboardView({
                                 if (isHydration) onViewHydration?.();
                                 if (isSteps) onViewSteps?.();
                               }}
-                              className="flex items-center gap-0.5 text-[8px] font-black text-black uppercase shrink-0"
+                              className="flex items-center gap-0.5 text-[8px] font-black text-foreground uppercase shrink-0"
                             >
                               Details <ChevronRight className="w-2.5 h-2.5" />
                             </button>
@@ -614,7 +614,7 @@ export function DashboardView({
             </p>
             <button 
               onClick={onViewGoalSetting}
-              className="text-[9px] font-black text-black uppercase flex items-center gap-1"
+              className="text-[9px] font-black text-foreground uppercase flex items-center gap-1"
             >
               Details <ArrowRight className="w-3 h-3" />
             </button>
@@ -754,7 +754,7 @@ export function DashboardView({
               </div>
               <button 
                 onClick={() => onViewTasks?.()}
-                className="text-[9px] font-black text-black uppercase flex items-center gap-1"
+                className="text-[9px] font-black text-foreground uppercase flex items-center gap-1"
               >
                 See More <ChevronRight className="w-3 h-3" />
               </button>

@@ -547,7 +547,7 @@ export default function PulseFlowApp() {
               className={cn(
                 "flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 group flex-1 justify-center max-w-[110px]",
                 isActive 
-                  ? "bg-primary/10 text-black" 
+                  ? "bg-primary/10" 
                   : "text-muted-foreground hover:bg-muted"
               )}
             >
@@ -556,7 +556,7 @@ export default function PulseFlowApp() {
                 style={isActive ? { stroke: 'url(#icon-gradient)', fill: 'none' } : {}}
               />
               <span className={cn(
-                "text-[10px] font-black uppercase tracking-tight transition-all text-black",
+                "text-[10px] font-black uppercase tracking-tight transition-all text-foreground",
                 isActive ? "opacity-100 ml-1" : "opacity-0 w-0 h-0 overflow-hidden"
               )}>
                 {item.label}

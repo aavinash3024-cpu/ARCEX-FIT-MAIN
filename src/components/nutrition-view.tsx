@@ -862,7 +862,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
             </div>
             <button 
               onClick={() => setShowSummary(true)} 
-              className="text-[9px] font-bold text-black uppercase flex items-center hover:opacity-70 transition-opacity"
+              className="text-[9px] font-bold text-foreground uppercase flex items-center hover:opacity-70 transition-opacity"
             >
               View Summary <ChevronRight className="w-3 h-3 ml-0.5" />
             </button>
@@ -888,7 +888,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
                           </div>
                         </div>
                       </div>
-                      <Button onClick={() => deleteLoggedMeal(meal.id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
+                      <Button onClick={() => deleteLoggedMeal(id)} size="icon" variant="ghost" className="absolute right-2 top-2 w-7 h-7 rounded-full text-destructive/40 hover:text-destructive transition-colors">
                         <Trash2 className="w-3.5 h-3.5" />
                       </Button>
                       <span className="absolute bottom-2 right-2 text-[7px] font-bold text-muted-foreground/30">{meal.time}</span>
