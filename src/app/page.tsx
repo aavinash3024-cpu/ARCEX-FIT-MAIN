@@ -502,7 +502,7 @@ export default function PulseFlowApp() {
 
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none">
           <span className="font-black text-xl tracking-tighter text-foreground">arcex</span>
-          <span className="font-black text-xl tracking-tighter text-primary">fit</span>
+          <span className="font-black text-xl tracking-tighter bg-gradient-to-br from-[#59D9A2] to-[#7EBCE6] bg-clip-text text-transparent">fit</span>
         </div>
 
         <div className="flex gap-2">
