@@ -545,9 +545,9 @@ export default function PulseFlowApp() {
                   : "text-muted-foreground hover:bg-muted"
               )}
             >
-              <Icon className={cn("w-5 h-5 shrink-0", isActive && "fill-current")} />
+              <Icon className={cn("w-4 h-4 shrink-0", isActive && "fill-current")} />
               <span className={cn(
-                "text-xs font-black uppercase tracking-tight transition-all",
+                "text-[10px] font-black uppercase tracking-tight transition-all",
                 isActive ? "opacity-100 ml-1" : "opacity-0 w-0 h-0 overflow-hidden"
               )}>
                 {item.label}
