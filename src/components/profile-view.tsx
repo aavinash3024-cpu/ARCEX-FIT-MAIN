@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -60,14 +61,15 @@ import {
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 
+export type ProfileSubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'reset';
+
 interface ProfileViewProps {
   onBack: () => void;
+  initialSubView?: ProfileSubView;
 }
 
-type SubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'reset';
-
-export function ProfileView({ onBack }: ProfileViewProps) {
-  const [activeSubView, setActiveSubView] = useState<SubView>('main');
+export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProps) {
+  const [activeSubView, setActiveSubView] = useState<ProfileSubView>(initialSubView);
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -632,7 +634,7 @@ export function ProfileView({ onBack }: ProfileViewProps) {
                 {section.items.map((item, i) => (
                   <button 
                     key={i} 
-                    onClick={() => setActiveSubView(item.id as SubView)}
+                    onClick={() => setActiveSubView(item.id as ProfileSubView)}
                     className="w-full p-4 flex items-center justify-between hover:bg-muted/5 transition-all text-left group border-b border-muted/5 last:border-0"
                   >
                     <div className="flex items-center gap-4">

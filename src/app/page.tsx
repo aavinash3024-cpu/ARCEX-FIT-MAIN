@@ -412,6 +412,13 @@ export default function PulseFlowApp() {
             onBack={() => window.history.back()}
           />
         );
+      case 'subscription':
+        return (
+          <ProfileView 
+            initialSubView="subscription"
+            onBack={() => window.history.back()}
+          />
+        );
       case 'guide':
         return (
           <GuideView 
@@ -471,7 +478,12 @@ export default function PulseFlowApp() {
         </div>
 
         <div className="flex gap-2">
-          <Button variant="ghost" size="icon" className="rounded-full bg-muted/50 w-9 h-9">
+          <Button 
+            onClick={() => navigateTo('subscription')}
+            variant="ghost" 
+            size="icon" 
+            className="rounded-full bg-muted/50 w-9 h-9"
+          >
             <Crown className="w-4 h-4 text-amber-500" />
           </Button>
           <Button 
