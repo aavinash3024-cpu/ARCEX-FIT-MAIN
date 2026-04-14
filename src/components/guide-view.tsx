@@ -5,7 +5,6 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { 
   ChevronLeft, 
-  Sparkles, 
   User, 
   Loader2, 
   Activity,
@@ -201,16 +200,16 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
     if (type === 'micros') {
       const nutrientData: NutrientItem[] = [
-        { label: "Vitamin A", val: totals.vitaminA, target: microTargets.vitaminA, unit: "mcg", color: "#f97316" },
-        { label: "Omega-3", val: totals.omega3, target: microTargets.omega3, unit: "g", color: "#0ea5e9" },
-        { label: "Vitamin C", val: totals.vitaminC, target: microTargets.vitaminC, unit: "mg", color: "#eab308" },
-        { label: "Zinc", val: totals.zinc, target: microTargets.zinc, unit: "mg", color: "#6366f1" },
-        { label: "Selenium", val: totals.selenium, target: microTargets.selenium, unit: "mcg", color: "#f43f5e" },
-        { label: "Magnesium", val: totals.magnesium, target: microTargets.magnesium, unit: "mg", color: "#a855f7" },
-        { label: "Vitamin D", val: totals.vitaminD, target: microTargets.vitaminD, unit: "mcg", color: "#f59e0b" },
-        { label: "Potassium", val: totals.potassium, target: microTargets.potassium, unit: "mg", color: "#10b981" },
-        { label: "Iron", val: totals.iron, target: microTargets.iron, unit: "mg", color: "#ef4444" },
-        { label: "Calcium", val: totals.calcium, target: microTargets.calcium, unit: "mg", color: "#64748b" },
+        { label: "Vitamin A", val: todayTotals.vitaminA, target: microTargets.vitaminA, unit: "mcg", color: "#f97316" },
+        { label: "Omega-3", val: todayTotals.omega3, target: microTargets.omega3, unit: "g", color: "#0ea5e9" },
+        { label: "Vitamin C", val: todayTotals.vitaminC, target: microTargets.vitaminC, unit: "mg", color: "#eab308" },
+        { label: "Zinc", val: todayTotals.zinc, target: microTargets.zinc, unit: "mg", color: "#6366f1" },
+        { label: "Selenium", val: todayTotals.selenium, target: microTargets.selenium, unit: "mcg", color: "#f43f5e" },
+        { label: "Magnesium", val: todayTotals.magnesium, target: microTargets.magnesium, unit: "mg", color: "#a855f7" },
+        { label: "Vitamin D", val: todayTotals.vitaminD, target: microTargets.vitaminD, unit: "mcg", color: "#f59e0b" },
+        { label: "Potassium", val: todayTotals.potassium, target: microTargets.potassium, unit: "mg", color: "#10b981" },
+        { label: "Iron", val: todayTotals.iron, target: microTargets.iron, unit: "mg", color: "#ef4444" },
+        { label: "Calcium", val: todayTotals.calcium, target: microTargets.calcium, unit: "mg", color: "#64748b" },
       ];
 
       return {
@@ -391,9 +390,6 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
               </div>
             </div>
             <p className="text-[8px] font-bold text-white/60 uppercase tracking-[0.2em] mt-0.5">ANALYSIS ASSISTANT</p>
-          </div>
-          <div className="w-9 h-9 rounded-full bg-white/10 flex items-center justify-center shrink-0 border border-white/10 backdrop-blur-sm">
-            <Sparkles className="w-3.5 h-3.5 text-white/60" />
           </div>
         </div>
       </div>
