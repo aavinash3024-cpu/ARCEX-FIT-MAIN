@@ -373,9 +373,9 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
   );
 
   const renderSubscription = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
-      {/* Premium Elite Membership Card */}
-      <Card className="border-none bg-gradient-to-br from-[#0f172a] to-[#1e293b] shadow-2xl rounded-[1.5rem] overflow-hidden text-white relative h-52 flex flex-col justify-between p-6 group transition-all hover:scale-[1.02]">
+    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
+      {/* Compact Membership Card */}
+      <Card className="border-none bg-gradient-to-br from-[#0f172a] to-[#1e293b] shadow-2xl rounded-[1.5rem] overflow-hidden text-white relative h-40 flex flex-col justify-between p-6 group transition-all hover:scale-[1.02]">
         {/* Background Symbol */}
         <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:scale-110 transition-transform pointer-events-none">
           <Zap className="w-48 h-48 text-white" />
@@ -391,7 +391,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
           </div>
           
           {/* Gold Metallic Chip */}
-          <div className="w-12 h-9 rounded-md bg-gradient-to-br from-[#fcd34d] via-[#fbbf24] to-[#d97706] shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_2px_4px_rgba(0,0,0,0.3)] flex items-center justify-center border border-white/20 relative overflow-hidden">
+          <div className="w-10 h-7 rounded-md bg-gradient-to-br from-[#fcd34d] via-[#fbbf24] to-[#d97706] shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_2px_4px_rgba(0,0,0,0.3)] flex items-center justify-center border border-white/20 relative overflow-hidden">
             <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,transparent_0%,black_100%)]" />
             <div className="grid grid-cols-2 gap-0.5 w-full h-full p-1.5">
               <div className="border-r border-b border-black/10" />
@@ -399,31 +399,23 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
               <div className="border-r border-black/10" />
               <div className="border-black/10" />
             </div>
-            {/* Chip Circuit Lines */}
-            <div className="absolute inset-0 flex flex-col justify-around py-1 opacity-30">
-              <div className="h-px w-full bg-black/40" />
-              <div className="h-px w-full bg-black/40" />
-            </div>
           </div>
         </div>
 
-        <div className="relative z-10">
-          <p className="text-lg font-mono tracking-[0.2em] opacity-80 mb-4 text-white/90">**** **** **** 2025</p>
-          <div className="flex justify-between items-end">
-            <div className="space-y-0.5">
-              <p className="text-[8px] font-black text-white/40 uppercase tracking-widest leading-none">Member Name</p>
-              <p className="text-sm font-black uppercase truncate max-w-[180px] tracking-tight">{profileName}</p>
-            </div>
-            <div className="text-right space-y-0.5">
-              <p className="text-[8px] font-black text-white/40 uppercase tracking-widest leading-none">Valid Thru</p>
-              <p className="text-xs font-bold tracking-widest">01 / 26</p>
-            </div>
+        <div className="relative z-10 flex justify-between items-end">
+          <div className="space-y-0.5">
+            <p className="text-[8px] font-black text-white/40 uppercase tracking-widest leading-none">Member Name</p>
+            <p className="text-sm font-black uppercase truncate max-w-[180px] tracking-tight">{profileName}</p>
+          </div>
+          <div className="text-right space-y-0.5">
+            <p className="text-[8px] font-black text-white/40 uppercase tracking-widest leading-none">Member Since</p>
+            <p className="text-xs font-bold tracking-widest">JAN / 2024</p>
           </div>
         </div>
       </Card>
 
       {/* Subscription Strategy Plans */}
-      <div className="space-y-4">
+      <div className="space-y-4 pt-2">
         <div className="flex items-center justify-between px-3">
           <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Choose Your Strategy</h3>
           <span className="text-[8px] font-black text-primary uppercase tracking-widest animate-pulse">Save up to 60%</span>
@@ -506,13 +498,6 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
             </Card>
           ))}
         </div>
-      </div>
-
-      <div className="pt-2 pb-10">
-        <Button className="w-full h-14 rounded-2xl bg-primary text-white font-black uppercase text-[11px] tracking-widest shadow-xl shadow-primary/20 gap-2">
-          Secure Full Elite Access
-        </Button>
-        <p className="text-center text-[8px] font-black text-muted-foreground/40 uppercase tracking-[0.25em] mt-4">Encrypted Checkout • Cancel Anytime</p>
       </div>
     </div>
   );
