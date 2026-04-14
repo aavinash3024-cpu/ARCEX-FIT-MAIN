@@ -36,7 +36,8 @@ import {
   Star,
   AlertTriangle,
   Check,
-  Scale
+  Scale,
+  Crown
 } from "lucide-react";
 import { 
   Select,
@@ -373,76 +374,124 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
 
   const renderSubscription = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
-      {/* Current Status Card */}
-      <Card className="border-none bg-gradient-to-br from-purple-500 to-indigo-600 shadow-xl rounded-[2.5rem] overflow-hidden text-white relative">
-        <div className="absolute top-0 right-0 p-8 opacity-10">
-          <Trophy className="w-32 h-32" />
+      {/* Premium Elite Credit Card Status */}
+      <Card className="border-none bg-gradient-to-br from-[#1a1a2e] to-[#16213e] shadow-2xl rounded-[1.5rem] overflow-hidden text-white relative h-52 flex flex-col justify-between p-6 group transition-all hover:scale-[1.02]">
+        <div className="absolute top-0 right-0 p-8 opacity-10 group-hover:scale-110 transition-transform">
+          <Crown className="w-32 h-32 text-amber-500" />
         </div>
-        <CardContent className="p-8 space-y-6 relative z-10">
+        
+        <div className="flex justify-between items-start relative z-10">
           <div className="space-y-1">
-            <p className="text-[10px] font-black uppercase tracking-widest opacity-70">Current Plan</p>
-            <h2 className="text-3xl font-black tracking-tighter">Elite Premium</h2>
+            <div className="flex items-center gap-2">
+              <Trophy className="w-4 h-4 text-amber-500" />
+              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/60">Elite Member</p>
+            </div>
+            <h2 className="text-xl font-black tracking-tighter">PULSEFLOW PREMIUM</h2>
           </div>
-          <div className="h-px w-full bg-white/20" />
-          <div className="space-y-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                <CheckCircle2 className="w-4 h-4 text-white" />
-              </div>
-              <p className="text-sm font-bold">Unlimited AI Meal Parsing</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                <CheckCircle2 className="w-4 h-4 text-white" />
-              </div>
-              <p className="text-sm font-bold">Advanced Workout Analytics</p>
-            </div>
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
-                <CheckCircle2 className="w-4 h-4 text-white" />
-              </div>
-              <p className="text-sm font-bold">Priority Performance Support</p>
+          <div className="w-12 h-9 rounded-md bg-gradient-to-br from-amber-400 to-amber-600 shadow-inner flex items-center justify-center border border-white/10">
+            <div className="grid grid-cols-2 gap-0.5">
+              <div className="w-3 h-2 bg-white/20 rounded-sm" />
+              <div className="w-3 h-2 bg-white/20 rounded-sm" />
+              <div className="w-3 h-2 bg-white/20 rounded-sm" />
+              <div className="w-3 h-2 bg-white/20 rounded-sm" />
             </div>
           </div>
-          <div className="pt-2">
-            <Badge variant="secondary" className="bg-white/20 text-white border-none font-black uppercase text-[10px] px-3 h-6">
-              Renews Jan 15, 2025
-            </Badge>
+        </div>
+
+        <div className="relative z-10">
+          <p className="text-lg font-mono tracking-widest opacity-80 mb-4">**** **** **** 2025</p>
+          <div className="flex justify-between items-end">
+            <div className="space-y-0.5">
+              <p className="text-[8px] font-black text-white/40 uppercase tracking-widest leading-none">Card Holder</p>
+              <p className="text-xs font-bold uppercase truncate max-w-[150px]">{profileName}</p>
+            </div>
+            <div className="text-right space-y-0.5">
+              <p className="text-[8px] font-black text-white/40 uppercase tracking-widest leading-none">Valid Thru</p>
+              <p className="text-xs font-bold">01 / 26</p>
+            </div>
           </div>
-        </CardContent>
+        </div>
       </Card>
 
-      {/* Subscription Plans */}
+      {/* Subscription Strategy Plans */}
       <div className="space-y-4">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Choose Your Strategy</h3>
-        <div className="grid gap-3">
+        <div className="flex items-center justify-between px-3">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Choose Your Strategy</h3>
+          <span className="text-[8px] font-black text-primary uppercase tracking-widest animate-pulse">Save up to 60%</span>
+        </div>
+        
+        <div className="grid gap-4">
           {[
-            { id: 'monthly', name: 'Monthly', price: '229', period: 'Month', description: 'Standard billing cycle' },
-            { id: 'half-year', name: 'Half Year', price: '699', period: '6 Months', description: 'Optimal choice', popular: true },
-            { id: 'yearly', name: 'Yearly', price: '1099', period: 'Year', description: 'Elite commitment', saving: 'Best Value' },
+            { 
+              id: 'monthly', 
+              name: 'Entry Strategy', 
+              price: '229', 
+              original: null,
+              discount: null,
+              period: 'Month', 
+              description: 'Standard monthly commitment',
+              features: ['Daily AI Meal Parsing', 'Basic Workout Tracking', 'Email Support']
+            },
+            { 
+              id: 'half-year', 
+              name: 'Progressive Elite', 
+              price: '699', 
+              original: '1374',
+              discount: '49% OFF',
+              period: '6 Months', 
+              description: 'Our most balanced approach', 
+              popular: true,
+              features: ['Unlimited AI Parsing', 'Advanced Muscle Analysis', 'Priority Support', 'Custom AI Analyst']
+            },
+            { 
+              id: 'yearly', 
+              name: 'Legendary Performance', 
+              price: '1099', 
+              original: '2748',
+              discount: '60% OFF',
+              period: 'Year', 
+              description: 'Absolute commitment to excellence', 
+              saving: 'Best Value',
+              features: ['Full Executive Access', 'Beta Testing Perks', 'Exclusive Community', 'Personal Success Manager']
+            },
           ].map((plan) => (
             <Card key={plan.id} className={cn(
-              "border-none shadow-md rounded-[1.5rem] overflow-hidden border border-muted/10 transition-all active:scale-[0.98] cursor-pointer group",
-              plan.popular ? "bg-primary/5 ring-2 ring-primary/20" : "bg-card"
+              "border-none shadow-md rounded-[1.5rem] overflow-hidden border transition-all active:scale-[0.98] cursor-pointer group",
+              plan.popular ? "bg-primary/5 ring-2 ring-primary/20" : "bg-card border-muted/10"
             )}>
-              <CardContent className="p-5 flex items-center justify-between">
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <h4 className="font-black text-sm uppercase tracking-tight text-foreground/80">{plan.name}</h4>
-                    {plan.popular && (
-                      <Badge className="bg-primary text-white border-none font-black uppercase text-[7px] px-1.5 h-4">Most Popular</Badge>
-                    )}
-                    {plan.saving && (
-                      <Badge variant="outline" className="text-emerald-600 border-emerald-200 bg-emerald-50 font-black uppercase text-[7px] px-1.5 h-4">{plan.saving}</Badge>
-                    )}
+              <CardContent className="p-0">
+                <div className="p-5 flex items-center justify-between border-b border-muted/5">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-black text-sm uppercase tracking-tight text-foreground/80">{plan.name}</h4>
+                      {plan.discount && (
+                        <Badge className="bg-emerald-500 text-white border-none font-black uppercase text-[7px] px-1.5 h-4">{plan.discount}</Badge>
+                      )}
+                    </div>
+                    <p className="text-[10px] font-bold text-muted-foreground uppercase">{plan.description}</p>
                   </div>
-                  <p className="text-[10px] font-bold text-muted-foreground uppercase">{plan.description}</p>
+                  <div className="text-right">
+                    <div className="flex items-baseline justify-end gap-1">
+                      {plan.original && (
+                        <span className="text-[10px] font-bold text-muted-foreground/40 line-through tracking-tighter">
+                          {plan.original}
+                        </span>
+                      )}
+                      <span className="text-xl font-black text-foreground">{plan.price}</span>
+                    </div>
+                    <p className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">/ {plan.period}</p>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <div className="flex items-baseline justify-end gap-0.5">
-                    <span className="text-xl font-black text-foreground">{plan.price}</span>
+                
+                <div className="p-5 bg-muted/5">
+                  <div className="grid gap-2">
+                    {plan.features.map((feat, i) => (
+                      <div key={i} className="flex items-center gap-2">
+                        <Check className="w-3 h-3 text-emerald-500 shrink-0" />
+                        <span className="text-[10px] font-bold text-foreground/60 uppercase">{feat}</span>
+                      </div>
+                    ))}
                   </div>
-                  <p className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">/ {plan.period}</p>
                 </div>
               </CardContent>
             </Card>
@@ -450,9 +499,12 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
         </div>
       </div>
 
-      <Button variant="outline" className="w-full h-14 rounded-2xl border-2 border-indigo-100 text-indigo-600 font-black uppercase text-[11px] tracking-widest hover:bg-indigo-50 mt-2">
-        Manage Active Subscription
-      </Button>
+      <div className="pt-2 pb-10">
+        <Button className="w-full h-14 rounded-2xl bg-primary text-white font-black uppercase text-[11px] tracking-widest shadow-xl shadow-primary/20 gap-2">
+          Secure Full Elite Access
+        </Button>
+        <p className="text-center text-[8px] font-black text-muted-foreground/40 uppercase tracking-[0.25em] mt-4">Encrypted Checkout • Cancel Anytime</p>
+      </div>
     </div>
   );
 
