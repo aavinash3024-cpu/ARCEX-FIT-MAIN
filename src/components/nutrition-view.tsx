@@ -1043,7 +1043,6 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
           </Button>
           <div className="space-y-0.5">
             <h1 className="text-2xl font-bold font-headline leading-none">Detailed Analysis</h1>
-            <p className="text-[10px] font-black text-primary uppercase tracking-widest">Historical Performance</p>
           </div>
         </div>
 
@@ -1141,7 +1140,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
           <div className="px-1 mt-4">
             <Button 
               onClick={() => setShowDetails(true)}
-              className="w-full h-12 rounded-xl bg-foreground hover:bg-foreground/90 text-background font-black text-[10px] uppercase tracking-widest shadow-lg shadow-foreground/20 transition-all active:scale-[0.98] gap-2"
+              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
             >
               Check Detailed Analysis <ChevronRight className="w-4 h-4" />
             </Button>
@@ -1157,7 +1156,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
           <div className="px-1 mt-4">
             <Button 
               onClick={() => setShowDetails(true)}
-              className="w-full h-12 rounded-xl bg-foreground hover:bg-foreground/90 text-background font-black text-[10px] uppercase tracking-widest shadow-lg shadow-foreground/20 transition-all active:scale-[0.98] gap-2"
+              className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
             >
               Check Detailed Analysis <ChevronRight className="w-4 h-4" />
             </Button>
