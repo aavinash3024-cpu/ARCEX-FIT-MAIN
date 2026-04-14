@@ -42,6 +42,12 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
     high: 'bg-destructive'
   };
 
+  const priorityTextColor = {
+    low: 'text-green-500',
+    medium: 'text-amber-500',
+    high: 'text-destructive'
+  };
+
   const dotColor = {
     low: 'bg-green-500',
     medium: 'bg-amber-500',
@@ -103,7 +109,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
         </Button>
-        <h1 className="text-2xl font-bold font-headline">Daily Tasks</h1>
+        <h1 className="text-2xl font-bold font-headline text-foreground">Daily Tasks</h1>
       </div>
 
       <div className="flex items-center justify-between bg-card p-3 rounded-2xl shadow-sm border border-muted/20 mx-1">
@@ -150,7 +156,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
                     onChange={(e) => setNewTaskTitle(e.target.value)}
                     disabled={filteredTasks.length >= 100}
                     placeholder={filteredTasks.length >= 100 ? "Daily limit reached" : "What needs to be done?"}
-                    className="w-full h-12 pl-10 pr-4 bg-muted/5 border border-muted-foreground/10 rounded-xl text-xs focus:ring-1 focus:ring-primary/20 transition-all font-bold disabled:opacity-50"
+                    className="w-full h-12 pl-10 pr-4 bg-muted/5 border border-muted-foreground/10 rounded-xl text-xs focus:ring-1 focus:ring-primary/20 transition-all font-bold disabled:opacity-50 text-foreground"
                   />
                 </div>
               </div>
@@ -167,10 +173,11 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
                       disabled={filteredTasks.length >= 100}
                       className={cn(
                         "py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all",
+                        priorityTextColor[p],
                         selectedPriority === p 
-                          ? "bg-background text-primary shadow-sm scale-[1.02] border border-primary/5" 
-                          : "text-muted-foreground hover:text-foreground/70",
-                        "disabled:opacity-50"
+                          ? "bg-background shadow-sm scale-[1.02] border border-primary/5" 
+                          : "opacity-40 hover:opacity-100",
+                        "disabled:opacity-20"
                       )}
                     >
                       {p}
