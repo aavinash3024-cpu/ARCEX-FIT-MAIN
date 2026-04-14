@@ -702,7 +702,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
 
       <Card className="border-none shadow-sm overflow-hidden bg-card">
         <div className="p-3 flex items-center gap-3">
-          <div className="gradient-ring shrink-0">
+          <div className="shrink-0 p-[2px] rounded-full" style={{ background: 'linear-gradient(to right, #065A54, #08A391)' }}>
             <div className="w-9 h-9 rounded-full overflow-hidden relative bg-muted/20 border border-white/20">
               <Image 
                 src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=400&auto=format&fit=crop"
@@ -853,7 +853,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
       </Card>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
-        <div className="h-1.5 bg-primary w-full" />
+        <div className="h-1.5 w-full" style={{ background: 'linear-gradient(to right, #065A54, #08A391)' }} />
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between px-1">
             <div className="space-y-0.5">
