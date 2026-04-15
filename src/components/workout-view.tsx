@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -324,16 +323,16 @@ export function WorkoutView() {
             />
           </div>
 
-          <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-1">
+          <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-1 bg-muted/50 p-1 rounded-2xl border border-muted/20">
             {muscleGroups.map(m => (
               <button
                 key={m}
                 onClick={() => setMuscleFilter(m)}
                 className={cn(
-                  "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
+                  "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border border-transparent",
                   muscleFilter === m 
-                    ? "bg-white/90 text-black border-white/20 shadow-md backdrop-blur-md" 
-                    : "bg-card text-muted-foreground border-muted/20"
+                    ? "bg-[#fcfcfc] text-black shadow-sm" 
+                    : "text-muted-foreground"
                 )}
               >
                 {m}
@@ -786,16 +785,16 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
           />
         </div>
 
-        <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4 mb-2">
+        <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4 mb-2 bg-muted/50 p-1 rounded-2xl border border-muted/20">
           {muscleGroups.map((m: any) => (
             <button
               key={m}
               onClick={() => setMuscleFilter(m)}
               className={cn(
-                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
+                "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border border-transparent",
                 muscleFilter === m 
-                  ? "bg-white/90 text-black border-white/20 shadow-md backdrop-blur-md" 
-                  : "bg-card text-muted-foreground border-muted/20"
+                  ? "bg-[#fcfcfc] text-black shadow-sm" 
+                  : "text-muted-foreground"
               )}
             >
               {m}
@@ -936,12 +935,12 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between bg-muted/30 p-1.5 rounded-2xl shadow-inner border border-muted/20 mx-1">
+        <div className="flex items-center justify-between bg-muted/50 p-1 rounded-2xl shadow-inner border border-muted/20 mx-1">
           <button 
             onClick={() => setActiveType('strength')}
             className={cn(
               "flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-              activeType === 'strength' ? "bg-white/90 text-black shadow-md backdrop-blur-md" : "text-muted-foreground"
+              activeType === 'strength' ? "bg-[#fcfcfc] text-black shadow-sm" : "text-muted-foreground"
             )}
           >
             Rep Based
@@ -950,21 +949,21 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
             onClick={() => setActiveType('time')}
             className={cn(
               "flex-1 py-2.5 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all",
-              activeType === 'time' ? "bg-white/90 text-black shadow-md backdrop-blur-md" : "text-muted-foreground"
+              activeType === 'time' ? "bg-[#fcfcfc] text-black shadow-sm" : "text-muted-foreground"
             )}
           >
             Time Based
           </button>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-1">
+        <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-1 bg-muted/50 p-1 rounded-full mx-1 border border-muted/20">
           {filteredMuscles.map(muscle => (
             <button
               key={muscle}
               onClick={() => setActiveMuscle(muscle)}
               className={cn(
-                "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
-                activeMuscle === muscle ? "bg-white/90 text-black border-white/20 shadow-md backdrop-blur-md" : "bg-card text-muted-foreground border-muted/20"
+                "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border border-transparent",
+                activeMuscle === muscle ? "bg-[#fcfcfc] text-black shadow-sm" : "text-muted-foreground"
               )}
             >
               {muscle}
@@ -1240,16 +1239,16 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
         <h1 className="text-2xl font-bold font-headline">Weekly Split</h1>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-1">
+      <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-1 bg-muted/50 p-1 rounded-full mx-1 border border-muted/20">
         {DAYS.map(day => (
           <button
             key={day}
             onClick={() => setActiveDay(day)}
             className={cn(
-              "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
+              "px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border border-transparent",
               activeDay === day 
-                ? "bg-white/90 text-black border-white/20 shadow-md backdrop-blur-md" 
-                : "bg-card text-muted-foreground border-muted/20"
+                ? "bg-[#fcfcfc] text-black shadow-sm" 
+                : "text-muted-foreground"
             )}
           >
             {day.substring(0, 3)}
@@ -1310,16 +1309,16 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
         </div>
 
         <div className="space-y-4">
-          <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-2">
+          <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-2 bg-muted/50 p-1 rounded-full mx-1 border border-muted/20">
             {report.muscles.map(muscle => (
               <button
                 key={muscle}
                 onClick={() => setActiveMuscleReport(muscle)}
                 className={cn(
-                  "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border",
+                  "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all shrink-0 border border-transparent",
                   activeMuscleReport === muscle 
-                    ? "bg-white/90 text-black border-white/20 shadow-md backdrop-blur-md" 
-                    : "bg-card text-muted-foreground border-muted/20"
+                    ? "bg-[#fcfcfc] text-black shadow-sm" 
+                    : "text-muted-foreground"
                 )}
               >
                 {muscle}
@@ -1427,16 +1426,16 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input autoFocus type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search..." className="w-full h-12 pl-10 pr-4 bg-muted/10 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20" />
             </div>
-            <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4 mb-2">
+            <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4 mb-2 bg-muted/50 p-1 rounded-full border border-muted/20">
               {muscleGroups.map(m => (
                 <button 
                   key={m} 
                   onClick={() => setMuscleFilter(m)} 
                   className={cn(
-                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border transition-all shrink-0", 
+                    "px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest border border-transparent transition-all shrink-0", 
                     muscleFilter === m 
-                      ? "bg-white/90 text-black border-white/20 shadow-md backdrop-blur-md" 
-                      : "bg-card text-muted-foreground border-muted/20"
+                      ? "bg-[#fcfcfc] text-black shadow-sm" 
+                      : "text-muted-foreground"
                   )}
                 >
                   {m}

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -71,7 +70,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
     const w = parseFloat(weight);
     const h = parseFloat(height);
     const a = parseFloat(age);
-    if (isNaN(w) || isNaN(h) || isNaN(a)) return;
+    if (isNaN(w) || iNaN(h) || isNaN(a)) return;
 
     let bmrVal = (10 * w) + (6.25 * h) - (5 * a);
     if (gender === 'male') bmrVal += 5;
@@ -144,10 +143,10 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
       </div>
 
       <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as CalculatorType)} className="w-full">
-        <TabsList className="grid w-full grid-cols-3 h-11 bg-muted/30 backdrop-blur-sm p-1 rounded-2xl shadow-inner border border-muted/20">
-          <TabsTrigger value="bmr" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-white/90 data-[state=active]:text-black data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-md">Energy</TabsTrigger>
-          <TabsTrigger value="1rm" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-white/90 data-[state=active]:text-black data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-md">Power</TabsTrigger>
-          <TabsTrigger value="bodyfat" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-white/90 data-[state=active]:text-black data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-md">Body</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-3 h-11 bg-muted/50 p-1 rounded-2xl shadow-inner border border-muted/20">
+          <TabsTrigger value="bmr" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-[#fcfcfc] data-[state=active]:text-black data-[state=active]:shadow-sm">Energy</TabsTrigger>
+          <TabsTrigger value="1rm" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-[#fcfcfc] data-[state=active]:text-black data-[state=active]:shadow-sm">Power</TabsTrigger>
+          <TabsTrigger value="bodyfat" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-[#fcfcfc] data-[state=active]:text-black data-[state=active]:shadow-sm">Body</TabsTrigger>
         </TabsList>
 
         <TabsContent value="bmr" className="space-y-4 pt-4">

@@ -1,4 +1,3 @@
-
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -474,9 +473,9 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
         </div>
 
         <Tabs defaultValue="weekly" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 h-11 bg-muted/30 backdrop-blur-sm p-1 rounded-2xl shadow-inner border border-muted/20">
-            <TabsTrigger value="weekly" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-white/90 data-[state=active]:text-black data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-md">Weekly</TabsTrigger>
-            <TabsTrigger value="monthly" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-white/90 data-[state=active]:text-black data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-md">Monthly</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 h-11 bg-muted/50 p-1 rounded-2xl shadow-inner border border-muted/20">
+            <TabsTrigger value="weekly" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-[#fcfcfc] data-[state=active]:text-black data-[state=active]:shadow-sm">Weekly</TabsTrigger>
+            <TabsTrigger value="monthly" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-[#fcfcfc] data-[state=active]:text-black data-[state=active]:shadow-sm">Monthly</TabsTrigger>
           </TabsList>
 
           {['weekly', 'monthly'].map((period) => (
@@ -736,14 +735,14 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
         <CardContent className="p-0">
           <Tabs value={logTab} onValueChange={setLogTab} className="w-full">
             <div className="px-2 py-1">
-              <TabsList className="grid w-full grid-cols-3 h-10 bg-muted/50 p-1 rounded-xl">
-                <TabsTrigger value="log" className="text-[10px] font-bold uppercase tracking-tight gap-1.5 rounded-lg data-[state=active]:shadow-sm">
+              <TabsList className="grid w-full grid-cols-3 h-10 bg-muted/50 p-1 rounded-xl shadow-inner border border-muted/20">
+                <TabsTrigger value="log" className="text-[10px] font-bold uppercase tracking-tight gap-1.5 rounded-lg data-[state=active]:bg-[#fcfcfc] data-[state=active]:text-black data-[state=active]:shadow-sm">
                   <Plus className="w-3.5 h-3.5" /> Log
                 </TabsTrigger>
-                <TabsTrigger value="recent" className="text-[10px] font-bold uppercase tracking-tight gap-1.5 rounded-lg data-[state=active]:shadow-sm">
+                <TabsTrigger value="recent" className="text-[10px] font-bold uppercase tracking-tight gap-1.5 rounded-lg data-[state=active]:bg-[#fcfcfc] data-[state=active]:text-black data-[state=active]:shadow-sm">
                   <Clock className="w-3.5 h-3.5" /> Recent
                 </TabsTrigger>
-                <TabsTrigger value="saved" className="text-[10px] font-bold uppercase tracking-tight gap-1.5 rounded-lg data-[state=active]:shadow-sm">
+                <TabsTrigger value="saved" className="text-[10px] font-bold uppercase tracking-tight gap-1.5 rounded-lg data-[state=active]:bg-[#fcfcfc] data-[state=active]:text-black data-[state=active]:shadow-sm">
                   <Bookmark className="w-3.5 h-3.5" /> Saved
                 </TabsTrigger>
               </TabsList>
@@ -856,7 +855,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
       </Card>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
-        <div className="h-1.5 w-full" style={{ background: '#065A54' }} />
+        <div className="h-1.5 w-full" style={{ background: 'linear-gradient(to right, #065A54, #08A391)' }} />
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between px-1">
             <div className="space-y-0.5">
@@ -1050,9 +1049,9 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
         </div>
 
         <Tabs defaultValue="aesthetics" className="w-full">
-          <TabsList className="grid w-full grid-cols-2 h-11 bg-muted/30 backdrop-blur-sm p-1 rounded-2xl shadow-inner border border-muted/20">
-            <TabsTrigger value="aesthetics" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-white/90 data-[state=active]:text-black data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-md">Skin and Heal</TabsTrigger>
-            <TabsTrigger value="performance" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-white/90 data-[state=active]:text-black data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-md">Gym and Recovery</TabsTrigger>
+          <TabsList className="grid w-full grid-cols-2 h-11 bg-muted/50 p-1 rounded-2xl shadow-inner border border-muted/20">
+            <TabsTrigger value="aesthetics" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-[#fcfcfc] data-[state=active]:text-black data-[state=active]:shadow-sm">Skin and Heal</TabsTrigger>
+            <TabsTrigger value="performance" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-[#fcfcfc] data-[state=active]:text-black data-[state=active]:shadow-sm">Gym and Recovery</TabsTrigger>
           </TabsList>
 
           <TabsContent value="aesthetics" className="space-y-4 mt-4">
@@ -1064,9 +1063,9 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
                 <span className="text-[11px] font-black text-foreground uppercase tracking-tight">
                   {periodLabel}
                 </span>
-                <div className="flex gap-2 mt-1">
-                   <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-white/90 text-black shadow-sm backdrop-blur-md" : "text-muted-foreground")}>Week</button>
-                   <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-white/90 text-black shadow-sm backdrop-blur-md" : "text-muted-foreground")}>Month</button>
+                <div className="flex gap-2 mt-1 bg-muted/30 p-0.5 rounded-lg">
+                   <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-[#fcfcfc] text-black shadow-sm" : "text-muted-foreground")}>Week</button>
+                   <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-[#fcfcfc] text-black shadow-sm" : "text-muted-foreground")}>Month</button>
                 </div>
               </div>
               <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full">
@@ -1093,9 +1092,9 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
                 <span className="text-[11px] font-black text-foreground uppercase tracking-tight">
                   {periodLabel}
                 </span>
-                <div className="flex gap-2 mt-1">
-                   <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-white/90 text-black shadow-sm backdrop-blur-md" : "text-muted-foreground")}>Week</button>
-                   <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-white/90 text-black shadow-sm backdrop-blur-md" : "text-muted-foreground")}>Month</button>
+                <div className="flex gap-2 mt-1 bg-muted/30 p-0.5 rounded-lg">
+                   <button onClick={() => setPeriod('weekly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'weekly' ? "bg-[#fcfcfc] text-black shadow-sm" : "text-muted-foreground")}>Week</button>
+                   <button onClick={() => setPeriod('monthly')} className={cn("text-[8px] font-black uppercase px-2 py-0.5 rounded-md transition-all", period === 'monthly' ? "bg-[#fcfcfc] text-black shadow-sm" : "text-muted-foreground")}>Month</button>
                 </div>
               </div>
               <Button variant="ghost" size="icon" onClick={handleNext} className="rounded-full">
@@ -1129,9 +1128,9 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
       </div>
 
       <Tabs defaultValue="aesthetics" className="w-full">
-        <TabsList className="grid w-full grid-cols-2 h-11 bg-muted/30 backdrop-blur-sm p-1 rounded-2xl shadow-inner border border-muted/20">
-          <TabsTrigger value="aesthetics" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-white/90 data-[state=active]:text-black data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-md">Skin and Heal</TabsTrigger>
-          <TabsTrigger value="performance" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-white/90 data-[state=active]:text-black data-[state=active]:shadow-sm data-[state=active]:backdrop-blur-md">Gym and Recovery</TabsTrigger>
+        <TabsList className="grid w-full grid-cols-2 h-11 bg-muted/50 p-1 rounded-2xl shadow-inner border border-muted/20">
+          <TabsTrigger value="aesthetics" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-[#fcfcfc] data-[state=active]:text-black data-[state=active]:shadow-sm">Skin and Heal</TabsTrigger>
+          <TabsTrigger value="performance" className="text-[10px] font-black uppercase tracking-tight rounded-xl data-[state=active]:bg-[#fcfcfc] data-[state=active]:text-black data-[state=active]:shadow-sm">Gym and Recovery</TabsTrigger>
         </TabsList>
 
         <TabsContent value="aesthetics" className="space-y-4 mt-4">

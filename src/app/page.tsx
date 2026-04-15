@@ -490,8 +490,9 @@ export default function PulseFlowApp() {
       <svg width="0" height="0" className="absolute">
         <defs>
           <linearGradient id="icon-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-            <stop offset="0%" stopColor="#59D9A2" />
-            <stop offset="100%" stopColor="#7EBCE6" />
+            <stop offset="0%" stopColor="#4ade80" />
+            <stop offset="50%" stopColor="#2dd4bf" />
+            <stop offset="100%" stopColor="#3b82f6" />
           </linearGradient>
         </defs>
       </svg>
@@ -508,7 +509,7 @@ export default function PulseFlowApp() {
 
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none">
           <span className="font-black text-xl tracking-tighter text-foreground">arcex</span>
-          <span className="font-black text-xl tracking-tighter bg-gradient-to-br from-[#59D9A2] to-[#7EBCE6] bg-clip-text text-transparent">fit</span>
+          <span className="font-black text-xl tracking-tighter bg-gradient-to-br from-[#4ade80] via-[#2dd4bf] to-[#3b82f6] bg-clip-text text-transparent">fit</span>
         </div>
 
         <div className="flex gap-2">
@@ -552,7 +553,7 @@ export default function PulseFlowApp() {
               )}
             >
               <Icon 
-                className={cn("w-4 h-4 shrink-0")} 
+                className={cn("w-4 h-4 shrink-0 transition-colors")} 
                 style={isActive ? { stroke: 'url(#icon-gradient)', fill: 'none' } : {}}
               />
               <span className={cn(

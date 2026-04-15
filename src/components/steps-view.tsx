@@ -258,14 +258,14 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
           </Card>
         </div>
 
-        <Card className="border-none shadow-sm bg-green-50/50 border border-green-100">
+        <Card className="border-none shadow-sm bg-card border border-muted/20">
           <CardContent className="p-4 flex justify-between items-center">
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
                 <CheckCircle2 className="w-4 h-4 text-green-600" />
               </div>
               <div className="space-y-0.5">
-                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none">Activity Health</p>
+                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none">Active Days</p>
                 <p className="text-xs font-bold text-foreground">{goalsMet} / 7 Days Met</p>
               </div>
             </div>
