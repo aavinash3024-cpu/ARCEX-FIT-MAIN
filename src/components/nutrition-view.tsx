@@ -703,15 +703,17 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
 
       <Card className="border-none shadow-sm overflow-hidden bg-card">
         <div className="p-3 flex items-center gap-3">
-          <div className="shrink-0 p-[2px] rounded-full" style={{ background: 'linear-gradient(to right, #065A54, #08A391)' }}>
-            <div className="w-9 h-9 rounded-full overflow-hidden relative bg-muted/20 border border-white/20">
-              <Image 
-                src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=400&auto=format&fit=crop"
-                alt="Nutrition Logo"
-                fill
-                className="object-cover"
-                data-ai-hint="healthy food avatar"
-              />
+          <div className="shrink-0 p-[1.5px] rounded-full bg-[#065A54]">
+            <div className="p-[1.5px] rounded-full bg-white">
+              <div className="w-8 h-8 rounded-full overflow-hidden relative bg-muted/20 shadow-sm">
+                <Image 
+                  src="https://images.unsplash.com/photo-1490645935967-10de6ba17061?q=80&w=400&auto=format&fit=crop"
+                  alt="Nutrition Logo"
+                  fill
+                  className="object-cover"
+                  data-ai-hint="healthy food avatar"
+                />
+              </div>
             </div>
           </div>
           <div className="flex-1 min-w-0">
@@ -854,7 +856,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
       </Card>
 
       <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
-        <div className="h-1.5 w-full" style={{ background: 'linear-gradient(to right, #065A54, #08A391)' }} />
+        <div className="h-1.5 w-full" style={{ background: '#065A54' }} />
         <CardContent className="p-5 space-y-4">
           <div className="flex items-center justify-between px-1">
             <div className="space-y-0.5">

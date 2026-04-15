@@ -417,15 +417,17 @@ export function WorkoutView() {
 
       <Card className="border-none shadow-sm overflow-hidden bg-card rounded-2xl">
         <div className="p-3 flex items-center gap-3">
-          <div className="gradient-ring shrink-0">
-            <div className="w-9 h-9 rounded-full overflow-hidden relative bg-muted/20 border border-white/20 shadow-sm">
-              <Image 
-                src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"
-                alt="Workout"
-                fill
-                className="object-cover"
-                data-ai-hint="gym equipment"
-              />
+          <div className="shrink-0 p-[1.5px] rounded-full bg-[#065A54]">
+            <div className="p-[1.5px] rounded-full bg-white">
+              <div className="w-8 h-8 rounded-full overflow-hidden relative bg-muted/20 shadow-sm">
+                <Image 
+                  src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?q=80&w=400&auto=format&fit=crop"
+                  alt="Workout"
+                  fill
+                  className="object-cover"
+                  data-ai-hint="gym equipment"
+                />
+              </div>
             </div>
           </div>
           <div className="flex-1 min-w-0">
@@ -848,7 +850,7 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
 
 function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onViewDetail: (pr: any) => void }) {
   const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
-  const [activeType, setActiveType] = useState<'strength' | 'time'>('strength');
+  const [activeType, setActiveType] = useState<'strength' | 'time'| 'reps'>(() => 'strength');
   const [activeMuscle, setActiveMuscle] = useState<string>("CHEST");
 
   useEffect(() => {

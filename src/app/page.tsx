@@ -500,7 +500,7 @@ export default function PulseFlowApp() {
         <div className="flex items-center">
           <button 
             onClick={() => navigateTo('profile')}
-            className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center transition-all border border-neutral-700 shadow-sm"
+            className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center transition-all"
           >
             <User className="w-4 h-4 text-foreground" />
           </button>
