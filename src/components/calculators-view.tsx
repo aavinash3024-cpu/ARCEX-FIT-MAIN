@@ -69,6 +69,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
       scrollContainer.scrollTop = 0;
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [activeTab]);
 
@@ -308,7 +309,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 </div>
               </div>
 
-              <div className="bg-amber-500/10 p-4 rounded-2xl border border-amber-500/20 flex items-start gap-3">
+              <div className="bg-amber-50/10 p-4 rounded-2xl border border-amber-50/20 flex items-start gap-3">
                 <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <p className="text-[9px] text-amber-800 font-bold leading-tight uppercase tracking-tight">
                   HEAVY LOAD WARNING: Personal records should always be attempted with a spotter or in a power rack with safety pins engaged.

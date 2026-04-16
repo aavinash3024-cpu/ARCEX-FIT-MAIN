@@ -93,6 +93,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
       scrollContainer.scrollTop = 0;
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [activeSubView]);
 
@@ -207,7 +208,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
 
     if (goalData) {
       const updatedGoal = {
-        ...goalData,
+        ...updatedGoal,
         gender: profileGender,
         age: parseInt(profileAge) || goalData.age
       };

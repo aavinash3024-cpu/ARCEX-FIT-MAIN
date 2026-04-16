@@ -112,6 +112,7 @@ export function WorkoutView() {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
       scrollContainer.scrollTop = 0;
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [activeSubView, selectedExercise, loggingExercise]);
 
@@ -860,6 +861,15 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
   const [activeType, setActiveType] = useState<'strength' | 'time'| 'reps'>(() => 'strength');
   const [activeMuscle, setActiveMuscle] = useState<string>("CHEST");
 
+  // STABLE SCROLL RESET - INTERNAL NAVIGATION
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.swipe-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTop = 0;
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [activeType, activeMuscle]);
+
   useEffect(() => {
     const saved = localStorage.getItem('pulseflow_workout_history');
     if (saved) {
@@ -1020,6 +1030,15 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
 }
 
 function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => void }) {
+  // STABLE SCROLL RESET - INTERNAL NAVIGATION
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.swipe-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTop = 0;
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, []);
+
   if (!viewingPRs) return null;
 
   const isTimeBased = !viewingPRs.records[0].weight;
@@ -1144,6 +1163,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
       scrollContainer.scrollTop = 0;
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [activeDay, activeMuscleReport]);
 
@@ -1431,7 +1451,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
 
       {isAdding && (
         <div className="fixed inset-0 z-[60] bg-black/40 backdrop-blur-sm flex items-end animate-in fade-in duration-300">
-          <div className="w-full max-w-lg mx-auto bg-card rounded-t-[2.5rem] shadow-2xl p-6 h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-500">
+          <div className="w-full max-sm mx-auto bg-card rounded-t-[2.5rem] shadow-2xl p-6 h-[80vh] flex flex-col animate-in slide-in-from-bottom duration-500">
             <div className="flex items-center justify-between mb-4 pt-2">
               <h3 className="text-xl font-black uppercase tracking-tighter">Choose Moves</h3>
               <Button variant="ghost" size="icon" onClick={() => setIsAdding(false)} className="rounded-full">
@@ -1516,6 +1536,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
       scrollContainer.scrollTop = 0;
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [refDate]);
 

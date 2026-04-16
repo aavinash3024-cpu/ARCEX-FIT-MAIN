@@ -67,6 +67,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
       scrollContainer.scrollTop = 0;
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [step, isSaved]);
 

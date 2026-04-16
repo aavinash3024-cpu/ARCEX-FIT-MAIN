@@ -173,6 +173,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
       scrollContainer.scrollTop = 0;
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [showSummary, showMacroAnalysis, showMicroAnalysis]);
 
@@ -956,6 +957,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
       scrollContainer.scrollTop = 0;
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [showDetails, period]);
 
@@ -1343,6 +1345,7 @@ function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'mont
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
       scrollContainer.scrollTop = 0;
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
     }
   }, [refDate]);
 
