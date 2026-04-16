@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -62,6 +61,14 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
   const [calAdj, setCalAdj] = useState([0]);
   const [protAdj, setProtAdj] = useState([1.8]);
   const [carbRatio, setCarbRatio] = useState([50]);
+
+  // Reset scroll when switching steps
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.swipe-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [step, isSaved]);
 
   useEffect(() => {
     const saved = localStorage.getItem('pulseflow_goal_data');

@@ -77,9 +77,11 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
 
   const coachImage = PlaceHolderImages.find(img => img.id === 'gym-coach');
 
+  // Unified Scroll Reset for Guide View interactions
   useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+    const scrollContainer = document.querySelector('.swipe-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
     }
   }, [messages, isLoading]);
 

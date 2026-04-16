@@ -54,10 +54,9 @@ export default function PulseFlowApp() {
     }
   }, [user, isUserLoading, auth]);
 
-  // STABLE SCROLL RESET
+  // STABLE SCROLL RESET - PRIMARY NAVIGATION
   useEffect(() => {
-    // Only reset scroll when switching primary tabs
-    if (mainRef.current && activeTab !== 'guide') {
+    if (mainRef.current) {
       mainRef.current.scrollTop = 0;
       mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
     }

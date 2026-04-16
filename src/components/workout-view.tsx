@@ -1139,6 +1139,14 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
   const [muscleFilter, setMuscleFilter] = useState("ALL");
   const [activeMuscleReport, setActiveMuscleReport] = useState("CHEST");
 
+  // Reset scroll when building splits or switching days
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.swipe-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [activeDay, activeMuscleReport]);
+
   const toggleSelection = (ex: Exercise) => {
     const isSelected = selectedItems.some(i => i.name === ex.name);
     const dayExercisesCount = (split[activeDay] || []).length;
@@ -1502,6 +1510,14 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
 function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
   const [refDate, setRefDate] = useState(new Date());
   const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
+
+  // Reset scroll when navigating history weeks
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.swipe-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [refDate]);
 
   useEffect(() => {
     const saved = localStorage.getItem('pulseflow_workout_history');
