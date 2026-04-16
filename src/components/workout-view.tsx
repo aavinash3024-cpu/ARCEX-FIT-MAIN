@@ -42,7 +42,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { cn } from "@/lib/utils";
+import { cn } from '@/lib/utils';
 import { Progress } from "@/components/ui/progress";
 import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
@@ -111,7 +111,7 @@ export function WorkoutView() {
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+      scrollContainer.scrollTop = 0;
     }
   }, [activeSubView, selectedExercise, loggingExercise]);
 
@@ -1143,7 +1143,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+      scrollContainer.scrollTop = 0;
     }
   }, [activeDay, activeMuscleReport]);
 
@@ -1515,7 +1515,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+      scrollContainer.scrollTop = 0;
     }
   }, [refDate]);
 

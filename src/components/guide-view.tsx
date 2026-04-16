@@ -81,7 +81,7 @@ export function GuideView({ goalData, loggedMeals, hydrationAmount, weightHistor
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
-      scrollContainer.scrollTo({ top: scrollContainer.scrollHeight, behavior: 'smooth' });
+      scrollContainer.scrollTop = scrollContainer.scrollHeight;
     }
   }, [messages, isLoading]);
 

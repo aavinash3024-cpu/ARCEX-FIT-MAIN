@@ -92,7 +92,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+      scrollContainer.scrollTop = 0;
     }
   }, [activeSubView]);
 
@@ -781,7 +781,7 @@ function LegalItem({ icon: Icon, label, color, bg }: { icon: any, label: string,
   return (
     <button className="w-full p-4 flex items-center justify-between transition-all text-left group border-b border-muted/5 last:border-0">
       <div className="flex items-center gap-4">
-        <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shadow-sm", bg || "bg-green-50", color || "text-green-600")}>
+        <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shadow-sm", bg || "bg-blue-50", color || "text-blue-600")}>
           <Icon className="w-4 h-4" />
         </div>
         <span className="text-sm font-bold text-foreground/90">{label}</span>

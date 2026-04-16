@@ -68,7 +68,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+      scrollContainer.scrollTop = 0;
     }
   }, [activeTab]);
 
