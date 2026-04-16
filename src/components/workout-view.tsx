@@ -323,7 +323,7 @@ export function WorkoutView() {
             />
           </div>
 
-          <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-1 bg-muted/50 p-1 rounded-2xl border border-muted/20">
+          <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-1">
             {muscleGroups.map(m => (
               <button
                 key={m}
@@ -785,7 +785,7 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
           />
         </div>
 
-        <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4 mb-2 bg-muted/50 p-1 rounded-2xl border border-muted/20">
+        <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4 mb-2">
           {muscleGroups.map((m: any) => (
             <button
               key={m}
@@ -935,7 +935,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
       </div>
 
       <div className="space-y-4">
-        <div className="flex items-center justify-between bg-muted/50 p-1 rounded-2xl shadow-inner border border-muted/20 mx-1">
+        <div className="flex items-center justify-between gap-2 mx-1">
           <button 
             onClick={() => setActiveType('strength')}
             className={cn(
@@ -956,7 +956,7 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
           </button>
         </div>
 
-        <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-1 bg-muted/50 p-1 rounded-full mx-1 border border-muted/20">
+        <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-1 mx-1">
           {filteredMuscles.map(muscle => (
             <button
               key={muscle}
@@ -1239,7 +1239,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
         <h1 className="text-2xl font-bold font-headline">Weekly Split</h1>
       </div>
 
-      <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-1 bg-muted/50 p-1 rounded-full mx-1 border border-muted/20">
+      <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-1 mx-1">
         {DAYS.map(day => (
           <button
             key={day}
@@ -1309,7 +1309,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
         </div>
 
         <div className="space-y-4">
-          <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-2 bg-muted/50 p-1 rounded-full mx-1 border border-muted/20">
+          <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-2 px-2 mx-1">
             {report.muscles.map(muscle => (
               <button
                 key={muscle}
@@ -1426,7 +1426,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
               <input autoFocus type="text" value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} placeholder="Search..." className="w-full h-12 pl-10 pr-4 bg-muted/10 border-none rounded-2xl text-sm font-bold focus:ring-2 focus:ring-primary/20" />
             </div>
-            <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4 mb-2 bg-muted/50 p-1 rounded-full border border-muted/20">
+            <div className="flex gap-2 overflow-x-auto whitespace-nowrap swipe-container pb-4 mb-2">
               {muscleGroups.map(m => (
                 <button 
                   key={m} 
