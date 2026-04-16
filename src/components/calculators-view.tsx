@@ -14,10 +14,7 @@ import {
   Trophy,
   Activity,
   Info,
-  CircleHelp,
   AlertTriangle,
-  TrendingUp,
-  Percent
 } from "lucide-react";
 import { 
   Select,
@@ -223,30 +220,44 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               </div>
 
               <div className="grid grid-cols-1 gap-3">
-                <div className="bg-orange-500/5 p-4 rounded-xl border border-orange-500/10 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border border-orange-500/20">
-                      <Flame className="w-4 h-4 text-orange-500" />
+                <div className="bg-orange-500/5 p-4 rounded-xl border border-orange-500/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border border-orange-500/20">
+                        <Flame className="w-4 h-4 text-orange-500" />
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Basal Metabolism (BMR)</p>
+                        <p className="text-xl font-black">{bmrResults ? bmrResults.bmr : '---'}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Basal Metabolism</p>
-                      <p className="text-xl font-black">{bmrResults ? bmrResults.bmr : '---'}</p>
-                    </div>
+                    <Badge variant="outline" className="text-[8px] font-black border-orange-500/20 text-orange-600 bg-white">KCAL/DAY</Badge>
                   </div>
-                  <Badge variant="outline" className="text-[8px] font-black border-orange-500/20 text-orange-600 bg-white">KCAL/DAY</Badge>
+                  <div className="bg-orange-500/10 p-2 rounded-lg">
+                    <p className="text-[8px] font-bold text-orange-800 leading-tight uppercase">
+                      What it means: The calories your body burns at absolute rest to maintain vital functions like breathing and heartbeat.
+                    </p>
+                  </div>
                 </div>
                 
-                <div className="bg-sky-500/5 p-4 rounded-xl border border-sky-500/10 flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border border-sky-500/20">
-                      <Zap className="w-4 h-4 text-sky-500" />
+                <div className="bg-sky-500/5 p-4 rounded-xl border border-sky-500/10 space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border border-sky-500/20">
+                        <Zap className="w-4 h-4 text-sky-500" />
+                      </div>
+                      <div>
+                        <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Total Expenditure (TDEE)</p>
+                        <p className="text-xl font-black">{bmrResults ? bmrResults.tdee : '---'}</p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Total Expenditure</p>
-                      <p className="text-xl font-black">{bmrResults ? bmrResults.tdee : '---'}</p>
-                    </div>
+                    <Badge variant="outline" className="text-[8px] font-black border-sky-500/20 text-sky-600 bg-white">KCAL/DAY</Badge>
                   </div>
-                  <Badge variant="outline" className="text-[8px] font-black border-sky-500/20 text-sky-600 bg-white">KCAL/DAY</Badge>
+                  <div className="bg-sky-500/10 p-2 rounded-lg">
+                    <p className="text-[8px] font-bold text-sky-800 leading-tight uppercase">
+                      What it means: Your "Maintenance Calories." The total energy you burn daily including exercise and digestion.
+                    </p>
+                  </div>
                 </div>
               </div>
 
@@ -269,7 +280,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
           <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl">
             <CardContent className="p-5 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
-                <Dumbbell className="w-4 h-4 text-amber-500" />
+                <Dumbbell className="w-4 h-4 text-orange-600" />
                 <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Strength Estimator</h2>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -282,7 +293,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                   <Input type="number" value={reps} onChange={(e) => setReps(e.target.value === "" ? "" : Math.min(1000, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
-              <Button onClick={calculateOrm} className="w-full h-12 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98]">Calculate Max</Button>
+              <Button onClick={calculateOrm} className="w-full h-12 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-orange-600/20 transition-all active:scale-[0.98]">Calculate Max</Button>
             </CardContent>
           </Card>
 
@@ -290,15 +301,22 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
             <CardContent className="p-5 space-y-6">
               <div className="flex items-center justify-between border-b border-muted/10 pb-4">
                 <div className="space-y-0.5">
-                  <p className="text-[9px] font-black text-amber-600 uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
+                  <p className="text-[9px] font-black text-orange-600 uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
                   <div className="flex items-baseline gap-1">
                     <p className="text-4xl font-black text-foreground tracking-tighter">{ormResult ? ormResult : '---'}</p>
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">kg</span>
                   </div>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center border border-amber-100 shadow-inner">
-                  <Trophy className="w-6 h-6 text-amber-500" />
+                <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center border border-orange-100 shadow-inner">
+                  <Trophy className="w-6 h-6 text-orange-600" />
                 </div>
+              </div>
+
+              <div className="bg-orange-600/10 p-4 rounded-xl border border-orange-600/20 flex gap-3 items-start">
+                <AlertTriangle className="w-4 h-4 text-orange-600 shrink-0 mt-0.5" />
+                <p className="text-[9px] font-black text-orange-900 leading-relaxed uppercase tracking-tighter">
+                  PRECATION: Do not attempt to test your actual 1RM without a qualified spotter or safety bars. These calculations are estimates based on sub-maximal loads.
+                </p>
               </div>
 
               <div className="space-y-3">
@@ -326,7 +344,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                             <TableCell className="py-0 text-[10px] font-black text-center border-r border-muted/5 text-muted-foreground/50">
                               {Math.round(intensity * 100)}%
                             </TableCell>
-                            <TableCell className="py-0 text-[11px] font-black text-center text-amber-600">
+                            <TableCell className="py-0 text-[11px] font-black text-center text-orange-600">
                               {weightForReps ? `${Math.round(weightForReps)}` : '---'}
                             </TableCell>
                           </TableRow>
