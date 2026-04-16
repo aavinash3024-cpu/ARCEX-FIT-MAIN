@@ -322,7 +322,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                    <Activity className="w-3.5 h-3.5" /> INTENSITY MATRIX
+                    <Activity className="w-3.5 h-3.5" /> ESTIMATED CAPACITY
                   </h4>
                 </div>
                 <div className="rounded-xl border border-muted/20 overflow-hidden bg-muted/5">
@@ -422,28 +422,28 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 {bfResults && <Badge className="bg-primary text-primary-foreground font-black uppercase tracking-tighter text-[8px] h-5 px-2 rounded-lg">{bfResults.category}</Badge>}
               </div>
 
-              <div className="space-y-3">
-                <div className="flex items-center justify-between p-3 rounded-xl bg-muted/5 border border-muted/10">
-                  <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-6 bg-primary rounded-full" />
-                    <div>
+              <div className="space-y-4">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="bg-muted/5 p-3 rounded-2xl border border-muted/10">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
                       <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Lean Mass</p>
-                      <p className="text-sm font-black">{bfResults ? bfResults.lbm : '---'} <span className="text-[9px] text-muted-foreground">KG</span></p>
                     </div>
+                    <p className="text-sm font-black">{bfResults ? bfResults.lbm : '---'} <span className="text-[9px] text-muted-foreground">KG</span></p>
                   </div>
-                  <div className="flex items-center gap-3 text-right">
-                    <div>
-                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Fat Mass</p>
-                      <p className="text-sm font-black text-orange-600">{bfResults && weight ? (parseFloat(weight) - bfResults.lbm).toFixed(1) : '---'} <span className="text-[9px] text-muted-foreground">KG</span></p>
+                  <div className="bg-orange-500/5 p-3 rounded-2xl border border-orange-500/10">
+                    <div className="flex items-center gap-2 mb-1">
+                      <div className="w-1.5 h-1.5 rounded-full bg-orange-600" />
+                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest text-orange-600/70">Fat Mass</p>
                     </div>
-                    <div className="w-1.5 h-6 bg-orange-600 rounded-full" />
+                    <p className="text-sm font-black text-orange-600">{bfResults && weight ? (parseFloat(weight) - bfResults.lbm).toFixed(1) : '---'} <span className="text-[9px] text-muted-foreground">KG</span></p>
                   </div>
                 </div>
                 
-                <div className="bg-accent/5 p-3 rounded-xl border border-accent/10 flex items-start gap-3">
-                  <Info className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
-                  <p className="text-[9px] text-accent/70 font-bold uppercase tracking-tight">
-                    Navy Method: Estimated based on circumference measurements.
+                <div className="bg-muted/5 p-3 rounded-xl border border-muted/10 flex items-start gap-3">
+                  <Info className="w-3.5 h-3.5 text-foreground/40 shrink-0 mt-0.5" />
+                  <p className="text-[9px] text-foreground/60 font-bold uppercase tracking-tight leading-relaxed">
+                    Navy Method: Estimated based on circumference measurements of the neck, waist, and hips.
                   </p>
                 </div>
               </div>

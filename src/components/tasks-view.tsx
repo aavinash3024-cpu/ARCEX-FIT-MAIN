@@ -42,12 +42,6 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
     high: 'bg-destructive'
   };
 
-  const priorityTextColor = {
-    low: 'text-green-500',
-    medium: 'text-amber-500',
-    high: 'text-destructive'
-  };
-
   const dotColor = {
     low: 'bg-green-500',
     medium: 'bg-amber-500',
@@ -165,23 +159,32 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
                 <label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">
                   SET PRIORITY
                 </label>
-                <div className="grid grid-cols-3 gap-1 bg-muted/50 p-1 rounded-xl shadow-inner border border-muted/20">
-                  {(['low', 'medium', 'high'] as Priority[]).map((p) => (
-                    <button
-                      key={p}
-                      onClick={() => setSelectedPriority(p)}
-                      disabled={filteredTasks.length >= 100}
-                      className={cn(
-                        "py-2 rounded-lg text-[9px] font-black uppercase tracking-widest transition-all border border-transparent",
-                        selectedPriority === p 
-                          ? "bg-[#fcfcfc] text-black shadow-sm" 
-                          : cn("opacity-40 hover:opacity-100", priorityTextColor[p]),
-                        "disabled:opacity-20"
-                      )}
-                    >
-                      {p}
-                    </button>
-                  ))}
+                <div className="grid grid-cols-3 gap-1 bg-muted/40 p-1 rounded-2xl shadow-inner border border-muted/10">
+                  {(['low', 'medium', 'high'] as Priority[]).map((p) => {
+                    const isActive = selectedPriority === p;
+                    const priorityThemes = {
+                      low: "bg-green-500 text-white shadow-green-500/20",
+                      medium: "bg-amber-500 text-white shadow-amber-500/20",
+                      high: "bg-destructive text-white shadow-destructive/20"
+                    };
+                    
+                    return (
+                      <button
+                        key={p}
+                        onClick={() => setSelectedPriority(p)}
+                        disabled={filteredTasks.length >= 100}
+                        className={cn(
+                          "py-2 rounded-xl text-[9px] font-black uppercase tracking-widest transition-all",
+                          isActive 
+                            ? cn("shadow-md", priorityThemes[p]) 
+                            : "text-muted-foreground hover:text-foreground hover:bg-muted/50",
+                          "disabled:opacity-20"
+                        )}
+                      >
+                        {p}
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
