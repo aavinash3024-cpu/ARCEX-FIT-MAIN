@@ -98,29 +98,27 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
                   <Pencil className="w-3.5 h-3.5" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="rounded-[2.5rem] w-[92%] max-w-sm p-8 border-none shadow-2xl overflow-hidden">
-                <DialogHeader className="space-y-4">
-                  <div className="flex justify-center">
-                    <div className="w-12 h-12 rounded-full bg-muted/10 flex items-center justify-center">
-                      <Footprints className="w-6 h-6 text-foreground/40" />
-                    </div>
-                  </div>
-                  <DialogTitle className="text-center font-black uppercase text-sm tracking-[0.2em] text-foreground">
+              <DialogContent className="rounded-3xl w-[90%] max-w-[320px] p-5 border-none shadow-2xl overflow-hidden">
+                <DialogHeader className="space-y-1">
+                  <DialogTitle className="text-center font-black uppercase text-xs tracking-widest text-foreground">
                     Daily Step Goal
                   </DialogTitle>
                 </DialogHeader>
-                <div className="py-8 flex flex-col items-center gap-4">
-                  <div className="flex items-center gap-3 w-full">
+                <div className="py-3 flex flex-col items-center gap-3">
+                  <div className="space-y-2 w-full">
+                    <label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest block text-center opacity-60">
+                      Step Target
+                    </label>
                     <Input 
                       type="number" 
                       value={tempTarget} 
                       onChange={(e) => setTempTarget(Number(e.target.value))}
-                      className="w-full text-center text-2xl font-black rounded-2xl border-muted-foreground/10 h-16 bg-muted/5 focus:ring-primary/20 transition-all"
+                      className="w-full text-center text-xl font-black rounded-xl border-muted-foreground/10 h-12 bg-muted/5 focus:ring-primary/20 transition-all"
                     />
                   </div>
                 </div>
                 <DialogFooter className="sm:justify-center">
-                  <Button onClick={handleUpdateTarget} className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[11px] tracking-[0.15em] shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+                  <Button onClick={handleUpdateTarget} className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
                     Update Target
                   </Button>
                 </DialogFooter>

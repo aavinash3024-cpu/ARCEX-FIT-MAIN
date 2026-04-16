@@ -16,7 +16,8 @@ import {
   Calendar,
   History,
   Trash2,
-  Target
+  Target,
+  X
 } from "lucide-react";
 import { 
   XAxis, 
@@ -141,7 +142,6 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
       <h1 className="text-2xl font-bold font-headline mb-2 px-1">Progress</h1>
 
       <div className="space-y-4 animate-in fade-in duration-500">
-        {/* COMPACTED CURRENT WEIGHT CARD */}
         <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl mx-1">
           <CardContent className="p-3.5 space-y-3">
             <div className="flex justify-between items-start">
@@ -265,20 +265,15 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
               <Plus className="w-4 h-4" /> Log New Weight Entry
             </Button>
           </DialogTrigger>
-          <DialogContent className="rounded-[2.5rem] w-[92%] max-w-sm p-8 border-none shadow-2xl overflow-hidden">
-            <DialogHeader className="space-y-4">
-              <div className="flex justify-center">
-                <div className="w-12 h-12 rounded-full bg-muted/10 flex items-center justify-center">
-                  <Scale className="w-6 h-6 text-foreground/40" />
-                </div>
-              </div>
-              <DialogTitle className="text-center font-black uppercase text-sm tracking-[0.2em] text-foreground">
+          <DialogContent className="rounded-3xl w-[90%] max-w-[320px] p-5 border-none shadow-2xl overflow-hidden">
+            <DialogHeader className="space-y-1">
+              <DialogTitle className="text-center font-black uppercase text-xs tracking-widest text-foreground">
                 Daily Weight Log
               </DialogTitle>
             </DialogHeader>
-            <div className="py-8 space-y-6">
-              <div className="space-y-3">
-                <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] block text-center">
+            <div className="py-3 space-y-4">
+              <div className="space-y-2">
+                <Label className="text-[9px] font-black text-muted-foreground uppercase tracking-widest block text-center opacity-60">
                   Current Weight (kg)
                 </Label>
                 <div className="relative">
@@ -299,13 +294,13 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
                       }
                     }}
                     placeholder={currentWeight > 0 ? currentWeight.toString() : "0.0"}
-                    className="rounded-2xl h-16 text-2xl font-black text-center border-muted-foreground/10 bg-muted/5 focus:ring-primary/20 transition-all"
+                    className="rounded-xl h-12 text-xl font-black text-center border-muted-foreground/10 bg-muted/5 focus:ring-primary/20 transition-all"
                   />
                 </div>
               </div>
             </div>
             <DialogFooter className="sm:justify-center">
-              <Button onClick={handleLogWeight} className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[11px] tracking-[0.15em] shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+              <Button onClick={handleLogWeight} className="w-full h-11 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[10px] tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
                 Save Entry
               </Button>
             </DialogFooter>
