@@ -44,10 +44,10 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
   const [activeTab, setActiveTab] = useState<CalculatorType>(initialType);
 
   // Shared inputs
-  const [age, setAge] = useState<string>("");
+  const [age, setAge] = useState<string>("25");
   const [gender, setGender] = useState<Gender>('male');
-  const [weight, setWeight] = useState<string>("");
-  const [height, setHeight] = useState<string>("");
+  const [weight, setWeight] = useState<string>("75");
+  const [height, setHeight] = useState<string>("175");
 
   // BMR results
   const [activity, setActivity] = useState<ActivityLevel>('moderate');
@@ -64,7 +64,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
   const [hip, setHip] = useState<string>("");
   const [bfResults, setBfResults] = useState<{ percentage: number; lbm: number; category: string } | null>(null);
 
-  // STABLE SCROLL RESET - INTERNAL NAVIGATION
+  // STABLE SCROLL RESET
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
@@ -223,7 +223,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-muted/10 p-5 rounded-3xl border border-muted/20 flex flex-col items-center text-center space-y-2 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center shadow-sm relative z-10 border border-muted/20">
                     <Flame className="w-5 h-5 text-orange-500" />
                   </div>
@@ -232,9 +232,9 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                   <p className="text-[8px] font-black text-muted-foreground uppercase tracking-tighter relative z-10">KCAL/DAY</p>
                 </div>
                 <div className="bg-muted/10 p-5 rounded-3xl border border-muted/20 flex flex-col items-center text-center space-y-2 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-accent/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
+                  <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                   <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center shadow-sm relative z-10 border border-muted/20">
-                    <Zap className="w-5 h-5 text-accent" />
+                    <Zap className="w-5 h-5 text-sky-500" />
                   </div>
                   <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest relative z-10">TDEE</p>
                   <p className="text-3xl font-black relative z-10">{bmrResults ? bmrResults.tdee : '---'}</p>
@@ -249,10 +249,10 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                     <p className="text-[10px] font-black uppercase text-foreground/80">TECHNICAL DEFINITIONS</p>
                     <div className="space-y-2">
                       <p className="text-[10px] leading-relaxed text-muted-foreground font-medium">
-                        <span className="font-bold text-foreground/70 uppercase">Basal Metabolic Rate:</span> The minimum calories required to maintain life at rest.
+                        <span className="font-bold text-foreground/70 uppercase">Basal Metabolic Rate:</span> The minimum energy required at rest.
                       </p>
                       <p className="text-[10px] leading-relaxed text-muted-foreground font-medium">
-                        <span className="font-bold text-foreground/70 uppercase">Total Daily Energy Expenditure:</span> BMR plus physical activity impact.
+                        <span className="font-bold text-foreground/70 uppercase">TDEE:</span> BMR plus your daily physical activity impact.
                       </p>
                     </div>
                   </div>
@@ -267,7 +267,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                   <div className="relative z-10 space-y-1">
                     <p className="text-[9px] font-black uppercase tracking-widest opacity-80">MAINTENANCE GOAL</p>
                     <p className="text-xs font-bold leading-relaxed">
-                      Consume <span className="text-base font-black px-1">{bmrResults.tdee}</span> calories per day to maintain your current weight and metabolic health.
+                      Consume <span className="text-base font-black px-1">{bmrResults.tdee}</span> calories per day to maintain current weight.
                     </p>
                   </div>
                 </div>
@@ -280,7 +280,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
           <Card className="border-none shadow-sm bg-card overflow-hidden">
             <CardContent className="p-6 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
-                <Dumbbell className="w-4 h-4 text-primary" />
+                <Dumbbell className="w-4 h-4 text-amber-500" />
                 <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Strength Estimator</h2>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -293,16 +293,16 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                   <Input type="number" value={reps} onChange={(e) => setReps(e.target.value === "" ? "" : Math.min(1000, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
-              <Button onClick={calculateOrm} className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">Calculate Max</Button>
+              <Button onClick={calculateOrm} className="w-full h-12 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-amber-500/20 transition-all active:scale-[0.98]">Calculate Max</Button>
             </CardContent>
           </Card>
 
           <Card className="border-none shadow-lg bg-card overflow-hidden rounded-3xl border border-muted/10">
             <CardContent className="p-5 space-y-6">
-              <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10 flex flex-col items-center text-center space-y-1.5 relative overflow-hidden shadow-inner">
-                <div className="absolute -right-4 -top-4 w-24 h-24 bg-primary/10 rounded-full blur-2xl" />
-                <Trophy className="w-8 h-8 text-primary mb-1 drop-shadow-sm" />
-                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
+              <div className="bg-amber-500/5 p-6 rounded-3xl border border-amber-500/10 flex flex-col items-center text-center space-y-1.5 relative overflow-hidden shadow-inner">
+                <div className="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl" />
+                <Trophy className="w-8 h-8 text-amber-500 mb-1 drop-shadow-sm" />
+                <p className="text-[10px] font-black text-amber-600 uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
                 <div className="flex items-baseline gap-1">
                   <p className="text-5xl font-black text-foreground tracking-tighter">{ormResult ? ormResult : '---'}</p>
                   <span className="text-sm font-bold text-muted-foreground uppercase tracking-tighter">kg</span>
@@ -312,14 +312,14 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <div className="bg-amber-50/10 p-4 rounded-2xl border border-amber-50/20 flex items-start gap-3">
                 <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                 <p className="text-[9px] text-amber-800 font-bold leading-tight uppercase tracking-tight">
-                  HEAVY LOAD WARNING: Personal records should always be attempted with a spotter or in a power rack with safety pins engaged.
+                  PR SAFETY: Personal records should always be attempted with a spotter or in a power rack with safety pins.
                 </p>
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
                   <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                    <Activity className="w-3.5 h-3.5" /> Calculated Intensity Table
+                    <Activity className="w-3.5 h-3.5" /> Load Intensity Table
                   </h4>
                   <Badge variant="outline" className="text-[8px] h-4 font-black uppercase opacity-60">Epley Formula</Badge>
                 </div>
@@ -342,7 +342,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                             <TableCell className="py-0 text-[10px] font-black text-center border-r border-muted/5 text-muted-foreground/60">
                               {Math.round(intensity * 100)}%
                             </TableCell>
-                            <TableCell className="py-0 text-[11px] font-black text-center text-primary">
+                            <TableCell className="py-0 text-[11px] font-black text-center text-amber-600">
                               {weightForReps ? `${Math.round(weightForReps)}` : '---'}
                             </TableCell>
                           </TableRow>
@@ -360,8 +360,8 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
           <Card className="border-none shadow-sm bg-card overflow-hidden">
             <CardContent className="p-6 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
-                <Scale className="w-4 h-4 text-primary" />
-                <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Anthropometric Data</h2>
+                <Scale className="w-4 h-4 text-[#08A391]" />
+                <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Body Composition</h2>
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
@@ -403,25 +403,25 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                   </div>
                 )}
               </div>
-              <Button onClick={calculateBf} className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">Analyze Composition</Button>
+              <Button onClick={calculateBf} className="w-full h-12 rounded-xl bg-[#08A391] hover:bg-[#068c7b] text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-[#08A391]/20 transition-all active:scale-[0.98]">Analyze Composition</Button>
             </CardContent>
           </Card>
 
           <Card className="border-none shadow-lg bg-card overflow-hidden rounded-3xl border border-muted/10">
             <CardContent className="p-5 space-y-6">
-              <div className="bg-primary/5 p-6 rounded-3xl border border-primary/10 flex flex-col items-center text-center space-y-1 relative overflow-hidden shadow-inner">
-                <Activity className="absolute -right-4 -top-4 w-20 h-20 text-primary/10 -rotate-12" />
-                <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Body Fat Percentage</p>
+              <div className="bg-[#08A391]/5 p-6 rounded-3xl border border-[#08A391]/10 flex flex-col items-center text-center space-y-1 relative overflow-hidden shadow-inner">
+                <Activity className="absolute -right-4 -top-4 w-20 h-20 text-[#08A391]/10 -rotate-12" />
+                <p className="text-[10px] font-black text-[#08A391] uppercase tracking-[0.2em]">Body Fat Percentage</p>
                 <div className="flex items-baseline gap-1 relative z-10">
                   <p className="text-5xl font-black text-foreground tracking-tighter">{bfResults ? bfResults.percentage : '---'}</p>
                   <span className="text-base font-bold text-muted-foreground tracking-tighter">%</span>
                 </div>
-                {bfResults && <Badge className="bg-primary text-white font-black uppercase tracking-tighter text-[9px] mt-2 h-6 px-3 shadow-md">{bfResults.category}</Badge>}
+                {bfResults && <Badge className="bg-[#08A391] text-white font-black uppercase tracking-tighter text-[9px] mt-2 h-6 px-3 shadow-md">{bfResults.category}</Badge>}
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-muted/10 p-5 rounded-3xl border border-muted/20 text-center space-y-1.5 group">
-                  <div className="w-1.5 h-1.5 bg-primary rounded-full mx-auto mb-1" />
+                  <div className="w-1.5 h-1.5 bg-[#08A391] rounded-full mx-auto mb-1" />
                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Lean Mass</p>
                   <div className="flex items-baseline justify-center gap-0.5">
                     <p className="text-2xl font-black">{bfResults ? bfResults.lbm : '---'}</p>
@@ -429,7 +429,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                   </div>
                 </div>
                 <div className="bg-muted/10 p-5 rounded-3xl border border-muted/20 text-center space-y-1.5 group">
-                  <div className="w-1.5 h-1.5 bg-orange-400 rounded-full mx-auto mb-1" />
+                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mx-auto mb-1" />
                   <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Fat Mass</p>
                   <div className="flex items-baseline justify-center gap-0.5">
                     <p className="text-2xl font-black">{bfResults && weight ? (parseFloat(weight) - bfResults.lbm).toFixed(1) : '---'}</p>
@@ -441,7 +441,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <div className="bg-accent/5 p-4 rounded-2xl border border-accent/10 flex items-start gap-3">
                 <Info className="w-4 h-4 text-accent shrink-0 mt-0.5" />
                 <p className="text-[10px] text-accent/80 font-bold leading-relaxed uppercase tracking-tight">
-                  Calculation Method: U.S. Navy Body Fat Formula. This represents an estimate based on circumferential measurements and height.
+                  U.S. Navy Method: Estimated based on circumferential measurements. For accuracy, maintain consistent measurement protocols.
                 </p>
               </div>
             </CardContent>
