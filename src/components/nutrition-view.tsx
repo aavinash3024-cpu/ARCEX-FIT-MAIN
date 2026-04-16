@@ -168,7 +168,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
   const [foodCache, setFoodCache] = useState<Record<string, CachedFoodItem>>({});
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Scroll to top on sub-view change
+  // STABLE SCROLL RESET - INTERNAL NAVIGATION
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
@@ -951,7 +951,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
   const [period, setPeriod] = useState<'weekly' | 'monthly'>('weekly');
   const [refDate, setRefDate] = useState(new Date());
 
-  // Scroll to top on sub-view change
+  // STABLE SCROLL RESET - INTERNAL NAVIGATION
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
@@ -1338,7 +1338,7 @@ function WeeklyMicroTable({ allHistory, targets, micros, title, refDate, period 
 function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'monthly', history: LoggedMeal[], goalData: any }) {
   const [refDate, setRefDate] = useState(new Date());
 
-  // Scroll to top on period change
+  // STABLE SCROLL RESET - TRENDS NAVIGATION
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {

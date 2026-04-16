@@ -88,7 +88,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
   const [profileGender, setProfileGender] = useState("male");
   const [profileAge, setProfileAge] = useState("25");
 
-  // Scroll to top on sub-view change
+  // STABLE SCROLL RESET - INTERNAL NAVIGATION
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {

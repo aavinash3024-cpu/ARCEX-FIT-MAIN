@@ -107,7 +107,7 @@ export function WorkoutView() {
 
   const todayName = format(new Date(), 'EEEE');
 
-  // Scroll to top on sub-view change
+  // STABLE SCROLL RESET - INTERNAL NAVIGATION
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
@@ -1139,7 +1139,7 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
   const [muscleFilter, setMuscleFilter] = useState("ALL");
   const [activeMuscleReport, setActiveMuscleReport] = useState("CHEST");
 
-  // Reset scroll when building splits or switching days
+  // STABLE SCROLL RESET - SPLIT BUILDER NAVIGATION
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
@@ -1511,7 +1511,7 @@ function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
   const [refDate, setRefDate] = useState(new Date());
   const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
 
-  // Reset scroll when navigating history weeks
+  // STABLE SCROLL RESET - HISTORY NAVIGATION
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {

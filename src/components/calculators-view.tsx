@@ -64,7 +64,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
   const [hip, setHip] = useState<string>("");
   const [bfResults, setBfResults] = useState<{ percentage: number; lbm: number; category: string } | null>(null);
 
-  // Scroll to top on tab change
+  // STABLE SCROLL RESET - INTERNAL NAVIGATION
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {

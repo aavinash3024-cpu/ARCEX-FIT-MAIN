@@ -62,7 +62,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
   const [protAdj, setProtAdj] = useState([1.8]);
   const [carbRatio, setCarbRatio] = useState([50]);
 
-  // Reset scroll when switching steps
+  // STABLE SCROLL RESET - INTERNAL NAVIGATION
   useEffect(() => {
     const scrollContainer = document.querySelector('.swipe-container');
     if (scrollContainer) {
