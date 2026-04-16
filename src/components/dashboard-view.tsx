@@ -489,7 +489,7 @@ export function DashboardView({
                               indicatorClassName={
                                 isCalories ? "bg-gradient-to-r from-[#F59202] to-[#FFB84D]" : 
                                 isSteps ? "bg-green-500" : 
-                                isHydration ? "bg-blue-500" : ""
+                                isHydration ? "bg-[#3b82f6]" : ""
                               }
                             />
                             
@@ -499,15 +499,15 @@ export function DashboardView({
                                   className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
                                   style={{ left: `${(bmr / m.targetVal) * 100}%` }}
                                 >
-                                  <span className="text-[6px] font-bold text-rose-500">BMR</span>
-                                  <div className="h-2 w-[1px] bg-rose-500/40" />
+                                  <span className="text-[6px] font-black text-rose-400">BMR</span>
+                                  <div className="h-2 w-[1px] bg-rose-400" />
                                 </div>
                                 <div 
                                   className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
                                   style={{ left: `${Math.min((tdee / m.targetVal) * 100, 98)}%` }}
                                 >
-                                  <span className="text-[6px] font-bold text-primary">TDEE</span>
-                                  <div className="h-2 w-[1px] bg-primary/60" />
+                                  <span className="text-[6px] font-black text-primary">TDEE</span>
+                                  <div className="h-2 w-[1px] bg-primary" />
                                 </div>
                               </>
                             )}

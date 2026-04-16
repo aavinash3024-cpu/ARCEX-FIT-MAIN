@@ -195,7 +195,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
             </div>
           </div>
 
-          <div className="h-[216px] overflow-y-auto swipe-container scroll-smooth">
+          <div className="h-[250px] overflow-y-auto swipe-container scroll-smooth">
             {filteredTasks.length === 0 ? (
               <div className="text-center py-12 flex flex-col items-center gap-3 opacity-20">
                 <div className="w-12 h-12 rounded-full border-2 border-dashed border-foreground/30 flex items-center justify-center">
@@ -209,17 +209,17 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
                   <div key={task.id} className="relative flex items-center justify-between p-4 pl-6 hover:bg-muted/5 transition-colors group">
                     <div className={cn("absolute left-0 top-0 bottom-0 w-1.5", priorityBgColor[task.priority])} />
                     
-                    <div className="flex items-center gap-4 min-w-0">
+                    <div className="flex items-center gap-4 flex-1 min-w-0 mr-2">
                       <Checkbox 
                         checked={task.completed} 
                         onCheckedChange={() => {
                           toggleTask(task.id);
                         }}
-                        className="h-5 w-5 rounded-md border-2 border-primary/20 data-[state=checked]:bg-primary"
+                        className="h-5 w-5 rounded-md border-2 border-primary/20 data-[state=checked]:bg-primary shrink-0"
                       />
-                      <div className="space-y-0.5 min-w-0">
+                      <div className="flex-1 min-w-0 py-0.5">
                         <p className={cn(
-                          "text-xs font-bold transition-all",
+                          "text-xs font-bold transition-all break-all",
                           task.completed ? "text-muted-foreground line-through opacity-50" : "text-foreground"
                         )}>
                           {task.title}
@@ -231,7 +231,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
                       variant="ghost" 
                       size="icon" 
                       onClick={() => deleteTask(task.id)}
-                      className="h-8 w-8 rounded-full text-muted-foreground/40 hover:text-destructive transition-colors"
+                      className="h-8 w-8 rounded-full text-muted-foreground/40 hover:text-destructive transition-colors shrink-0"
                     >
                       <Trash2 className="w-4 h-4" />
                     </Button>
