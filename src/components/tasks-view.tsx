@@ -219,7 +219,7 @@ export function TasksView({ tasks, setTasks, onBack }: TasksViewProps) {
                       />
                       <div className="space-y-0.5 min-w-0">
                         <p className={cn(
-                          "text-xs font-bold transition-all truncate",
+                          "text-xs font-bold transition-all",
                           task.completed ? "text-muted-foreground line-through opacity-50" : "text-foreground"
                         )}>
                           {task.title}

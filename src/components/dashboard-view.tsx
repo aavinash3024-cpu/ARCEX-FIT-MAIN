@@ -499,15 +499,15 @@ export function DashboardView({
                                   className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
                                   style={{ left: `${(bmr / m.targetVal) * 100}%` }}
                                 >
-                                  <span className="text-[6px] font-bold text-destructive/60">BMR</span>
-                                  <div className="h-2 w-[1px] bg-destructive/40" />
+                                  <span className="text-[6px] font-bold text-rose-500">BMR</span>
+                                  <div className="h-2 w-[1px] bg-rose-500/40" />
                                 </div>
                                 <div 
                                   className="absolute bottom-[50%] mb-[3px] flex flex-col items-center -translate-x-1/2" 
                                   style={{ left: `${Math.min((tdee / m.targetVal) * 100, 98)}%` }}
                                 >
-                                  <span className="text-[6px] font-bold text-accent">TDEE</span>
-                                  <div className="h-2 w-[1px] bg-accent/60" />
+                                  <span className="text-[6px] font-bold text-primary">TDEE</span>
+                                  <div className="h-2 w-[1px] bg-primary/60" />
                                 </div>
                               </>
                             )}
@@ -728,19 +728,22 @@ export function DashboardView({
                   {todaysTasks.slice(0, 2).map((task) => (
                     <div key={task.id} className="relative flex items-center justify-between p-3 rounded-xl bg-muted/20 border border-muted/20 shadow-sm group overflow-hidden">
                       <div className={cn("absolute left-0 top-0 bottom-0 w-1", priorityBgColor[task.priority])} />
-                      <div className="flex items-center gap-3 pl-2">
+                      <div className="flex items-center gap-3 pl-2 min-w-0 flex-1">
                         <Checkbox 
                           checked={task.completed} 
                           onCheckedChange={() => onToggleTask(task.id)}
-                          className="h-4 w-4 rounded-md border-2 border-primary/20 data-[state=checked]:bg-primary"
+                          className="h-4 w-4 rounded-md border-2 border-primary/20 data-[state=checked]:bg-primary shrink-0"
                         />
-                        <div className="flex flex-col">
-                          <span className={`text-xs font-bold ${task.completed ? 'text-muted-foreground line-through decoration-muted-foreground/30' : 'text-foreground/80'}`}>
+                        <div className="flex flex-col min-w-0">
+                          <span className={cn(
+                            "text-xs font-bold truncate",
+                            task.completed ? 'text-muted-foreground line-through decoration-muted-foreground/30' : 'text-foreground/80'
+                          )}>
                             {task.title}
                           </span>
                         </div>
                       </div>
-                      <ChevronRight className="w-3 h-3 text-muted-foreground/20" />
+                      <ChevronRight className="w-3 h-3 text-muted-foreground/20 shrink-0" />
                     </div>
                   ))}
                 </>
