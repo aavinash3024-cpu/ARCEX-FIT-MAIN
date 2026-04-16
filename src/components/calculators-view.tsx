@@ -280,7 +280,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
           <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl">
             <CardContent className="p-5 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
-                <Dumbbell className="w-4 h-4 text-orange-600" />
+                <Dumbbell className="w-4 h-4 text-primary" />
                 <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Strength Estimator</h2>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -293,7 +293,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                   <Input type="number" value={reps} onChange={(e) => setReps(e.target.value === "" ? "" : Math.min(1000, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
               </div>
-              <Button onClick={calculateOrm} className="w-full h-12 rounded-xl bg-orange-600 hover:bg-orange-700 text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-orange-600/20 transition-all active:scale-[0.98]">Calculate Max</Button>
+              <Button onClick={calculateOrm} className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">Calculate Max</Button>
             </CardContent>
           </Card>
 
@@ -301,21 +301,21 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
             <CardContent className="p-5 space-y-6">
               <div className="flex items-center justify-between border-b border-muted/10 pb-4">
                 <div className="space-y-0.5">
-                  <p className="text-[9px] font-black text-orange-600 uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
+                  <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
                   <div className="flex items-baseline gap-1">
                     <p className="text-4xl font-black text-foreground tracking-tighter">{ormResult ? ormResult : '---'}</p>
                     <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">kg</span>
                   </div>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-orange-50 flex items-center justify-center border border-orange-100 shadow-inner">
-                  <Trophy className="w-6 h-6 text-orange-600" />
+                <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center border border-primary/10 shadow-inner">
+                  <Trophy className="w-6 h-6 text-primary" />
                 </div>
               </div>
 
               <div className="bg-orange-600/10 p-4 rounded-xl border border-orange-600/20 flex gap-3 items-start">
                 <AlertTriangle className="w-4 h-4 text-orange-600 shrink-0 mt-0.5" />
                 <p className="text-[9px] font-black text-orange-900 leading-relaxed uppercase tracking-tighter">
-                  PRECATION: Do not attempt to test your actual 1RM without a qualified spotter or safety bars. These calculations are estimates based on sub-maximal loads.
+                  PRECAUTION: Do not attempt to test your actual 1RM without a qualified spotter or safety bars. These calculations are estimates based on sub-maximal loads.
                 </p>
               </div>
 
@@ -344,7 +344,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                             <TableCell className="py-0 text-[10px] font-black text-center border-r border-muted/5 text-muted-foreground/50">
                               {Math.round(intensity * 100)}%
                             </TableCell>
-                            <TableCell className="py-0 text-[11px] font-black text-center text-orange-600">
+                            <TableCell className="py-0 text-[11px] font-black text-center text-primary">
                               {weightForReps ? `${Math.round(weightForReps)}` : '---'}
                             </TableCell>
                           </TableRow>
@@ -362,7 +362,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
           <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl">
             <CardContent className="p-5 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
-                <Scale className="w-4 h-4 text-[#08A391]" />
+                <Scale className="w-4 h-4 text-primary" />
                 <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Body Composition</h2>
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -405,7 +405,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                   </div>
                 )}
               </div>
-              <Button onClick={calculateBf} className="w-full h-12 rounded-xl bg-[#08A391] hover:bg-[#068c7b] text-white font-black text-[10px] uppercase tracking-widest shadow-lg shadow-[#08A391]/20 transition-all active:scale-[0.98]">Analyze Composition</Button>
+              <Button onClick={calculateBf} className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">Analyze Composition</Button>
             </CardContent>
           </Card>
 
@@ -413,19 +413,19 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
             <CardContent className="p-5 space-y-5">
               <div className="flex items-center justify-between border-b border-muted/10 pb-4">
                 <div className="space-y-0.5">
-                  <p className="text-[9px] font-black text-[#08A391] uppercase tracking-[0.2em]">Body Fat Percentage</p>
+                  <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Body Fat Percentage</p>
                   <div className="flex items-baseline gap-1 relative z-10">
                     <p className="text-4xl font-black text-foreground tracking-tighter">{bfResults ? bfResults.percentage : '---'}</p>
                     <span className="text-[10px] font-bold text-muted-foreground tracking-tighter">%</span>
                   </div>
                 </div>
-                {bfResults && <Badge className="bg-[#08A391] text-white font-black uppercase tracking-tighter text-[8px] h-5 px-2 rounded-lg">{bfResults.category}</Badge>}
+                {bfResults && <Badge className="bg-primary text-primary-foreground font-black uppercase tracking-tighter text-[8px] h-5 px-2 rounded-lg">{bfResults.category}</Badge>}
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between p-3 rounded-xl bg-muted/5 border border-muted/10">
                   <div className="flex items-center gap-3">
-                    <div className="w-1.5 h-6 bg-[#08A391] rounded-full" />
+                    <div className="w-1.5 h-6 bg-primary rounded-full" />
                     <div>
                       <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Lean Mass</p>
                       <p className="text-sm font-black">{bfResults ? bfResults.lbm : '---'} <span className="text-[9px] text-muted-foreground">KG</span></p>
@@ -434,9 +434,9 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                   <div className="flex items-center gap-3 text-right">
                     <div>
                       <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Fat Mass</p>
-                      <p className="text-sm font-black text-orange-500">{bfResults && weight ? (parseFloat(weight) - bfResults.lbm).toFixed(1) : '---'} <span className="text-[9px] text-muted-foreground">KG</span></p>
+                      <p className="text-sm font-black text-orange-600">{bfResults && weight ? (parseFloat(weight) - bfResults.lbm).toFixed(1) : '---'} <span className="text-[9px] text-muted-foreground">KG</span></p>
                     </div>
-                    <div className="w-1.5 h-6 bg-orange-500 rounded-full" />
+                    <div className="w-1.5 h-6 bg-orange-600 rounded-full" />
                   </div>
                 </div>
                 
