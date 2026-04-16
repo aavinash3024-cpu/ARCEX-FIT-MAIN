@@ -141,9 +141,9 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
       <h1 className="text-2xl font-bold font-headline mb-2 px-1">Progress</h1>
 
       <div className="space-y-4 animate-in fade-in duration-500">
-        {/* Compacted Current Weight Card */}
+        {/* COMPACTED CURRENT WEIGHT CARD */}
         <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl mx-1">
-          <CardContent className="p-4 space-y-4">
+          <CardContent className="p-3.5 space-y-3">
             <div className="flex justify-between items-start">
               <div className="space-y-0.5">
                 <p className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.15em]">Current Weight</p>
@@ -163,28 +163,27 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
               )}
             </div>
 
-            <div className="grid grid-cols-3 gap-2">
-              <div className="text-center p-2 bg-muted/5 rounded-xl border border-muted/10">
+            <div className="grid grid-cols-3 gap-1.5">
+              <div className="text-center p-1.5 bg-muted/5 rounded-xl border border-muted/10">
                  <p className="text-[7px] text-muted-foreground uppercase font-black tracking-widest mb-0.5">Start</p>
                  <p className="font-black text-[10px]">{startWeight > 0 ? startWeight.toFixed(1) : "---"}</p>
               </div>
-              <div className="text-center p-2 bg-muted/5 rounded-xl border border-muted/10">
+              <div className="text-center p-1.5 bg-muted/5 rounded-xl border border-muted/10">
                  <p className="text-[7px] text-muted-foreground uppercase font-black tracking-widest mb-0.5">Goal</p>
                  <p className="font-black text-[10px]">{targetWeight > 0 ? targetWeight.toFixed(1) : "---"}</p>
               </div>
-              <div className="text-center p-2 bg-primary/5 rounded-xl border border-primary/10">
+              <div className="text-center p-1.5 bg-primary/5 rounded-xl border border-primary/10">
                  <p className="text-[7px] text-primary uppercase font-black tracking-widest mb-0.5">Left</p>
                  <p className="font-black text-[10px] text-primary">{targetWeight > 0 ? Math.abs(currentWeight - targetWeight).toFixed(1) : "---"}</p>
               </div>
             </div>
 
-            <div className="pt-3 border-t border-muted/10 space-y-2">
+            <div className="pt-2 border-t border-muted/10 space-y-1.5">
               <div className="flex justify-between items-center">
                 <div className="flex items-center gap-1.5">
                   <Target className="w-3 h-3 text-primary" />
                   <span className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Active Progress</span>
                 </div>
-                <span className="text-[10px] font-black text-[#6b85a3]">{progressPercent}%</span>
               </div>
               <Progress value={progressPercent} className="h-1 bg-muted" indicatorClassName="bg-[#6b85a3]" />
             </div>

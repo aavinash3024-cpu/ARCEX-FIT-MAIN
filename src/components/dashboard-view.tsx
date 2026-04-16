@@ -430,9 +430,7 @@ export function DashboardView({
                       </div>
                       {isStreak ? (
                         <span className="text-[9px] font-black text-primary uppercase tracking-tighter">{streakData.count} DAY STREAK</span>
-                      ) : (
-                        <span className="text-[10px] font-bold text-muted-foreground">{percentage}%</span>
-                      )}
+                      ) : null}
                     </div>
                     
                     <div className="flex items-center justify-between">

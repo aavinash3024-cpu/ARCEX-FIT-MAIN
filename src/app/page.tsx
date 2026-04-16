@@ -54,43 +54,15 @@ export default function PulseFlowApp() {
     }
   }, [user, isUserLoading, auth]);
 
-  // GLOBAL SCROLL RESET MECHANISM
+  // STABLE SCROLL RESET
   useEffect(() => {
-    const mainElement = mainRef.current;
-    if (!mainElement) return;
-
-    const resetScroll = () => {
-      if (mainElement) {
-        const isGuideActive = mainElement.querySelector('[data-view="guide"]');
-        if (isGuideActive) return;
-
-        mainElement.scrollTop = 0;
-        mainElement.scrollTo({ top: 0, behavior: 'instant' });
-      }
-      window.scrollTo(0, 0);
-    };
-
-    const observer = new MutationObserver((mutations) => {
-      const isHistoryActive = mutations.some(m => {
-        const target = m.target as HTMLElement;
-        return target.closest && (target.closest('.accordion-content') || target.closest('.progress-history-list'));
-      });
-      if (isHistoryActive) return;
-
-      const hasStructuralChange = mutations.some(m => 
-        m.type === 'childList' && 
-        (m.addedNodes.length > 0 || m.removedNodes.length > 0)
-      );
-
-      if (hasStructuralChange) {
-        resetScroll();
-      }
-    });
-
-    observer.observe(mainElement, { childList: true, subtree: true });
-
-    return () => observer.disconnect();
-  }, []);
+    // Only reset scroll when switching primary tabs
+    if (mainRef.current && activeTab !== 'guide') {
+      mainRef.current.scrollTop = 0;
+      mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
+    }
+    window.scrollTo(0, 0);
+  }, [activeTab]);
 
   // Back Button / History Support
   useEffect(() => {
@@ -513,23 +485,19 @@ export default function PulseFlowApp() {
         </div>
 
         <div className="flex gap-2">
-          <Button 
+          <button 
             onClick={() => navigateTo('subscription')}
-            variant="ghost" 
-            size="icon" 
-            className="rounded-full bg-muted/50 w-9 h-9"
+            className="rounded-full bg-muted/50 w-9 h-9 flex items-center justify-center"
           >
             <Crown className="w-4 h-4 text-amber-500" />
-          </Button>
-          <Button 
+          </button>
+          <button 
             onClick={() => navigateTo('notifications')}
-            variant="ghost" 
-            size="icon" 
-            className="rounded-full bg-muted/50 w-9 h-9 relative"
+            className="rounded-full bg-muted/50 w-9 h-9 relative flex items-center justify-center"
           >
-            <Bell className="w-4 h-4" />
+            <Bell className="w-4 h-4 text-foreground" />
             <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-primary rounded-full border border-background"></span>
-          </Button>
+          </button>
         </div>
       </header>
 
