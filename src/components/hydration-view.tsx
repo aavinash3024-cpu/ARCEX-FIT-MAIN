@@ -9,7 +9,8 @@ import {
   Plus,
   ChevronLeft, 
   Calendar,
-  CheckCircle2
+  CheckCircle2,
+  Droplets
 } from "lucide-react";
 import { 
   AreaChart, 
@@ -99,23 +100,34 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
                   <Pencil className="w-3.5 h-3.5" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className="rounded-2xl w-[90%] max-w-sm">
-                <DialogHeader>
-                  <DialogTitle className="text-center font-black uppercase text-xs tracking-widest text-primary">Set Daily Target</DialogTitle>
+              <DialogContent className="rounded-[2.5rem] w-[92%] max-w-sm p-8 border-none shadow-2xl overflow-hidden">
+                <DialogHeader className="space-y-4">
+                  <div className="flex justify-center">
+                    <div className="w-12 h-12 rounded-full bg-muted/10 flex items-center justify-center">
+                      <Droplets className="w-6 h-6 text-foreground/40" />
+                    </div>
+                  </div>
+                  <DialogTitle className="text-center font-black uppercase text-sm tracking-[0.2em] text-foreground">
+                    Set Daily Target
+                  </DialogTitle>
                 </DialogHeader>
-                <div className="py-6 flex flex-col items-center gap-4">
-                  <div className="flex items-center gap-3">
-                    <Input 
-                      type="number" 
-                      value={tempTarget} 
-                      onChange={(e) => setTempTarget(Number(e.target.value))}
-                      className="w-32 text-center text-xl font-bold rounded-xl border-muted-foreground/10 h-12"
-                    />
-                    <span className="font-bold text-muted-foreground">ML</span>
+                <div className="py-8 flex flex-col items-center gap-4">
+                  <div className="flex items-center gap-3 w-full">
+                    <div className="relative flex-1">
+                      <Input 
+                        type="number" 
+                        value={tempTarget} 
+                        onChange={(e) => setTempTarget(Number(e.target.value))}
+                        className="w-full text-center text-2xl font-black rounded-2xl border-muted-foreground/10 h-16 bg-muted/5 focus:ring-primary/20 transition-all"
+                      />
+                      <span className="absolute right-4 top-1/2 -translate-y-1/2 text-[10px] font-black text-muted-foreground uppercase tracking-widest">ML</span>
+                    </div>
                   </div>
                 </div>
-                <DialogFooter>
-                  <Button onClick={handleUpdateTarget} className="w-full h-12 rounded-xl bg-primary font-black uppercase text-[11px] tracking-widest">Update Goal</Button>
+                <DialogFooter className="sm:justify-center">
+                  <Button onClick={handleUpdateTarget} className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[11px] tracking-[0.15em] shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+                    Update Goal
+                  </Button>
                 </DialogFooter>
               </DialogContent>
             </Dialog>

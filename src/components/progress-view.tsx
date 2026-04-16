@@ -265,38 +265,49 @@ export function ProgressView({ goalData, weightHistory, onLogWeight, onDeleteWei
               <Plus className="w-4 h-4" /> Log New Weight Entry
             </Button>
           </DialogTrigger>
-          <DialogContent className="rounded-2xl w-[90%] max-w-sm">
-            <DialogHeader>
-              <DialogTitle className="text-center font-black uppercase text-xs tracking-widest text-primary flex items-center justify-center gap-2">
-                <Scale className="w-4 h-4" /> Daily Weight Log
+          <DialogContent className="rounded-[2.5rem] w-[92%] max-w-sm p-8 border-none shadow-2xl overflow-hidden">
+            <DialogHeader className="space-y-4">
+              <div className="flex justify-center">
+                <div className="w-12 h-12 rounded-full bg-muted/10 flex items-center justify-center">
+                  <Scale className="w-6 h-6 text-foreground/40" />
+                </div>
+              </div>
+              <DialogTitle className="text-center font-black uppercase text-sm tracking-[0.2em] text-foreground">
+                Daily Weight Log
               </DialogTitle>
             </DialogHeader>
-            <div className="py-6 space-y-4">
-              <div className="space-y-2">
-                <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">CURRENT WEIGHT (KG)</Label>
-                <Input 
-                  type="number" 
-                  value={newWeight} 
-                  onChange={(e) => {
-                    const val = e.target.value;
-                    if (val === "") {
-                      setNewWeight("");
-                      return;
-                    }
-                    const num = parseFloat(val);
-                    if (num > 1000) {
-                      setNewWeight("1000");
-                    } else {
-                      setNewWeight(val);
-                    }
-                  }}
-                  placeholder={currentWeight > 0 ? currentWeight.toString() : "0.0"}
-                  className="rounded-xl h-12 text-lg font-bold text-center border-muted-foreground/10 bg-muted/5"
-                />
+            <div className="py-8 space-y-6">
+              <div className="space-y-3">
+                <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] block text-center">
+                  Current Weight (kg)
+                </Label>
+                <div className="relative">
+                  <Input 
+                    type="number" 
+                    value={newWeight} 
+                    onChange={(e) => {
+                      const val = e.target.value;
+                      if (val === "") {
+                        setNewWeight("");
+                        return;
+                      }
+                      const num = parseFloat(val);
+                      if (num > 1000) {
+                        setNewWeight("1000");
+                      } else {
+                        setNewWeight(val);
+                      }
+                    }}
+                    placeholder={currentWeight > 0 ? currentWeight.toString() : "0.0"}
+                    className="rounded-2xl h-16 text-2xl font-black text-center border-muted-foreground/10 bg-muted/5 focus:ring-primary/20 transition-all"
+                  />
+                </div>
               </div>
             </div>
-            <DialogFooter>
-              <Button onClick={handleLogWeight} className="w-full h-12 rounded-xl bg-primary font-black uppercase text-[11px] tracking-widest">Save Entry</Button>
+            <DialogFooter className="sm:justify-center">
+              <Button onClick={handleLogWeight} className="w-full h-14 rounded-2xl bg-primary hover:bg-primary/90 text-primary-foreground font-black uppercase text-[11px] tracking-[0.15em] shadow-lg shadow-primary/20 transition-all active:scale-[0.98]">
+                Save Entry
+              </Button>
             </DialogFooter>
           </DialogContent>
         </Dialog>
