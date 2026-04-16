@@ -16,7 +16,8 @@ import {
   Info,
   CircleHelp,
   AlertTriangle,
-  TrendingUp
+  TrendingUp,
+  Percent
 } from "lucide-react";
 import { 
   Select,
@@ -161,8 +162,8 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
         </TabsList>
 
         <TabsContent value="bmr" className="space-y-4 pt-4">
-          <Card className="border-none shadow-sm bg-card overflow-hidden">
-            <CardContent className="p-6 space-y-6">
+          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl">
+            <CardContent className="p-5 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Calculator className="w-4 h-4 text-primary" />
                 <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Input Metrics</h2>
@@ -214,61 +215,49 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg bg-card overflow-hidden rounded-3xl border border-muted/10">
+          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl border border-muted/10">
             <CardContent className="p-6 space-y-6">
-              <div className="text-center space-y-1">
+              <div className="text-left space-y-1">
                 <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">ENERGY BALANCE</h3>
                 <p className="text-[9px] font-bold text-muted-foreground uppercase">ESTIMATED DAILY REQUIREMENTS</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-muted/10 p-5 rounded-3xl border border-muted/20 flex flex-col items-center text-center space-y-2 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-orange-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center shadow-sm relative z-10 border border-muted/20">
-                    <Flame className="w-5 h-5 text-orange-500" />
-                  </div>
-                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest relative z-10">BMR</p>
-                  <p className="text-3xl font-black relative z-10">{bmrResults ? bmrResults.bmr : '---'}</p>
-                  <p className="text-[8px] font-black text-muted-foreground uppercase tracking-tighter relative z-10">KCAL/DAY</p>
-                </div>
-                <div className="bg-muted/10 p-5 rounded-3xl border border-muted/20 flex flex-col items-center text-center space-y-2 relative overflow-hidden group">
-                  <div className="absolute inset-0 bg-gradient-to-br from-sky-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="w-10 h-10 rounded-full bg-background flex items-center justify-center shadow-sm relative z-10 border border-muted/20">
-                    <Zap className="w-5 h-5 text-sky-500" />
-                  </div>
-                  <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest relative z-10">TDEE</p>
-                  <p className="text-3xl font-black relative z-10">{bmrResults ? bmrResults.tdee : '---'}</p>
-                  <p className="text-[8px] font-black text-muted-foreground uppercase tracking-tighter relative z-10">KCAL/DAY</p>
-                </div>
-              </div>
-
-              <div className="bg-muted/5 p-4 rounded-2xl border border-muted/10 space-y-3">
-                <div className="flex items-start gap-3">
-                  <CircleHelp className="w-4 h-4 text-primary shrink-0 mt-0.5" />
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-black uppercase text-foreground/80">TECHNICAL DEFINITIONS</p>
-                    <div className="space-y-2">
-                      <p className="text-[10px] leading-relaxed text-muted-foreground font-medium">
-                        <span className="font-bold text-foreground/70 uppercase">Basal Metabolic Rate:</span> The minimum energy required at rest.
-                      </p>
-                      <p className="text-[10px] leading-relaxed text-muted-foreground font-medium">
-                        <span className="font-bold text-foreground/70 uppercase">TDEE:</span> BMR plus your daily physical activity impact.
-                      </p>
+              <div className="grid grid-cols-1 gap-3">
+                <div className="bg-orange-500/5 p-4 rounded-xl border border-orange-500/10 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border border-orange-500/20">
+                      <Flame className="w-4 h-4 text-orange-500" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Basal Metabolism</p>
+                      <p className="text-xl font-black">{bmrResults ? bmrResults.bmr : '---'}</p>
                     </div>
                   </div>
+                  <Badge variant="outline" className="text-[8px] font-black border-orange-500/20 text-orange-600 bg-white">KCAL/DAY</Badge>
+                </div>
+                
+                <div className="bg-sky-500/5 p-4 rounded-xl border border-sky-500/10 flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border border-sky-500/20">
+                      <Zap className="w-4 h-4 text-sky-500" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Total Expenditure</p>
+                      <p className="text-xl font-black">{bmrResults ? bmrResults.tdee : '---'}</p>
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="text-[8px] font-black border-sky-500/20 text-sky-600 bg-white">KCAL/DAY</Badge>
                 </div>
               </div>
 
               {bmrResults && (
-                <div className="bg-[#6b85a3] p-5 rounded-2xl text-white shadow-xl shadow-[#6b85a3]/20 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-4 opacity-10">
-                    <Flame className="w-16 h-16" />
-                  </div>
-                  <div className="relative z-10 space-y-1">
-                    <p className="text-[9px] font-black uppercase tracking-widest opacity-80">MAINTENANCE GOAL</p>
-                    <p className="text-xs font-bold leading-relaxed">
-                      Consume <span className="text-base font-black px-1">{bmrResults.tdee}</span> calories per day to maintain current weight.
+                <div className="bg-[#6b85a3] p-4 rounded-xl text-white shadow-lg shadow-[#6b85a3]/10 relative overflow-hidden">
+                  <div className="relative z-10 flex items-center justify-between">
+                    <p className="text-[10px] font-bold leading-tight">
+                      <span className="block text-[8px] font-black uppercase opacity-60 mb-0.5">MAINTENANCE STRATEGY</span>
+                      Consume {bmrResults.tdee} kcal to maintain weight.
                     </p>
+                    <Flame className="w-5 h-5 opacity-40" />
                   </div>
                 </div>
               )}
@@ -277,8 +266,8 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
         </TabsContent>
 
         <TabsContent value="1rm" className="space-y-4 pt-4">
-          <Card className="border-none shadow-sm bg-card overflow-hidden">
-            <CardContent className="p-6 space-y-6">
+          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl">
+            <CardContent className="p-5 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Dumbbell className="w-4 h-4 text-amber-500" />
                 <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Strength Estimator</h2>
@@ -297,49 +286,44 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg bg-card overflow-hidden rounded-3xl border border-muted/10">
+          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl border border-muted/10">
             <CardContent className="p-5 space-y-6">
-              <div className="bg-amber-500/5 p-6 rounded-3xl border border-amber-500/10 flex flex-col items-center text-center space-y-1.5 relative overflow-hidden shadow-inner">
-                <div className="absolute -right-4 -top-4 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl" />
-                <Trophy className="w-8 h-8 text-amber-500 mb-1 drop-shadow-sm" />
-                <p className="text-[10px] font-black text-amber-600 uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
-                <div className="flex items-baseline gap-1">
-                  <p className="text-5xl font-black text-foreground tracking-tighter">{ormResult ? ormResult : '---'}</p>
-                  <span className="text-sm font-bold text-muted-foreground uppercase tracking-tighter">kg</span>
+              <div className="flex items-center justify-between border-b border-muted/10 pb-4">
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-black text-amber-600 uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
+                  <div className="flex items-baseline gap-1">
+                    <p className="text-4xl font-black text-foreground tracking-tighter">{ormResult ? ormResult : '---'}</p>
+                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">kg</span>
+                  </div>
                 </div>
-              </div>
-
-              <div className="bg-amber-50/10 p-4 rounded-2xl border border-amber-50/20 flex items-start gap-3">
-                <AlertTriangle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                <p className="text-[9px] text-amber-800 font-bold leading-tight uppercase tracking-tight">
-                  PR SAFETY: Personal records should always be attempted with a spotter or in a power rack with safety pins.
-                </p>
+                <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center border border-amber-100 shadow-inner">
+                  <Trophy className="w-6 h-6 text-amber-500" />
+                </div>
               </div>
 
               <div className="space-y-3">
                 <div className="flex items-center justify-between">
-                  <h4 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
-                    <Activity className="w-3.5 h-3.5" /> Load Intensity Table
+                  <h4 className="text-[9px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+                    <Activity className="w-3.5 h-3.5" /> INTENSITY MATRIX
                   </h4>
-                  <Badge variant="outline" className="text-[8px] h-4 font-black uppercase opacity-60">Epley Formula</Badge>
                 </div>
-                <div className="rounded-2xl border border-muted/20 overflow-hidden shadow-sm">
+                <div className="rounded-xl border border-muted/20 overflow-hidden bg-muted/5">
                   <Table>
-                    <TableHeader className="bg-muted/30">
+                    <TableHeader className="bg-muted/10">
                       <TableRow className="hover:bg-transparent border-b-muted/10">
-                        <TableHead className="h-9 text-[8px] font-black uppercase text-center border-r border-muted/10">Reps</TableHead>
-                        <TableHead className="h-9 text-[8px] font-black uppercase text-center border-r border-muted/10">Intensity</TableHead>
-                        <TableHead className="h-9 text-[8px] font-black uppercase text-center">Load (kg)</TableHead>
+                        <TableHead className="h-8 text-[7px] font-black uppercase text-center border-r border-muted/10">Reps</TableHead>
+                        <TableHead className="h-8 text-[7px] font-black uppercase text-center border-r border-muted/10">Intensity</TableHead>
+                        <TableHead className="h-8 text-[7px] font-black uppercase text-center">Load (kg)</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
-                      {[2, 4, 6, 8, 10, 12].map((repCount) => {
+                      {[2, 4, 6, 8, 10].map((repCount) => {
                         const intensity = 1 / (1 + (repCount / 30));
                         const weightForReps = ormResult ? ormResult * intensity : null;
                         return (
-                          <TableRow key={repCount} className="hover:bg-muted/5 border-b-muted/5 last:border-0 h-10">
+                          <TableRow key={repCount} className="hover:bg-muted/5 border-b-muted/5 last:border-0 h-9">
                             <TableCell className="py-0 text-[10px] font-bold text-center border-r border-muted/5">{repCount}</TableCell>
-                            <TableCell className="py-0 text-[10px] font-black text-center border-r border-muted/5 text-muted-foreground/60">
+                            <TableCell className="py-0 text-[10px] font-black text-center border-r border-muted/5 text-muted-foreground/50">
                               {Math.round(intensity * 100)}%
                             </TableCell>
                             <TableCell className="py-0 text-[11px] font-black text-center text-amber-600">
@@ -357,8 +341,8 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
         </TabsContent>
 
         <TabsContent value="bodyfat" className="space-y-4 pt-4">
-          <Card className="border-none shadow-sm bg-card overflow-hidden">
-            <CardContent className="p-6 space-y-6">
+          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl">
+            <CardContent className="p-5 space-y-6">
               <div className="flex items-center gap-2 pb-2 border-b border-muted/20">
                 <Scale className="w-4 h-4 text-[#08A391]" />
                 <h2 className="text-xs font-black uppercase tracking-widest text-foreground/80">Body Composition</h2>
@@ -407,42 +391,43 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
             </CardContent>
           </Card>
 
-          <Card className="border-none shadow-lg bg-card overflow-hidden rounded-3xl border border-muted/10">
-            <CardContent className="p-5 space-y-6">
-              <div className="bg-[#08A391]/5 p-6 rounded-3xl border border-[#08A391]/10 flex flex-col items-center text-center space-y-1 relative overflow-hidden shadow-inner">
-                <Activity className="absolute -right-4 -top-4 w-20 h-20 text-[#08A391]/10 -rotate-12" />
-                <p className="text-[10px] font-black text-[#08A391] uppercase tracking-[0.2em]">Body Fat Percentage</p>
-                <div className="flex items-baseline gap-1 relative z-10">
-                  <p className="text-5xl font-black text-foreground tracking-tighter">{bfResults ? bfResults.percentage : '---'}</p>
-                  <span className="text-base font-bold text-muted-foreground tracking-tighter">%</span>
+          <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl border border-muted/10">
+            <CardContent className="p-5 space-y-5">
+              <div className="flex items-center justify-between border-b border-muted/10 pb-4">
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-black text-[#08A391] uppercase tracking-[0.2em]">Body Fat Percentage</p>
+                  <div className="flex items-baseline gap-1 relative z-10">
+                    <p className="text-4xl font-black text-foreground tracking-tighter">{bfResults ? bfResults.percentage : '---'}</p>
+                    <span className="text-[10px] font-bold text-muted-foreground tracking-tighter">%</span>
+                  </div>
                 </div>
-                {bfResults && <Badge className="bg-[#08A391] text-white font-black uppercase tracking-tighter text-[9px] mt-2 h-6 px-3 shadow-md">{bfResults.category}</Badge>}
+                {bfResults && <Badge className="bg-[#08A391] text-white font-black uppercase tracking-tighter text-[8px] h-5 px-2 rounded-lg">{bfResults.category}</Badge>}
               </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <div className="bg-muted/10 p-5 rounded-3xl border border-muted/20 text-center space-y-1.5 group">
-                  <div className="w-1.5 h-1.5 bg-[#08A391] rounded-full mx-auto mb-1" />
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Lean Mass</p>
-                  <div className="flex items-baseline justify-center gap-0.5">
-                    <p className="text-2xl font-black">{bfResults ? bfResults.lbm : '---'}</p>
-                    <span className="text-[10px] font-bold text-muted-foreground">KG</span>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between p-3 rounded-xl bg-muted/5 border border-muted/10">
+                  <div className="flex items-center gap-3">
+                    <div className="w-1.5 h-6 bg-[#08A391] rounded-full" />
+                    <div>
+                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Lean Mass</p>
+                      <p className="text-sm font-black">{bfResults ? bfResults.lbm : '---'} <span className="text-[9px] text-muted-foreground">KG</span></p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-3 text-right">
+                    <div>
+                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Fat Mass</p>
+                      <p className="text-sm font-black text-orange-500">{bfResults && weight ? (parseFloat(weight) - bfResults.lbm).toFixed(1) : '---'} <span className="text-[9px] text-muted-foreground">KG</span></p>
+                    </div>
+                    <div className="w-1.5 h-6 bg-orange-500 rounded-full" />
                   </div>
                 </div>
-                <div className="bg-muted/10 p-5 rounded-3xl border border-muted/20 text-center space-y-1.5 group">
-                  <div className="w-1.5 h-1.5 bg-orange-500 rounded-full mx-auto mb-1" />
-                  <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Fat Mass</p>
-                  <div className="flex items-baseline justify-center gap-0.5">
-                    <p className="text-2xl font-black">{bfResults && weight ? (parseFloat(weight) - bfResults.lbm).toFixed(1) : '---'}</p>
-                    <span className="text-[10px] font-bold text-muted-foreground">KG</span>
-                  </div>
+                
+                <div className="bg-accent/5 p-3 rounded-xl border border-accent/10 flex items-start gap-3">
+                  <Info className="w-3.5 h-3.5 text-accent shrink-0 mt-0.5" />
+                  <p className="text-[9px] text-accent/70 font-bold uppercase tracking-tight">
+                    Navy Method: Estimated based on circumference measurements.
+                  </p>
                 </div>
-              </div>
-              
-              <div className="bg-accent/5 p-4 rounded-2xl border border-accent/10 flex items-start gap-3">
-                <Info className="w-4 h-4 text-accent shrink-0 mt-0.5" />
-                <p className="text-[10px] text-accent/80 font-bold leading-relaxed uppercase tracking-tight">
-                  U.S. Navy Method: Estimated based on circumferential measurements. For accuracy, maintain consistent measurement protocols.
-                </p>
               </div>
             </CardContent>
           </Card>
