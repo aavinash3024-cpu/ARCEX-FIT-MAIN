@@ -299,16 +299,28 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
 
           <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl border border-muted/10">
             <CardContent className="p-5 space-y-6">
-              <div className="flex items-center justify-between border-b border-muted/10 pb-4">
-                <div className="space-y-0.5">
-                  <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Estimated 1 Rep Max</p>
-                  <div className="flex items-baseline gap-1">
-                    <p className="text-4xl font-black text-foreground tracking-tighter">{ormResult ? ormResult : '---'}</p>
-                    <span className="text-[10px] font-bold text-muted-foreground uppercase tracking-tighter">kg</span>
+              <div className="text-left space-y-1">
+                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">MAXIMUM PERFORMANCE</h3>
+                <p className="text-[9px] font-bold text-muted-foreground uppercase">ESTIMATED STRENGTH LIMITS</p>
+              </div>
+
+              <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border border-primary/20">
+                      <Trophy className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Estimated 1 Rep Max</p>
+                      <p className="text-xl font-black">{ormResult ? ormResult : '---'}</p>
+                    </div>
                   </div>
+                  <Badge variant="outline" className="text-[8px] font-black border-primary/20 text-primary bg-white">KG</Badge>
                 </div>
-                <div className="w-12 h-12 rounded-xl bg-primary/5 flex items-center justify-center border border-primary/10 shadow-inner">
-                  <Trophy className="w-6 h-6 text-primary" />
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <p className="text-[8px] font-bold text-primary leading-tight uppercase">
+                    What it means: The maximum weight you could theoretically lift for a single repetition based on your sub-maximal performance.
+                  </p>
                 </div>
               </div>
 
@@ -410,16 +422,33 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
           </Card>
 
           <Card className="border-none shadow-sm bg-card overflow-hidden rounded-2xl border border-muted/10">
-            <CardContent className="p-5 space-y-5">
-              <div className="flex items-center justify-between border-b border-muted/10 pb-4">
-                <div className="space-y-0.5">
-                  <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Body Fat Percentage</p>
-                  <div className="flex items-baseline gap-1 relative z-10">
-                    <p className="text-4xl font-black text-foreground tracking-tighter">{bfResults ? bfResults.percentage : '---'}</p>
-                    <span className="text-[10px] font-bold text-muted-foreground tracking-tighter">%</span>
+            <CardContent className="p-6 space-y-6">
+              <div className="text-left space-y-1">
+                <h3 className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">BODY AUDIT</h3>
+                <p className="text-[9px] font-bold text-muted-foreground uppercase">TISSUE ANALYSIS SUMMARY</p>
+              </div>
+
+              <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-3">
+                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border border-primary/20">
+                      <Scale className="w-4 h-4 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Body Fat Percentage</p>
+                      <div className="flex items-center gap-2">
+                        <p className="text-xl font-black">{bfResults ? bfResults.percentage : '---'}</p>
+                        {bfResults && <Badge className="bg-primary text-primary-foreground font-black uppercase tracking-tighter text-[7px] h-4 px-1.5 rounded-lg">{bfResults.category}</Badge>}
+                      </div>
+                    </div>
                   </div>
+                  <Badge variant="outline" className="text-[8px] font-black border-primary/20 text-primary bg-white">%</Badge>
                 </div>
-                {bfResults && <Badge className="bg-primary text-primary-foreground font-black uppercase tracking-tighter text-[8px] h-5 px-2 rounded-lg">{bfResults.category}</Badge>}
+                <div className="bg-primary/10 p-2 rounded-lg">
+                  <p className="text-[8px] font-bold text-primary leading-tight uppercase">
+                    What it means: The percentage of your total body weight that is composed of adipose tissue (fat) versus lean mass (muscle, bone, water).
+                  </p>
+                </div>
               </div>
 
               <div className="space-y-4">
@@ -441,8 +470,8 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 </div>
                 
                 <div className="bg-muted/5 p-3 rounded-xl border border-muted/10 flex items-start gap-3">
-                  <Info className="w-3.5 h-3.5 text-foreground/40 shrink-0 mt-0.5" />
-                  <p className="text-[9px] text-foreground/60 font-bold uppercase tracking-tight leading-relaxed">
+                  <Info className="w-3.5 h-3.5 text-foreground/60 shrink-0 mt-0.5" />
+                  <p className="text-[9px] text-foreground/80 font-bold uppercase tracking-tight leading-relaxed">
                     Navy Method: Estimated based on circumference measurements of the neck, waist, and hips.
                   </p>
                 </div>
