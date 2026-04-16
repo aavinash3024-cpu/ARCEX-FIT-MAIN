@@ -107,6 +107,14 @@ export function WorkoutView() {
 
   const todayName = format(new Date(), 'EEEE');
 
+  // Scroll to top on sub-view change
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.swipe-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [activeSubView, selectedExercise, loggingExercise]);
+
   useEffect(() => {
     const savedSplit = localStorage.getItem('pulseflow_workout_split');
     if (savedSplit) {

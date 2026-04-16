@@ -168,6 +168,14 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
   const [foodCache, setFoodCache] = useState<Record<string, CachedFoodItem>>({});
   const [isLoaded, setIsLoaded] = useState(false);
 
+  // Scroll to top on sub-view change
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.swipe-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [showSummary, showMacroAnalysis, showMicroAnalysis]);
+
   useEffect(() => {
     const savedRecent = localStorage.getItem('pulseflow_recent_meals');
     const savedFavorites = localStorage.getItem('pulseflow_saved_meals');
@@ -903,7 +911,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
         </CardContent>
       </Card>
 
-      <div className="grid grid-cols-2 gap-4">
+      <div className="grid grid-cols-2 gap-4 mx-1">
         <Card 
           onClick={() => setShowMicroAnalysis(true)}
           className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer transition-all group shadow-none"
@@ -942,6 +950,14 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
   const [showDetails, setShowDetails] = useState(false);
   const [period, setPeriod] = useState<'weekly' | 'monthly'>('weekly');
   const [refDate, setRefDate] = useState(new Date());
+
+  // Scroll to top on sub-view change
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.swipe-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [showDetails, period]);
 
   const handlePrev = () => {
     if (period === 'weekly') setRefDate(prev => subWeeks(prev, 1));
@@ -1321,6 +1337,14 @@ function WeeklyMicroTable({ allHistory, targets, micros, title, refDate, period 
 
 function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'monthly', history: LoggedMeal[], goalData: any }) {
   const [refDate, setRefDate] = useState(new Date());
+
+  // Scroll to top on period change
+  useEffect(() => {
+    const scrollContainer = document.querySelector('.swipe-container');
+    if (scrollContainer) {
+      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
+    }
+  }, [refDate]);
 
   const handlePrev = () => {
     if (period === 'weekly') setRefDate(prev => subWeeks(prev, 1));
