@@ -374,43 +374,36 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   const renderSubscription = () => (
-    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 px-1 pb-24">
-      <div className="space-y-2 px-3">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1 pb-24">
+      {/* Current Status Card */}
+      <Card className="border-none bg-primary/10 rounded-[2rem] border border-primary/20 shadow-sm overflow-hidden mx-1">
+        <CardContent className="p-5 flex items-center justify-between">
+          <div className="flex items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
+              <Crown className="w-6 h-6 text-white" />
+            </div>
+            <div>
+              <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Active Membership</p>
+              <h3 className="text-lg font-black text-foreground uppercase tracking-tighter">ELITE PREMIUM</h3>
+            </div>
+          </div>
+          <div className="text-right">
+            <Badge variant="outline" className="border-primary/30 text-primary text-[8px] font-black uppercase tracking-widest">PRO</Badge>
+            <p className="text-[8px] font-bold text-muted-foreground uppercase mt-1 tracking-tighter">Renews 24 Oct</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="space-y-2 px-3 pt-2">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Choose Your Strategy</h3>
         <p className="text-sm font-bold text-foreground/80">Unlock the full power of ARCEX Elite.</p>
       </div>
 
-      <div className="grid gap-6">
-        <Card className="border-none bg-card rounded-[2rem] border border-muted/10 shadow-sm overflow-hidden">
-          <CardContent className="p-6 space-y-6">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center">
-                <Shield className="w-4 h-4 text-muted-foreground" />
-              </div>
-              <h4 className="text-sm font-black uppercase tracking-tight">Standard Features (Free)</h4>
-            </div>
-            <div className="grid gap-3">
-              {[
-                { label: 'Hydration Tracking with Weekly Analysis', icon: HeartPulse },
-                { label: 'Steps Tracking with Weekly Analysis', icon: Activity },
-                { label: 'Activity Streak & Badges', icon: Zap },
-                { label: 'Daily Task Management System', icon: ListTodo },
-                { label: 'Custom Workout Creation', icon: Dumbbell }
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <div className="mt-0.5">
-                    <Check className="w-3.5 h-3.5 text-muted-foreground/40" />
-                  </div>
-                  <span className="text-xs font-bold text-foreground/60 uppercase">{item.label}</span>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card className="border-none bg-primary/5 rounded-[2rem] border-2 border-primary/20 shadow-xl overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-6 opacity-[0.05] pointer-events-none">
-            <Crown className="w-24 h-24 text-primary" />
+      <div className="grid gap-4">
+        {/* Elite Card */}
+        <Card className="border-none bg-card rounded-[2rem] border border-muted/10 shadow-xl overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
+            <Sparkles className="w-32 h-32 text-primary" />
           </div>
           <CardContent className="p-6 space-y-6">
             <div className="flex items-center gap-2 mb-2">
@@ -419,6 +412,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
               </div>
               <h4 className="text-sm font-black uppercase tracking-tight text-primary">Elite Benefits (Premium)</h4>
             </div>
+            
             <div className="grid gap-3">
               {[
                 { label: 'Workout Strength Growth Analytics', icon: TrendingUp },
@@ -428,9 +422,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 { label: 'Full Micro & Macro Nutrient Analysis', icon: LineChart },
                 { label: 'YOUR PERSONAL AI PROGRESS ANALYSIS', icon: Sparkles, highlight: true }
               ].map((item, i) => (
-                <div key={i} className={cn("flex items-start gap-3", item.highlight && "bg-primary/10 p-2 -mx-2 rounded-lg")}>
+                <div key={i} className={cn("flex items-start gap-3", item.highlight && "bg-primary/10 p-2.5 -mx-2 rounded-xl border border-primary/10")}>
                   <div className="mt-0.5">
-                    <Star className={cn("w-3.5 h-3.5", item.highlight ? "text-primary fill-primary" : "text-primary")} />
+                    <CheckCircle2 className={cn("w-4 h-4", item.highlight ? "text-primary fill-primary/20" : "text-primary/40")} />
                   </div>
                   <span className={cn("text-xs font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground/80")}>
                     {item.label}
@@ -440,9 +434,35 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
             </div>
           </CardContent>
         </Card>
+
+        {/* Standard Card */}
+        <Card className="border-none bg-card rounded-[2rem] border border-muted/10 shadow-sm overflow-hidden opacity-80">
+          <CardContent className="p-6 space-y-4">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center">
+                <Shield className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <h4 className="text-sm font-black uppercase tracking-tight">Standard Features (Free)</h4>
+            </div>
+            <div className="grid gap-2.5">
+              {[
+                { label: 'Hydration Tracking with Weekly Analysis' },
+                { label: 'Steps Tracking with Weekly Analysis' },
+                { label: 'Activity Streak & Badges' },
+                { label: 'Daily Task Manager' },
+                { label: 'Custom Workout Creation' }
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <Check className="w-3.5 h-3.5 text-muted-foreground/30 mt-0.5" />
+                  <span className="text-[11px] font-bold text-foreground/50 uppercase tracking-tight">{item.label}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 pt-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Elite Commitment Plans</h3>
         
         <div className="grid gap-3">
@@ -481,9 +501,6 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
             </Card>
           ))}
         </div>
-        <p className="text-[8px] text-center text-muted-foreground/40 font-bold uppercase tracking-widest px-4">
-          All premium plans unlock the exact same Elite features. Choose the duration that fits your fitness journey.
-        </p>
       </div>
     </div>
   );

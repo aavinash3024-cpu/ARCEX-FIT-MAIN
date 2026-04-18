@@ -79,7 +79,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
     const w = parseFloat(weight);
     const h = parseFloat(height);
     const a = parseFloat(age);
-    if (isNaN(w) || iNaN(h) || isNaN(a)) return;
+    if (isNaN(w) || isNaN(h) || isNaN(a)) return;
 
     let bmrVal = (10 * w) + (6.25 * h) - (5 * a);
     if (gender === 'male') bmrVal += 5;
