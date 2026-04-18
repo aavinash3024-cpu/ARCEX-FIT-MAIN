@@ -15,7 +15,6 @@ import {
   Bookmark,
   Clock,
   Mic,
-  Camera,
   ChevronRight,
   ChevronLeft,
   Loader2,
@@ -29,16 +28,9 @@ import {
   Zap,
   Info,
   Check,
-  Activity,
-  Droplets,
   HeartPulse,
-  Flame,
-  Dumbbell,
   X,
-  ShieldCheck,
-  Table as TableIcon,
-  CircleCheck,
-  AlertCircle
+  ShieldCheck
 } from "lucide-react";
 import { 
   AreaChart, 
@@ -47,12 +39,9 @@ import {
   YAxis, 
   CartesianGrid, 
   Tooltip, 
-  ResponsiveContainer,
-  Bar,
-  BarChart
+  ResponsiveContainer
 } from 'recharts';
 import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 import { parseMeal } from '@/ai/flows/parse-meal-flow';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { cn } from '@/lib/utils';
@@ -65,7 +54,6 @@ import {
   isWithinInterval, 
   startOfMonth, 
   endOfMonth, 
-  isSameDay,
   addWeeks,
   subWeeks,
   addMonths,
@@ -140,7 +128,9 @@ interface CachedFoodItem {
 interface NutritionViewProps {
   loggedMeals: LoggedMeal[];
   setLoggedMeals: React.Dispatch<React.SetStateAction<LoggedMeal[]>>;
-  initialShowSummary?: boolean;
+  activeView?: 'log' | 'summary' | 'micro' | 'macro';
+  onNavigate: (tab: string) => void;
+  initialShowSummary?: boolean; // Maintain compatibility
 }
 
 const MACRO_COLORS = {
@@ -150,34 +140,12 @@ const MACRO_COLORS = {
   fiber: "#10b981"
 };
 
-/** 
- * Common scroll reset utility for internal navigation.
- * Targets the main scrollable container by ID.
- */
-function triggerScrollReset() {
-  const container = document.getElementById('main-scroll-container');
-  if (container) {
-    // Stage 1: Immediate reset
-    container.scrollTop = 0;
-    container.scrollTo({ top: 0, behavior: 'instant' });
-    
-    // Stage 2: Next frame reset (ensures React has painted the new content)
-    requestAnimationFrame(() => {
-      container.scrollTop = 0;
-    });
-
-    // Stage 3: Tiny timeout safety (prevents browser anchoring persistence)
-    setTimeout(() => {
-      container.scrollTop = 0;
-    }, 10);
-  }
-}
-
-export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary = false }: NutritionViewProps) {
+export function NutritionView({ loggedMeals, setLoggedMeals, activeView = 'log', onNavigate, initialShowSummary }: NutritionViewProps) {
   const { toast } = useToast();
-  const [showSummary, setShowSummary] = useState(initialShowSummary);
-  const [showMacroAnalysis, setShowMacroAnalysis] = useState(false);
-  const [showMicroAnalysis, setShowMicroAnalysis] = useState(false);
+  
+  // Use official navigation state from props
+  const currentView = initialShowSummary ? 'summary' : activeView;
+
   const [logTab, setLogTab] = useState("log");
   const [mealInput, setMealInput] = useState("");
   const [isParsing, setIsParsing] = useState(false);
@@ -190,11 +158,6 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
   const [goalData, setGoalData] = useState<any>(null);
   const [foodCache, setFoodCache] = useState<Record<string, CachedFoodItem>>({});
   const [isLoaded, setIsLoaded] = useState(false);
-
-  // AGGRESSIVE INTERNAL SCROLL RESET
-  useEffect(() => {
-    triggerScrollReset();
-  }, [showSummary, showMacroAnalysis, showMicroAnalysis]);
 
   useEffect(() => {
     const savedRecent = localStorage.getItem('pulseflow_recent_meals');
@@ -488,13 +451,13 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
     return savedMeals.some(s => s.name.toLowerCase() === mealName.toLowerCase());
   };
 
-  if (showMicroAnalysis) return <MicroAnalysisView key="micro-view" allHistory={allHistory} loggedMeals={loggedMeals} goalData={goalData} onBack={() => setShowMicroAnalysis(false)} />;
+  if (currentView === 'micro') return <MicroAnalysisView key="micro-view" allHistory={allHistory} loggedMeals={loggedMeals} goalData={goalData} onBack={() => onNavigate('nutrition')} onNavigate={onNavigate} />;
 
-  if (showMacroAnalysis) {
+  if (currentView === 'macro') {
     return (
       <div key="macro-view" className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
-          <Button variant="ghost" size="icon" onClick={() => setShowMacroAnalysis(false)} className="rounded-full bg-muted/50 w-9 h-9">
+          <Button variant="ghost" size="icon" onClick={() => onNavigate('nutrition')} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
           </Button>
           <h1 className="text-2xl font-bold font-headline">Macro Analysis</h1>
@@ -516,7 +479,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
     );
   }
 
-  if (showSummary) {
+  if (currentView === 'summary') {
     const totals = loggedMeals.reduce((acc, meal) => ({
       calories: acc.calories + meal.calories,
       protein: acc.protein + meal.protein,
@@ -570,7 +533,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
     return (
       <div key="summary-view" className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
-          <Button variant="ghost" size="icon" onClick={() => setShowSummary(false)} className="rounded-full bg-muted/50 w-9 h-9">
+          <Button variant="ghost" size="icon" onClick={() => onNavigate('nutrition')} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
           </Button>
           <h1 className="text-2xl font-bold font-headline">Daily Summary</h1>
@@ -891,7 +854,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
               <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground/30">LOGGED ITEMS</p>
             </div>
             <button 
-              onClick={() => setShowSummary(true)} 
+              onClick={() => onNavigate('nutrition-summary')} 
               className="text-[9px] font-bold text-foreground uppercase flex items-center hover:opacity-70 transition-opacity"
             >
               View Summary <ChevronRight className="w-3 h-3 ml-0.5" />
@@ -933,7 +896,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
 
       <div className="grid grid-cols-2 gap-4 mx-1">
         <Card 
-          onClick={() => setShowMicroAnalysis(true)}
+          onClick={() => onNavigate('nutrition-micro')}
           className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer transition-all group shadow-none"
         >
           <CardContent className="p-5 flex flex-col items-start gap-3 relative">
@@ -948,7 +911,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
         </Card>
 
         <Card 
-          onClick={() => setShowMacroAnalysis(true)}
+          onClick={() => onNavigate('nutrition-macro')}
           className="border-none bg-card overflow-hidden rounded-[1.5rem] border border-muted/10 cursor-pointer transition-all group shadow-none"
         >
           <CardContent className="p-5 flex flex-col items-start gap-3 relative">
@@ -966,15 +929,10 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
   );
 }
 
-function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allHistory: LoggedMeal[], loggedMeals: LoggedMeal[], goalData: any, onBack: () => void }) {
+function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack, onNavigate }: { allHistory: LoggedMeal[], loggedMeals: LoggedMeal[], goalData: any, onBack: () => void, onNavigate: (tab: string) => void }) {
   const [showDetails, setShowDetails] = useState(false);
   const [period, setPeriod] = useState<'weekly' | 'monthly'>('weekly');
   const [refDate, setRefDate] = useState(new Date());
-
-  // INTERNAL RESET
-  useEffect(() => {
-    triggerScrollReset();
-  }, [showDetails, period, refDate]);
 
   const handlePrev = () => {
     if (period === 'weekly') setRefDate(prev => subWeeks(prev, 1));
@@ -1003,17 +961,6 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
       };
     }
   }, [refDate, period]);
-
-  const periodMeals = useMemo(() => {
-    return allHistory.filter(m => {
-      const d = new Date(m.timestamp);
-      return isWithinInterval(d, interval);
-    });
-  }, [allHistory, interval]);
-
-  const trackedDaysInPeriod = useMemo(() => {
-    return Array.from(new Set(periodMeals.map(m => m.dateStr))).length;
-  }, [periodMeals]);
 
   const todayTotals = useMemo(() => {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
@@ -1356,11 +1303,6 @@ function WeeklyMicroTable({ allHistory, targets, micros, title, refDate, period 
 
 function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'monthly', history: LoggedMeal[], goalData: any }) {
   const [refDate, setRefDate] = useState(new Date());
-
-  // INTERNAL RESET
-  useEffect(() => {
-    triggerScrollReset();
-  }, [refDate]);
 
   const handlePrev = () => {
     if (period === 'weekly') setRefDate(prev => subWeeks(prev, 1));

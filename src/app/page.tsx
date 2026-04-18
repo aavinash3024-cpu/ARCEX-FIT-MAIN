@@ -55,6 +55,7 @@ export default function PulseFlowApp() {
   }, [user, isUserLoading, auth]);
 
   // STABLE SCROLL RESET - PRIMARY NAVIGATION
+  // This watcher handles all scroll resets because internal navigation is now "Official"
   useEffect(() => {
     if (mainRef.current) {
       mainRef.current.scrollTop = 0;
@@ -341,6 +342,8 @@ export default function PulseFlowApp() {
             key="nutrition-main"
             loggedMeals={loggedMeals}
             setLoggedMeals={setLoggedMeals}
+            activeView="log"
+            onNavigate={navigateTo}
           />
         );
       case 'nutrition-summary':
@@ -349,7 +352,28 @@ export default function PulseFlowApp() {
             key="nutrition-summary"
             loggedMeals={loggedMeals}
             setLoggedMeals={setLoggedMeals}
-            initialShowSummary={true}
+            activeView="summary"
+            onNavigate={navigateTo}
+          />
+        );
+      case 'nutrition-micro':
+        return (
+          <NutritionView 
+            key="nutrition-micro"
+            loggedMeals={loggedMeals}
+            setLoggedMeals={setLoggedMeals}
+            activeView="micro"
+            onNavigate={navigateTo}
+          />
+        );
+      case 'nutrition-macro':
+        return (
+          <NutritionView 
+            key="nutrition-macro"
+            loggedMeals={loggedMeals}
+            setLoggedMeals={setLoggedMeals}
+            activeView="macro"
+            onNavigate={navigateTo}
           />
         );
       case 'workout': return <WorkoutView />;
@@ -511,7 +535,7 @@ export default function PulseFlowApp() {
       <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card/90 backdrop-blur-xl border-t px-4 py-3 flex justify-between items-center z-50">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeTab === item.id || (item.id === 'nutrition' && activeTab === 'nutrition-summary');
+          const isActive = activeTab === item.id || (item.id === 'nutrition' && ['nutrition-summary', 'nutrition-micro', 'nutrition-macro'].includes(activeTab));
           return (
             <button
               key={item.id}
