@@ -44,7 +44,9 @@ import {
   LineChart,
   ListTodo,
   Activity,
-  Dumbbell
+  Dumbbell,
+  TrendingUp,
+  Sparkles
 } from "lucide-react";
 import { 
   Select,
@@ -378,7 +380,6 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         <p className="text-sm font-bold text-foreground/80">Unlock the full power of ARCEX Elite.</p>
       </div>
 
-      {/* Feature Comparison Section */}
       <div className="grid gap-6">
         <Card className="border-none bg-card rounded-[2rem] border border-muted/10 shadow-sm overflow-hidden">
           <CardContent className="p-6 space-y-6">
@@ -441,7 +442,6 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         </Card>
       </div>
 
-      {/* Plan Selection Buttons */}
       <div className="space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Elite Commitment Plans</h3>
         

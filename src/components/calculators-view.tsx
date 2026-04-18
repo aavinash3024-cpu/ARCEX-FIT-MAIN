@@ -79,7 +79,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
     const w = parseFloat(weight);
     const h = parseFloat(height);
     const a = parseFloat(age);
-    if (isNaN(w) || isNaN(h) || isNaN(a)) return;
+    if (isNaN(w) || iNaN(h) || isNaN(a)) return;
 
     let bmrVal = (10 * w) + (6.25 * h) - (5 * a);
     if (gender === 'male') bmrVal += 5;
@@ -408,7 +408,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Waist (cm)</Label>
-                  <Input type="number" value={waist} onChange={(e) => setWeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input type="number" value={waist} onChange={(e) => setWaist(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
                 {gender === 'female' && (
                   <div className="space-y-2">
