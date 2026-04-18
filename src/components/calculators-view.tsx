@@ -79,7 +79,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
     const w = parseFloat(weight);
     const h = parseFloat(height);
     const a = parseFloat(age);
-    if (isNaN(w) || iNaN(h) || iNaN(a)) return;
+    if (isNaN(w) || isNaN(h) || isNaN(a)) return;
 
     let bmrVal = (10 * w) + (6.25 * h) - (5 * a);
     if (gender === 'male') bmrVal += 5;
@@ -312,7 +312,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                     </div>
                     <div>
                       <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Estimated 1 Rep Max</p>
-                      <p className="text-xl font-black">{ormResult ? ormResult : '---'}</p>
+                      <p className="text-xl font-black text-sky-600">{ormResult ? ormResult : '---'}</p>
                     </div>
                   </div>
                   <Badge variant="outline" className="text-[8px] font-black border-sky-500/20 text-sky-600 bg-white">KG</Badge>

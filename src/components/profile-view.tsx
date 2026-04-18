@@ -36,7 +36,13 @@ import {
   AlertTriangle,
   Check,
   Scale,
-  Crown
+  Crown,
+  HeartPulse,
+  Layout,
+  UtensilsCrossed,
+  BarChart3,
+  LineChart,
+  ListTodo
 } from "lucide-react";
 import { 
   Select,
@@ -364,131 +370,118 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   const renderSubscription = () => (
-    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
-      {/* Compact Membership Card */}
-      <Card className="border-none bg-gradient-to-br from-[#0f172a] to-[#1e293b] shadow-2xl rounded-[1.5rem] overflow-hidden text-white relative h-40 flex flex-col justify-between p-6 group transition-all hover:scale-[1.02]">
-        {/* Background Symbol */}
-        <div className="absolute top-0 right-0 p-8 opacity-[0.03] group-hover:scale-110 transition-transform pointer-events-none">
-          <Zap className="w-48 h-48 text-white" />
-        </div>
-        
-        <div className="flex justify-between items-start relative z-10">
-          <div className="space-y-1">
-            <div className="flex items-center gap-2">
-              <Trophy className="w-4 h-4 text-amber-400" />
-              <p className="text-[10px] font-black uppercase tracking-[0.25em] text-white/60">Elite Member</p>
-            </div>
-            <h2 className="text-xl font-black tracking-tighter">ARCEX PREMIUM</h2>
-          </div>
-          
-          {/* Gold Metallic Chip */}
-          <div className="w-10 h-7 rounded-md bg-gradient-to-br from-[#fcd34d] via-[#fbbf24] to-[#d97706] shadow-[inset_0_1px_2px_rgba(255,255,255,0.5),0_2px_4px_rgba(0,0,0,0.3)] flex items-center justify-center border border-white/20 relative overflow-hidden">
-            <div className="absolute inset-0 opacity-20 bg-[radial-gradient(circle_at_center,transparent_0%,black_100%)]" />
-            <div className="grid grid-cols-2 gap-0.5 w-full h-full p-1.5">
-              <div className="border-r border-b border-black/10" />
-              <div className="border-b border-black/10" />
-              <div className="border-r border-black/10" />
-              <div className="border-black/10" />
-            </div>
-          </div>
-        </div>
+    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 px-1 pb-24">
+      <div className="space-y-2 px-3">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Choose Your Strategy</h3>
+        <p className="text-sm font-bold text-foreground/80">Unlock the full power of ARCEX Elite.</p>
+      </div>
 
-        <div className="relative z-10 flex justify-between items-end">
-          <div className="space-y-0.5">
-            <p className="text-[8px] font-black text-white/40 uppercase tracking-widest leading-none">Member Name</p>
-            <p className="text-sm font-black uppercase truncate max-w-[180px] tracking-tight">{profileName}</p>
-          </div>
-          <div className="text-right space-y-0.5">
-            <p className="text-[8px] font-black text-white/40 uppercase tracking-widest leading-none">Member Since</p>
-            <p className="text-xs font-bold tracking-widest">JAN / 2024</p>
-          </div>
-        </div>
-      </Card>
+      {/* Feature Comparison Section */}
+      <div className="grid gap-6">
+        <Card className="border-none bg-card rounded-[2rem] border border-muted/10 shadow-sm overflow-hidden">
+          <CardContent className="p-6 space-y-6">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center">
+                <Shield className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <h4 className="text-sm font-black uppercase tracking-tight">Standard Features (Free)</h4>
+            </div>
+            <div className="grid gap-3">
+              {[
+                { label: 'Hydration Tracking with Weekly Analysis', icon: HeartPulse },
+                { label: 'Steps Tracking with Weekly Analysis', icon: Activity },
+                { label: 'Activity Streak & Badges', icon: Zap },
+                { label: 'Daily Task Management System', icon: ListTodo },
+                { label: 'Custom Workout Creation', icon: Dumbbell }
+              ].map((item, i) => (
+                <div key={i} className="flex items-start gap-3">
+                  <div className="mt-0.5">
+                    <Check className="w-3.5 h-3.5 text-muted-foreground/40" />
+                  </div>
+                  <span className="text-xs font-bold text-foreground/60 uppercase">{item.label}</span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
 
-      {/* Subscription Strategy Plans */}
-      <div className="space-y-4 pt-2">
-        <div className="flex items-center justify-between px-3">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Choose Your Strategy</h3>
-          <span className="text-[8px] font-black text-primary uppercase tracking-widest animate-pulse">Save up to 60%</span>
-        </div>
+        <Card className="border-none bg-primary/5 rounded-[2rem] border-2 border-primary/20 shadow-xl overflow-hidden relative">
+          <div className="absolute top-0 right-0 p-6 opacity-[0.05] pointer-events-none">
+            <Crown className="w-24 h-24 text-primary" />
+          </div>
+          <CardContent className="p-6 space-y-6">
+            <div className="flex items-center gap-2 mb-2">
+              <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
+                <Crown className="w-4 h-4 text-primary" />
+              </div>
+              <h4 className="text-sm font-black uppercase tracking-tight text-primary">Elite Benefits (Premium)</h4>
+            </div>
+            <div className="grid gap-3">
+              {[
+                { label: 'Workout Strength Growth Analytics', icon: TrendingUp },
+                { label: 'Advanced Workout Split Analysis', icon: Layout },
+                { label: 'AI-Powered Meal Logging (Unlimited)', icon: UtensilsCrossed },
+                { label: 'Daily, Weekly & Monthly Meal Reports', icon: BarChart3 },
+                { label: 'Full Micro & Macro Nutrient Analysis', icon: LineChart },
+                { label: 'YOUR PERSONAL AI PROGRESS ANALYSIS', icon: Sparkles, highlight: true }
+              ].map((item, i) => (
+                <div key={i} className={cn("flex items-start gap-3", item.highlight && "bg-primary/10 p-2 -mx-2 rounded-lg")}>
+                  <div className="mt-0.5">
+                    <Star className={cn("w-3.5 h-3.5", item.highlight ? "text-primary fill-primary" : "text-primary")} />
+                  </div>
+                  <span className={cn("text-xs font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground/80")}>
+                    {item.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Plan Selection Buttons */}
+      <div className="space-y-4">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Elite Commitment Plans</h3>
         
-        <div className="grid gap-4">
+        <div className="grid gap-3">
           {[
-            { 
-              id: 'monthly', 
-              name: 'Entry Strategy', 
-              price: '229', 
-              original: null,
-              discount: null,
-              period: 'Month', 
-              description: 'Standard monthly commitment',
-              features: ['Daily AI Meal Parsing', 'Basic Workout Tracking', 'Email Support']
-            },
-            { 
-              id: 'half-year', 
-              name: 'Progressive Elite', 
-              price: '699', 
-              original: '1374',
-              discount: '49% OFF',
-              period: '6 Months', 
-              description: 'Our most balanced approach', 
-              popular: true,
-              features: ['Unlimited AI Parsing', 'Advanced Muscle Analysis', 'Priority Support', 'Custom AI Analyst']
-            },
-            { 
-              id: 'yearly', 
-              name: 'Legendary Performance', 
-              price: '1099', 
-              original: '2748',
-              discount: '60% OFF',
-              period: 'Year', 
-              description: 'Absolute commitment to excellence', 
-              saving: 'Best Value',
-              features: ['Full Executive Access', 'Beta Testing Perks', 'Exclusive Community', 'Personal Success Manager']
-            },
+            { id: 'monthly', name: 'Monthly Elite', price: '229', period: 'Month', label: 'Basic Strategy' },
+            { id: 'quarterly', name: 'Quarterly Elite', price: '599', period: '3 Months', label: 'Recommended', popular: true, save: 'Save 15%' },
+            { id: 'half-year', name: 'Elite Performance', price: '1099', period: '6 Months', label: 'Best Value', save: 'Save 20%' }
           ].map((plan) => (
             <Card key={plan.id} className={cn(
-              "border-none shadow-md rounded-[1.5rem] overflow-hidden border transition-all cursor-pointer group",
-              plan.popular ? "bg-primary/5 ring-2 ring-primary/20" : "bg-card border-muted/10"
+              "border-none shadow-md rounded-2xl overflow-hidden border transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99]",
+              plan.popular ? "bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2" : "bg-card border-muted/10"
             )}>
-              <CardContent className="p-0">
-                <div className="p-5 flex items-center justify-between border-b border-muted/5">
-                  <div className="space-y-1">
-                    <div className="flex items-center gap-2">
-                      <h4 className="font-black text-sm uppercase tracking-tight text-foreground/80">{plan.name}</h4>
-                      {plan.discount && (
-                        <Badge className="bg-emerald-500 text-white border-none font-black uppercase text-[7px] px-1.5 h-4">{plan.discount}</Badge>
-                      )}
-                    </div>
-                    <p className="text-[10px] font-bold text-muted-foreground uppercase">{plan.description}</p>
+              <CardContent className="p-4 flex items-center justify-between">
+                <div className="space-y-0.5">
+                  <div className="flex items-center gap-2">
+                    <h5 className="font-black text-xs uppercase tracking-widest">{plan.name}</h5>
+                    {plan.save && (
+                      <Badge className={cn("text-[7px] font-black uppercase px-1.5 h-4", plan.popular ? "bg-white text-primary" : "bg-primary text-white")}>
+                        {plan.save}
+                      </Badge>
+                    )}
                   </div>
-                  <div className="text-right">
-                    <div className="flex items-baseline justify-end gap-1">
-                      {plan.original && (
-                        <span className="text-[10px] font-bold text-muted-foreground/40 line-through tracking-tighter">
-                          {plan.original}
-                        </span>
-                      )}
-                      <span className="text-xl font-black text-foreground">{plan.price}</span>
-                    </div>
-                    <p className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest">/ {plan.period}</p>
-                  </div>
+                  <p className={cn("text-[8px] font-black uppercase tracking-widest opacity-60", plan.popular ? "text-white" : "text-muted-foreground")}>
+                    {plan.label}
+                  </p>
                 </div>
-                
-                <div className="p-5 bg-muted/5">
-                  <div className="grid gap-2">
-                    {plan.features.map((feat, i) => (
-                      <div key={i} className="flex items-center gap-2">
-                        <Check className="w-3 h-3 text-emerald-500 shrink-0" />
-                        <span className="text-[10px] font-bold text-foreground/60 uppercase">{feat}</span>
-                      </div>
-                    ))}
+                <div className="text-right">
+                  <div className="flex items-baseline justify-end gap-1">
+                    <span className="text-lg font-black">{plan.price}</span>
                   </div>
+                  <p className={cn("text-[7px] font-black uppercase tracking-widest opacity-60", plan.popular ? "text-white" : "text-muted-foreground")}>
+                    / {plan.period}
+                  </p>
                 </div>
               </CardContent>
             </Card>
           ))}
         </div>
+        <p className="text-[8px] text-center text-muted-foreground/40 font-bold uppercase tracking-widest px-4">
+          All premium plans unlock the exact same Elite features. Choose the duration that fits your fitness journey.
+        </p>
       </div>
     </div>
   );
