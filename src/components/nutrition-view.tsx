@@ -168,13 +168,17 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
   const [foodCache, setFoodCache] = useState<Record<string, CachedFoodItem>>({});
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // STABLE SCROLL RESET - INTERNAL NAVIGATION
+  // STABLE INTERNAL SCROLL RESET
   useEffect(() => {
-    const scrollContainer = document.querySelector('.swipe-container');
-    if (scrollContainer) {
-      scrollContainer.scrollTop = 0;
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
-    }
+    const handleReset = () => {
+      const container = document.getElementById('main-scroll-container');
+      if (container) {
+        container.scrollTop = 0;
+        container.scrollTo({ top: 0, behavior: 'instant' });
+      }
+    };
+    // requestAnimationFrame ensures the reset happens AFTER React paints the new view
+    requestAnimationFrame(handleReset);
   }, [showSummary, showMacroAnalysis, showMicroAnalysis]);
 
   useEffect(() => {
@@ -952,13 +956,16 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
   const [period, setPeriod] = useState<'weekly' | 'monthly'>('weekly');
   const [refDate, setRefDate] = useState(new Date());
 
-  // STABLE SCROLL RESET - INTERNAL NAVIGATION
+  // STABLE INTERNAL SCROLL RESET
   useEffect(() => {
-    const scrollContainer = document.querySelector('.swipe-container');
-    if (scrollContainer) {
-      scrollContainer.scrollTop = 0;
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
-    }
+    const handleReset = () => {
+      const container = document.getElementById('main-scroll-container');
+      if (container) {
+        container.scrollTop = 0;
+        container.scrollTo({ top: 0, behavior: 'instant' });
+      }
+    };
+    requestAnimationFrame(handleReset);
   }, [showDetails, period, refDate]);
 
   const handlePrev = () => {
@@ -1340,13 +1347,16 @@ function WeeklyMicroTable({ allHistory, targets, micros, title, refDate, period 
 function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'monthly', history: LoggedMeal[], goalData: any }) {
   const [refDate, setRefDate] = useState(new Date());
 
-  // STABLE SCROLL RESET - TRENDS NAVIGATION
+  // STABLE INTERNAL SCROLL RESET
   useEffect(() => {
-    const scrollContainer = document.querySelector('.swipe-container');
-    if (scrollContainer) {
-      scrollContainer.scrollTop = 0;
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
-    }
+    const handleReset = () => {
+      const container = document.getElementById('main-scroll-container');
+      if (container) {
+        container.scrollTop = 0;
+        container.scrollTo({ top: 0, behavior: 'instant' });
+      }
+    };
+    requestAnimationFrame(handleReset);
   }, [refDate]);
 
   const handlePrev = () => {

@@ -500,7 +500,11 @@ export default function PulseFlowApp() {
         </div>
       </header>
 
-      <main ref={mainRef} className="flex-1 px-4 overflow-y-auto swipe-container">
+      <main 
+        ref={mainRef} 
+        id="main-scroll-container"
+        className="flex-1 px-4 overflow-y-auto swipe-container"
+      >
         {renderContent()}
       </main>
 
