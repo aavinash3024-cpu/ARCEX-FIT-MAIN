@@ -128,7 +128,7 @@ interface CachedFoodItem {
 interface NutritionViewProps {
   loggedMeals: LoggedMeal[];
   setLoggedMeals: React.Dispatch<React.SetStateAction<LoggedMeal[]>>;
-  activeView?: 'log' | 'summary' | 'micro' | 'macro';
+  activeView?: 'log' | 'summary' | 'micro' | 'macro' | 'micro-detail';
   onNavigate: (tab: string) => void;
   initialShowSummary?: boolean; // Maintain compatibility
 }
@@ -451,7 +451,19 @@ export function NutritionView({ loggedMeals, setLoggedMeals, activeView = 'log',
     return savedMeals.some(s => s.name.toLowerCase() === mealName.toLowerCase());
   };
 
-  if (currentView === 'micro') return <MicroAnalysisView key="micro-view" allHistory={allHistory} loggedMeals={loggedMeals} goalData={goalData} onBack={() => onNavigate('nutrition')} onNavigate={onNavigate} />;
+  if (currentView === 'micro' || currentView === 'micro-detail') {
+    return (
+      <MicroAnalysisView 
+        key="micro-view" 
+        allHistory={allHistory} 
+        loggedMeals={loggedMeals} 
+        goalData={goalData} 
+        onBack={() => onNavigate('nutrition')} 
+        onNavigate={onNavigate} 
+        showDetails={currentView === 'micro-detail'}
+      />
+    );
+  }
 
   if (currentView === 'macro') {
     return (
@@ -929,8 +941,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, activeView = 'log',
   );
 }
 
-function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack, onNavigate }: { allHistory: LoggedMeal[], loggedMeals: LoggedMeal[], goalData: any, onBack: () => void, onNavigate: (tab: string) => void }) {
-  const [showDetails, setShowDetails] = useState(false);
+function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack, onNavigate, showDetails }: { allHistory: LoggedMeal[], loggedMeals: LoggedMeal[], goalData: any, onBack: () => void, onNavigate: (tab: string) => void, showDetails: boolean }) {
   const [period, setPeriod] = useState<'weekly' | 'monthly'>('weekly');
   const [refDate, setRefDate] = useState(new Date());
 
@@ -1020,7 +1031,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack, onNaviga
     return (
       <div key="micro-details" className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2 px-1">
-          <Button variant="ghost" size="icon" onClick={() => setShowDetails(false)} className="rounded-full bg-muted/50 w-9 h-9">
+          <Button variant="ghost" size="icon" onClick={() => onNavigate('nutrition-micro')} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
           </Button>
           <div className="space-y-0.5">
@@ -1123,7 +1134,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack, onNaviga
           </div>
           <div className="px-1 mt-4">
             <Button 
-              onClick={() => setShowDetails(true)}
+              onClick={() => onNavigate('nutrition-micro-detail')}
               className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
             >
               Check Detailed Analysis <ChevronRight className="w-4 h-4" />
@@ -1139,7 +1150,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack, onNaviga
           </div>
           <div className="px-1 mt-4">
             <Button 
-              onClick={() => setShowDetails(true)}
+              onClick={() => onNavigate('nutrition-micro-detail')}
               className="w-full h-12 rounded-xl bg-primary hover:bg-primary/90 text-primary-foreground font-black text-[10px] uppercase tracking-widest shadow-lg shadow-primary/20 transition-all active:scale-[0.98] gap-2"
             >
               Check Detailed Analysis <ChevronRight className="w-4 h-4" />

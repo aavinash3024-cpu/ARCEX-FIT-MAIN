@@ -65,11 +65,11 @@ export type ProfileSubView = 'main' | 'personal-info' | 'subscription' | 'legal'
 
 interface ProfileViewProps {
   onBack: () => void;
-  initialSubView?: ProfileSubView;
+  activeView?: ProfileSubView;
+  onNavigate: (tab: string) => void;
 }
 
-export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProps) {
-  const [activeSubView, setActiveSubView] = useState<ProfileSubView>(initialSubView);
+export function ProfileView({ onBack, activeView = 'main', onNavigate }: ProfileViewProps) {
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -87,15 +87,6 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
   const [profileDob, setProfileDob] = useState("1998-05-15");
   const [profileGender, setProfileGender] = useState("male");
   const [profileAge, setProfileAge] = useState("25");
-
-  // STABLE SCROLL RESET - INTERNAL NAVIGATION
-  useEffect(() => {
-    const scrollContainer = document.querySelector('.swipe-container');
-    if (scrollContainer) {
-      scrollContainer.scrollTop = 0;
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
-    }
-  }, [activeSubView]);
 
   useEffect(() => {
     // Load Goal Data
@@ -208,7 +199,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
 
     if (goalData) {
       const updatedGoal = {
-        ...updatedGoal,
+        ...goalData,
         gender: profileGender,
         age: parseInt(profileAge) || goalData.age
       };
@@ -218,7 +209,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
 
     setTimeout(() => {
       setIsSaving(false);
-      setActiveSubView('main');
+      onNavigate('profile');
     }, 800);
   };
 
@@ -253,34 +244,26 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
     }, 1500);
   };
 
-  const handleBack = () => {
-    if (activeSubView !== 'main') {
-      setActiveSubView('main');
-    } else {
-      onBack();
-    }
-  };
-
   const menuSections = [
     {
       title: "My Account",
       items: [
-        { id: 'personal-info', icon: User, label: "Personal Information", subLabel: "Name, email, and identity", color: "text-blue-500", bg: "bg-blue-50" },
-        { id: 'subscription', icon: CreditCard, label: "Subscription Plan", subLabel: "Elite Premium", color: "text-purple-500", bg: "bg-purple-50" },
-        { id: 'reset', icon: RefreshCw, label: "Reset Progress", subLabel: "Fresh start, keep profile", color: "text-rose-500", bg: "bg-rose-50" },
+        { id: 'profile-personal', icon: User, label: "Personal Information", subLabel: "Name, email, and identity", color: "text-blue-500", bg: "bg-blue-50" },
+        { id: 'profile-subscription', icon: CreditCard, label: "Subscription Plan", subLabel: "Elite Premium", color: "text-purple-500", bg: "bg-purple-50" },
+        { id: 'profile-reset', icon: RefreshCw, label: "Reset Progress", subLabel: "Fresh start, keep profile", color: "text-rose-500", bg: "bg-rose-50" },
       ]
     },
     {
       title: "Security & Privacy",
       items: [
         { id: 'help', icon: HelpCircle, label: "Help Center", subLabel: "FAQs and troubleshooting", color: "text-sky-500", bg: "bg-sky-50" },
-        { id: 'legal', icon: Shield, label: "Legal", subLabel: "Privacy policy & terms", color: "text-green-500", bg: "bg-green-50" },
+        { id: 'profile-legal', icon: Shield, label: "Legal", subLabel: "Privacy policy & terms", color: "text-green-500", bg: "bg-green-50" },
       ]
     },
     {
       title: "App Settings",
       items: [
-        { id: 'settings', icon: Settings, label: "Settings", subLabel: "Units and app preferences", color: "text-slate-500", bg: "bg-slate-50" },
+        { id: 'profile-settings', icon: Settings, label: "Settings", subLabel: "Units and app preferences", color: "text-slate-500", bg: "bg-slate-50" },
         { id: 'rate', icon: Star, label: "Rate the App", subLabel: "Share your feedback", color: "text-amber-500", bg: "bg-amber-50" },
       ]
     }
@@ -728,7 +711,7 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
                 {section.items.map((item, i) => (
                   <button 
                     key={i} 
-                    onClick={() => setActiveSubView(item.id as ProfileSubView)}
+                    onClick={() => onNavigate(item.id)}
                     className="w-full p-4 flex items-center justify-between transition-all text-left group border-b border-muted/5 last:border-0"
                   >
                     <div className="flex items-center gap-4">
@@ -756,24 +739,24 @@ export function ProfileView({ onBack, initialSubView = 'main' }: ProfileViewProp
   return (
     <div className="space-y-6 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2 px-1">
-        <Button variant="ghost" size="icon" onClick={handleBack} className="rounded-full bg-muted/50 w-9 h-9">
+        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
         </Button>
         <h1 className="text-2xl font-bold font-headline">
-          {activeSubView === 'personal-info' ? 'Personal Info' :
-           activeSubView === 'subscription' ? 'Subscription' :
-           activeSubView === 'legal' ? 'Legal' :
-           activeSubView === 'settings' ? 'Settings' : 
-           activeSubView === 'reset' ? 'Start Fresh' : 'Profile'}
+          {activeView === 'personal-info' ? 'Personal Info' :
+           activeView === 'subscription' ? 'Subscription' :
+           activeView === 'legal' ? 'Legal' :
+           activeView === 'settings' ? 'Settings' : 
+           activeView === 'reset' ? 'Start Fresh' : 'Profile'}
         </h1>
       </div>
 
-      {activeSubView === 'main' && renderMain()}
-      {activeSubView === 'personal-info' && renderPersonalInfo()}
-      {activeSubView === 'subscription' && renderSubscription()}
-      {activeSubView === 'legal' && renderLegal()}
-      {activeSubView === 'settings' && renderSettings()}
-      {activeSubView === 'reset' && renderReset()}
+      {activeView === 'main' && renderMain()}
+      {activeView === 'personal-info' && renderPersonalInfo()}
+      {activeView === 'subscription' && renderSubscription()}
+      {activeView === 'legal' && renderLegal()}
+      {activeView === 'settings' && renderSettings()}
+      {activeView === 'reset' && renderReset()}
     </div>
   );
 }

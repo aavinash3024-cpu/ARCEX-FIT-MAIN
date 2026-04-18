@@ -85,8 +85,12 @@ const formatExerciseTime = (seconds: any) => {
   return `${m}m ${s}s`;
 };
 
-export function WorkoutView() {
-  const [activeSubView, setActiveSubView] = useState<'main' | 'library' | 'split' | 'history' | 'pr' | 'pr-detail'>('main');
+interface WorkoutViewProps {
+  activeView?: 'main' | 'library' | 'split' | 'history' | 'pr' | 'pr-detail';
+  onNavigate: (tab: string) => void;
+}
+
+export function WorkoutView({ activeView = 'main', onNavigate }: WorkoutViewProps) {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedPR, setSelectedPR] = useState<any | null>(null);
   
@@ -106,15 +110,6 @@ export function WorkoutView() {
   const [secInput, setSecInput] = useState("");
 
   const todayName = format(new Date(), 'EEEE');
-
-  // STABLE SCROLL RESET - INTERNAL NAVIGATION
-  useEffect(() => {
-    const scrollContainer = document.querySelector('.swipe-container');
-    if (scrollContainer) {
-      scrollContainer.scrollTop = 0;
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
-    }
-  }, [activeSubView, selectedExercise, loggingExercise]);
 
   useEffect(() => {
     const savedSplit = localStorage.getItem('pulseflow_workout_split');
@@ -308,11 +303,11 @@ export function WorkoutView() {
     );
   }
 
-  if (activeSubView === 'library') {
+  if (activeView === 'library') {
     return (
       <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
-          <Button variant="ghost" size="icon" onClick={() => setActiveSubView('main')} className="rounded-full bg-muted/50 w-9 h-9">
+          <Button variant="ghost" size="icon" onClick={() => onNavigate('workout')} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
           </Button>
           <h1 className="text-2xl font-bold font-headline">Exercise Library</h1>
@@ -390,37 +385,37 @@ export function WorkoutView() {
     );
   }
 
-  if (activeSubView === 'split') {
-    return <SplitBuilderView split={split} setSplit={setSplit} onBack={() => setActiveSubView('main')} />;
+  if (activeView === 'split') {
+    return <SplitBuilderView split={split} setSplit={setSplit} onBack={() => onNavigate('workout')} />;
   }
 
-  if (activeSubView === 'history') {
-    return <WorkoutHistoryView onBack={() => setActiveSubView('main')} />;
+  if (activeView === 'history') {
+    return <WorkoutHistoryView onBack={() => onNavigate('workout')} />;
   }
 
-  if (activeSubView === 'pr') {
+  if (activeView === 'pr') {
     return (
       <PersonalRecordsView 
-        onBack={() => setActiveSubView('main')} 
+        onBack={() => onNavigate('workout')} 
         onViewDetail={(pr) => {
           setSelectedPR(pr);
-          setActiveSubView('pr-detail');
+          onNavigate('workout-pr-detail');
         }}
       />
     );
   }
 
-  if (activeSubView === 'pr-detail') {
+  if (activeView === 'pr-detail') {
     return (
       <PRDetailView 
         viewingPRs={selectedPR} 
-        onBack={() => setActiveSubView('pr')}
+        onBack={() => onNavigate('workout-pr')}
       />
     );
   }
 
   return (
-    <div className="space-y-4 pb-24 pt-4">
+    <div key="workout-main" className="space-y-4 pb-24 pt-4">
       <div className="px-1">
         <h1 className="text-2xl font-bold font-headline">Workouts</h1>
       </div>
@@ -514,7 +509,7 @@ export function WorkoutView() {
       </Card>
 
       <Card 
-        onClick={() => setActiveSubView('split')}
+        onClick={() => onNavigate('workout-split')}
         className="border-none shadow-sm bg-card overflow-hidden group cursor-pointer transition-all border-l-4 border-l-purple-400 rounded-lg flex items-center h-20 mx-1"
       >
         <div className="shrink-0 w-20 h-full relative">
@@ -538,7 +533,7 @@ export function WorkoutView() {
       </Card>
 
       <Card 
-        onClick={() => setActiveSubView('pr')} 
+        onClick={() => onNavigate('workout-pr')} 
         className="border-none shadow-sm bg-card border-l-4 border-l-primary overflow-hidden group cursor-pointer transition-all rounded-lg flex items-center h-20 mx-1"
       >
         <div className="shrink-0 w-20 h-full relative">
@@ -563,7 +558,7 @@ export function WorkoutView() {
 
       <div className="grid grid-cols-2 gap-4 mx-1">
         <Card 
-          onClick={() => setActiveSubView('history')}
+          onClick={() => onNavigate('workout-history')}
           className="border-none shadow-sm bg-card border border-muted/20 cursor-pointer transition-all p-5 flex flex-col items-start gap-3 rounded-2xl active:scale-[0.99]"
         >
           <div className="w-10 h-10 bg-sky-100 rounded-xl flex items-center justify-center">
@@ -576,7 +571,7 @@ export function WorkoutView() {
         </Card>
         
         <Card 
-          onClick={() => setActiveSubView('library')}
+          onClick={() => onNavigate('workout-library')}
           className="border-none shadow-sm bg-card hover:bg-indigo-50 transition-all cursor-pointer border border-muted/20 p-5 flex flex-col items-start gap-3 rounded-2xl active:scale-[0.99]"
         >
           <div className="w-10 h-10 bg-indigo-100 rounded-xl flex items-center justify-center">
@@ -865,15 +860,6 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
   const [activeType, setActiveType] = useState<'strength' | 'time'| 'reps'>(() => 'strength');
   const [activeMuscle, setActiveMuscle] = useState<string>("CHEST");
 
-  // STABLE SCROLL RESET - INTERNAL NAVIGATION
-  useEffect(() => {
-    const scrollContainer = document.querySelector('.swipe-container');
-    if (scrollContainer) {
-      scrollContainer.scrollTop = 0;
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
-    }
-  }, [activeType, activeMuscle]);
-
   useEffect(() => {
     const saved = localStorage.getItem('pulseflow_workout_history');
     if (saved) {
@@ -1038,15 +1024,6 @@ function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onV
 }
 
 function PRDetailView({ viewingPRs, onBack }: { viewingPRs: any, onBack: () => void }) {
-  // STABLE SCROLL RESET - INTERNAL NAVIGATION
-  useEffect(() => {
-    const scrollContainer = document.querySelector('.swipe-container');
-    if (scrollContainer) {
-      scrollContainer.scrollTop = 0;
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
-    }
-  }, []);
-
   if (!viewingPRs) return null;
 
   const isTimeBased = !viewingPRs.records[0].weight;
@@ -1165,15 +1142,6 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
   const [searchQuery, setSearchQuery] = useState("");
   const [muscleFilter, setMuscleFilter] = useState("ALL");
   const [activeMuscleReport, setActiveMuscleReport] = useState("CHEST");
-
-  // STABLE SCROLL RESET - SPLIT BUILDER NAVIGATION
-  useEffect(() => {
-    const scrollContainer = document.querySelector('.swipe-container');
-    if (scrollContainer) {
-      scrollContainer.scrollTop = 0;
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
-    }
-  }, [activeDay, activeMuscleReport]);
 
   const toggleSelection = (ex: Exercise) => {
     const isSelected = selectedItems.some(i => i.name === ex.name);
@@ -1544,15 +1512,6 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
 function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
   const [refDate, setRefDate] = useState(new Date());
   const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
-
-  // STABLE SCROLL RESET - HISTORY NAVIGATION
-  useEffect(() => {
-    const scrollContainer = document.querySelector('.swipe-container');
-    if (scrollContainer) {
-      scrollContainer.scrollTop = 0;
-      scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
-    }
-  }, [refDate]);
 
   useEffect(() => {
     const saved = localStorage.getItem('pulseflow_workout_history');

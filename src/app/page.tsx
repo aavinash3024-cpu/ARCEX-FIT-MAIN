@@ -366,6 +366,16 @@ export default function PulseFlowApp() {
             onNavigate={navigateTo}
           />
         );
+      case 'nutrition-micro-detail':
+        return (
+          <NutritionView 
+            key="nutrition-micro-detail"
+            loggedMeals={loggedMeals}
+            setLoggedMeals={setLoggedMeals}
+            activeView="micro-detail"
+            onNavigate={navigateTo}
+          />
+        );
       case 'nutrition-macro':
         return (
           <NutritionView 
@@ -376,7 +386,13 @@ export default function PulseFlowApp() {
             onNavigate={navigateTo}
           />
         );
-      case 'workout': return <WorkoutView />;
+      case 'workout': return <WorkoutView activeView="main" onNavigate={navigateTo} />;
+      case 'workout-library': return <WorkoutView activeView="library" onNavigate={navigateTo} />;
+      case 'workout-split': return <WorkoutView activeView="split" onNavigate={navigateTo} />;
+      case 'workout-history': return <WorkoutView activeView="history" onNavigate={navigateTo} />;
+      case 'workout-pr': return <WorkoutView activeView="pr" onNavigate={navigateTo} />;
+      case 'workout-pr-detail': return <WorkoutView activeView="pr-detail" onNavigate={navigateTo} />;
+      
       case 'rank': 
         return (
           <ProgressView 
@@ -429,14 +445,57 @@ export default function PulseFlowApp() {
       case 'profile':
         return (
           <ProfileView 
+            activeView="main"
             onBack={() => window.history.back()}
+            onNavigate={navigateTo}
           />
         );
-      case 'subscription':
+      case 'profile-personal':
         return (
           <ProfileView 
-            initialSubView="subscription"
+            activeView="personal-info"
             onBack={() => window.history.back()}
+            onNavigate={navigateTo}
+          />
+        );
+      case 'profile-subscription':
+        return (
+          <ProfileView 
+            activeView="subscription"
+            onBack={() => window.history.back()}
+            onNavigate={navigateTo}
+          />
+        );
+      case 'profile-legal':
+        return (
+          <ProfileView 
+            activeView="legal"
+            onBack={() => window.history.back()}
+            onNavigate={navigateTo}
+          />
+        );
+      case 'profile-settings':
+        return (
+          <ProfileView 
+            activeView="settings"
+            onBack={() => window.history.back()}
+            onNavigate={navigateTo}
+          />
+        );
+      case 'profile-reset':
+        return (
+          <ProfileView 
+            activeView="reset"
+            onBack={() => window.history.back()}
+            onNavigate={navigateTo}
+          />
+        );
+      case 'subscription': // Legacy route for top-bar button
+        return (
+          <ProfileView 
+            activeView="subscription"
+            onBack={() => window.history.back()}
+            onNavigate={navigateTo}
           />
         );
       case 'guide':
@@ -509,7 +568,7 @@ export default function PulseFlowApp() {
 
         <div className="flex gap-2">
           <button 
-            onClick={() => navigateTo('subscription')}
+            onClick={() => navigateTo('profile-subscription')}
             className="rounded-full bg-muted/50 w-9 h-9 flex items-center justify-center"
           >
             <Crown className="w-4 h-4 text-amber-500" />
@@ -535,7 +594,10 @@ export default function PulseFlowApp() {
       <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card/90 backdrop-blur-xl border-t px-4 py-3 flex justify-between items-center z-50">
         {navItems.map((item) => {
           const Icon = item.icon;
-          const isActive = activeTab === item.id || (item.id === 'nutrition' && ['nutrition-summary', 'nutrition-micro', 'nutrition-macro'].includes(activeTab));
+          const isNutrition = item.id === 'nutrition' && ['nutrition-summary', 'nutrition-micro', 'nutrition-macro', 'nutrition-micro-detail'].includes(activeTab);
+          const isWorkout = item.id === 'workout' && ['workout-library', 'workout-split', 'workout-history', 'workout-pr', 'workout-pr-detail'].includes(activeTab);
+          const isActive = activeTab === item.id || isNutrition || isWorkout;
+          
           return (
             <button
               key={item.id}
