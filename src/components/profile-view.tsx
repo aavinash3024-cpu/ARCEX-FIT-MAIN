@@ -42,7 +42,9 @@ import {
   UtensilsCrossed,
   BarChart3,
   LineChart,
-  ListTodo
+  ListTodo,
+  Activity,
+  Dumbbell
 } from "lucide-react";
 import { 
   Select,

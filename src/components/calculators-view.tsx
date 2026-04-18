@@ -248,7 +248,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                       </div>
                       <div>
                         <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Total Expenditure (TDEE)</p>
-                        <p className="text-xl font-black">{bmrResults ? bmrResults.tdee : '---'}</p>
+                        <p className="text-xl font-black text-sky-600">{bmrResults ? bmrResults.tdee : '---'}</p>
                       </div>
                     </div>
                     <Badge variant="outline" className="text-[8px] font-black border-sky-500/20 text-sky-600 bg-white">KCAL/DAY</Badge>
@@ -408,7 +408,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
                   <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Waist (cm)</Label>
-                  <Input type="number" value={waist} onChange={(e) => setWaist(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
+                  <Input type="number" value={waist} onChange={(e) => setWeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())} placeholder="0" className="rounded-xl border-muted-foreground/10 bg-background h-11 text-xs font-bold" />
                 </div>
                 {gender === 'female' && (
                   <div className="space-y-2">
@@ -428,24 +428,24 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 <p className="text-[9px] font-bold text-muted-foreground uppercase">TISSUE ANALYSIS SUMMARY</p>
               </div>
 
-              <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 space-y-3">
+              <div className="bg-sky-500/5 p-4 rounded-xl border border-sky-500/10 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border border-primary/20">
-                      <Scale className="w-4 h-4 text-primary" />
+                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border border-sky-500/20">
+                      <Scale className="w-4 h-4 text-sky-500" />
                     </div>
                     <div>
                       <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Body Fat Percentage</p>
                       <div className="flex items-center gap-2">
-                        <p className="text-xl font-black">{bfResults ? bfResults.percentage : '---'}</p>
-                        {bfResults && <Badge className="bg-primary text-primary-foreground font-black uppercase tracking-tighter text-[7px] h-4 px-1.5 rounded-lg">{bfResults.category}</Badge>}
+                        <p className="text-xl font-black text-sky-600">{bfResults ? bfResults.percentage : '---'}</p>
+                        {bfResults && <Badge className="bg-sky-500 text-white font-black uppercase tracking-tighter text-[7px] h-4 px-1.5 rounded-lg">{bfResults.category}</Badge>}
                       </div>
                     </div>
                   </div>
-                  <Badge variant="outline" className="text-[8px] font-black border-primary/20 text-primary bg-white">%</Badge>
+                  <Badge variant="outline" className="text-[8px] font-black border-sky-500/20 text-sky-600 bg-white">%</Badge>
                 </div>
-                <div className="bg-primary/10 p-2 rounded-lg">
-                  <p className="text-[8px] font-bold text-primary leading-tight uppercase">
+                <div className="bg-sky-500/10 p-2 rounded-lg">
+                  <p className="text-[8px] font-bold text-sky-800 leading-tight uppercase">
                     What it means: The percentage of your total body weight that is composed of adipose tissue (fat) versus lean mass (muscle, bone, water).
                   </p>
                 </div>
