@@ -79,7 +79,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
     const w = parseFloat(weight);
     const h = parseFloat(height);
     const a = parseFloat(age);
-    if (isNaN(w) || isNaN(h) || isNaN(a)) return;
+    if (isNaN(w) || iNaN(h) || iNaN(a)) return;
 
     let bmrVal = (10 * w) + (6.25 * h) - (5 * a);
     if (gender === 'male') bmrVal += 5;
@@ -304,21 +304,21 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
                 <p className="text-[9px] font-bold text-muted-foreground uppercase">ESTIMATED STRENGTH LIMITS</p>
               </div>
 
-              <div className="bg-primary/5 p-4 rounded-xl border border-primary/10 space-y-3">
+              <div className="bg-sky-500/5 p-4 rounded-xl border border-sky-500/10 space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border border-primary/20">
-                      <Trophy className="w-4 h-4 text-primary" />
+                    <div className="w-8 h-8 rounded-full bg-background flex items-center justify-center shadow-sm border border-sky-500/20">
+                      <Trophy className="w-4 h-4 text-sky-500" />
                     </div>
                     <div>
                       <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Estimated 1 Rep Max</p>
                       <p className="text-xl font-black">{ormResult ? ormResult : '---'}</p>
                     </div>
                   </div>
-                  <Badge variant="outline" className="text-[8px] font-black border-primary/20 text-primary bg-white">KG</Badge>
+                  <Badge variant="outline" className="text-[8px] font-black border-sky-500/20 text-sky-600 bg-white">KG</Badge>
                 </div>
-                <div className="bg-primary/10 p-2 rounded-lg">
-                  <p className="text-[8px] font-bold text-primary leading-tight uppercase">
+                <div className="bg-sky-500/10 p-2 rounded-lg">
+                  <p className="text-[8px] font-bold text-sky-800 leading-tight uppercase">
                     What it means: The maximum weight you could theoretically lift for a single repetition based on your sub-maximal performance.
                   </p>
                 </div>
@@ -453,12 +453,12 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
 
               <div className="space-y-4">
                 <div className="grid grid-cols-2 gap-3">
-                  <div className="bg-muted/5 p-3 rounded-2xl border border-muted/10">
+                  <div className="bg-sky-500/5 p-3 rounded-2xl border border-sky-500/10">
                     <div className="flex items-center gap-2 mb-1">
-                      <div className="w-1.5 h-1.5 rounded-full bg-primary" />
+                      <div className="w-1.5 h-1.5 rounded-full bg-sky-500" />
                       <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Lean Mass</p>
                     </div>
-                    <p className="text-sm font-black">{bfResults ? bfResults.lbm : '---'} <span className="text-[9px] text-muted-foreground">KG</span></p>
+                    <p className="text-sm font-black text-sky-600">{bfResults ? bfResults.lbm : '---'} <span className="text-[9px] text-muted-foreground">KG</span></p>
                   </div>
                   <div className="bg-orange-500/5 p-3 rounded-2xl border border-orange-500/10">
                     <div className="flex items-center gap-2 mb-1">
