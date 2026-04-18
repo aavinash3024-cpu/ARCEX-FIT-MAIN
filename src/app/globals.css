@@ -66,6 +66,8 @@
 .swipe-container {
   scrollbar-width: none;
   -ms-overflow-style: none;
+  /* CRITICAL: Disable scroll anchoring so manual resets aren't fought by the browser */
+  overflow-anchor: none;
 }
 
 .swipe-container::-webkit-scrollbar {

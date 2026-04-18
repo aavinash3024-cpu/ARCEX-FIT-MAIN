@@ -150,6 +150,29 @@ const MACRO_COLORS = {
   fiber: "#10b981"
 };
 
+/** 
+ * Common scroll reset utility for internal navigation.
+ * Targets the main scrollable container by ID.
+ */
+function triggerScrollReset() {
+  const container = document.getElementById('main-scroll-container');
+  if (container) {
+    // Stage 1: Immediate reset
+    container.scrollTop = 0;
+    container.scrollTo({ top: 0, behavior: 'instant' });
+    
+    // Stage 2: Next frame reset (ensures React has painted the new content)
+    requestAnimationFrame(() => {
+      container.scrollTop = 0;
+    });
+
+    // Stage 3: Tiny timeout safety (prevents browser anchoring persistence)
+    setTimeout(() => {
+      container.scrollTop = 0;
+    }, 10);
+  }
+}
+
 export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary = false }: NutritionViewProps) {
   const { toast } = useToast();
   const [showSummary, setShowSummary] = useState(initialShowSummary);
@@ -168,17 +191,9 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
   const [foodCache, setFoodCache] = useState<Record<string, CachedFoodItem>>({});
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // STABLE INTERNAL SCROLL RESET
+  // AGGRESSIVE INTERNAL SCROLL RESET
   useEffect(() => {
-    const handleReset = () => {
-      const container = document.getElementById('main-scroll-container');
-      if (container) {
-        container.scrollTop = 0;
-        container.scrollTo({ top: 0, behavior: 'instant' });
-      }
-    };
-    // requestAnimationFrame ensures the reset happens AFTER React paints the new view
-    requestAnimationFrame(handleReset);
+    triggerScrollReset();
   }, [showSummary, showMacroAnalysis, showMicroAnalysis]);
 
   useEffect(() => {
@@ -473,11 +488,11 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
     return savedMeals.some(s => s.name.toLowerCase() === mealName.toLowerCase());
   };
 
-  if (showMicroAnalysis) return <MicroAnalysisView allHistory={allHistory} loggedMeals={loggedMeals} goalData={goalData} onBack={() => setShowMicroAnalysis(false)} />;
+  if (showMicroAnalysis) return <MicroAnalysisView key="micro-view" allHistory={allHistory} loggedMeals={loggedMeals} goalData={goalData} onBack={() => setShowMicroAnalysis(false)} />;
 
   if (showMacroAnalysis) {
     return (
-      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div key="macro-view" className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
           <Button variant="ghost" size="icon" onClick={() => setShowMacroAnalysis(false)} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
@@ -553,7 +568,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
     const allItems = loggedMeals.flatMap(m => m.items || []);
 
     return (
-      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div key="summary-view" className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2">
           <Button variant="ghost" size="icon" onClick={() => setShowSummary(false)} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
@@ -708,7 +723,7 @@ export function NutritionView({ loggedMeals, setLoggedMeals, initialShowSummary 
   }
 
   return (
-    <div className="space-y-4 pb-24 pt-4">
+    <div key="log-view" className="space-y-4 pb-24 pt-4">
       <div className="flex items-center justify-between">
         <h1 className="text-2xl font-bold font-headline">Nutrition</h1>
       </div>
@@ -956,16 +971,9 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
   const [period, setPeriod] = useState<'weekly' | 'monthly'>('weekly');
   const [refDate, setRefDate] = useState(new Date());
 
-  // STABLE INTERNAL SCROLL RESET
+  // INTERNAL RESET
   useEffect(() => {
-    const handleReset = () => {
-      const container = document.getElementById('main-scroll-container');
-      if (container) {
-        container.scrollTop = 0;
-        container.scrollTo({ top: 0, behavior: 'instant' });
-      }
-    };
-    requestAnimationFrame(handleReset);
+    triggerScrollReset();
   }, [showDetails, period, refDate]);
 
   const handlePrev = () => {
@@ -1063,7 +1071,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
 
   if (showDetails) {
     return (
-      <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+      <div key="micro-details" className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
         <div className="flex items-center gap-4 pt-2 px-1">
           <Button variant="ghost" size="icon" onClick={() => setShowDetails(false)} className="rounded-full bg-muted/50 w-9 h-9">
             <ChevronLeft className="w-5 h-5" />
@@ -1099,6 +1107,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
             </div>
 
             <WeeklyMicroTable 
+              key={`${period}-${refDate.toISOString()}-aesthetics`}
               allHistory={allHistory} 
               targets={targets} 
               micros={aesthetics} 
@@ -1128,6 +1137,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
             </div>
 
             <WeeklyMicroTable 
+              key={`${period}-${refDate.toISOString()}-performance`}
               allHistory={allHistory} 
               targets={targets} 
               micros={performance} 
@@ -1142,7 +1152,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
   }
 
   return (
-    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div key="micro-summary" className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2 px-1">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
@@ -1347,16 +1357,9 @@ function WeeklyMicroTable({ allHistory, targets, micros, title, refDate, period 
 function TrendsContent({ period, history, goalData }: { period: 'weekly' | 'monthly', history: LoggedMeal[], goalData: any }) {
   const [refDate, setRefDate] = useState(new Date());
 
-  // STABLE INTERNAL SCROLL RESET
+  // INTERNAL RESET
   useEffect(() => {
-    const handleReset = () => {
-      const container = document.getElementById('main-scroll-container');
-      if (container) {
-        container.scrollTop = 0;
-        container.scrollTo({ top: 0, behavior: 'instant' });
-      }
-    };
-    requestAnimationFrame(handleReset);
+    triggerScrollReset();
   }, [refDate]);
 
   const handlePrev = () => {
