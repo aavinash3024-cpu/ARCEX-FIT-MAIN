@@ -577,7 +577,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
                       <Label className="text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">Protein Intensity</Label>
                       <Badge variant="secondary" className="text-[9px] font-bold">{protAdj[0]}g/kg</Badge>
                   </div>
-                  <Slider value={protAdj} onValueChange={setProtAdj} min={1.2} max={2.5} step={0.1} />
+                  <Slider value={protAdj} onValueChange={setProtAdj} min={1.2} max={3.0} step={0.1} />
                 </div>
 
                 <div className="space-y-4">
