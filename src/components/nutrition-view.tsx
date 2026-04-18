@@ -959,7 +959,7 @@ function MicroAnalysisView({ allHistory, loggedMeals, goalData, onBack }: { allH
       scrollContainer.scrollTop = 0;
       scrollContainer.scrollTo({ top: 0, behavior: 'instant' });
     }
-  }, [showDetails, period]);
+  }, [showDetails, period, refDate]);
 
   const handlePrev = () => {
     if (period === 'weekly') setRefDate(prev => subWeeks(prev, 1));
