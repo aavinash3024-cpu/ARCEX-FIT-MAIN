@@ -36,6 +36,9 @@ import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { AnimatedBackground } from './animated-background';
 import { cn } from "@/lib/utils";
+import { doc } from 'firebase/firestore';
+import { useFirestore, useUser, setDocumentNonBlocking } from '@/firebase';
+import { format } from 'date-fns';
 
 type Objective = 'maintain' | 'gain' | 'loss';
 type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'extreme';
@@ -61,6 +64,8 @@ const INDIAN_STATES = [
 ].sort();
 
 export function OnboardingView({ onComplete }: OnboardingViewProps) {
+  const { firestore } = useFirestore();
+  const { user } = useUser();
   const [step, setStep] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
 
@@ -159,13 +164,73 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
         calAdj, protAdj, carbRatio, isSaved: true,
         ...calculations
       };
+      
+      // 1. Persist to Local Storage
       localStorage.setItem('pulseflow_goal_data', JSON.stringify(dataToSave));
       localStorage.setItem('pulseflow_user_profile', JSON.stringify({ 
         name, 
-        email: `${name.toLowerCase().replace(/\s/g, '.')}@pulseflow.ai`, 
+        email: user?.email || `${name.toLowerCase().replace(/\s/g, '.')}@pulseflow.ai`, 
         dob: "1998-05-15", 
         location: userState 
       }));
+
+      // 2. Persist to Firestore (Non-blocking)
+      if (user && firestore) {
+        const userRef = doc(firestore, 'userProfiles', user.uid);
+        const nameParts = name.trim().split(' ');
+        const firstName = nameParts[0] || 'User';
+        const lastName = nameParts.slice(1).join(' ') || '';
+
+        const profileData = {
+          id: user.uid,
+          email: user.email || `${user.uid}@pulseflow.anonymous`,
+          firstName,
+          lastName,
+          dateOfBirth: "1998-05-15",
+          heightCm: parseFloat(height),
+          gender,
+          activityLevel: activity,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        setDocumentNonBlocking(userRef, profileData, { merge: true });
+
+        // Create initial goal
+        const goalRef = doc(firestore, `userProfiles/${user.uid}/goals`, 'primary_goal');
+        const goalData = {
+          id: 'primary_goal',
+          userId: user.uid,
+          type: objective === 'loss' ? 'weight_loss' : objective === 'gain' ? 'muscle_gain' : 'nutrition',
+          targetValue: parseFloat(targetWeight),
+          targetUnit: 'kg',
+          startDate: format(new Date(), 'yyyy-MM-dd'),
+          status: 'active',
+          description: `Goal to ${objective} weight to ${targetWeight}kg`,
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        setDocumentNonBlocking(goalRef, goalData, { merge: true });
+
+        // Initial Metric Entry
+        const todayStr = format(new Date(), 'yyyy-MM-dd');
+        const metricRef = doc(firestore, `userProfiles/${user.uid}/dailyMetrics`, todayStr);
+        const metricData = {
+          id: todayStr,
+          userId: user.uid,
+          date: todayStr,
+          caloriesConsumed: 0,
+          proteinGrams: 0,
+          carbohydrateGrams: 0,
+          fatGrams: 0,
+          hydrationMl: 0,
+          stepsCount: 0,
+          weightKg: parseFloat(weight),
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        };
+        setDocumentNonBlocking(metricRef, metricData, { merge: true });
+      }
+
       onComplete();
     } else {
       setStep(step + 1);

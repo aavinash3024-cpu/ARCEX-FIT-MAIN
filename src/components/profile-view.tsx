@@ -72,6 +72,8 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
+import { doc } from 'firebase/firestore';
+import { useFirestore, useUser, setDocumentNonBlocking } from '@/firebase';
 
 export type ProfileSubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'reset';
 
@@ -83,6 +85,9 @@ interface ProfileViewProps {
 }
 
 export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSplash }: ProfileViewProps) {
+  const { firestore } = useFirestore();
+  const { user } = useUser();
+
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -231,6 +236,23 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
       dob: profileDob
     };
     localStorage.setItem('pulseflow_user_profile', JSON.stringify(profileData));
+
+    // Update Firestore
+    if (user && firestore) {
+      const userRef = doc(firestore, 'userProfiles', user.uid);
+      const nameParts = profileName.trim().split(' ');
+      const firstName = nameParts[0] || 'User';
+      const lastName = nameParts.slice(1).join(' ') || '';
+
+      const firestoreProfile = {
+        firstName,
+        lastName,
+        gender: profileGender,
+        activityLevel: goalData?.activity || 'moderate',
+        updatedAt: new Date().toISOString()
+      };
+      setDocumentNonBlocking(userRef, firestoreProfile, { merge: true });
+    }
 
     if (goalData) {
       const updatedGoal = {
