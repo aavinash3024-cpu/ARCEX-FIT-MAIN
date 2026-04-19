@@ -132,7 +132,7 @@ export function AuthView() {
                   {isSuccess ? "Access Granted" : isLogin ? "Welcome Back" : "Create Account"}
                 </h2>
                 <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                  {isSuccess ? "Establishing Connection..." : isLogin ? "Enter your credentials" : "Join the performance community"}
+                  {isSuccess ? "Establishing Connection..." : isLogin ? "Enter your details" : "Join the community"}
                 </p>
               </div>
 
@@ -147,7 +147,7 @@ export function AuthView() {
                   <form onSubmit={handleSubmit} className="space-y-5">
                     <div className="space-y-4">
                       <div className="space-y-2">
-                        <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Email Protocol</Label>
+                        <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Email Address</Label>
                         <div className="relative">
                           <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
                           <Input 
@@ -164,14 +164,14 @@ export function AuthView() {
 
                       <div className="space-y-2">
                         <div className="flex justify-between items-center px-1">
-                          <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Security Key</Label>
+                          <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Password</Label>
                           {isLogin && (
                             <button 
                               type="button"
                               onClick={handleForgotPassword}
                               className="text-[8px] font-black text-primary uppercase tracking-widest hover:opacity-70"
                             >
-                              Forgot Key?
+                              Forgot?
                             </button>
                           )}
                         </div>
@@ -203,7 +203,7 @@ export function AuthView() {
                       className="w-full h-14 rounded-2xl bg-primary text-slate-950 font-black uppercase tracking-widest shadow-xl shadow-primary/20 gap-2 transition-all active:scale-95"
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : isLogin ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
-                      {isLogin ? "Execute Login" : "Initialize Account"}
+                      {isLogin ? "Log In" : "Sign Up"}
                     </Button>
                   </form>
 
@@ -234,7 +234,7 @@ export function AuthView() {
                 disabled={isLoading}
               >
                 {isLogin ? "Need an account?" : "Already have an account?"}
-                <span className="text-white">{isLogin ? "Sign Up" : "Login"}</span>
+                <span className="text-white">{isLogin ? "Sign Up" : "Log In"}</span>
                 <ArrowRight className="w-3 h-3" />
               </button>
             </div>

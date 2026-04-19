@@ -669,7 +669,6 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
             <LegalItem icon={FileText} label="Terms and Conditions" color="text-blue-600" bg="bg-blue-50" />
             <LegalItem icon={Lock} label="Privacy Policy" color="text-indigo-600" bg="bg-indigo-50" />
             <LegalItem icon={Stethoscope} label="Health and Medical Disclaimer" color="text-rose-600" bg="bg-rose-50" />
-            <LegalItem icon={Banknote} label="Payment and Subscription Policy" color="text-emerald-600" bg="bg-emerald-50" />
           </CardContent>
         </Card>
       </div>
@@ -801,7 +800,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
               bg="bg-sky-50"
               onClick={handleChangePassword}
             />
-            <SettingsButton icon={LogOut} label="Logout" subLabel="Sync and sign out" color="text-amber-600" bg="bg-amber-50" onClick={handleLogout} />
+            <SettingsButton icon={LogOut} label="Log Out" subLabel="Sync and sign out" color="text-amber-600" bg="bg-amber-50" onClick={handleLogout} />
             
             <AlertDialog>
               <AlertDialogTrigger asChild>
@@ -820,7 +819,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
               </AlertDialogTrigger>
               <AlertDialogContent className="rounded-[2.5rem] w-[90%] max-sm border-none shadow-2xl">
                 <AlertDialogHeader>
-                  <AlertDialogTitle className="text-center font-black uppercase tracking-tighter text-xl text-destructive">Purge Profile?</AlertDialogTitle>
+                  <AlertDialogTitle className="text-center font-black uppercase tracking-tighter text-xl text-destructive">Delete Account?</AlertDialogTitle>
                   <AlertDialogDescription className="text-center text-xs font-medium px-2 leading-relaxed">
                     This will permanently delete your identity and all wellness history from arcexfit. This action is final.
                   </AlertDialogDescription>
@@ -831,7 +830,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
                     disabled={isDeleting}
                     className="w-full h-12 rounded-2xl bg-destructive hover:bg-destructive/90 text-white font-black uppercase text-[10px] tracking-widest"
                   >
-                    {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Yes, Purge My Data"}
+                    {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Yes, Delete My Data"}
                   </AlertDialogAction>
                   <AlertDialogCancel className="w-full h-12 rounded-2xl border-muted/20 font-black uppercase text-[10px] tracking-widest mt-0">
                     Cancel
@@ -1032,7 +1031,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
     {
       title: "My Account",
       items: [
-        { id: 'profile-personal-info', icon: User, label: "Personal Information", subLabel: "Name, email, and identity", color: "text-blue-500", bg: "bg-blue-50" },
+        { id: 'profile-personal-info', icon: User, label: "Personal Information", subLabel: "Name and identity", color: "text-blue-500", bg: "bg-blue-50" },
         { id: 'profile-subscription', icon: CreditCard, label: "Subscription Plan", subLabel: "Elite Premium", color: "text-purple-500", bg: "bg-purple-50" },
         { id: 'profile-reset', icon: RefreshCw, label: "Reset Progress", subLabel: "Fresh start, keep profile", color: "text-rose-500", bg: "bg-rose-50" },
       ]
@@ -1040,15 +1039,15 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
     {
       title: "Security & Privacy",
       items: [
-        { id: 'profile-help', icon: HelpCircle, label: "Help Center", subLabel: "FAQs and troubleshooting", color: "text-sky-500", bg: "bg-sky-50" },
-        { id: 'profile-legal', icon: Shield, label: "Legal", subLabel: "Privacy policy & terms", color: "text-green-500", bg: "bg-green-50" },
+        { id: 'profile-help', icon: HelpCircle, label: "Help Center", subLabel: "FAQs and support", color: "text-sky-500", bg: "bg-sky-50" },
+        { id: 'profile-legal', icon: Shield, label: "Legal", subLabel: "Privacy and terms", color: "text-green-500", bg: "bg-green-50" },
       ]
     },
     {
       title: "App Settings",
       items: [
-        { id: 'profile-settings', icon: Settings, label: "Settings", subLabel: "Units and app preferences", color: "text-slate-500", bg: "bg-slate-50" },
-        { id: 'logout', icon: LogOut, label: "Logout", subLabel: "Sync and sign out", color: "text-amber-600", bg: "bg-amber-50", onClick: handleLogout },
+        { id: 'profile-settings', icon: Settings, label: "Settings", subLabel: "App preferences", color: "text-slate-500", bg: "bg-slate-50" },
+        { id: 'logout', icon: LogOut, label: "Log Out", subLabel: "Sync and sign out", color: "text-amber-600", bg: "bg-amber-50", onClick: handleLogout },
       ]
     }
   ];

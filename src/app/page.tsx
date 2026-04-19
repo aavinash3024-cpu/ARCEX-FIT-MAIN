@@ -567,6 +567,7 @@ export default function PulseFlowApp() {
       case 'profile-legal':
       case 'profile-settings':
       case 'profile-reset':
+      case 'profile-help':
         const profileSub = activeTab === 'profile' ? 'main' : activeTab.replace('profile-', '') as any;
         return (
           <ProfileView 
