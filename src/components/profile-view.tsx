@@ -377,9 +377,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   const renderSubscription = () => (
-    <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
+    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       {/* 1. SUBSCRIPTION PLANS (COMPACT 2-COLUMN GRID) */}
-      <div className="px-1 space-y-4 pt-4">
+      <div className="px-1 space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3 text-center">See Subscription Plans</h3>
         <div className="grid grid-cols-2 gap-3 px-1">
           {[
