@@ -56,6 +56,18 @@ export default function PulseFlowApp() {
   const [isLoaded, setIsLoaded] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
 
+  const triggerHaptic = (type: 'light' | 'medium' | 'success' | 'warning' = 'light') => {
+    const enabled = localStorage.getItem('pulseflow_haptics') !== 'false';
+    if (!enabled || typeof window === 'undefined' || !window.navigator.vibrate) return;
+
+    switch(type) {
+      case 'light': window.navigator.vibrate(15); break;
+      case 'medium': window.navigator.vibrate(30); break;
+      case 'success': window.navigator.vibrate([20, 40, 20]); break;
+      case 'warning': window.navigator.vibrate([40, 40, 40]); break;
+    }
+  };
+
   // Initialize Anonymous Auth
   useEffect(() => {
     if (!isUserLoading && !user && auth) {
@@ -93,6 +105,7 @@ export default function PulseFlowApp() {
 
   const navigateTo = (tab: string) => {
     if (tab !== activeTab) {
+      triggerHaptic('light');
       window.history.pushState({ tab }, '');
       setActiveTab(tab);
     }
@@ -125,7 +138,11 @@ export default function PulseFlowApp() {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const lastResetDate = localStorage.getItem('pulseflow_last_reset_date');
     const savedDarkMode = localStorage.getItem('pulseflow_dark_mode');
-    if (savedDarkMode === 'true') document.documentElement.classList.add('dark');
+    if (savedDarkMode === 'true') {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
 
     const isNewDay = lastResetDate !== todayStr;
 
@@ -341,10 +358,12 @@ export default function PulseFlowApp() {
   }, [loggedMeals, hydrationAmount, stepsCount, goalData, isLoaded]);
 
   const updateHydration = (amount: number) => {
+    triggerHaptic('light');
     setHydrationAmount(prev => Math.min(50000, Math.max(0, prev + amount)));
   };
 
   const updateSteps = (amount: number) => {
+    triggerHaptic('light');
     setStepsCount(prev => Math.max(0, prev + amount));
   };
 
@@ -365,7 +384,10 @@ export default function PulseFlowApp() {
         return (
           <DashboardView 
             tasks={tasks}
-            onToggleTask={(id) => setTask(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t))}
+            onToggleTask={(id) => {
+               triggerHaptic('light');
+               setTask(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+            }}
             hydrationAmount={hydrationAmount}
             onUpdateHydration={updateHydration}
             stepsCount={stepsCount}
@@ -428,7 +450,14 @@ export default function PulseFlowApp() {
         return (
           <ProfileView 
             activeView={profileSub} 
-            onBack={() => activeTab === 'profile' ? navigateTo('dashboard') : navigateTo('profile')} 
+            onBack={() => {
+              triggerHaptic('light');
+              if (activeTab === 'profile') {
+                setActiveTab('dashboard');
+              } else {
+                setActiveTab('profile');
+              }
+            }} 
             onNavigate={navigateTo} 
           />
         );

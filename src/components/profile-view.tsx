@@ -89,6 +89,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   const [isResetting, setIsResetting] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState('yearly');
 
+  // Guard for theme/preference initialization to prevent layout shifts/accidental resets
+  const [isReady, setIsReady] = useState(false);
+
   // Preference States
   const [darkMode, setDarkMode] = useState(false);
   const [hapticsEnabled, setHapticsEnabled] = useState(true);
@@ -101,6 +104,16 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   const [profileDob, setProfileDob] = useState("1998-05-15");
   const [profileGender, setProfileGender] = useState("male");
   const [profileAge, setProfileAge] = useState("25");
+
+  const triggerHaptic = (type: 'light' | 'medium' | 'success' | 'warning' = 'light') => {
+    if (!hapticsEnabled || typeof window === 'undefined' || !window.navigator.vibrate) return;
+    switch(type) {
+      case 'light': window.navigator.vibrate(15); break;
+      case 'medium': window.navigator.vibrate(30); break;
+      case 'success': window.navigator.vibrate([20, 40, 20]); break;
+      case 'warning': window.navigator.vibrate([40, 40, 40]); break;
+    }
+  };
 
   useEffect(() => {
     // Load Goal Data
@@ -141,32 +154,39 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
     }
 
     // Load Preferences
-    const savedDarkMode = localStorage.getItem('pulseflow_dark_mode');
-    if (savedDarkMode !== null) setDarkMode(savedDarkMode === 'true');
+    const savedDarkMode = localStorage.getItem('pulseflow_dark_mode') === 'true';
+    setDarkMode(savedDarkMode);
+    
     const savedHaptics = localStorage.getItem('pulseflow_haptics');
     if (savedHaptics !== null) setHapticsEnabled(savedHaptics === 'true');
+    
     const savedNotify = localStorage.getItem('pulseflow_notifications');
     if (savedNotify !== null) setNotificationsEnabled(savedNotify === 'true');
+
+    setIsReady(true);
   }, []);
 
-  // Theme Side Effect
+  // Theme Side Effect - Controlled by isReady guard to prevent un-darkening on profile entry
   useEffect(() => {
+    if (!isReady) return;
     if (darkMode) {
       document.documentElement.classList.add('dark');
     } else {
       document.documentElement.classList.remove('dark');
     }
     localStorage.setItem('pulseflow_dark_mode', darkMode.toString());
-  }, [darkMode]);
+  }, [darkMode, isReady]);
 
   // Haptics & Notifications Side Effects
   useEffect(() => {
+    if (!isReady) return;
     localStorage.setItem('pulseflow_haptics', hapticsEnabled.toString());
-  }, [hapticsEnabled]);
+  }, [hapticsEnabled, isReady]);
 
   useEffect(() => {
+    if (!isReady) return;
     localStorage.setItem('pulseflow_notifications', notificationsEnabled.toString());
-  }, [notificationsEnabled]);
+  }, [notificationsEnabled, isReady]);
 
   const { startWeight, targetWeight, currentWeight, progressPercent } = useMemo(() => {
     const sW = goalData?.weight ? parseFloat(goalData.weight) : 0;
@@ -201,6 +221,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   }, [goalData, weightHistory]);
 
   const handleSaveProfile = () => {
+    triggerHaptic('success');
     setIsSaving(true);
     
     const profileData = {
@@ -223,11 +244,12 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
 
     setTimeout(() => {
       setIsSaving(false);
-      onNavigate('profile');
+      onBack();
     }, 800);
   };
 
   const handleResetApp = () => {
+    triggerHaptic('warning');
     setIsResetting(true);
     
     const keysToRemove = [
@@ -367,7 +389,10 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
             return (
               <div 
                 key={plan.id}
-                onClick={() => setSelectedPlanId(plan.id)}
+                onClick={() => {
+                  triggerHaptic('light');
+                  setSelectedPlanId(plan.id);
+                }}
                 className={cn(
                   "relative p-[1.5px] rounded-2xl transition-all cursor-pointer group",
                   isSelected 
@@ -501,7 +526,10 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
               color="text-slate-500" 
               bg="bg-slate-50"
               checked={darkMode}
-              onCheckedChange={setDarkMode}
+              onCheckedChange={(val) => {
+                triggerHaptic('light');
+                setDarkMode(val);
+              }}
             />
             <SettingsSwitch 
               icon={Smartphone} 
@@ -510,7 +538,12 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
               color="text-sky-500" 
               bg="bg-slate-50"
               checked={hapticsEnabled}
-              onCheckedChange={setHapticsEnabled}
+              onCheckedChange={(val) => {
+                setHapticsEnabled(val);
+                if (val && typeof window !== 'undefined' && window.navigator.vibrate) {
+                  window.navigator.vibrate(15);
+                }
+              }}
             />
             <SettingsSwitch 
               icon={Bell} 
@@ -519,7 +552,10 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
               color="text-primary" 
               bg="bg-primary/5"
               checked={notificationsEnabled}
-              onCheckedChange={setNotificationsEnabled}
+              onCheckedChange={(val) => {
+                triggerHaptic('light');
+                setNotificationsEnabled(val);
+              }}
             />
           </CardContent>
         </Card>
@@ -690,7 +726,10 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 {section.items.map((item, i) => (
                   <button 
                     key={i} 
-                    onClick={() => onNavigate(item.id)}
+                    onClick={() => {
+                      triggerHaptic('light');
+                      onNavigate(item.id);
+                    }}
                     className="w-full p-4 flex items-center justify-between transition-all text-left group border-b border-muted/5 last:border-0"
                   >
                     <div className="flex items-center gap-4">
@@ -743,7 +782,10 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   return (
     <div className="space-y-4 pb-2 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2 px-1">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
+        <Button variant="ghost" size="icon" onClick={() => {
+           triggerHaptic('light');
+           onBack();
+        }} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
         </Button>
         <h1 className="text-2xl font-bold font-headline">
