@@ -19,7 +19,9 @@ import {
   Fingerprint,
   ShieldCheck,
   Cpu,
-  ArrowRight
+  ArrowRight,
+  PieChart,
+  Settings2
 } from "lucide-react";
 import { 
   Select,
@@ -442,21 +444,41 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           {step === 4 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
               <div className="px-2 text-center space-y-1">
-                <h2 className="text-2xl font-bold text-white">Daily Plan</h2>
+                <h2 className="text-2xl font-bold text-white">Fine-Tuning</h2>
                 <p className="text-sm text-white/50">Your customized nutritional strategy</p>
               </div>
 
               <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
-                <CardContent className="p-8 space-y-12">
-                  <div className="bg-white/[0.02] p-8 rounded-2xl text-center border border-white/5 shadow-inner">
-                    <p className="text-xs font-semibold text-primary/70 mb-2">Target Calories</p>
-                    <div className="flex items-baseline justify-center gap-2">
-                      <p className="text-5xl font-bold text-white tracking-tight">{calculations.finalCalories}</p>
-                      <span className="text-xs text-primary font-bold">kcal</span>
+                <CardContent className="p-6 space-y-8">
+                  <div className="space-y-6">
+                    <div className="bg-primary/10 p-6 rounded-2xl text-center space-y-1 border border-primary/20 shadow-inner">
+                      <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Calculated Daily Intake</p>
+                      <p className="text-4xl font-black text-white">{calculations.finalCalories} <span className="text-xs text-white/40">KCAL</span></p>
+                    </div>
+
+                    <div className="bg-white/[0.02] p-5 rounded-2xl space-y-4 border border-white/5">
+                      <p className="text-[10px] font-black text-center text-white/30 uppercase tracking-widest">Real-time Macro Breakdown</p>
+                      <div className="grid grid-cols-3 gap-2">
+                        <div className="text-center space-y-0.5">
+                          <p className="text-lg font-black" style={{ color: MACRO_COLORS.protein }}>{calculations.protein}g</p>
+                          <p className="text-[8px] font-bold text-white/40 uppercase">Protein</p>
+                          <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black bg-white/5 text-white border-none">{calculations.proteinPct}%</Badge>
+                        </div>
+                        <div className="text-center space-y-0.5">
+                          <p className="text-lg font-black" style={{ color: MACRO_COLORS.carbs }}>{calculations.carbs}g</p>
+                          <p className="text-[8px] font-bold text-white/40 uppercase">Carbs</p>
+                          <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black bg-white/5 text-white border-none">{calculations.carbPct}%</Badge>
+                        </div>
+                        <div className="text-center space-y-0.5">
+                          <p className="text-lg font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
+                          <p className="text-[8px] font-bold text-white/40 uppercase">Fats</p>
+                          <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black bg-white/5 text-white border-none">{calculations.fatPct}%</Badge>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                  
-                  <div className="space-y-10">
+
+                  <div className="space-y-10 pt-4">
                     <div className="space-y-5">
                       <div className="flex justify-between items-center px-1">
                         <Label className="text-xs font-semibold text-white/60">Calorie Adjustment</Label>
@@ -467,7 +489,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
 
                     <div className="space-y-5">
                       <div className="flex justify-between items-center px-1">
-                        <Label className="text-xs font-semibold text-white/60">Protein Priority</Label>
+                        <Label className="text-xs font-semibold text-white/60">Protein Intensity</Label>
                         <Badge variant="secondary" className="text-[10px] font-bold h-6 bg-amber-500/20 text-amber-500 border-none">{protAdj[0]}g/kg</Badge>
                       </div>
                       <Slider value={protAdj} onValueChange={setProtAdj} min={1.2} max={3.0} step={0.1} className="[&_[role=slider]]:bg-amber-500" />
@@ -475,8 +497,8 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
 
                     <div className="space-y-5">
                       <div className="flex justify-between items-center px-1">
-                        <Label className="text-xs font-semibold text-white/60">Macro Distribution</Label>
-                        <Badge variant="secondary" className="text-[10px] font-bold h-6 bg-blue-500/20 text-blue-500 border-none">{carbRatio[0]}% Carbs</Badge>
+                        <Label className="text-xs font-semibold text-white/60">Carb:Fat Ratio</Label>
+                        <Badge variant="secondary" className="text-[10px] font-bold h-6 bg-blue-500/20 text-blue-500 border-none">{carbRatio[0]}:{100 - carbRatio[0]}</Badge>
                       </div>
                       <Slider value={carbRatio} onValueChange={setCarbRatio} min={20} max={80} step={5} className="[&_[role=slider]]:bg-blue-500" />
                     </div>
@@ -489,54 +511,74 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           {step === 5 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
               <div className="px-2 text-center space-y-1">
-                <h2 className="text-2xl font-bold text-white">Final Review</h2>
+                <h2 className="text-2xl font-bold text-white">Review Strategy</h2>
                 <p className="text-sm text-white/50">Confirm your setup to begin</p>
               </div>
 
               <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
                 <CardContent className="p-8 space-y-10">
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="bg-white/[0.02] p-6 rounded-xl border border-white/5">
-                      <p className="text-[10px] font-bold text-primary mb-1">DAILY INTAKE</p>
-                      <p className="text-3xl font-bold text-white">{calculations.finalCalories}</p>
-                      <p className="text-[10px] text-white/20 font-medium">kcal</p>
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      <div className="flex items-center justify-between">
+                        <div className="space-y-0.5">
+                          <p className="text-[9px] font-semibold text-white/30 uppercase tracking-widest">Weekly Pace</p>
+                          <p className="text-sm font-bold uppercase text-white">{calculations.derivedWeeklyRate} kg / week</p>
+                        </div>
+                        <div className="text-right space-y-0.5">
+                          <p className="text-[9px] font-semibold text-white/30 uppercase tracking-widest">Estimated Time</p>
+                          <p className="text-sm font-bold text-primary uppercase">{calculations.weeksToGoal} weeks</p>
+                        </div>
+                      </div>
+
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                            <p className="text-[9px] font-semibold text-white/40 uppercase">Budget</p>
+                            <p className="text-lg font-bold text-primary">{calculations.finalCalories} kcal</p>
+                        </div>
+                        <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                            <p className="text-[9px] font-semibold text-white/40 uppercase">TDEE</p>
+                            <p className="text-lg font-bold text-white/20">{calculations.tdee} kcal</p>
+                        </div>
+                      </div>
                     </div>
-                    <div className="bg-white/[0.02] p-6 rounded-xl border border-white/5 text-right">
-                      <p className="text-[10px] font-bold text-white/40 mb-1">WEEKLY RATE</p>
-                      <p className="text-3xl font-bold text-white">{calculations.derivedWeeklyRate}</p>
-                      <p className="text-[10px] text-white/20 font-medium">kg / week</p>
+
+                    <div className="space-y-5">
+                      <p className="text-[10px] font-black uppercase text-center tracking-widest text-white/30">MACROS BREAKDOWN</p>
+                      <div className="grid grid-cols-4 gap-2">
+                        <div className="text-center">
+                            <p className="text-sm font-black" style={{ color: MACRO_COLORS.protein }}>{calculations.protein}g</p>
+                            <p className="text-[7px] font-bold text-white/40 uppercase">Protein</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-sm font-black" style={{ color: MACRO_COLORS.carbs }}>{calculations.carbs}g</p>
+                            <p className="text-[7px] font-bold text-white/40 uppercase">Carbs</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-sm font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
+                            <p className="text-[7px] font-bold text-white/40 uppercase">Fats</p>
+                        </div>
+                        <div className="text-center">
+                            <p className="text-sm font-black" style={{ color: MACRO_COLORS.fiber }}>{calculations.fiber}g</p>
+                            <p className="text-[7px] font-bold text-white/40 uppercase">Fiber</p>
+                        </div>
+                      </div>
+                      
+                      <div className="space-y-2">
+                        <div className="flex h-2 w-full rounded-full overflow-hidden bg-white/5">
+                          <div style={{ width: `${calculations.proteinPct}%`, backgroundColor: MACRO_COLORS.protein }} />
+                          <div style={{ width: `${calculations.carbPct}%`, backgroundColor: MACRO_COLORS.carbs }} />
+                          <div style={{ width: `${calculations.fatPct}%`, backgroundColor: MACRO_COLORS.fat }} />
+                        </div>
+                        <div className="flex justify-between text-[7px] font-semibold uppercase text-white/20">
+                          <span>{calculations.proteinPct}% Protein</span>
+                          <span>{calculations.carbPct}% Carbs</span>
+                          <span>{calculations.fatPct}% Fats</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
 
-                  <div className="space-y-6 pt-2">
-                    <h4 className="text-[10px] font-bold text-white/30 text-center">MACRO BREAKDOWN</h4>
-                    <div className="grid grid-cols-4 gap-2 text-center">
-                      <div className="space-y-1">
-                        <p className="text-base font-bold" style={{ color: MACRO_COLORS.protein }}>{calculations.protein}g</p>
-                        <p className="text-[9px] text-white/20 font-bold uppercase">Prot</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-base font-bold" style={{ color: MACRO_COLORS.carbs }}>{calculations.carbs}g</p>
-                        <p className="text-[9px] text-white/20 font-bold uppercase">Carb</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-base font-bold" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
-                        <p className="text-[9px] text-white/20 font-bold uppercase">Fat</p>
-                      </div>
-                      <div className="space-y-1">
-                        <p className="text-base font-bold" style={{ color: MACRO_COLORS.fiber }}>{calculations.fiber}g</p>
-                        <p className="text-[9px] text-white/20 font-bold uppercase">Fiber</p>
-                      </div>
-                    </div>
-                    
-                    <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden flex">
-                      <div className="h-full transition-all duration-1000" style={{ width: `${calculations.proteinPct}%`, backgroundColor: MACRO_COLORS.protein }} />
-                      <div className="h-full transition-all duration-1000" style={{ width: `${calculations.carbPct}%`, backgroundColor: MACRO_COLORS.carbs }} />
-                      <div className="h-full transition-all duration-1000" style={{ width: `${calculations.fatPct}%`, backgroundColor: MACRO_COLORS.fat }} />
-                    </div>
-                  </div>
-
-                  <div className="bg-emerald-500/5 p-6 rounded-2xl border border-emerald-500/10 flex gap-4 items-center">
+                  <div className="bg-emerald-500/10 p-6 rounded-2xl border border-emerald-500/20 flex gap-4 items-center">
                     <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg shrink-0">
                       <CheckCircle2 className="w-5 h-5 text-white" />
                     </div>
