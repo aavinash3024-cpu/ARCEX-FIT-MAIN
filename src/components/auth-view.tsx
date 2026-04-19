@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -16,7 +16,7 @@ import {
   Loader2
 } from 'lucide-react';
 import { AnimatedBackground } from './animated-background';
-import { useAuth, initiateEmailSignIn, initiateEmailSignUp, initiateAnonymousSignIn } from '@/firebase';
+import { useAuth, initiateEmailSignIn, initiateEmailSignUp, initiateAnonymousSignIn, errorEmitter } from '@/firebase';
 import { cn } from '@/lib/utils';
 
 export function AuthView() {
@@ -27,6 +27,15 @@ export function AuthView() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    const handleAuthError = (err: any) => {
+      setError(err.message || "Authentication failed.");
+      setIsLoading(false);
+    };
+    errorEmitter.on('auth-error', handleAuthError);
+    return () => errorEmitter.off('auth-error', handleAuthError);
+  }, []);
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password || !auth) return;
@@ -34,8 +43,8 @@ export function AuthView() {
     setIsLoading(true);
     setError(null);
     
-    // Safety fallback: re-enable UI if no state change occurs
-    const safetyTimer = setTimeout(() => setIsLoading(false), 4000);
+    // Safety fallback
+    const safetyTimer = setTimeout(() => setIsLoading(false), 5000);
     
     try {
       if (isLogin) {
@@ -62,7 +71,6 @@ export function AuthView() {
       <AnimatedBackground />
 
       <div className="relative z-10 flex flex-col h-full px-8 pt-20 pb-12 overflow-y-auto">
-        {/* Branding */}
         <div className="flex flex-col items-center justify-center mb-12 shrink-0">
           <div className="flex items-center gap-2 mb-2">
             <span className="font-black text-4xl tracking-tighter text-white">arcex</span>
@@ -71,7 +79,6 @@ export function AuthView() {
           <p className="text-[10px] font-black text-white/30 uppercase tracking-[0.4em] pl-[0.4em]">MISSION CONTROL</p>
         </div>
 
-        {/* Auth Card */}
         <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full pb-12">
           <Card className="border-white/10 bg-white/[0.03] backdrop-blur-2xl shadow-2xl rounded-3xl overflow-hidden">
             <CardContent className="p-8 space-y-8">
@@ -163,7 +170,6 @@ export function AuthView() {
           </div>
         </div>
 
-        {/* Footer */}
         <div className="mt-auto pt-8 flex flex-col items-center gap-4">
           <div className="flex items-center gap-4 text-[8px] font-black text-white/20 uppercase tracking-[0.2em]">
             <span>Secure Encryption</span>

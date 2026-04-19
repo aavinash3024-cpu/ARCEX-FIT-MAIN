@@ -1,4 +1,4 @@
-"use use client";
+"use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
@@ -37,7 +37,7 @@ import { Badge } from "@/components/ui/badge";
 import { AnimatedBackground } from './animated-background';
 import { cn } from "@/lib/utils";
 import { doc } from 'firebase/firestore';
-import { useFirestore, useUser, setDocumentNonBlocking } from '@/firebase';
+import { useFirestore, useUser, setDocumentNonBlocking, errorEmitter } from '@/firebase';
 import { format } from 'date-fns';
 
 type Objective = 'maintain' | 'gain' | 'loss';
@@ -68,6 +68,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
   const { user } = useUser();
   const [step, setStep] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   // Step 1: Personal Info
   const [name, setName] = useState("");
@@ -89,6 +90,14 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
   const [calAdj, setCalAdj] = useState([0]);
   const [protAdj, setProtAdj] = useState([1.8]);
   const [carbRatio, setCarbRatio] = useState([50]);
+
+  useEffect(() => {
+    const handleAuthError = (err: any) => {
+      setError(err.message || "An authentication error occurred.");
+    };
+    errorEmitter.on('auth-error', handleAuthError);
+    return () => errorEmitter.off('auth-error', handleAuthError);
+  }, []);
 
   useEffect(() => {
     setIsLoaded(true);
@@ -147,6 +156,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
   }, [weight, height, age, gender, activity, objective, targetWeight, calAdj, protAdj, carbRatio]);
 
   const handleNext = () => {
+    setError(null);
     if (step === 1 && (!name.trim() || !userState)) return;
     if (step === 3 && !calculations.isWeightValid) return;
     
@@ -159,13 +169,12 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
 
     if (step === 5) {
       const dataToSave = {
-        gender, age, weight, height, activity,
+        gender, age: parseInt(age), weight, height, activity,
         objective, targetWeight, weeklyRate,
         calAdj, protAdj, carbRatio, isSaved: true,
         ...calculations
       };
       
-      // 1. Persist to Local Storage
       localStorage.setItem('pulseflow_goal_data', JSON.stringify(dataToSave));
       localStorage.setItem('pulseflow_user_profile', JSON.stringify({ 
         name, 
@@ -174,7 +183,6 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
         location: userState 
       }));
 
-      // 2. Persist to Firestore (Non-blocking)
       if (user && firestore) {
         const userRef = doc(firestore, 'userProfiles', user.uid);
         const nameParts = name.trim().split(' ');
@@ -195,9 +203,8 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
         };
         setDocumentNonBlocking(userRef, profileData, { merge: true });
 
-        // Create initial goal
         const goalRef = doc(firestore, `userProfiles/${user.uid}/goals`, 'primary_goal');
-        const goalData = {
+        const gData = {
           id: 'primary_goal',
           userId: user.uid,
           type: objective === 'loss' ? 'weight_loss' : objective === 'gain' ? 'muscle_gain' : 'nutrition',
@@ -209,9 +216,8 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           createdAt: new Date().toISOString(),
           updatedAt: new Date().toISOString()
         };
-        setDocumentNonBlocking(goalRef, goalData, { merge: true });
+        setDocumentNonBlocking(goalRef, gData, { merge: true });
 
-        // Initial Metric Entry
         const todayStr = format(new Date(), 'yyyy-MM-dd');
         const metricRef = doc(firestore, `userProfiles/${user.uid}/dailyMetrics`, todayStr);
         const metricData = {
@@ -244,7 +250,6 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
       <AnimatedBackground />
 
       <div className="relative z-10 flex flex-col h-full">
-        {/* Branding Title */}
         <div className="pt-10 flex flex-col items-center justify-center shrink-0">
           <div className="flex items-center gap-1.5">
             <span className="font-black text-2xl tracking-tighter text-white">arcex</span>
@@ -252,44 +257,38 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           </div>
         </div>
 
-        {/* Step Header */}
         <div className="px-8 pt-6 pb-6 flex flex-col items-center gap-4 shrink-0">
           <div className="flex justify-between items-center w-full max-w-sm gap-2">
-            {[1, 2, 3, 4, 5].map((i) => {
-              const isActive = step === i;
-              const isCompleted = step > i;
-              return (
-                <div key={i} className="flex-1 flex flex-col gap-2">
-                   <div className={cn(
-                     "h-1.5 w-full rounded-full transition-all duration-500", 
-                     isCompleted ? "bg-primary/60" : isActive ? "bg-primary shadow-[0_0_15px_rgba(74,222,128,0.5)]" : "bg-white/10"
-                   )} />
-                   <p className={cn(
-                     "text-[10px] font-bold text-center transition-all duration-500",
-                     isActive ? "text-primary" : "text-white/20"
-                   )}>
-                     Step {i}
-                   </p>
-                </div>
-              );
-            })}
+            {[1, 2, 3, 4, 5].map((i) => (
+              <div key={i} className="flex-1 flex flex-col gap-2">
+                 <div className={cn(
+                   "h-1.5 w-full rounded-full transition-all duration-500", 
+                   step > i ? "bg-primary/60" : step === i ? "bg-primary shadow-[0_0_15px_rgba(74,222,128,0.5)]" : "bg-white/10"
+                 )} />
+                 <p className={cn(
+                   "text-[10px] font-bold text-center transition-all duration-500",
+                   step === i ? "text-primary" : "text-white/20"
+                 )}>
+                   Step {i}
+                 </p>
+              </div>
+            ))}
           </div>
         </div>
 
-        {/* Main Interface Content */}
         <div className="flex-1 px-4 overflow-y-auto swipe-container pb-40">
           {step === 1 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
               <div className="px-2 text-center space-y-1">
-                <h2 className="text-2xl font-bold text-white">Your Identity</h2>
-                <p className="text-sm text-white/50">Let's start with the basics</p>
+                <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Your Identity</h2>
+                <p className="text-xs text-white/40 uppercase tracking-widest">PERSONAL PARAMETERS</p>
               </div>
               
               <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
                 <CardContent className="p-6 space-y-6">
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-white/70 pl-1">Full Name</Label>
-                    <div className="relative group">
+                    <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Full Name</Label>
+                    <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
                       <Input 
                         placeholder="Alex Johnson"
@@ -302,7 +301,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label className="text-xs font-semibold text-white/70 pl-1">Age</Label>
+                      <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Age</Label>
                       <Input 
                         type="number"
                         value={age} 
@@ -311,7 +310,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-semibold text-white/70 pl-1">Sex</Label>
+                      <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Sex</Label>
                       <Select value={gender} onValueChange={(val: 'male' | 'female') => setGender(val)}>
                         <SelectTrigger className="h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
                           <SelectValue placeholder="Select" />
@@ -324,27 +323,21 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     </div>
                   </div>
 
-                  <div className="space-y-4 pt-2 border-t border-white/5">
-                    <div className="flex items-center gap-2 mb-1">
-                      <MapPin className="w-3.5 h-3.5 text-primary" />
-                      <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Your Location</span>
-                    </div>
-                    
-                    <div className="space-y-4">
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-semibold text-white/60 pl-1 uppercase">State</Label>
-                        <Select value={userState} onValueChange={(val) => setUserState(val)}>
-                          <SelectTrigger className="h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
-                            <SelectValue placeholder="Select State" />
-                          </SelectTrigger>
-                          <SelectContent className="z-[200] rounded-xl bg-slate-900 border-white/10 text-white max-h-[250px]">
-                            {INDIAN_STATES.map(s => (
-                              <SelectItem key={s} value={s}>{s}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
+                  <div className="space-y-2">
+                    <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Current State</Label>
+                    <Select value={userState} onValueChange={(val) => setUserState(val)}>
+                      <SelectTrigger className="h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
+                        <div className="flex items-center gap-2">
+                          <MapPin className="w-3.5 h-3.5 text-primary" />
+                          <SelectValue placeholder="Select State" />
+                        </div>
+                      </SelectTrigger>
+                      <SelectContent className="z-[200] rounded-xl bg-slate-900 border-white/10 text-white max-h-[250px]">
+                        {INDIAN_STATES.map(s => (
+                          <SelectItem key={s} value={s}>{s}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
                   </div>
                 </CardContent>
               </Card>
@@ -354,15 +347,15 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           {step === 2 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
               <div className="px-2 text-center space-y-1">
-                <h2 className="text-2xl font-bold text-white">Body Metrics</h2>
-                <p className="text-sm text-white/50">Details used for metabolic calculations</p>
+                <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Body Metrics</h2>
+                <p className="text-xs text-white/40 uppercase tracking-widest">METABOLIC DATA</p>
               </div>
 
               <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
                 <CardContent className="p-8 space-y-8">
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
-                      <Label className="text-xs font-semibold text-white/70 pl-1">Weight (kg)</Label>
+                      <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Weight (kg)</Label>
                       <Input 
                         type="number"
                         value={weight} 
@@ -371,7 +364,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label className="text-xs font-semibold text-white/70 pl-1">Height (cm)</Label>
+                      <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Height (cm)</Label>
                       <Input 
                         type="number"
                         value={height} 
@@ -381,7 +374,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label className="text-xs font-semibold text-white/70 pl-1">Daily Activity Level</Label>
+                    <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Daily Activity Level</Label>
                     <Select value={activity} onValueChange={(val: ActivityLevel) => setActivity(val)}>
                       <SelectTrigger className="h-14 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
                         <SelectValue placeholder="Select Activity" />
@@ -403,8 +396,8 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           {step === 3 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
               <div className="px-2 text-center space-y-1">
-                <h2 className="text-2xl font-bold text-white">Your Goal</h2>
-                <p className="text-sm text-white/50">What are we aiming for?</p>
+                <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Your Goal</h2>
+                <p className="text-xs text-white/40 uppercase tracking-widest">OBJECTIVE SELECTION</p>
               </div>
 
               <div className="grid grid-cols-3 gap-2 px-1">
@@ -413,13 +406,13 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     key={obj}
                     onClick={() => setObjective(obj)}
                     className={cn(
-                      "p-4 rounded-xl border transition-all text-center backdrop-blur-md",
+                      "p-4 rounded-xl border transition-all text-center backdrop-blur-md uppercase text-[10px] font-black tracking-widest",
                       objective === obj 
-                        ? "border-primary bg-primary/10 shadow-lg" 
-                        : "border-white/5 bg-white/5"
+                        ? "border-primary bg-primary/10 shadow-lg text-primary" 
+                        : "border-white/5 bg-white/5 text-white/30"
                     )}
                   >
-                    <p className={cn("text-xs font-bold capitalize", objective === obj ? "text-primary" : "text-white/30")}>{obj}</p>
+                    {obj}
                   </button>
                 ))}
               </div>
@@ -427,7 +420,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
               <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
                 <CardContent className="p-8 space-y-10">
                   <div className="space-y-4">
-                    <Label className="text-xs font-semibold text-white/70 text-center block">Target Weight (kg)</Label>
+                    <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest text-center block">Target Weight (kg)</Label>
                     <Input 
                       type="number"
                       value={targetWeight} 
@@ -438,12 +431,12 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                       )}
                     />
                     {!calculations.isWeightValid && (
-                      <p className="text-[10px] font-bold text-red-500 text-center mt-2">Weight must match {objective} objective</p>
+                      <p className="text-[10px] font-black text-red-500 text-center mt-2 uppercase tracking-tighter">Target mismatch for {objective} objective</p>
                     )}
                   </div>
 
                   <div className="space-y-4">
-                    <Label className="text-xs font-semibold text-white/70 text-center block">Desired Pace</Label>
+                    <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest text-center block">Desired Pace</Label>
                     <div className="grid gap-3">
                       {[0.25, 0.5, 0.75, 1.0].map((rate) => (
                         <button
@@ -455,13 +448,13 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                           )}
                         >
                           <div>
-                            <p className={cn("text-sm font-bold", weeklyRate === rate ? "text-primary" : "text-white/60")}>{rate} kg per week</p>
+                            <p className={cn("text-xs font-black uppercase tracking-tight", weeklyRate === rate ? "text-primary" : "text-white/60")}>{rate} kg per week</p>
                           </div>
                           <Badge variant="outline" className={cn(
-                            "h-7 text-[10px] font-bold transition-all px-3 rounded-full",
-                            weeklyRate === rate ? "border-primary text-primary" : "border-white/10 text-white/20"
+                            "h-7 text-[10px] font-bold transition-all px-3 rounded-full border-none",
+                            weeklyRate === rate ? "bg-primary/20 text-primary" : "bg-white/5 text-white/20"
                           )}>
-                            {(calculations.weightDiff / rate).toFixed(1) === "Infinity" ? "0" : (calculations.weightDiff / rate).toFixed(1)} weeks
+                            {(calculations.weightDiff / rate).toFixed(1)} weeks
                           </Badge>
                         </button>
                       ))}
@@ -475,8 +468,8 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           {step === 4 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
               <div className="px-2 text-center space-y-1">
-                <h2 className="text-2xl font-bold text-white">Fine-Tuning</h2>
-                <p className="text-sm text-white/50">Your customized nutritional strategy</p>
+                <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Fine-Tuning</h2>
+                <p className="text-xs text-white/40 uppercase tracking-widest">NUTRITIONAL STRATEGY</p>
               </div>
 
               <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
@@ -493,17 +486,14 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                         <div className="text-center space-y-0.5">
                           <p className="text-base font-black" style={{ color: MACRO_COLORS.protein }}>{calculations.protein}g</p>
                           <p className="text-[8px] font-bold text-white/40 uppercase">Protein</p>
-                          <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black bg-white/5 text-white border-none">{calculations.proteinPct}%</Badge>
                         </div>
                         <div className="text-center space-y-0.5">
                           <p className="text-base font-black" style={{ color: MACRO_COLORS.carbs }}>{calculations.carbs}g</p>
                           <p className="text-[8px] font-bold text-white/40 uppercase">Carbs</p>
-                          <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black bg-white/5 text-white border-none">{calculations.carbPct}%</Badge>
                         </div>
                         <div className="text-center space-y-0.5">
                           <p className="text-base font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
                           <p className="text-[8px] font-bold text-white/40 uppercase">Fats</p>
-                          <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black bg-white/5 text-white border-none">{calculations.fatPct}%</Badge>
                         </div>
                       </div>
                     </div>
@@ -542,86 +532,39 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           {step === 5 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
               <div className="px-2 text-center space-y-1">
-                <h2 className="text-2xl font-bold text-white">Everything's Ready</h2>
-                <p className="text-sm text-white/50">Check your plan one last time</p>
+                <h2 className="text-2xl font-bold text-white uppercase tracking-tighter">Setup Finished</h2>
+                <p className="text-xs text-white/40 uppercase tracking-widest">CONFIRMATION</p>
               </div>
 
-              <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
-                <CardContent className="p-8 space-y-8">
-                  <div className="space-y-6">
-                    <div className="space-y-4">
-                      <div className="flex items-center justify-between">
-                        <div className="space-y-0.5">
-                          <p className="text-[9px] font-semibold text-white/30 uppercase tracking-widest">Weekly Pace</p>
-                          <p className="text-sm font-bold uppercase text-white">{calculations.derivedWeeklyRate} kg / week</p>
-                        </div>
-                        <div className="text-right space-y-0.5">
-                          <p className="text-[9px] font-semibold text-white/30 uppercase tracking-widest">Estimated Time</p>
-                          <p className="text-sm font-bold text-primary uppercase">{calculations.weeksToGoal} weeks</p>
+              <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-3xl overflow-hidden">
+                <CardContent className="p-8 space-y-10">
+                  <div className="flex flex-col items-center justify-center text-center space-y-6 py-6">
+                    <div className="relative">
+                      <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse" />
+                      <div className="w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.3)] border-2 border-emerald-500/30 relative z-10">
+                        <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center shadow-xl border-4 border-white/20">
+                          <Check className="w-10 h-10 text-white" strokeWidth={4} />
                         </div>
                       </div>
-
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-white/[0.02] p-4 rounded-xl border border-white/5">
-                            <p className="text-[9px] font-semibold text-white/40 uppercase">Budget</p>
-                            <p className="text-lg font-bold text-primary">{calculations.finalCalories} kcal</p>
-                        </div>
-                        <div className="bg-white/[0.02] p-4 rounded-xl border border-white/5">
-                            <p className="text-[9px] font-semibold text-white/40 uppercase">TDEE</p>
-                            <p className="text-lg font-bold text-white/20">{calculations.tdee} kcal</p>
-                        </div>
-                      </div>
+                      <div className="absolute -inset-4 border border-emerald-500/10 rounded-full animate-[spin_10s_linear_infinite]" />
+                      <div className="absolute -inset-8 border border-emerald-500/5 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
                     </div>
-
-                    <div className="space-y-5">
-                      <p className="text-[10px] font-black uppercase text-center tracking-widest text-white/30">MACROS AUDIT</p>
-                      <div className="grid grid-cols-4 gap-2">
-                        <div className="text-center">
-                            <p className="text-sm font-black" style={{ color: MACRO_COLORS.protein }}>{calculations.protein}g</p>
-                            <p className="text-[7px] font-bold text-white/40 uppercase">Protein</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-sm font-black" style={{ color: MACRO_COLORS.carbs }}>{calculations.carbs}g</p>
-                            <p className="text-[7px] font-bold text-white/40 uppercase">Carbs</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-sm font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
-                            <p className="text-[7px] font-bold text-white/40 uppercase">Fats</p>
-                        </div>
-                        <div className="text-center">
-                            <p className="text-sm font-black" style={{ color: MACRO_COLORS.fiber }}>{calculations.fiber}g</p>
-                            <p className="text-[7px] font-bold text-white/40 uppercase">Fiber</p>
-                        </div>
-                      </div>
-                      
-                      <div className="space-y-2">
-                        <div className="flex h-2 w-full rounded-full overflow-hidden bg-white/5">
-                          <div style={{ width: `${calculations.proteinPct}%`, backgroundColor: MACRO_COLORS.protein }} />
-                          <div style={{ width: `${calculations.carbPct}%`, backgroundColor: MACRO_COLORS.carbs }} />
-                          <div style={{ width: `${calculations.fatPct}%`, backgroundColor: MACRO_COLORS.fat }} />
-                        </div>
-                        <div className="flex justify-between text-[7px] font-semibold uppercase text-white/20">
-                          <span>{calculations.proteinPct}% Protein</span>
-                          <span>{calculations.carbPct}% Carbs</span>
-                          <span>{calculations.fatPct}% Fats</span>
-                        </div>
-                      </div>
+                    
+                    <div className="space-y-2">
+                      <h3 className="text-2xl font-black text-white uppercase tracking-tighter">Your Profile is Ready</h3>
+                      <p className="text-[10px] text-white/40 font-black uppercase tracking-[0.3em]">ALL SYSTEMS ONLINE</p>
                     </div>
                   </div>
 
-                  {/* Integrated Completion Section */}
-                  <div className="pt-8 border-t border-white/5">
-                    <div className="flex flex-col items-center justify-center text-center space-y-3 py-4">
-                      <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.2)] border-2 border-emerald-500/30">
-                        <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg">
-                          <Check className="w-6 h-6 text-white" strokeWidth={3} />
-                        </div>
-                      </div>
-                      <div className="space-y-1">
-                        <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Your Profile is Ready</h3>
-                        <p className="text-[10px] text-white/40 font-bold uppercase tracking-tight">Setup Finished</p>
-                      </div>
-                    </div>
+                  <div className="bg-white/[0.02] p-6 rounded-2xl border border-white/5 space-y-4">
+                     <div className="flex justify-between items-center border-b border-white/5 pb-3">
+                        <span className="text-[10px] font-black text-white/30 uppercase">DAILY BUDGET</span>
+                        <span className="text-lg font-black text-primary">{calculations.finalCalories} KCAL</span>
+                     </div>
+                     <div className="flex justify-between items-center">
+                        <span className="text-[10px] font-black text-white/30 uppercase">TARGET WEIGHT</span>
+                        <span className="text-lg font-black text-white">{targetWeight} KG</span>
+                     </div>
                   </div>
                 </CardContent>
               </Card>
@@ -629,21 +572,20 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           )}
         </div>
 
-        {/* Action Controls */}
         <div className="fixed bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent flex gap-4 z-20 max-w-lg mx-auto">
           {step > 1 && (
             <Button 
               variant="ghost" 
               onClick={() => setStep(step - 1)}
-              className="flex-1 h-14 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white transition-all font-bold"
+              className="flex-1 h-14 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white transition-all font-black uppercase text-[10px] tracking-widest"
             >
-              Previous
+              Back
             </Button>
           )}
           <Button 
             onClick={handleNext}
             disabled={step === 1 && (!name.trim() || !userState)}
-            className="flex-[2] h-14 rounded-xl bg-primary text-slate-950 font-bold shadow-xl gap-2 active:scale-95 transition-all"
+            className="flex-[2] h-14 rounded-xl bg-primary text-slate-950 font-black uppercase text-[10px] tracking-widest shadow-xl gap-2 active:scale-95 transition-all"
           >
             {step === 5 ? "Launch arcexfit" : "Next Step"}
             <ArrowRight className="w-4 h-4" />
