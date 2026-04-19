@@ -644,7 +644,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
                   <div className={cn(
                     "w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm border p-[1.5px]",
                     item.highlight ? "border-primary/40" : "border-muted/20"
-                  )}>
+                    )}>
                     <div className={cn("w-full h-full rounded-full flex items-center justify-center text-white")} style={{ background: item.colors }}>
                       <item.icon className="w-4 h-4" />
                     </div>
@@ -837,7 +837,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
         <section className="space-y-3">
           <h3 className="text-xs font-black uppercase text-primary tracking-widest">3. Data & Storage</h3>
           <p>
-            We provide cloud backups via Firebase for your convenience, but your primary data lives on your device. We are not responsible for data loss resulting from clearing your browser cache, changing devices without syncing, or technical failures outside our control.
+            We provide cloud backups via Firebase for your convenience, but your primary data lives on your phone. We are not responsible for data loss resulting from clearing your browser cache, changing devices without syncing, or technical failures outside our control.
           </p>
         </section>
 
@@ -871,12 +871,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
       </div>
       
       <div className="space-y-8 text-sm leading-relaxed text-foreground/80 font-medium">
-        <div className="bg-amber-500/10 p-5 rounded-3xl border border-amber-500/20 flex gap-4 items-start shadow-sm">
-          <AlertTriangle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5" />
-          <p className="text-xs font-bold text-amber-900 leading-relaxed uppercase tracking-tight">
-            arcex fit is a digital tracking tool for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment.
-          </p>
-        </div>
+        <p className="text-base font-bold text-foreground leading-relaxed uppercase tracking-tight">
+          arcex fit is a digital tracking tool for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment.
+        </p>
 
         <section className="space-y-3">
           <h3 className="text-xs font-black uppercase text-primary tracking-widest">Not a Medical Provider</h3>
@@ -1039,9 +1036,6 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
               <AlertDialogContent className="rounded-[2.5rem] w-[90%] max-sm border-none shadow-2xl">
                 <AlertDialogHeader>
                   <AlertDialogTitle className="text-center font-black uppercase tracking-tighter text-xl text-destructive">Delete Account?</AlertDialogTitle>
-                  <AlertDialogDescription className="text-center text-xs font-medium px-2 leading-relaxed">
-                    This will permanently delete your identity and all wellness history from arcexfit. This action is final.
-                  </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="flex-col gap-2 sm:flex-col mt-4">
                   <AlertDialogAction 
