@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -21,11 +22,12 @@ import {
   Activity,
   History,
   Clock,
-  Check
+  Check,
+  X
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-// Icon Map to handle JSON serialization (React components can't be stored in localStorage)
+// Icon Map to handle string persistence
 const ICON_MAP: Record<string, any> = {
   'trophy': Trophy,
   'target': Target,
@@ -36,7 +38,8 @@ const ICON_MAP: Record<string, any> = {
   'activity': Activity,
   'trending-up': TrendingUp,
   'heart-pulse': HeartPulse,
-  'dumbbell': Dumbbell
+  'dumbbell': Dumbbell,
+  'check': CheckCircle2
 };
 
 export interface Notification {
@@ -44,10 +47,11 @@ export interface Notification {
   title: string;
   description: string;
   time: string;
+  timestamp: number;
   type: 'achievement' | 'system' | 'goal';
   subtype?: '50-percent' | '100-percent' | 'pr';
   isRead: boolean;
-  icon: string; // Use string keys for persistence
+  icon: string;
   gradient: string;
 }
 
@@ -58,8 +62,13 @@ interface NotificationsViewProps {
 }
 
 export function NotificationsView({ notifications, setNotifications, onBack }: NotificationsViewProps) {
-  const [autoDelete, setAutoDelete] = useState(true);
-  const [autoDeletePeriod, setAutoDeletePeriod] = useState<'24h' | '1w'>('24h');
+  const [autoDelete, setAutoDelete] = useState(() => localStorage.getItem('pulseflow_notif_autodelete') !== 'false');
+  const [autoDeletePeriod, setAutoDeletePeriod] = useState<'24h' | '1w'>(() => (localStorage.getItem('pulseflow_notif_period') as any) || '24h');
+
+  useEffect(() => {
+    localStorage.setItem('pulseflow_notif_autodelete', autoDelete.toString());
+    localStorage.setItem('pulseflow_notif_period', autoDeletePeriod);
+  }, [autoDelete, autoDeletePeriod]);
 
   const markAllRead = () => {
     setNotifications(prev => prev.map(n => ({ ...n, isRead: true })));
@@ -75,22 +84,23 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
 
   return (
     <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
-      <div className="flex items-center gap-4 px-1">
-        <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
-          <ChevronLeft className="w-5 h-5" />
-        </Button>
-        <h1 className="text-2xl font-bold font-headline">Notifications</h1>
-      </div>
-
-      <div className="px-1 mb-2">
-        <Button 
-          variant="ghost" 
-          size="sm" 
-          onClick={markAllRead} 
-          className="text-[10px] font-black uppercase tracking-widest text-[#08A391] hover:bg-[#08A391]/5 p-0 h-auto"
-        >
-          Mark all as read
-        </Button>
+      <div className="px-1 flex flex-col gap-1">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
+            <ChevronLeft className="w-5 h-5" />
+          </Button>
+          <h1 className="text-2xl font-bold font-headline">Notifications</h1>
+        </div>
+        <div className="pl-12 mt-1">
+          <Button 
+            variant="ghost" 
+            size="sm" 
+            onClick={markAllRead} 
+            className="text-[10px] font-black uppercase tracking-widest text-[#08A391] hover:bg-[#08A391]/5 p-0 h-auto"
+          >
+            Mark all as read
+          </Button>
+        </div>
       </div>
 
       <Card className="border-none shadow-sm bg-muted/5 rounded-2xl mx-1 mb-6">
@@ -102,7 +112,7 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
               </div>
               <div className="space-y-0.5">
                 <h4 className="text-[11px] font-black uppercase tracking-tight text-foreground/80 leading-none">Auto-Cleanup</h4>
-                <p className="text-[9px] font-bold text-muted-foreground/60 uppercase">Keep your inbox clean</p>
+                <p className="text-[9px] font-bold text-muted-foreground/60 uppercase">Default: 24 Hours</p>
               </div>
             </div>
             <Switch checked={autoDelete} onCheckedChange={setAutoDelete} className="data-[state=checked]:bg-primary" />
@@ -141,7 +151,7 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
           </div>
         ) : (
           notifications.map((n) => {
-            const Icon = ICON_MAP[n.icon] || Bell;
+            const IconComponent = ICON_MAP[n.icon] || Bell;
             return (
               <Card 
                 key={n.id} 
@@ -160,7 +170,7 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
                     style={{ background: n.gradient }}
                     >
                       <div className="w-full h-full rounded-full bg-card flex items-center justify-center">
-                        <Icon className={cn("w-5 h-5", !n.isRead ? "text-foreground" : "text-muted-foreground")} />
+                        <IconComponent className={cn("w-5 h-5", !n.isRead ? "text-foreground" : "text-muted-foreground")} />
                       </div>
                     </div>
                     {!n.isRead && (
@@ -185,13 +195,13 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
                         {n.time}
                       </span>
                       {n.subtype === '100-percent' && (
-                        <Badge className="bg-emerald-500/10 text-emerald-600 text-[7px] font-black uppercase h-3.5 border-none px-1.5 rounded-sm">Goal Mastered</Badge>
+                        <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 text-[7px] font-black uppercase h-3.5 border-none px-1.5 rounded-sm">Goal Mastered</Badge>
                       )}
                       {n.subtype === '50-percent' && (
-                        <Badge className="bg-blue-500/10 text-blue-600 text-[7px] font-black uppercase h-3.5 border-none px-1.5 rounded-sm">50% Achieved</Badge>
+                        <Badge variant="secondary" className="bg-blue-500/10 text-blue-600 text-[7px] font-black uppercase h-3.5 border-none px-1.5 rounded-sm">50% Achieved</Badge>
                       )}
                       {n.subtype === 'pr' && (
-                        <Badge className="bg-amber-500/10 text-amber-600 text-[7px] font-black uppercase h-3.5 border-none px-1.5 rounded-sm">New Record</Badge>
+                        <Badge variant="secondary" className="bg-amber-500/10 text-amber-600 text-[7px] font-black uppercase h-3.5 border-none px-1.5 rounded-sm">New Record</Badge>
                       )}
                     </div>
                   </div>

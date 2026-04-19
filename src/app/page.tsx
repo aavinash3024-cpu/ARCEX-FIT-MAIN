@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -30,7 +31,7 @@ import { ProfileView } from '@/components/profile-view';
 import { GuideView } from '@/components/guide-view';
 import { NotificationsView, type Notification } from '@/components/notifications-view';
 import { Button } from '@/components/ui/button';
-import { format, isYesterday } from 'date-fns';
+import { format, isYesterday, isSameDay, subHours, subDays } from 'date-fns';
 import { useAuth, useUser, initiateAnonymousSignIn } from '@/firebase';
 import { cn } from '@/lib/utils';
 
@@ -49,43 +50,10 @@ export default function PulseFlowApp() {
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [streakData, setStreakData] = useState({ count: 0, history: [] as string[] });
-  const [notifications, setNotifications] = useState<Notification[]>([
-    {
-      id: '1',
-      title: 'New Peak: 100kg Bench Press',
-      description: 'Elite progress! You just smashed your previous Bench Press PR. Your strength growth is in the top 5% this week.',
-      time: 'Just now',
-      type: 'achievement',
-      subtype: 'pr',
-      isRead: false,
-      icon: 'trophy',
-      gradient: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)'
-    },
-    {
-      id: '2',
-      title: 'Goal Master: 100% Protein',
-      description: 'You have hit your daily protein target of 160g. Perfect for muscle recovery and skin cell regeneration.',
-      time: '2 hours ago',
-      type: 'goal',
-      subtype: '100-percent',
-      isRead: false,
-      icon: 'target',
-      gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
-    },
-    {
-      id: '3',
-      title: 'Goal Momentum: 50% Calories',
-      description: 'You are halfway to your daily calorie budget. You have 1,100 kcal remaining for the day.',
-      time: '5 hours ago',
-      type: 'goal',
-      subtype: '50-percent',
-      isRead: true,
-      icon: 'flame',
-      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
-    }
-  ]);
-  const [isLoaded, setIsLoaded] = useState(false);
+  const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [sentMilestones, setSentMilestones] = useState<Record<string, string[]>>({});
   
+  const [isLoaded, setIsLoaded] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
 
   // Initialize Anonymous Auth
@@ -130,6 +98,29 @@ export default function PulseFlowApp() {
     }
   };
 
+  const addNotification = (
+    title: string, 
+    description: string, 
+    type: Notification['type'], 
+    subtype?: Notification['subtype'], 
+    icon: string = 'bell', 
+    gradient: string = 'linear-gradient(135deg, #4ade80 0%, #3b82f6 100%)'
+  ) => {
+    const newNotif: Notification = {
+      id: Math.random().toString(36).substr(2, 9),
+      title,
+      description,
+      time: 'Just now',
+      timestamp: Date.now(),
+      type,
+      subtype,
+      isRead: false,
+      icon,
+      gradient
+    };
+    setNotifications(prev => [newNotif, ...prev]);
+  };
+
   useEffect(() => {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const lastResetDate = localStorage.getItem('pulseflow_last_reset_date');
@@ -147,7 +138,8 @@ export default function PulseFlowApp() {
     const savedWeight = localStorage.getItem('pulseflow_weight_history');
     const savedMeals = localStorage.getItem('pulseflow_today_logged_meals');
     const savedStreak = localStorage.getItem('pulseflow_streak_v3');
-    const savedNotifications = localStorage.getItem('pulseflow_notifications_data');
+    const savedNotifications = localStorage.getItem('pulseflow_notifications_data_v2');
+    const savedMilestones = localStorage.getItem('pulseflow_sent_milestones');
     
     if (savedTasks) {
       try { setTask(JSON.parse(savedTasks)); } catch (e) {}
@@ -167,7 +159,32 @@ export default function PulseFlowApp() {
     if (savedStepsHistory) { try { setStepsHistory(JSON.parse(savedStepsHistory)); } catch (e) {} }
     if (savedGoal) { try { setGoalData(JSON.parse(savedGoal)); } catch (e) {} }
     if (savedWeight) { try { setWeightHistory(JSON.parse(savedWeight)); } catch (e) {} }
-    if (savedNotifications) { try { setNotifications(JSON.parse(savedNotifications)); } catch (e) {} }
+    
+    if (savedNotifications) { 
+      try { 
+        let parsed = JSON.parse(savedNotifications);
+        // Auto-Delete Logic
+        const autoDelete = localStorage.getItem('pulseflow_notif_autodelete') !== 'false';
+        const period = localStorage.getItem('pulseflow_notif_period') || '24h';
+        const cutoff = period === '24h' ? subHours(new Date(), 24).getTime() : subDays(new Date(), 7).getTime();
+        
+        if (autoDelete) {
+          parsed = parsed.filter((n: any) => (n.timestamp || 0) > cutoff);
+        }
+        setNotifications(parsed); 
+      } catch (e) {} 
+    }
+
+    if (savedMilestones) {
+      try { 
+        const parsed = JSON.parse(savedMilestones);
+        if (parsed.date === todayStr) {
+          setSentMilestones(parsed.milestones || {});
+        } else {
+          setSentMilestones({});
+        }
+      } catch (e) {}
+    }
 
     if (isNewDay) {
       setLoggedMeals([]);
@@ -202,54 +219,76 @@ export default function PulseFlowApp() {
     setIsLoaded(true);
   }, []);
 
-  useEffect(() => {
-    if (isLoaded) localStorage.setItem('pulseflow_tasks', JSON.stringify(tasks));
-  }, [tasks, isLoaded]);
-
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('pulseflow_hydration', hydrationAmount.toString());
-      const today = format(new Date(), 'yyyy-MM-dd');
-      setHydrationHistory(prev => {
-        const newHistory = { ...prev, [today]: hydrationAmount };
-        localStorage.setItem('pulseflow_hydration_history', JSON.stringify(newHistory));
-        return newHistory;
-      });
-    }
-  }, [hydrationAmount, isLoaded]);
-
+  // Persistent storage sync
+  useEffect(() => { if (isLoaded) localStorage.setItem('pulseflow_tasks', JSON.stringify(tasks)); }, [tasks, isLoaded]);
+  useEffect(() => { if (isLoaded) localStorage.setItem('pulseflow_hydration', hydrationAmount.toString()); }, [hydrationAmount, isLoaded]);
+  useEffect(() => { if (isLoaded) localStorage.setItem('pulseflow_steps', stepsCount.toString()); }, [stepsCount, isLoaded]);
+  useEffect(() => { if (isLoaded) localStorage.setItem('pulseflow_weight_history', JSON.stringify(weightHistory)); }, [weightHistory, isLoaded]);
+  useEffect(() => { if (isLoaded) localStorage.setItem('pulseflow_today_logged_meals', JSON.stringify(loggedMeals)); }, [loggedMeals, isLoaded]);
+  useEffect(() => { if (isLoaded) localStorage.setItem('pulseflow_notifications_data_v2', JSON.stringify(notifications)); }, [notifications, isLoaded]);
+  
   useEffect(() => {
     if (isLoaded) {
-      localStorage.setItem('pulseflow_steps', stepsCount.toString());
-      const today = format(new Date(), 'yyyy-MM-dd');
-      setStepsHistory(prev => {
-        const newHistory = { ...prev, [today]: stepsCount };
-        localStorage.setItem('pulseflow_steps_history', JSON.stringify(newHistory));
-        return newHistory;
-      });
+      const todayStr = format(new Date(), 'yyyy-MM-dd');
+      localStorage.setItem('pulseflow_sent_milestones', JSON.stringify({ date: todayStr, milestones: sentMilestones }));
     }
-  }, [stepsCount, isLoaded]);
+  }, [sentMilestones, isLoaded]);
 
+  // ACHIEVEMENT MONITORING ENGINE
   useEffect(() => {
-    if (isLoaded) localStorage.setItem('pulseflow_weight_history', JSON.stringify(weightHistory));
-  }, [weightHistory, isLoaded]);
+    if (!isLoaded || !goalData) return;
 
-  useEffect(() => {
-    if (isLoaded) localStorage.setItem('pulseflow_today_logged_meals', JSON.stringify(loggedMeals));
-  }, [loggedMeals, isLoaded]);
+    const todayStr = format(new Date(), 'yyyy-MM-dd');
+    const checkMilestone = (key: string, current: number, target: number, label: string, icon: string, grad: string) => {
+      const milestones = sentMilestones[key] || [];
+      const pct = (current / target) * 100;
 
-  useEffect(() => {
-    if (isLoaded) localStorage.setItem('pulseflow_notifications_data', JSON.stringify(notifications));
-  }, [notifications, isLoaded]);
+      // 50% Milestone
+      if (pct >= 50 && !milestones.includes('50')) {
+        addNotification(
+          `Goal Momentum: 50% ${label}`,
+          `You've reached the halfway mark for your daily ${label.toLowerCase()} target. Keep going!`,
+          'goal',
+          '50-percent',
+          icon,
+          grad
+        );
+        setSentMilestones(prev => ({ ...prev, [key]: [...(prev[key] || []), '50'] }));
+      }
+      
+      // 100% Milestone
+      if (pct >= 100 && !milestones.includes('100')) {
+        addNotification(
+          `Goal Master: 100% ${label}`,
+          `Achievement unlocked! You have successfully mastered your daily ${label.toLowerCase()} goal.`,
+          'goal',
+          '100-percent',
+          icon,
+          grad
+        );
+        setSentMilestones(prev => ({ ...prev, [key]: [...(prev[key] || []), '100'] }));
+      }
+    };
 
-  const refreshGoalData = () => {
-    const savedGoal = localStorage.getItem('pulseflow_goal_data');
-    if (savedGoal) setGoalData(JSON.parse(savedGoal));
-  };
+    // 1. Calories
+    const curCal = loggedMeals.reduce((acc, m) => acc + (m.calories || 0), 0);
+    const tarCal = goalData.finalCalories || 2200;
+    checkMilestone('calories', curCal, tarCal, 'Calories', 'flame', 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)');
 
-  const toggleTask = (id: string) => {
-    setTask(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
-  };
+    // 2. Protein
+    const curProt = loggedMeals.reduce((acc, m) => acc + (m.protein || 0), 0);
+    const tarProt = goalData.protein || 150;
+    checkMilestone('protein', curProt, tarProt, 'Protein', 'target', 'linear-gradient(135deg, #10b981 0%, #059669 100%)');
+
+    // 3. Hydration
+    const curHyd = hydrationAmount / 1000;
+    const tarHyd = goalData.hydrationTargetLiters || 3.0;
+    checkMilestone('hydration', curHyd, tarHyd, 'Hydration', 'heart-pulse', 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)');
+
+    // 4. Steps
+    checkMilestone('steps', stepsCount, 10000, 'Steps', 'zap', 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)');
+
+  }, [loggedMeals, hydrationAmount, stepsCount, goalData, isLoaded]);
 
   const updateHydration = (amount: number) => {
     setHydrationAmount(prev => Math.min(50000, Math.max(0, prev + amount)));
@@ -257,27 +296,6 @@ export default function PulseFlowApp() {
 
   const updateSteps = (amount: number) => {
     setStepsCount(prev => Math.max(0, prev + amount));
-  };
-
-  const handleOpenCalculator = (type: string) => {
-    const calcMap: Record<string, 'bmr' | '1rm' | 'bodyfat'> = {
-      '1 Rep Max': '1rm',
-      'Body Fat %': 'bodyfat',
-      'BMR / TDEE': 'bmr'
-    };
-    setActiveCalculator(calcMap[type] || 'bmr');
-    navigateTo('calculators');
-  };
-
-  const handleLogWeight = (newEntry: { date: string, weight: number }) => {
-    setWeightHistory(prev => {
-      const updated = [...prev, newEntry].sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime());
-      return updated;
-    });
-  };
-
-  const handleDeleteWeight = (date: string) => {
-    setWeightHistory(prev => prev.filter(entry => entry.date !== date));
   };
 
   const unreadCount = notifications.filter(n => !n.isRead).length;
@@ -297,7 +315,7 @@ export default function PulseFlowApp() {
         return (
           <DashboardView 
             tasks={tasks}
-            onToggleTask={toggleTask}
+            onToggleTask={(id) => setTask(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t))}
             hydrationAmount={hydrationAmount}
             onUpdateHydration={updateHydration}
             stepsCount={stepsCount}
@@ -309,7 +327,11 @@ export default function PulseFlowApp() {
             onViewHydration={() => navigateTo('hydration')} 
             onViewSteps={() => navigateTo('steps')}
             onViewTasks={() => navigateTo('tasks')} 
-            onViewCalculators={handleOpenCalculator}
+            onViewCalculators={(type) => {
+               const map: any = {'1 Rep Max': '1rm', 'Body Fat %': 'bodyfat', 'BMR / TDEE': 'bmr'};
+               setActiveCalculator(map[type] || 'bmr');
+               navigateTo('calculators');
+            }}
             onViewGoalSetting={() => navigateTo('goal-setting')}
             onViewProgress={() => navigateTo('rank')}
             onViewGuide={() => navigateTo('guide')}
@@ -317,111 +339,35 @@ export default function PulseFlowApp() {
           />
         );
       case 'nutrition': 
-        return (
-          <NutritionView 
-            key="nutrition-main"
-            loggedMeals={loggedMeals}
-            setLoggedMeals={setLoggedMeals}
-            activeView="log"
-            onNavigate={navigateTo}
-          />
-        );
+        return <NutritionView loggedMeals={loggedMeals} setLoggedMeals={setLoggedMeals} activeView="log" onNavigate={navigateTo} />;
       case 'nutrition-summary':
-        return (
-          <NutritionView 
-            key="nutrition-summary"
-            loggedMeals={loggedMeals}
-            setLoggedMeals={setLoggedMeals}
-            activeView="summary"
-            onNavigate={navigateTo}
-          />
-        );
+        return <NutritionView loggedMeals={loggedMeals} setLoggedMeals={setLoggedMeals} activeView="summary" onNavigate={navigateTo} />;
       case 'nutrition-micro':
-        return (
-          <NutritionView 
-            key="nutrition-micro"
-            loggedMeals={loggedMeals}
-            setLoggedMeals={setLoggedMeals}
-            activeView="micro"
-            onNavigate={navigateTo}
-          />
-        );
+        return <NutritionView loggedMeals={loggedMeals} setLoggedMeals={setLoggedMeals} activeView="micro" onNavigate={navigateTo} />;
       case 'nutrition-micro-detail':
-        return (
-          <NutritionView 
-            key="nutrition-micro-detail"
-            loggedMeals={loggedMeals}
-            setLoggedMeals={setLoggedMeals}
-            activeView="micro-detail"
-            onNavigate={navigateTo}
-          />
-        );
+        return <NutritionView loggedMeals={loggedMeals} setLoggedMeals={setLoggedMeals} activeView="micro-detail" onNavigate={navigateTo} />;
       case 'nutrition-macro':
-        return (
-          <NutritionView 
-            key="nutrition-macro"
-            loggedMeals={loggedMeals}
-            setLoggedMeals={setLoggedMeals}
-            activeView="macro"
-            onNavigate={navigateTo}
-          />
-        );
+        return <NutritionView loggedMeals={loggedMeals} setLoggedMeals={setLoggedMeals} activeView="macro" onNavigate={navigateTo} />;
       case 'workout': return <WorkoutView activeView="main" onNavigate={navigateTo} />;
       case 'workout-library': return <WorkoutView activeView="library" onNavigate={navigateTo} />;
       case 'workout-split': return <WorkoutView activeView="split" onNavigate={navigateTo} />;
       case 'workout-history': return <WorkoutView activeView="history" onNavigate={navigateTo} />;
       case 'workout-pr': return <WorkoutView activeView="pr" onNavigate={navigateTo} />;
       case 'workout-pr-detail': return <WorkoutView activeView="pr-detail" onNavigate={navigateTo} />;
-      
       case 'rank': 
         return (
           <ProgressView 
             goalData={goalData} 
             weightHistory={weightHistory}
-            onLogWeight={handleLogWeight}
-            onDeleteWeight={handleDeleteWeight}
+            onLogWeight={(entry) => setWeightHistory(prev => [...prev, entry].sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()))}
+            onDeleteWeight={(date) => setWeightHistory(prev => prev.filter(e => e.date !== date))}
           />
         );
-      case 'hydration': 
-        return (
-          <HydrationView 
-            currentMl={hydrationAmount}
-            history={hydrationHistory}
-            onUpdateMl={updateHydration}
-            onBack={() => window.history.back()} 
-          />
-        );
-      case 'steps': 
-        return (
-          <StepsView 
-            currentSteps={stepsCount}
-            history={stepsHistory}
-            onUpdateSteps={updateSteps}
-            onBack={() => window.history.back()} 
-          />
-        );
-      case 'tasks': 
-        return (
-          <TasksView 
-            tasks={tasks}
-            setTasks={setTask}
-            onBack={() => window.history.back()} 
-          />
-        );
-      case 'calculators':
-        return (
-          <CalculatorsView 
-            initialType={activeCalculator}
-            onBack={() => window.history.back()}
-          />
-        );
-      case 'goal-setting':
-        return (
-          <GoalSettingView 
-            onBack={() => window.history.back()}
-            onGoalSaved={refreshGoalData}
-          />
-        );
+      case 'hydration': return <HydrationView currentMl={hydrationAmount} history={hydrationHistory} onUpdateMl={updateHydration} onBack={() => window.history.back()} />;
+      case 'steps': return <StepsView currentSteps={stepsCount} history={stepsHistory} onUpdateSteps={updateSteps} onBack={() => window.history.back()} />;
+      case 'tasks': return <TasksView tasks={tasks} setTasks={setTask} onBack={() => window.history.back()} />;
+      case 'calculators': return <CalculatorsView initialType={activeCalculator} onBack={() => window.history.back()} />;
+      case 'goal-setting': return <GoalSettingView onBack={() => window.history.back()} onGoalSaved={() => setGoalData(JSON.parse(localStorage.getItem('pulseflow_goal_data') || '{}'))} />;
       case 'profile':
       case 'profile-personal':
       case 'profile-subscription':
@@ -429,55 +375,12 @@ export default function PulseFlowApp() {
       case 'profile-settings':
       case 'profile-reset':
         const profileSub = activeTab === 'profile' ? 'main' : activeTab.replace('profile-', '') as any;
-        return (
-          <ProfileView 
-            activeView={profileSub}
-            onBack={() => navigateTo('profile')}
-            onNavigate={navigateTo}
-          />
-        );
-      case 'guide':
-        return (
-          <GuideView 
-            goalData={goalData}
-            loggedMeals={loggedMeals}
-            hydrationAmount={hydrationAmount}
-            weightHistory={weightHistory}
-            onBack={() => window.history.back()}
-          />
-        );
-      case 'notifications':
-        return (
-          <NotificationsView 
-            notifications={notifications}
-            setNotifications={setNotifications}
-            onBack={() => window.history.back()}
-          />
-        );
-      default: return (
-        <DashboardView 
-          tasks={tasks} 
-          onToggleTask={toggleTask} 
-          hydrationAmount={hydrationAmount} 
-          onUpdateHydration={updateHydration} 
-          goalData={goalData}
-          weightHistory={weightHistory}
-          loggedMeals={loggedMeals}
-          streakData={streakData}
-          onViewProgress={() => navigateTo('rank')}
-          onViewGuide={() => navigateTo('guide')}
-          onViewNutritionSummary={() => navigateTo('nutrition-summary')}
-        />
-      );
+        return <ProfileView activeView={profileSub} onBack={() => navigateTo('profile')} onNavigate={navigateTo} />;
+      case 'guide': return <GuideView goalData={goalData} loggedMeals={loggedMeals} hydrationAmount={hydrationAmount} weightHistory={weightHistory} onBack={() => window.history.back()} />;
+      case 'notifications': return <NotificationsView notifications={notifications} setNotifications={setNotifications} onBack={() => window.history.back()} />;
+      default: return null;
     }
   };
-
-  const navItems = [
-    { id: 'dashboard', icon: LayoutDashboard, label: 'Home' },
-    { id: 'nutrition', icon: UtensilsCrossed, label: 'Food' },
-    { id: 'workout', icon: Dumbbell, label: 'Gym' },
-    { id: 'rank', icon: ChartIcon, label: 'Progress' },
-  ];
 
   return (
     <div className="min-h-screen max-w-lg mx-auto bg-background flex flex-col relative shadow-xl border-x">
@@ -492,34 +395,21 @@ export default function PulseFlowApp() {
       </svg>
 
       <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b relative">
-        <div className="flex items-center">
-          <button 
-            onClick={() => navigateTo('profile')}
-            className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center transition-all"
-          >
-            <User className="w-4 h-4 text-foreground" />
-          </button>
-        </div>
-
+        <button onClick={() => navigateTo('profile')} className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center">
+          <User className="w-4 h-4 text-foreground" />
+        </button>
         <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none">
-          <span className="font-black text-xl tracking-tighter text-foreground">arcex</span>
+          <span className="font-black text-xl tracking-tighter">arcex</span>
           <span className="font-black text-xl tracking-tighter bg-gradient-to-br from-[#4ade80] via-[#2dd4bf] to-[#3b82f6] bg-clip-text text-transparent">fit</span>
         </div>
-
         <div className="flex gap-2">
-          <button 
-            onClick={() => navigateTo('profile-subscription')}
-            className="rounded-full bg-muted/50 w-9 h-9 flex items-center justify-center"
-          >
+          <button onClick={() => navigateTo('profile-subscription')} className="rounded-full bg-muted/50 w-9 h-9 flex items-center justify-center">
             <Crown className="w-4 h-4 text-amber-500" />
           </button>
-          <button 
-            onClick={() => navigateTo('notifications')}
-            className="rounded-full bg-muted/50 w-9 h-9 relative flex items-center justify-center"
-          >
+          <button onClick={() => navigateTo('notifications')} className="rounded-full bg-muted/50 w-9 h-9 relative flex items-center justify-center">
             <Bell className="w-4 h-4 text-foreground" />
             {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-destructive text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-background animate-in zoom-in">
+              <span className="absolute -top-1 -right-1 bg-destructive text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-background">
                 {unreadCount > 99 ? '99+' : unreadCount}
               </span>
             )}
@@ -527,45 +417,29 @@ export default function PulseFlowApp() {
         </div>
       </header>
 
-      <main 
-        ref={mainRef} 
-        id="main-scroll-container"
-        className="flex-1 px-4 overflow-y-auto swipe-container"
-      >
+      <main ref={mainRef} id="main-scroll-container" className="flex-1 px-4 overflow-y-auto swipe-container">
         {renderContent()}
       </main>
 
       <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card/90 backdrop-blur-xl border-t px-4 py-3 flex justify-between items-center z-50">
-        {navItems.map((item) => {
+        {[
+          { id: 'dashboard', icon: LayoutDashboard, label: 'Home' },
+          { id: 'nutrition', icon: UtensilsCrossed, label: 'Food' },
+          { id: 'workout', icon: Dumbbell, label: 'Gym' },
+          { id: 'rank', icon: ChartIcon, label: 'Progress' },
+        ].map((item) => {
           const Icon = item.icon;
           const isNutrition = item.id === 'nutrition' && ['nutrition-summary', 'nutrition-micro', 'nutrition-macro', 'nutrition-micro-detail'].includes(activeTab);
           const isWorkout = item.id === 'workout' && ['workout-library', 'workout-split', 'workout-history', 'workout-pr', 'workout-pr-detail'].includes(activeTab);
           const isActive = activeTab === item.id || isNutrition || isWorkout;
-          
           return (
             <button
               key={item.id}
               onClick={() => navigateTo(item.id)}
-              className={cn(
-                "flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 group flex-1 justify-center max-w-[110px]",
-                isActive 
-                  ? "bg-primary/10" 
-                  : "text-muted-foreground hover:bg-muted"
-              )}
+              className={cn("flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 flex-1 justify-center max-w-[110px]", isActive ? "bg-primary/10" : "text-muted-foreground")}
             >
-              <Icon 
-                className={cn("w-4 h-4 shrink-0 transition-colors")} 
-                style={isActive ? { stroke: 'url(#icon-gradient)', fill: 'none' } : {}}
-              />
-              <span className={cn(
-                "text-[10px] font-black uppercase tracking-tight transition-all text-foreground",
-                isActive ? "opacity-100 ml-1" : "opacity-0 w-0 h-0 overflow-hidden"
-              )}>
-                {item.label}
-              </span>
-              {!isActive && (
-                <span className="sr-only">{item.label}</span>
-              )}
+              <Icon className="w-4 h-4" style={isActive ? { stroke: 'url(#icon-gradient)', fill: 'none' } : {}} />
+              <span className={cn("text-[10px] font-black uppercase tracking-tight transition-all", isActive ? "opacity-100 ml-1" : "opacity-0 w-0 h-0 overflow-hidden")}>{item.label}</span>
             </button>
           );
         })}

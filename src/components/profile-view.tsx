@@ -247,7 +247,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
       'pulseflow_workout_logs',
       'pulseflow_workout_history',
       'pulseflow_streak_v3',
-      'pulseflow_last_reset_date'
+      'pulseflow_last_reset_date',
+      'pulseflow_sent_milestones',
+      'pulseflow_notifications_data_v2'
     ];
 
     keysToRemove.forEach(key => localStorage.removeItem(key));
@@ -393,7 +395,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                       <span className="text-xl font-black text-foreground">₹{plan.price}</span>
                     </div>
 
-                    <Badge className={cn("text-[8px] font-black uppercase px-2 h-4 border-none shadow-sm bg-emerald-500/10 text-emerald-500")}>
+                    <Badge variant="secondary" className={cn("text-[8px] font-black uppercase px-2 h-4 border-none shadow-sm bg-emerald-500/10 text-emerald-500")}>
                       SAVE {plan.save}
                     </Badge>
                   </CardContent>
@@ -413,25 +415,22 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 { label: 'Strength Growth', desc: 'Detailed power progress trends.', icon: TrendingUp, colors: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)' },
                 { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' },
                 { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
-                { label: 'Skin Based Micro Tracking', desc: 'Comprehensive analysis of micronutrients optimized for skin clarity and health.', icon: HeartPulse, colors: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' },
-                { label: 'Recovery Based Macro Tracking', desc: 'Advanced tracking of macronutrients vital for efficient muscle recovery and repair.', icon: Timer, colors: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' },
+                { label: 'Skin Health', desc: 'Micronutrient analysis for clarity.', icon: HeartPulse, colors: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' },
                 { label: 'Intake Reports', desc: 'Daily, Weekly, Monthly history.', icon: BarChart3, colors: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' },
-                { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED personal progress insights.', icon: Sparkles, colors: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', highlight: true }
+                { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED progress insights.', icon: Sparkles, colors: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', highlight: true }
               ].map((item, i) => (
-                <div key={i} className="flex flex-col gap-2">
-                  <div className="flex gap-4">
-                    <div className={cn(
-                      "w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm border p-[1.5px]",
-                      item.highlight ? "border-primary/40" : "border-muted/20"
-                    )}>
-                      <div className={cn("w-full h-full rounded-full flex items-center justify-center text-white")} style={{ background: item.colors }}>
-                        <item.icon className="w-4 h-4" />
-                      </div>
+                <div key={i} className="flex gap-4">
+                  <div className={cn(
+                    "w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm border p-[1.5px]",
+                    item.highlight ? "border-primary/40" : "border-muted/20"
+                  )}>
+                    <div className={cn("w-full h-full rounded-full flex items-center justify-center text-white")} style={{ background: item.colors }}>
+                      <item.icon className="w-4 h-4" />
                     </div>
-                    <div className="space-y-0.5">
-                      <h5 className={cn("text-[10px] font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground/90")}>{item.label}</h5>
-                      <p className="text-[9px] font-bold text-muted-foreground/60 leading-tight uppercase tracking-tight">{item.desc}</p>
-                    </div>
+                  </div>
+                  <div className="space-y-0.5">
+                    <h5 className={cn("text-[10px] font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground/90")}>{item.label}</h5>
+                    <p className="text-[9px] font-bold text-muted-foreground/60 leading-tight uppercase tracking-tight">{item.desc}</p>
                   </div>
                 </div>
               ))}
