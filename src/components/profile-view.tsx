@@ -63,6 +63,12 @@ import { Badge } from "@/components/ui/badge";
 import { Switch } from "@/components/ui/switch";
 import { Progress } from "@/components/ui/progress";
 import { 
+  eachDayOfInterval,
+  startOfMonth,
+  endOfMonth,
+  format
+} from "date-fns";
+import { 
   AlertDialog,
   AlertDialogAction,
   AlertDialogCancel,
