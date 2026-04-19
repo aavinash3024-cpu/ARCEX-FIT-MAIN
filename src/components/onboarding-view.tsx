@@ -302,7 +302,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                         <SelectTrigger className="h-14 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
-                        <SelectContent className="rounded-xl bg-slate-900 border-white/10 text-white">
+                        <SelectContent className="z-[200] rounded-xl bg-slate-900 border-white/10 text-white">
                           <SelectItem value="male">Male</SelectItem>
                           <SelectItem value="female">Female</SelectItem>
                         </SelectContent>
@@ -349,7 +349,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                       <SelectTrigger className="h-14 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
                         <SelectValue placeholder="Select Activity" />
                       </SelectTrigger>
-                      <SelectContent className="rounded-xl bg-slate-900 border-white/10 text-white">
+                      <SelectContent className="z-[200] rounded-xl bg-slate-900 border-white/10 text-white">
                         <SelectItem value="sedentary">Sedentary</SelectItem>
                         <SelectItem value="light">Lightly Active</SelectItem>
                         <SelectItem value="moderate">Moderately Active</SelectItem>
@@ -574,13 +574,15 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
 
                   {/* Integrated Completion Section */}
                   <div className="pt-8 border-t border-white/5">
-                    <div className="flex items-center gap-4 bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/20">
-                      <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg shrink-0">
-                        <Check className="w-4 h-4 text-white" />
+                    <div className="flex flex-col items-center justify-center text-center space-y-3 py-4">
+                      <div className="w-16 h-16 bg-emerald-500/20 rounded-full flex items-center justify-center shadow-[0_0_30px_rgba(16,185,129,0.2)] border-2 border-emerald-500/30">
+                        <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg">
+                          <Check className="w-6 h-6 text-white" strokeWidth={3} />
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-xs font-black text-emerald-400 uppercase tracking-widest">System Ready</p>
-                        <p className="text-[10px] text-white/40 font-medium">Your personal biometric profile is complete.</p>
+                      <div className="space-y-1">
+                        <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Your Profile is Ready</h3>
+                        <p className="text-[10px] text-white/40 font-bold uppercase tracking-tight">Initialization Complete</p>
                       </div>
                     </div>
                   </div>
