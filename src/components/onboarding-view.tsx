@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -148,6 +149,8 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
     }
 
     if (step === 5) {
+      if (!user) return;
+      const uid = user.uid;
       const dataToSave = {
         gender, age: parseInt(age), weight, height, activity,
         objective, targetWeight, weeklyRate,
@@ -155,32 +158,35 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
         ...calculations
       };
       
-      localStorage.setItem('pulseflow_goal_data', JSON.stringify(dataToSave));
-      localStorage.setItem('pulseflow_user_profile', JSON.stringify({ 
+      // Save locally with UID
+      localStorage.setItem(`arcex_${uid}_goal_data`, JSON.stringify(dataToSave));
+      localStorage.setItem(`arcex_${uid}_user_profile`, JSON.stringify({ 
         name, 
         email: user?.email || `${name.toLowerCase().replace(/\s/g, '.')}@pulseflow.ai`, 
         dob: "1998-05-15", 
         location: userState 
       }));
+      localStorage.setItem(`arcex_${uid}_onboarding_complete`, 'true');
 
-      if (user && firestore) {
-        const userRef = doc(firestore, 'userProfiles', user.uid);
+      if (firestore) {
+        const userRef = doc(firestore, 'userProfiles', uid);
         const nameParts = name.trim().split(' ');
         const firstName = nameParts[0] || 'User';
         const lastName = nameParts.slice(1).join(' ') || '';
 
         const profileData = {
-          id: user.uid,
-          email: user.email || `${user.uid}@pulseflow.anonymous`,
+          id: uid,
+          email: user.email || `${uid}@pulseflow.anonymous`,
           firstName, lastName, dateOfBirth: "1998-05-15",
           heightCm: parseFloat(height), gender, activityLevel: activity,
+          onboardingComplete: true,
           createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
         };
         setDocumentNonBlocking(userRef, profileData, { merge: true });
 
-        const goalRef = doc(firestore, `userProfiles/${user.uid}/goals`, 'primary_goal');
+        const goalRef = doc(firestore, `userProfiles/${uid}/goals`, 'primary_goal');
         const gData = {
-          id: 'primary_goal', userId: user.uid,
+          id: 'primary_goal', userId: uid,
           type: objective === 'loss' ? 'weight_loss' : objective === 'gain' ? 'muscle_gain' : 'nutrition',
           targetValue: parseFloat(targetWeight), targetUnit: 'kg',
           startDate: format(new Date(), 'yyyy-MM-dd'), status: 'active',

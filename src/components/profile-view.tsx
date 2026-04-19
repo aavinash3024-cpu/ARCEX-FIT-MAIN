@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -48,7 +49,8 @@ import {
   TrendingUp,
   Sparkles,
   Wifi,
-  Timer
+  Timer,
+  Loader2
 } from "lucide-react";
 import { 
   Select,
@@ -82,9 +84,11 @@ interface ProfileViewProps {
   activeView?: ProfileSubView;
   onNavigate: (tab: string) => void;
   onShowSplash?: () => void;
+  onSyncAndLogout?: () => Promise<void>;
+  isSyncing?: boolean;
 }
 
-export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSplash }: ProfileViewProps) {
+export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSplash, onSyncAndLogout, isSyncing }: ProfileViewProps) {
   const firestore = useFirestore();
   const { user } = useUser();
   const auth = useAuth();
@@ -122,8 +126,11 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
   };
 
   useEffect(() => {
+    if (!user) return;
+    const uid = user.uid;
+    
     // Load Goal Data
-    const savedGoal = localStorage.getItem('pulseflow_goal_data');
+    const savedGoal = localStorage.getItem(`arcex_${uid}_goal_data`);
     if (savedGoal) {
       try {
         const data = JSON.parse(savedGoal);
@@ -136,7 +143,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
     }
 
     // Load Weight History
-    const savedWeight = localStorage.getItem('pulseflow_weight_history');
+    const savedWeight = localStorage.getItem(`arcex_${uid}_weight_history`);
     if (savedWeight) {
       try {
         setWeightHistory(JSON.parse(savedWeight));
@@ -146,7 +153,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
     }
 
     // Load Profile Specific Data
-    const savedProfile = localStorage.getItem('pulseflow_user_profile');
+    const savedProfile = localStorage.getItem(`arcex_${uid}_user_profile`);
     if (savedProfile) {
       try {
         const data = JSON.parse(savedProfile);
@@ -159,7 +166,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
       }
     }
 
-    // Load Preferences
+    // Load Preferences (These stay global per device usually)
     const savedDarkMode = localStorage.getItem('pulseflow_dark_mode') === 'true';
     setDarkMode(savedDarkMode);
     
@@ -170,7 +177,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
     if (savedNotify !== null) setNotificationsEnabled(savedNotify === 'true');
 
     setIsReady(true);
-  }, []);
+  }, [user]);
 
   // Theme Side Effect - Controlled by isReady guard to prevent un-darkening on profile entry
   useEffect(() => {
@@ -227,20 +234,22 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
   }, [goalData, weightHistory]);
 
   const handleSaveProfile = () => {
+    if (!user) return;
     triggerHaptic('success');
     setIsSaving(true);
     
+    const uid = user.uid;
     const profileData = {
       name: profileName,
       email: profileEmail,
       location: profileLocation,
       dob: profileDob
     };
-    localStorage.setItem('pulseflow_user_profile', JSON.stringify(profileData));
+    localStorage.setItem(`arcex_${uid}_user_profile`, JSON.stringify(profileData));
 
     // Update Firestore
-    if (user && firestore) {
-      const userRef = doc(firestore, 'userProfiles', user.uid);
+    if (firestore) {
+      const userRef = doc(firestore, 'userProfiles', uid);
       const nameParts = profileName.trim().split(' ');
       const firstName = nameParts[0] || 'User';
       const lastName = nameParts.slice(1).join(' ') || '';
@@ -261,7 +270,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
         gender: profileGender,
         age: parseInt(profileAge) || goalData.age
       };
-      localStorage.setItem('pulseflow_goal_data', JSON.stringify(updatedGoal));
+      localStorage.setItem(`arcex_${uid}_goal_data`, JSON.stringify(updatedGoal));
       setGoalData(updatedGoal);
     }
 
@@ -272,37 +281,41 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
   };
 
   const handleLogout = async () => {
-    if (auth) {
+    if (onSyncAndLogout) {
+      await onSyncAndLogout();
+    } else if (auth) {
       await auth.signOut();
       window.location.reload();
     }
   };
 
   const handleResetApp = () => {
+    if (!user) return;
     triggerHaptic('warning');
     setIsResetting(true);
     
+    const uid = user.uid;
     const keysToRemove = [
-      'pulseflow_goal_data',
-      'pulseflow_tasks',
-      'pulseflow_hydration',
-      'pulseflow_hydration_history',
-      'pulseflow_steps',
-      'pulseflow_steps_history',
-      'pulseflow_weight_history',
-      'pulseflow_today_logged_meals',
-      'pulseflow_recent_meals',
-      'pulseflow_saved_meals',
-      'pulseflow_all_meals_history',
-      'pulseflow_workout_split',
-      'pulseflow_extra_moves',
-      'pulseflow_workout_logs',
-      'pulseflow_workout_history',
-      'pulseflow_streak_v3',
-      'pulseflow_last_reset_date',
-      'pulseflow_sent_milestones',
-      'pulseflow_notifications_data_v2',
-      'pulseflow_onboarding_complete'
+      `arcex_${uid}_goal_data`,
+      `arcex_${uid}_tasks`,
+      `arcex_${uid}_hydration`,
+      `arcex_${uid}_hydration_history`,
+      `arcex_${uid}_steps`,
+      `arcex_${uid}_steps_history`,
+      `arcex_${uid}_weight_history`,
+      `arcex_${uid}_today_logged_meals`,
+      `arcex_${uid}_recent_meals`,
+      `arcex_${uid}_saved_meals`,
+      `arcex_${uid}_all_meals_history`,
+      `arcex_${uid}_workout_split`,
+      `arcex_${uid}_extra_moves`,
+      `arcex_${uid}_workout_logs`,
+      `arcex_${uid}_workout_history`,
+      `arcex_${uid}_streak_v3`,
+      `arcex_${uid}_last_reset_date`,
+      `arcex_${uid}_sent_milestones`,
+      `arcex_${uid}_notifications_data_v2`,
+      `arcex_${uid}_onboarding_complete`
     ];
 
     keysToRemove.forEach(key => localStorage.removeItem(key));
@@ -314,8 +327,13 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
   };
 
   const handleRestartOnboarding = () => {
+    if (!user) return;
     triggerHaptic('medium');
-    localStorage.removeItem('pulseflow_onboarding_complete');
+    localStorage.removeItem(`arcex_${user.uid}_onboarding_complete`);
+    if (firestore) {
+      const userRef = doc(firestore, 'userProfiles', user.uid);
+      setDocumentNonBlocking(userRef, { onboardingComplete: false }, { merge: true });
+    }
     window.location.reload();
   };
 
@@ -816,6 +834,18 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
             </Card>
           </div>
         ))}
+
+        {isSyncing && (
+          <div className="fixed inset-0 z-[600] bg-black/40 backdrop-blur-md flex items-center justify-center">
+            <div className="bg-card p-8 rounded-3xl flex flex-col items-center gap-4 shadow-2xl border border-white/10 animate-in zoom-in-95">
+              <Loader2 className="w-10 h-10 animate-spin text-primary" />
+              <div className="text-center">
+                <p className="text-sm font-black uppercase tracking-tighter">Syncing to Cloud</p>
+                <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest mt-1">Safeguarding your progress...</p>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </>
   );
@@ -840,7 +870,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
       title: "App Settings",
       items: [
         { id: 'profile-settings', icon: Settings, label: "Settings", subLabel: "Units and app preferences", color: "text-slate-500", bg: "bg-slate-50" },
-        { id: 'logout', icon: LogOut, label: "Logout", subLabel: "End current session", color: "text-amber-600", bg: "bg-amber-50", onClick: handleLogout },
+        { id: 'logout', icon: LogOut, label: "Logout", subLabel: "Sync and sign out", color: "text-amber-600", bg: "bg-amber-50", onClick: handleLogout },
       ]
     }
   ];
