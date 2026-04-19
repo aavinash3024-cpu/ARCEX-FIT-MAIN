@@ -224,7 +224,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
       <div className="absolute inset-0 z-0">
         <Image 
           src={bgImage?.imageUrl || "https://images.unsplash.com/photo-1551288049-bbbda536339a?q=80&w=1200&auto=format&fit=crop"} 
-          alt="Background"
+          alt="" 
           fill
           className="object-cover opacity-20"
           data-ai-hint="fitness technology"
