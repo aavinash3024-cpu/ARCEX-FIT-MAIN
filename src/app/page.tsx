@@ -425,7 +425,13 @@ export default function PulseFlowApp() {
       case 'profile-settings':
       case 'profile-reset':
         const profileSub = activeTab === 'profile' ? 'main' : activeTab.replace('profile-', '') as any;
-        return <ProfileView activeView={profileSub} onBack={() => navigateTo('profile')} onNavigate={navigateTo} />;
+        return (
+          <ProfileView 
+            activeView={profileSub} 
+            onBack={() => activeTab === 'profile' ? navigateTo('dashboard') : navigateTo('profile')} 
+            onNavigate={navigateTo} 
+          />
+        );
       case 'guide': return <GuideView goalData={goalData} loggedMeals={loggedMeals} hydrationAmount={hydrationAmount} weightHistory={weightHistory} onBack={() => window.history.back()} />;
       case 'notifications': return <NotificationsView notifications={notifications} setNotifications={setNotifications} onBack={() => window.history.back()} />;
       default: return null;
