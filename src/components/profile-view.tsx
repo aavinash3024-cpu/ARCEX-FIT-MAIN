@@ -377,7 +377,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
 
   const renderSubscription = () => (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-24">
-      {/* 1. MEMBERSHIP STATUS CARD */}
+      {/* 1. MEMBERSHIP STATUS CARD (CREDIT CARD STYLE) */}
       <div className="px-1">
         <div className="relative w-full h-32 rounded-[1.75rem] overflow-hidden shadow-2xl">
           <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] via-[#2d3436] to-[#0f172a]" />
@@ -412,7 +412,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         </div>
       </div>
 
-      {/* 2. SUBSCRIPTION PLANS */}
+      {/* 2. SUBSCRIPTION PLANS (HORIZONTAL GRID WITH GRADIENT BOUNDARY) */}
       <div className="px-1 space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Subscription Plans</h3>
         <div className="grid grid-cols-3 gap-2.5">
@@ -420,80 +420,81 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
             { id: 'monthly', name: 'Monthly', price: '229', original: '299', save: '23%' },
             { id: 'half-year', name: 'Half-Year', price: '699', original: '1374', save: '49%' },
             { id: 'yearly', name: 'Yearly', price: '1299', original: '2748', save: '52%' }
-          ].map((plan) => (
-            <Card 
-              key={plan.id} 
-              onClick={() => setSelectedPlanId(plan.id)}
-              className={cn(
-                "border-none shadow-md rounded-2xl overflow-hidden border transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99]",
-                selectedPlanId === plan.id 
-                  ? "bg-primary/5 ring-1 ring-primary border-primary/20 shadow-primary/10" 
-                  : "bg-card border-muted/10 opacity-70"
-              )}
-            >
-              <CardContent className="p-3 flex flex-col items-center text-center gap-2">
-                <h5 className="font-black text-[9px] uppercase tracking-widest text-muted-foreground">{plan.name}</h5>
-                <div className="space-y-0.5 flex flex-col items-center">
-                  <span className="text-[8px] font-bold text-rose-500 line-through">₹{plan.original}</span>
-                  <div className="flex items-baseline gap-0.5">
-                    <span className="text-sm font-black text-foreground">₹{plan.price}</span>
-                  </div>
-                  <Badge className="bg-rose-500/10 text-rose-500 text-[7px] font-black uppercase px-1.5 h-3.5 border-none mt-1 shadow-sm">
-                    SAVE {plan.save}
-                  </Badge>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+          ].map((plan) => {
+            const isSelected = selectedPlanId === plan.id;
+            return (
+              <div 
+                key={plan.id}
+                onClick={() => setSelectedPlanId(plan.id)}
+                className={cn(
+                  "relative p-[1.5px] rounded-2xl transition-all cursor-pointer",
+                  isSelected ? "bg-gradient-to-br from-primary via-emerald-400 to-primary shadow-lg scale-[1.02]" : "bg-muted/20"
+                )}
+              >
+                <Card className="border-none bg-card rounded-[calc(1rem-0.5px)] h-full overflow-hidden">
+                  <CardContent className="p-3 flex flex-col items-center text-center gap-2">
+                    <h5 className={cn("font-black text-[9px] uppercase tracking-widest", isSelected ? "text-primary" : "text-muted-foreground")}>
+                      {plan.name}
+                    </h5>
+                    <div className="space-y-0.5 flex flex-col items-center">
+                      <span className="text-[8px] font-bold text-rose-500 line-through">₹{plan.original}</span>
+                      <div className="flex items-baseline gap-0.5">
+                        <span className="text-sm font-black text-foreground">₹{plan.price}</span>
+                      </div>
+                      <Badge className="bg-rose-500/10 text-rose-500 text-[7px] font-black uppercase px-1.5 h-3.5 border-none mt-1 shadow-sm">
+                        SAVE {plan.save}
+                      </Badge>
+                    </div>
+                  </CardContent>
+                </Card>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* 3. PREMIUM COVERAGE */}
+      {/* 3. PREMIUM & FREE FEATURES (CLEAN CARDS, NO HEADER/FOOTER) */}
       <div className="px-1 space-y-6">
-        <div className="flex gap-4">
-          <div className="w-1/4 pt-1">
-            <div className="sticky top-2">
-              <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-primary rotate-0 leading-tight">
-                ELITE<br />PREMIUM
-              </h4>
-              <p className="text-[7px] font-black text-muted-foreground/40 uppercase tracking-widest mt-1">COVERAGE</p>
-            </div>
-          </div>
-          <div className="flex-1 space-y-5">
-            {[
-              { label: 'Strength Growth', desc: 'Detailed power progress trends.', icon: TrendingUp, colors: 'from-amber-400 to-orange-500' },
-              { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'from-blue-400 to-indigo-600' },
-              { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'from-emerald-400 to-teal-600' },
-              { label: 'Intake Reports', desc: 'Daily, Weekly, Monthly history.', icon: BarChart3, colors: 'from-purple-400 to-pink-600' },
-              { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED personal progress insights.', icon: Sparkles, colors: 'from-cyan-400 to-blue-600', highlight: true }
-            ].map((item, i) => (
-              <div key={i} className="flex gap-4 group">
-                <div className={cn(
-                  "w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm border p-[1.5px]",
-                  item.highlight ? "border-primary/40" : "border-muted/20"
-                )}>
-                  <div className={cn("w-full h-full rounded-full flex items-center justify-center bg-gradient-to-br text-white", item.colors)}>
-                    <item.icon className="w-4 h-4" />
+        {/* PREMIUM CARD */}
+        <div className="space-y-4">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-primary px-3">Elite Premium Coverage</h3>
+          <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
+            <CardContent className="p-6 grid gap-6">
+              {[
+                { label: 'Strength Growth', desc: 'Detailed power progress trends.', icon: TrendingUp, colors: 'from-amber-400 to-orange-500' },
+                { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'from-blue-400 to-indigo-600' },
+                { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'from-emerald-400 to-teal-600' },
+                { label: 'Intake Reports', desc: 'Daily, Weekly, Monthly history.', icon: BarChart3, colors: 'from-purple-400 to-pink-600' },
+                { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED personal progress insights.', icon: Sparkles, colors: 'from-cyan-400 to-blue-600', highlight: true }
+              ].map((item, i) => (
+                <div key={i} className="flex gap-4">
+                  <div className={cn(
+                    "w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm border p-[1.5px]",
+                    item.highlight ? "border-primary/40" : "border-muted/20"
+                  )}>
+                    <div className={cn("w-full h-full rounded-full flex items-center justify-center bg-gradient-to-br text-white", item.colors)}>
+                      <item.icon className="w-4 h-4" />
+                    </div>
+                  </div>
+                  <div className="space-y-1">
+                    <h5 className={cn("text-[10px] font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground/90")}>{item.label}</h5>
+                    <p className="text-[9px] font-bold text-muted-foreground/60 leading-tight uppercase tracking-tight">{item.desc}</p>
                   </div>
                 </div>
-                <div className="space-y-0.5">
-                  <h5 className={cn("text-[10px] font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground/90")}>{item.label}</h5>
-                  <p className="text-[9px] font-bold text-muted-foreground/60 leading-tight uppercase tracking-tight">{item.desc}</p>
-                </div>
+              ))}
+              <div className="pt-4 border-t border-muted/5 flex items-center gap-2">
+                <CheckCircle2 className="w-3 h-3 text-primary" />
+                <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Includes everything in Free</span>
               </div>
-            ))}
-          </div>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* 4. FREE FEATURES */}
-        <div className="pt-8 border-t border-muted/10">
-          <div className="flex gap-4">
-            <div className="w-1/4 pt-1">
-              <h4 className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 leading-tight">
-                STANDARD<br />FREE
-              </h4>
-            </div>
-            <div className="flex-1 space-y-5">
+        {/* FREE CARD */}
+        <div className="space-y-4">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Standard Free Features</h3>
+          <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10 opacity-70">
+            <CardContent className="p-6 grid gap-6">
               {[
                 { label: 'Hydration', desc: 'Weekly water intake analysis.', icon: HeartPulse, colors: 'from-blue-300 to-blue-500' },
                 { label: 'Steps', desc: 'Movement tracking & trends.', icon: Activity, colors: 'from-green-300 to-green-500' },
@@ -501,20 +502,20 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 { label: 'Tasks', desc: 'Objective manager system.', icon: ListTodo, colors: 'from-slate-300 to-slate-500' },
                 { label: 'Workouts', desc: 'Custom routine creation.', icon: Dumbbell, colors: 'from-red-300 to-red-500' }
               ].map((item, i) => (
-                <div key={i} className="flex gap-4 opacity-70">
+                <div key={i} className="flex gap-4">
                   <div className="w-9 h-9 rounded-full border border-muted/20 p-[1.5px] shrink-0">
                     <div className={cn("w-full h-full rounded-full flex items-center justify-center bg-gradient-to-br text-white shadow-inner", item.colors)}>
                       <item.icon className="w-4 h-4" />
                     </div>
                   </div>
-                  <div className="space-y-0.5">
+                  <div className="space-y-1">
                     <h5 className="text-[10px] font-black uppercase tracking-tight text-foreground/80">{item.label}</h5>
                     <p className="text-[9px] font-bold text-muted-foreground/40 leading-tight uppercase tracking-tight">{item.desc}</p>
                   </div>
                 </div>
               ))}
-            </div>
-          </div>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </div>
