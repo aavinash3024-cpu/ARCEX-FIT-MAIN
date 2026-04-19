@@ -6,24 +6,15 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { 
-  ChevronRight, 
-  ChevronLeft, 
   Target, 
   Scale, 
-  CheckCircle2, 
   Sparkles,
-  Zap,
-  Activity,
   User,
-  HeartPulse,
-  Fingerprint,
-  ShieldCheck,
-  Cpu,
   ArrowRight,
-  PieChart,
   Settings2,
   Check,
-  MapPin
+  MapPin,
+  Loader2
 } from "lucide-react";
 import { 
   Select,
@@ -120,7 +111,6 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
     const finalCalories = Math.round(tdee + calAdj[0]);
     const proteinGrams = Math.round(w * protAdj[0]);
     const proteinKcal = proteinGrams * 4;
-    
     const fiberGrams = Math.round((finalCalories / 1000) * 14);
     
     const remainingKcal = Math.max(0, finalCalories - proteinKcal);
@@ -133,25 +123,13 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
 
     const currentDeficitOrSurplus = Math.abs(finalCalories - tdee);
     const derivedWeeklyRate = parseFloat((currentDeficitOrSurplus / 1100).toFixed(2));
-    
     const weightDiff = Math.abs(tw - w);
     const weeksToGoal = derivedWeeklyRate > 0 ? (weightDiff / derivedWeeklyRate).toFixed(1) : "0";
 
     return {
-      bmr,
-      tdee,
-      finalCalories,
-      protein: proteinGrams,
-      carbs: Math.round(carbKcal / 4),
-      fats: Math.round(fatKcal / 9),
-      fiber: fiberGrams,
-      proteinPct,
-      carbPct,
-      fatPct,
-      isWeightValid: objective === 'gain' ? tw > w : objective === 'loss' ? tw < w : tw === w,
-      weeksToGoal,
-      weightDiff,
-      derivedWeeklyRate
+      bmr, tdee, finalCalories, protein: proteinGrams, carbs: Math.round(carbKcal / 4), fats: Math.round(fatKcal / 9), fiber: fiberGrams,
+      proteinPct, carbPct, fatPct, isWeightValid: objective === 'gain' ? tw > w : objective === 'loss' ? tw < w : tw === w,
+      weeksToGoal, weightDiff, derivedWeeklyRate
     };
   }, [weight, height, age, gender, activity, objective, targetWeight, calAdj, protAdj, carbRatio]);
 
@@ -192,49 +170,22 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
         const profileData = {
           id: user.uid,
           email: user.email || `${user.uid}@pulseflow.anonymous`,
-          firstName,
-          lastName,
-          dateOfBirth: "1998-05-15",
-          heightCm: parseFloat(height),
-          gender,
-          activityLevel: activity,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          firstName, lastName, dateOfBirth: "1998-05-15",
+          heightCm: parseFloat(height), gender, activityLevel: activity,
+          createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
         };
         setDocumentNonBlocking(userRef, profileData, { merge: true });
 
         const goalRef = doc(firestore, `userProfiles/${user.uid}/goals`, 'primary_goal');
         const gData = {
-          id: 'primary_goal',
-          userId: user.uid,
+          id: 'primary_goal', userId: user.uid,
           type: objective === 'loss' ? 'weight_loss' : objective === 'gain' ? 'muscle_gain' : 'nutrition',
-          targetValue: parseFloat(targetWeight),
-          targetUnit: 'kg',
-          startDate: format(new Date(), 'yyyy-MM-dd'),
-          status: 'active',
+          targetValue: parseFloat(targetWeight), targetUnit: 'kg',
+          startDate: format(new Date(), 'yyyy-MM-dd'), status: 'active',
           description: `Goal to ${objective} weight to ${targetWeight}kg`,
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
         };
         setDocumentNonBlocking(goalRef, gData, { merge: true });
-
-        const todayStr = format(new Date(), 'yyyy-MM-dd');
-        const metricRef = doc(firestore, `userProfiles/${user.uid}/dailyMetrics`, todayStr);
-        const metricData = {
-          id: todayStr,
-          userId: user.uid,
-          date: todayStr,
-          caloriesConsumed: 0,
-          proteinGrams: 0,
-          carbohydrateGrams: 0,
-          fatGrams: 0,
-          hydrationMl: 0,
-          stepsCount: 0,
-          weightKg: parseFloat(weight),
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
-        };
-        setDocumentNonBlocking(metricRef, metricData, { merge: true });
       }
 
       onComplete();
@@ -303,9 +254,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Age</Label>
                       <Input 
-                        type="number"
-                        value={age} 
-                        onChange={(e) => setAge(e.target.value)}
+                        type="number" value={age} onChange={(e) => setAge(e.target.value)}
                         className="h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium text-center"
                       />
                     </div>
@@ -357,18 +306,14 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Weight (kg)</Label>
                       <Input 
-                        type="number"
-                        value={weight} 
-                        onChange={(e) => setWeight(e.target.value)}
+                        type="number" value={weight} onChange={(e) => setWeight(e.target.value)}
                         className="h-14 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium text-center"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Height (cm)</Label>
                       <Input 
-                        type="number"
-                        value={height} 
-                        onChange={(e) => setHeight(e.target.value)}
+                        type="number" value={height} onChange={(e) => setHeight(e.target.value)}
                         className="h-14 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium text-center"
                       />
                     </div>
@@ -422,9 +367,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                   <div className="space-y-4">
                     <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest text-center block">Target Weight (kg)</Label>
                     <Input 
-                      type="number"
-                      value={targetWeight} 
-                      onChange={(e) => setTargetWeight(e.target.value)}
+                      type="number" value={targetWeight} onChange={(e) => setTargetWeight(e.target.value)}
                       className={cn(
                         "h-16 rounded-xl font-bold text-2xl text-center transition-all bg-white/[0.01]",
                         !calculations.isWeightValid ? "border-red-500/50 bg-red-500/5 text-red-500" : "border-white/10 text-white"
@@ -575,8 +518,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
         <div className="fixed bottom-0 left-0 right-0 p-8 bg-gradient-to-t from-slate-950 via-slate-950/90 to-transparent flex gap-4 z-20 max-w-lg mx-auto">
           {step > 1 && (
             <Button 
-              variant="ghost" 
-              onClick={() => setStep(step - 1)}
+              variant="ghost" onClick={() => setStep(step - 1)}
               className="flex-1 h-14 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white transition-all font-black uppercase text-[10px] tracking-widest"
             >
               Back

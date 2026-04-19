@@ -13,10 +13,12 @@ import {
   LogIn, 
   User, 
   AlertCircle,
-  Loader2
+  Loader2,
+  CheckCircle2
 } from 'lucide-react';
 import { AnimatedBackground } from './animated-background';
 import { useAuth, initiateEmailSignIn, initiateEmailSignUp, initiateAnonymousSignIn, errorEmitter } from '@/firebase';
+import { onAuthStateChanged } from 'firebase/auth';
 import { cn } from '@/lib/utils';
 
 export function AuthView() {
@@ -25,26 +27,45 @@ export function AuthView() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // Success detection: If auth state changes to a user, stop loading
+  useEffect(() => {
+    if (!auth) return;
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setIsSuccess(true);
+        setIsLoading(false);
+      }
+    });
+    return () => unsubscribe();
+  }, [auth]);
+
+  // Error detection
   useEffect(() => {
     const handleAuthError = (err: any) => {
-      setError(err.message || "Authentication failed.");
+      let message = "Authentication failed.";
+      if (err.code === 'auth/wrong-password') message = "Incorrect password.";
+      if (err.code === 'auth/user-not-found') message = "No account found with this email.";
+      if (err.code === 'auth/invalid-email') message = "Invalid email format.";
+      if (err.code === 'auth/email-already-in-use') message = "Email already registered. Try logging in.";
+      if (err.code === 'auth/weak-password') message = "Password must be at least 6 characters.";
+      
+      setError(message);
       setIsLoading(false);
     };
+
     errorEmitter.on('auth-error', handleAuthError);
     return () => errorEmitter.off('auth-error', handleAuthError);
   }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!email || !password || !auth) return;
+    if (!email || !password || !auth || isLoading) return;
     
     setIsLoading(true);
     setError(null);
-    
-    // Safety fallback
-    const safetyTimer = setTimeout(() => setIsLoading(false), 5000);
     
     try {
       if (isLogin) {
@@ -53,17 +74,16 @@ export function AuthView() {
         initiateEmailSignUp(auth, email, password);
       }
     } catch (err: any) {
-      clearTimeout(safetyTimer);
-      setError(err.message || "Authentication failed.");
+      setError(err.message || "An unexpected error occurred.");
       setIsLoading(false);
     }
   };
 
   const handleGuest = () => {
-    if (!auth) return;
+    if (!auth || isLoading) return;
     setIsLoading(true);
+    setError(null);
     initiateAnonymousSignIn(auth);
-    setTimeout(() => setIsLoading(false), 4000);
   };
 
   return (
@@ -84,90 +104,105 @@ export function AuthView() {
             <CardContent className="p-8 space-y-8">
               <div className="text-center space-y-1">
                 <h2 className="text-xl font-bold text-white uppercase tracking-tight">
-                  {isLogin ? "Welcome Back" : "Create Account"}
+                  {isSuccess ? "Welcome" : isLogin ? "Welcome Back" : "Create Account"}
                 </h2>
                 <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                  {isLogin ? "Enter your credentials" : "Join the elite performance community"}
+                  {isSuccess ? "Redirecting to dashboard..." : isLogin ? "Enter your credentials" : "Join the performance community"}
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
-                <div className="space-y-4">
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Email Protocol</Label>
-                    <div className="relative">
-                      <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                      <Input 
-                        type="email"
-                        placeholder="pilot@arcexfit.ai"
-                        value={email}
-                        onChange={(e) => setEmail(e.target.value)}
-                        className="pl-12 h-14 rounded-2xl bg-white/[0.02] border-white/5 text-white font-medium focus:ring-primary/20 placeholder:text-white/10"
-                        required
-                      />
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Security Key</Label>
-                    <div className="relative">
-                      <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
-                      <Input 
-                        type="password"
-                        placeholder="••••••••"
-                        value={password}
-                        onChange={(e) => setPassword(e.target.value)}
-                        className="pl-12 h-14 rounded-2xl bg-white/[0.02] border-white/5 text-white font-medium focus:ring-primary/20 placeholder:text-white/10"
-                        required
-                      />
-                    </div>
+              {isSuccess ? (
+                <div className="flex flex-col items-center py-8 animate-in zoom-in-95">
+                  <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
+                    <CheckCircle2 className="w-8 h-8 text-slate-950" />
                   </div>
                 </div>
+              ) : (
+                <>
+                  <form onSubmit={handleSubmit} className="space-y-5">
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Email Protocol</Label>
+                        <div className="relative">
+                          <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                          <Input 
+                            type="email"
+                            placeholder="pilot@arcexfit.ai"
+                            value={email}
+                            onChange={(e) => setEmail(e.target.value)}
+                            className="pl-12 h-14 rounded-2xl bg-white/[0.02] border-white/5 text-white font-medium focus:ring-primary/20 placeholder:text-white/10"
+                            required
+                            disabled={isLoading}
+                          />
+                        </div>
+                      </div>
 
-                {error && (
-                  <div className="flex items-center gap-3 p-3 rounded-xl bg-destructive/10 border border-destructive/20 animate-in fade-in zoom-in-95">
-                    <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
-                    <p className="text-[10px] font-bold text-destructive uppercase tracking-tight leading-tight">{error}</p>
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Security Key</Label>
+                        <div className="relative">
+                          <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
+                          <Input 
+                            type="password"
+                            placeholder="••••••••"
+                            value={password}
+                            onChange={(e) => setPassword(e.target.value)}
+                            className="pl-12 h-14 rounded-2xl bg-white/[0.02] border-white/5 text-white font-medium focus:ring-primary/20 placeholder:text-white/10"
+                            required
+                            disabled={isLoading}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {error && (
+                      <div className="flex items-center gap-3 p-3 rounded-xl bg-destructive/10 border border-destructive/20 animate-in fade-in zoom-in-95">
+                        <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
+                        <p className="text-[10px] font-bold text-destructive uppercase tracking-tight leading-tight">{error}</p>
+                      </div>
+                    )}
+
+                    <Button 
+                      type="submit" 
+                      disabled={isLoading}
+                      className="w-full h-14 rounded-2xl bg-primary text-slate-950 font-black uppercase tracking-widest shadow-xl shadow-primary/20 gap-2 transition-all active:scale-95"
+                    >
+                      {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : isLogin ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
+                      {isLogin ? "Execute Login" : "Initialize Account"}
+                    </Button>
+                  </form>
+
+                  <div className="relative py-2">
+                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
+                    <div className="relative flex justify-center text-[8px] font-black uppercase tracking-[0.3em]"><span className="bg-slate-950 px-3 text-white/20">OR</span></div>
                   </div>
-                )}
 
-                <Button 
-                  type="submit" 
-                  disabled={isLoading}
-                  className="w-full h-14 rounded-2xl bg-primary text-slate-950 font-black uppercase tracking-widest shadow-xl shadow-primary/20 gap-2 transition-all active:scale-95"
-                >
-                  {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : isLogin ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}
-                  {isLogin ? "Execute Login" : "Initialize Account"}
-                </Button>
-              </form>
-
-              <div className="relative py-2">
-                <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
-                <div className="relative flex justify-center text-[8px] font-black uppercase tracking-[0.3em]"><span className="bg-slate-950 px-3 text-white/20">OR</span></div>
-              </div>
-
-              <Button 
-                variant="ghost" 
-                onClick={handleGuest}
-                disabled={isLoading}
-                className="w-full h-12 rounded-2xl bg-white/5 border border-white/5 text-white/60 hover:text-white hover:bg-white/10 font-black uppercase text-[10px] tracking-widest gap-2"
-              >
-                <User className="w-3.5 h-3.5" />
-                Continue as Guest
-              </Button>
+                  <Button 
+                    variant="ghost" 
+                    onClick={handleGuest}
+                    disabled={isLoading}
+                    className="w-full h-12 rounded-2xl bg-white/5 border border-white/5 text-white/60 hover:text-white hover:bg-white/10 font-black uppercase text-[10px] tracking-widest gap-2"
+                  >
+                    <User className="w-3.5 h-3.5" />
+                    Continue as Guest
+                  </Button>
+                </>
+              )}
             </CardContent>
           </Card>
 
-          <div className="mt-8 text-center">
-            <button 
-              onClick={() => { setError(null); setIsLogin(!isLogin); }}
-              className="text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-primary transition-colors flex items-center justify-center gap-2 mx-auto"
-            >
-              {isLogin ? "Need an account?" : "Already have an account?"}
-              <span className="text-white">{isLogin ? "Sign Up" : "Login"}</span>
-              <ArrowRight className="w-3 h-3" />
-            </button>
-          </div>
+          {!isSuccess && (
+            <div className="mt-8 text-center">
+              <button 
+                onClick={() => { setError(null); setIsLogin(!isLogin); }}
+                className="text-[10px] font-black text-white/40 uppercase tracking-widest hover:text-primary transition-colors flex items-center justify-center gap-2 mx-auto"
+                disabled={isLoading}
+              >
+                {isLogin ? "Need an account?" : "Already have an account?"}
+                <span className="text-white">{isLogin ? "Sign Up" : "Login"}</span>
+                <ArrowRight className="w-3 h-3" />
+              </button>
+            </div>
+          )}
         </div>
 
         <div className="mt-auto pt-8 flex flex-col items-center gap-4">
