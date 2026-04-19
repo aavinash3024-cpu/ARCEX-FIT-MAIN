@@ -257,31 +257,6 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
     }, 1500);
   };
 
-  const menuSections = [
-    {
-      title: "My Account",
-      items: [
-        { id: 'profile-personal', icon: User, label: "Personal Information", subLabel: "Name, email, and identity", color: "text-blue-500", bg: "bg-blue-50" },
-        { id: 'profile-subscription', icon: CreditCard, label: "Subscription Plan", subLabel: "Elite Premium", color: "text-purple-500", bg: "bg-purple-50" },
-        { id: 'profile-reset', icon: RefreshCw, label: "Reset Progress", subLabel: "Fresh start, keep profile", color: "text-rose-500", bg: "bg-rose-50" },
-      ]
-    },
-    {
-      title: "Security & Privacy",
-      items: [
-        { id: 'help', icon: HelpCircle, label: "Help Center", subLabel: "FAQs and troubleshooting", color: "text-sky-500", bg: "bg-sky-50" },
-        { id: 'profile-legal', icon: Shield, label: "Legal", subLabel: "Privacy policy & terms", color: "text-green-500", bg: "bg-green-50" },
-      ]
-    },
-    {
-      title: "App Settings",
-      items: [
-        { id: 'profile-settings', icon: Settings, label: "Settings", subLabel: "Units and app preferences", color: "text-slate-500", bg: "bg-slate-50" },
-        { id: 'rate', icon: Star, label: "Rate the App", subLabel: "Share your feedback", color: "text-amber-500", bg: "bg-amber-50" },
-      ]
-    }
-  ];
-
   const renderPersonalInfo = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       <div className="px-1 space-y-4">
@@ -377,11 +352,11 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   const renderSubscription = () => (
-    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
+    <div className="space-y-2 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       {/* 1. SUBSCRIPTION PLANS (COMPACT 2-COLUMN GRID) */}
       <div className="px-1 space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3 text-center">See Subscription Plans</h3>
-        <div className="grid grid-cols-2 gap-3 px-1">
+        <div className="grid grid-cols-2 gap-3 px-1 pt-4">
           {[
             { id: 'monthly', name: 'Monthly', price: '229', original: '299', save: '23%', perDay: '7.6' },
             { id: 'yearly', name: 'Yearly', price: '1299', original: '2748', save: '52%', perDay: '3.5' }
@@ -431,32 +406,34 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
       </div>
 
       {/* 2. PREMIUM & FREE FEATURES */}
-      <div className="px-1 space-y-6 pt-4">
+      <div className="px-1 space-y-6 pt-6">
         <div className="space-y-4">
           <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-primary px-3">Elite Premium Coverage</h3>
           <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
             <CardContent className="p-6 grid gap-6">
               {[
-                { label: 'Strength Growth', desc: 'Detailed power progress trends.', icon: TrendingUp, colors: 'from-amber-400 to-orange-500' },
-                { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'from-blue-400 to-indigo-600' },
-                { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'from-emerald-400 to-teal-600' },
-                { label: 'Skin Based Micro Tracking', desc: 'Daily, weekly and monthly analysis of micros related to or helping the skin, recovery.', icon: HeartPulse, colors: 'from-orange-400 to-rose-500' },
-                { label: 'Recovery Based Micro Tracking', desc: 'Daily, weekly and monthly analysis of micros related to or helping the skin, recovery.', icon: Timer, colors: 'from-indigo-400 to-blue-600' },
-                { label: 'Intake Reports', desc: 'Daily, Weekly, Monthly history.', icon: BarChart3, colors: 'from-purple-400 to-pink-600' },
-                { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED personal progress insights.', icon: Sparkles, colors: 'from-cyan-400 to-blue-600', highlight: true }
+                { label: 'Strength Growth', desc: 'Detailed power progress trends.', icon: TrendingUp, colors: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)' },
+                { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' },
+                { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
+                { label: 'Skin Based Micro Tracking', desc: 'Daily, weekly and monthly analysis of micros related to or helping the skin, recovery.', icon: HeartPulse, colors: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' },
+                { label: 'Recovery Based Micro Tracking', desc: 'Daily, weekly and monthly analysis of micros related to or helping the skin, recovery.', icon: Timer, colors: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' },
+                { label: 'Intake Reports', desc: 'Daily, Weekly, Monthly history.', icon: BarChart3, colors: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' },
+                { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED personal progress insights.', icon: Sparkles, colors: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', highlight: true }
               ].map((item, i) => (
-                <div key={i} className="flex gap-4">
-                  <div className={cn(
-                    "w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm border p-[1.5px]",
-                    item.highlight ? "border-primary/40" : "border-muted/20"
-                  )}>
-                    <div className={cn("w-full h-full rounded-full flex items-center justify-center bg-gradient-to-br text-white", item.colors)}>
-                      <item.icon className="w-4 h-4" />
+                <div key={i} className="flex flex-col gap-2">
+                  <div className="flex gap-4">
+                    <div className={cn(
+                      "w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm border p-[1.5px]",
+                      item.highlight ? "border-primary/40" : "border-muted/20"
+                    )}>
+                      <div className={cn("w-full h-full rounded-full flex items-center justify-center text-white")} style={{ background: item.colors }}>
+                        <item.icon className="w-4 h-4" />
+                      </div>
                     </div>
-                  </div>
-                  <div className="space-y-1">
-                    <h5 className={cn("text-[10px] font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground/90")}>{item.label}</h5>
-                    <p className="text-[9px] font-bold text-muted-foreground/60 leading-tight uppercase tracking-tight">{item.desc}</p>
+                    <div className="space-y-0.5">
+                      <h5 className={cn("text-[10px] font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground/90")}>{item.label}</h5>
+                      <p className="text-[9px] font-bold text-muted-foreground/60 leading-tight uppercase tracking-tight">{item.desc}</p>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -473,15 +450,15 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
           <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10 opacity-70">
             <CardContent className="p-6 grid gap-6">
               {[
-                { label: 'Hydration Tracking', desc: 'Weekly water intake analysis.', icon: HeartPulse, colors: 'from-blue-300 to-blue-500' },
-                { label: 'Steps Tracking', desc: 'Movement tracking & trends.', icon: Activity, colors: 'from-green-300 to-green-500' },
-                { label: 'Streaks', desc: 'Daily consistency badges.', icon: Zap, colors: 'from-yellow-300 to-orange-400' },
-                { label: 'Tasks', desc: 'Objective manager system.', icon: ListTodo, colors: 'from-slate-300 to-slate-500' },
-                { label: 'Workouts', desc: 'Custom routine creation.', icon: Dumbbell, colors: 'from-red-300 to-red-500' }
+                { label: 'Hydration Tracking', desc: 'Weekly water intake analysis.', icon: HeartPulse, colors: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)' },
+                { label: 'Steps Tracking', desc: 'Movement tracking & trends.', icon: Activity, colors: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)' },
+                { label: 'Streaks', desc: 'Daily consistency badges.', icon: Zap, colors: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)' },
+                { label: 'Tasks', desc: 'Objective manager system.', icon: ListTodo, colors: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)' },
+                { label: 'Workouts', desc: 'Custom routine creation.', icon: Dumbbell, colors: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)' }
               ].map((item, i) => (
                 <div key={i} className="flex gap-4">
                   <div className="w-9 h-9 rounded-full border border-muted/20 p-[1.5px] shrink-0">
-                    <div className={cn("w-full h-full rounded-full flex items-center justify-center bg-gradient-to-br text-white shadow-inner", item.colors)}>
+                    <div className={cn("w-full h-full rounded-full flex items-center justify-center text-white shadow-inner")} style={{ background: item.colors }}>
                       <item.icon className="w-4 h-4" />
                     </div>
                   </div>
@@ -740,6 +717,31 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
       </div>
     </>
   );
+
+  const menuSections = [
+    {
+      title: "My Account",
+      items: [
+        { id: 'profile-personal', icon: User, label: "Personal Information", subLabel: "Name, email, and identity", color: "text-blue-500", bg: "bg-blue-50" },
+        { id: 'profile-subscription', icon: CreditCard, label: "Subscription Plan", subLabel: "Elite Premium", color: "text-purple-500", bg: "bg-purple-50" },
+        { id: 'profile-reset', icon: RefreshCw, label: "Reset Progress", subLabel: "Fresh start, keep profile", color: "text-rose-500", bg: "bg-rose-50" },
+      ]
+    },
+    {
+      title: "Security & Privacy",
+      items: [
+        { id: 'help', icon: HelpCircle, label: "Help Center", subLabel: "FAQs and troubleshooting", color: "text-sky-500", bg: "bg-sky-50" },
+        { id: 'profile-legal', icon: Shield, label: "Legal", subLabel: "Privacy policy & terms", color: "text-green-500", bg: "bg-green-50" },
+      ]
+    },
+    {
+      title: "App Settings",
+      items: [
+        { id: 'profile-settings', icon: Settings, label: "Settings", subLabel: "Units and app preferences", color: "text-slate-500", bg: "bg-slate-50" },
+        { id: 'rate', icon: Star, label: "Rate the App", subLabel: "Share your feedback", color: "text-amber-500", bg: "bg-amber-50" },
+      ]
+    }
+  ];
 
   return (
     <div className="space-y-4 pb-2 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">

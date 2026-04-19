@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import { 
   ChevronLeft, 
   Bell, 
@@ -14,7 +15,9 @@ import {
   HeartPulse,
   Target,
   Sparkles,
-  CheckCircle2
+  CheckCircle2,
+  TrendingUp,
+  Activity
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -27,7 +30,7 @@ interface Notification {
   subtype?: '50-percent' | '100-percent' | 'pr';
   isRead: boolean;
   icon: any;
-  gradient: string;
+  gradient: string; // CSS linear-gradient string
 }
 
 interface NotificationsViewProps {
@@ -39,13 +42,13 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
     {
       id: '1',
       title: 'New Peak: 100kg Bench Press',
-      description: 'Congratulations! You just smashed your previous Bench Press PR. Your strength growth is in the top 5% this week.',
+      description: 'Elite progress! You just smashed your previous Bench Press PR. Your strength growth is in the top 5% this week.',
       time: 'Just now',
       type: 'achievement',
       subtype: 'pr',
       isRead: false,
       icon: Trophy,
-      gradient: 'from-amber-400 to-orange-600'
+      gradient: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)'
     },
     {
       id: '2',
@@ -55,8 +58,8 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
       type: 'goal',
       subtype: '100-percent',
       isRead: false,
-      icon: Dumbbell,
-      gradient: 'from-emerald-400 to-teal-600'
+      icon: Target,
+      gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
     },
     {
       id: '3',
@@ -67,28 +70,39 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
       subtype: '50-percent',
       isRead: true,
       icon: Flame,
-      gradient: 'from-orange-400 to-rose-500'
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
     },
     {
       id: '4',
-      title: 'Micro focus: 100% Vitamin C',
-      description: 'You have achieved your daily Vitamin C goal! Great for collagen synthesis and skin firmness.',
+      title: 'Micro Focus: 100% Vitamin C',
+      description: 'Achieved! Your daily Vitamin C goal is met. Great for collagen synthesis and skin health.',
       time: 'Yesterday',
       type: 'goal',
       subtype: '100-percent',
       isRead: true,
       icon: HeartPulse,
-      gradient: 'from-blue-400 to-indigo-600'
+      gradient: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)'
     },
     {
       id: '5',
+      title: 'Goal Master: 100% Macros',
+      description: 'Incredible consistency! You hit your Fat and Carb targets precisely today.',
+      time: 'Yesterday',
+      type: 'goal',
+      subtype: '100-percent',
+      isRead: true,
+      icon: CheckCircle2,
+      gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+    },
+    {
+      id: '6',
       title: 'Elite Premium Active',
-      description: 'Your ARCEX FIT Elite subscription is active. You now have unlimited Personal AI Analysis access.',
+      description: 'Your ARCEX FIT Elite subscription is active. Enjoy unlimited Personal AI Analysis and advanced tracking.',
       time: '2 days ago',
       type: 'system',
       isRead: true,
       icon: Sparkles,
-      gradient: 'from-cyan-400 to-blue-600'
+      gradient: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)'
     }
   ]);
 
@@ -131,13 +145,13 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
                 !n.isRead ? "bg-card" : "bg-card/50 opacity-70"
               )}>
                 <CardContent className="p-4 flex items-start gap-4">
-                  {/* Liquid Glow Icon Design like Subscription Page */}
+                  {/* Liquid Glow Icon Design */}
                   <div className="relative shrink-0 pt-1">
                     <div className={cn(
                       "w-11 h-11 rounded-full p-[1.5px] shadow-sm transition-transform duration-500",
                       !n.isRead ? "scale-110" : "scale-100 opacity-60"
                     )}
-                    style={{ background: `linear-gradient(to bottom right, ${n.gradient.split(' ').join(', ')})` }}
+                    style={{ background: n.gradient }}
                     >
                       <div className="w-full h-full rounded-full bg-card flex items-center justify-center">
                         <Icon className={cn("w-5 h-5", !n.isRead ? "text-foreground" : "text-muted-foreground")} />
@@ -165,10 +179,13 @@ export function NotificationsView({ onBack }: NotificationsViewProps) {
                         {n.time}
                       </span>
                       {n.subtype === '100-percent' && (
-                        <Badge className="bg-emerald-500/10 text-emerald-600 text-[7px] font-black uppercase h-3.5 border-none px-1.5">Achievement Met</Badge>
+                        <Badge className="bg-emerald-500/10 text-emerald-600 text-[7px] font-black uppercase h-3.5 border-none px-1.5 rounded-sm">Goal Mastered</Badge>
+                      )}
+                      {n.subtype === '50-percent' && (
+                        <Badge className="bg-blue-500/10 text-blue-600 text-[7px] font-black uppercase h-3.5 border-none px-1.5 rounded-sm">50% Acheived</Badge>
                       )}
                       {n.subtype === 'pr' && (
-                        <Badge className="bg-amber-500/10 text-amber-600 text-[7px] font-black uppercase h-3.5 border-none px-1.5">New Record</Badge>
+                        <Badge className="bg-amber-500/10 text-amber-600 text-[7px] font-black uppercase h-3.5 border-none px-1.5 rounded-sm">New Record</Badge>
                       )}
                     </div>
                   </div>
