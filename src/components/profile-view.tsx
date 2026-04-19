@@ -729,8 +729,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
   const renderPrivacyPolicy = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-4">
       <div className="space-y-2 border-b border-muted/10 pb-6">
-        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">May 22, 2024</p>
-        <h2 className="text-3xl font-black uppercase tracking-tighter">Privacy Policy</h2>
+        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">20 April, 2026</p>
       </div>
       
       <div className="space-y-8 text-sm leading-relaxed text-foreground/80 font-medium">
@@ -811,88 +810,108 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
   );
 
   const renderTermsConditions = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1">
-      <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
-        <CardContent className="p-6 space-y-6">
-          <div className="space-y-2 border-b border-muted/10 pb-4">
-            <h2 className="text-lg font-black uppercase tracking-tighter">Terms & Conditions</h2>
-            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Agreement of Use</p>
-          </div>
-          
-          <div className="space-y-6 text-sm leading-relaxed text-foreground/80 font-medium">
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">1. Your Responsibility</h3>
-              <p>You agree to provide honest information (like weight and age) to ensure the app’s calculations remain as safe as possible for you.</p>
-            </section>
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-4">
+      <div className="space-y-2 border-b border-muted/10 pb-6">
+        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">20 April, 2026</p>
+      </div>
+      
+      <div className="space-y-8 text-sm leading-relaxed text-foreground/80 font-medium">
+        <p className="text-base font-bold text-foreground leading-relaxed">
+          These Terms of Use govern your access to and use of the arcex fit application. By creating an account, you agree to follow these rules.
+        </p>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">2. Account Safety</h3>
-              <p>You are responsible for keeping your login details safe. Please do not share your password with others.</p>
-            </section>
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">1. Your Responsibility</h3>
+          <p>
+            You agree to provide honest and accurate information (such as weight, age, and biological sex) to ensure the app’s calculations remain as safe as possible for you. You are responsible for any activity that occurs under your account.
+          </p>
+        </section>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">3. Data & Storage</h3>
-              <p>We provide cloud backups for your convenience, but your primary data lives on your phone. We are not responsible for data lost if you clear your browser cache without syncing.</p>
-            </section>
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">2. Account Safety</h3>
+          <p>
+            You are responsible for keeping your login credentials (email and password) safe. Please do not share your password with others. If you suspect your account has been compromised, please change your password immediately in the settings.
+          </p>
+        </section>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">4. Usage Limits</h3>
-              <p>To keep the app fast and fair, we limit AI meal logs to 20 per day. Abusing the system or attempting to hack the app will result in account deletion.</p>
-            </section>
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">3. Data & Storage</h3>
+          <p>
+            We provide cloud backups via Firebase for your convenience, but your primary data lives on your device. We are not responsible for data loss resulting from clearing your browser cache, changing devices without syncing, or technical failures outside our control.
+          </p>
+        </section>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">5. Results</h3>
-              <p>While we strive to help you reach your goals, we cannot guarantee specific fitness results. Your progress depends on your consistency and personal health factors.</p>
-            </section>
-          </div>
-        </CardContent>
-      </Card>
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">4. Usage Limits & Abuse</h3>
+          <p>
+            To ensure the app remains fast and fair for all users, we limit AI-powered meal logging to 20 requests per day. Abusing the system, attempting to scrape data, or hacking the application will result in immediate account termination and permanent banning.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">5. Performance & Results</h3>
+          <p>
+            While arcex fit provides tools to help you reach your goals, we cannot guarantee specific fitness or weight-loss results. Your success depends on your own consistency, diet, exercise habits, and unique physiological factors.
+          </p>
+        </section>
+
+        <section className="space-y-3 pt-4 border-t border-muted/5">
+          <p className="text-[10px] font-bold text-muted-foreground italic text-center uppercase tracking-tight">
+            We reserve the right to update these terms at any time to improve the service.
+          </p>
+        </section>
+      </div>
     </div>
   );
 
   const renderMedicalDisclaimer = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1">
-      <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
-        <CardContent className="p-6 space-y-6">
-          <div className="space-y-2 border-b border-muted/10 pb-4">
-            <h2 className="text-lg font-black uppercase tracking-tighter">Health Disclaimer</h2>
-            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Read Before Starting</p>
-          </div>
-          
-          <div className="space-y-6 text-sm leading-relaxed text-foreground/80 font-medium">
-            <div className="bg-amber-500/10 p-4 rounded-2xl border border-amber-500/20 flex gap-3 items-start">
-              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
-              <p className="text-xs font-bold text-amber-900 leading-relaxed uppercase tracking-tight">
-                This app is for information only and is not a substitute for professional medical advice.
-              </p>
-            </div>
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-4">
+      <div className="space-y-2 border-b border-muted/10 pb-6">
+        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">20 April, 2026</p>
+      </div>
+      
+      <div className="space-y-8 text-sm leading-relaxed text-foreground/80 font-medium">
+        <div className="bg-amber-500/10 p-5 rounded-3xl border border-amber-500/20 flex gap-4 items-start shadow-sm">
+          <AlertTriangle className="w-6 h-6 text-amber-600 shrink-0 mt-0.5" />
+          <p className="text-xs font-bold text-amber-900 leading-relaxed uppercase tracking-tight">
+            arcex fit is a digital tracking tool for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment.
+          </p>
+        </div>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">Not a Medical Provider</h3>
-              <p>arcex fit is a digital tool. We are not doctors, nutritionists, or medical professionals.</p>
-            </section>
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">Not a Medical Provider</h3>
+          <p>
+            The creators of arcex fit are not doctors, nutritionists, or certified medical professionals. The information provided by the app, including calorie targets and macro/micro suggestions, is generated by mathematical formulas and AI models, not a personalized medical assessment.
+          </p>
+        </section>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">Consult Your Physician</h3>
-              <p>Always talk to a doctor before starting any new workout routine or changing your diet, especially if you have existing health conditions or are pregnant.</p>
-            </section>
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">Consult Your Physician</h3>
+          <p>
+            Always consult with a qualified healthcare provider before starting any new exercise routine, making significant changes to your diet, or following nutritional advice. This is especially critical if you are pregnant, nursing, have existing heart conditions, diabetes, or severe allergies.
+          </p>
+        </section>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">AI Estimations</h3>
-              <p>Our AI provides "smart estimates." While we aim for accuracy, these numbers should not be used to manage medical conditions like diabetes or severe allergies.</p>
-            </section>
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">AI & Data Estimation</h3>
+          <p>
+            Our AI meal parser provides "smart estimates." While we strive for precision using standard nutritional databases, these numbers are approximations. Do not rely solely on these estimates to manage medical conditions that require strict dose-based nutrition.
+          </p>
+        </section>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">Listen to Your Body</h3>
-              <p>If you feel pain, dizziness, or shortness of breath during any workout, stop immediately and seek medical help.</p>
-            </section>
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">Listen to Your Body</h3>
+          <p>
+            Exercise can be physically demanding. If at any time you feel faint, dizzy, experience chest pain, or shortness of breath, stop immediately and seek medical attention. You perform all exercises suggested or tracked in this app at your own risk.
+          </p>
+        </section>
 
-            <section className="space-y-2 border-t border-muted/5 pt-4">
-              <p className="text-[10px] font-bold text-muted-foreground italic">By using this app, you assume all risk of injury or health complications.</p>
-            </section>
-          </div>
-        </CardContent>
-      </Card>
+        <section className="space-y-3 pt-4 border-t border-muted/5 text-center">
+          <p className="text-[10px] font-bold text-muted-foreground italic uppercase tracking-tight">
+            By using arcex fit, you assume full responsibility for your health and physical safety.
+          </p>
+        </section>
+      </div>
     </div>
   );
 
