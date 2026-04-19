@@ -66,7 +66,9 @@ import {
   eachDayOfInterval,
   startOfMonth,
   endOfMonth,
-  format
+  format,
+  parseISO,
+  differenceInYears
 } from "date-fns";
 import { 
   AlertDialog,
@@ -187,6 +189,30 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
 
     setIsReady(true);
   }, [user]);
+
+  // Coordination Logic: Update Age when DOB changes
+  const updateAgeFromDob = (dobString: string) => {
+    if (!dobString) return;
+    const birthDate = parseISO(dobString);
+    if (isNaN(birthDate.getTime())) return;
+    const age = differenceInYears(new Date(), birthDate);
+    setProfileAge(Math.max(0, Math.min(100, age)).toString());
+  };
+
+  // Coordination Logic: Update DOB when Age changes (defaults to Jan 1st of corresponding year)
+  const updateDobFromAge = (ageStr: string) => {
+    const ageNum = parseInt(ageStr) || 0;
+    const currentYear = new Date().getFullYear();
+    const birthYear = currentYear - ageNum;
+    
+    // Try to keep the month/day if valid, otherwise Jan 1st
+    const existingDate = parseISO(profileDob);
+    const month = isNaN(existingDate.getTime()) ? 0 : existingDate.getMonth();
+    const day = isNaN(existingDate.getTime()) ? 1 : existingDate.getDate();
+    
+    const newDob = new Date(birthYear, month, day);
+    setProfileDob(format(newDob, 'yyyy-MM-dd'));
+  };
 
   // Track changes to enable/disable save button
   const hasChanges = useMemo(() => {
@@ -403,7 +429,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
       await initiatePasswordReset(auth, user.email);
       toast({ 
         title: "Reset Link Sent", 
-        description: `Check your inbox (${user.email}) for instructions to update your key.` 
+        description: `Check your inbox (${user.email}) for instructions to update your password.` 
       });
     } catch (e) {
       // Error handled by emitter
@@ -480,7 +506,11 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
                 <Input 
                   type="number"
                   value={profileAge} 
-                  onChange={(e) => setProfileAge(e.target.value === "" ? "" : Math.min(100, parseInt(e.target.value) || 0).toString())}
+                  onChange={(e) => {
+                    const val = e.target.value === "" ? "" : Math.min(100, parseInt(e.target.value) || 0).toString();
+                    setProfileAge(val);
+                    if (val !== "") updateDobFromAge(val);
+                  }}
                   className="h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs"
                 />
               </div>
@@ -518,7 +548,10 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
                 <Input 
                   type="date"
                   value={profileDob} 
-                  onChange={(e) => setProfileDob(e.target.value)}
+                  onChange={(e) => {
+                    setProfileDob(e.target.value);
+                    updateAgeFromDob(e.target.value);
+                  }}
                   className="pl-10 h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs"
                 />
               </div>
@@ -600,7 +633,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
             <CardContent className="p-6 grid gap-6">
               {[
                 { label: 'Strength Growth', desc: 'Detailed power progress trends.', icon: TrendingUp, colors: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)' },
-                { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' },
+                { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'linear-gradient(135deg, #3b82f6) 0%, #2563eb 100%)' },
                 { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
                 { label: 'Skin-Based Micro Tracking', desc: 'Track micronutrients optimized for skin health and clarity.', icon: HeartPulse, colors: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' },
                 { label: 'Recovery-Based Macro Tracking', desc: 'Track macronutrients vital for muscle repair and recovery.', icon: Zap, colors: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },

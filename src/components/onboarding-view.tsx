@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -251,13 +250,17 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
               <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
                 <CardContent className="p-6 space-y-6">
                   <div className="space-y-2">
-                    <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Full Name</Label>
+                    <div className="flex justify-between items-center px-1">
+                      <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Full Name</Label>
+                      <span className="text-[9px] font-black text-white/20 uppercase tracking-widest">{name.length}/20</span>
+                    </div>
                     <div className="relative">
                       <User className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
                       <Input 
                         placeholder="Alex Johnson"
                         value={name} 
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={(e) => setName(e.target.value.substring(0, 20))}
+                        maxLength={20}
                         className="pl-12 h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium focus:ring-primary/20 placeholder:text-white/10"
                       />
                     </div>
@@ -267,7 +270,9 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Age</Label>
                       <Input 
-                        type="number" value={age} onChange={(e) => setAge(e.target.value)}
+                        type="number" 
+                        value={age} 
+                        onChange={(e) => setAge(e.target.value === "" ? "" : Math.min(100, parseInt(e.target.value) || 0).toString())}
                         className="h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium text-center"
                       />
                     </div>
@@ -319,14 +324,18 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Weight (kg)</Label>
                       <Input 
-                        type="number" value={weight} onChange={(e) => setWeight(e.target.value)}
+                        type="number" 
+                        value={weight} 
+                        onChange={(e) => setWeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())}
                         className="h-14 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium text-center"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Height (cm)</Label>
                       <Input 
-                        type="number" value={height} onChange={(e) => setHeight(e.target.value)}
+                        type="number" 
+                        value={height} 
+                        onChange={(e) => setHeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())}
                         className="h-14 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium text-center"
                       />
                     </div>
@@ -380,7 +389,9 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                   <div className="space-y-4">
                     <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest text-center block">Target Weight (kg)</Label>
                     <Input 
-                      type="number" value={targetWeight} onChange={(e) => setTargetWeight(e.target.value)}
+                      type="number" 
+                      value={targetWeight} 
+                      onChange={(e) => setTargetWeight(e.target.value === "" ? "" : Math.min(500, parseInt(e.target.value) || 0).toString())}
                       className={cn(
                         "h-16 rounded-xl font-bold text-2xl text-center transition-all bg-white/[0.01]",
                         !calculations.isWeightValid ? "border-red-500/50 bg-red-500/5 text-red-500" : "border-white/10 text-white"
