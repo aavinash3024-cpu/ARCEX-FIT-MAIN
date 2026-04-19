@@ -246,7 +246,7 @@ export default function PulseFlowApp() {
       // 50% Milestone
       if (pct >= 50 && !milestones.includes('50')) {
         addNotification(
-          `Goal Momentum: 50% ${label}`,
+          `Goal: 50% ${label}`,
           `You've reached the halfway mark for your daily ${label.toLowerCase()} target. Keep going!`,
           'goal',
           '50-percent',
@@ -275,57 +275,67 @@ export default function PulseFlowApp() {
     const tarCal = goalData.finalCalories || 2200;
     checkMilestone('calories', curCal, tarCal, 'Calories', 'flame', 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)');
 
-    // 2. Protein
-    const curProt = loggedMeals.reduce((acc, m) => acc + (m.protein || 0), 0);
-    const tarProt = goalData.protein || 150;
-    checkMilestone('protein', curProt, tarProt, 'Protein', 'target', 'linear-gradient(135deg, #10b981 0%, #059669 100%)');
+    // 2. Macros
+    const totals = loggedMeals.reduce((acc, m) => ({
+      protein: acc.protein + (m.protein || 0),
+      carbs: acc.carbs + (m.carbs || 0),
+      fat: acc.fat + (m.fat || 0),
+      fiber: acc.fiber + (m.fiber || 0),
+      vitA: acc.vitA + (m.vitaminA || 0),
+      omega3: acc.omega3 + (m.omega3 || 0),
+      vitC: acc.vitC + (m.vitaminC || 0),
+      zinc: acc.zinc + (m.zinc || 0),
+      selenium: acc.selenium + (m.selenium || 0),
+      mag: acc.mag + (m.magnesium || 0),
+      vitD: acc.vitD + (m.vitaminD || 0),
+      potassium: acc.potassium + (m.potassium || 0),
+      iron: acc.iron + (m.iron || 0),
+      calcium: acc.calcium + (m.calcium || 0),
+    }), { 
+      protein: 0, carbs: 0, fat: 0, fiber: 0,
+      vitA: 0, omega3: 0, vitC: 0, zinc: 0, selenium: 0, 
+      mag: 0, vitD: 0, potassium: 0, iron: 0, calcium: 0 
+    });
 
-    // 3. Carbs
-    const curCarbs = loggedMeals.reduce((acc, m) => acc + (m.carbs || 0), 0);
-    const tarCarbs = goalData.carbs || 250;
-    checkMilestone('carbs', curCarbs, tarCarbs, 'Carbohydrates', 'activity', 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)');
+    checkMilestone('protein', totals.protein, goalData.protein || 150, 'Protein', 'target', 'linear-gradient(135deg, #10b981 0%, #059669 100%)');
+    checkMilestone('carbs', totals.carbs, goalData.carbs || 250, 'Carbohydrates', 'zap', 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)');
+    checkMilestone('fats', totals.fat, goalData.fats || 70, 'Fats', 'flame', 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)');
+    checkMilestone('fiber', totals.fiber, goalData.fiber || 30, 'Fiber', 'zap', 'linear-gradient(135deg, #10b981 0%, #059669 100%)');
 
-    // 4. Fats
-    const curFats = loggedMeals.reduce((acc, m) => acc + (m.fat || 0), 0);
-    const tarFats = goalData.fats || 70;
-    checkMilestone('fats', curFats, tarFats, 'Fats', 'flame', 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)');
-
-    // 5. Fiber
-    const curFiber = loggedMeals.reduce((acc, m) => acc + (m.fiber || 0), 0);
-    const tarFiber = goalData.fiber || 30;
-    checkMilestone('fiber', curFiber, tarFiber, 'Fiber', 'zap', 'linear-gradient(135deg, #10b981 0%, #059669 100%)');
-
-    // 6. Micros (Key focus)
+    // 3. Micros (All 10)
     const userGender = goalData?.gender || 'male';
-    const targets = {
+    const userAge = parseInt(goalData?.age) || 25;
+    
+    const microTargets = {
       vitA: userGender === 'male' ? 900 : 700,
+      omega3: userGender === 'male' ? 1.6 : 1.1,
       vitC: userGender === 'male' ? 90 : 75,
       zinc: userGender === 'male' ? 11 : 8,
+      selenium: 55,
       mag: userGender === 'male' ? 420 : 320,
-      omega3: userGender === 'male' ? 1.6 : 1.1
+      vitD: userAge > 70 ? 20 : 15,
+      potassium: userGender === 'male' ? 3400 : 2600,
+      iron: userGender === 'male' ? 8 : (userAge < 50 ? 18 : 8),
+      calcium: userAge > 50 && userGender === 'female' ? 1200 : 1000,
     };
 
-    const curVitA = loggedMeals.reduce((acc, m) => acc + (m.vitaminA || 0), 0);
-    checkMilestone('vitA', curVitA, targets.vitA, 'Vitamin A', 'sparkles', 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)');
+    checkMilestone('vitA', totals.vitA, microTargets.vitA, 'Vitamin A', 'sparkles', 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)');
+    checkMilestone('omega3', totals.omega3, microTargets.omega3, 'Omega-3', 'droplets', 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)');
+    checkMilestone('vitC', totals.vitC, microTargets.vitC, 'Vitamin C', 'zap', 'linear-gradient(135deg, #eab308 0%, #facc15 100%)');
+    checkMilestone('zinc', totals.zinc, microTargets.zinc, 'Zinc', 'shield', 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)');
+    checkMilestone('selenium', totals.selenium, microTargets.selenium, 'Selenium', 'star', 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)');
+    checkMilestone('magnesium', totals.mag, microTargets.mag, 'Magnesium', 'heart-pulse', 'linear-gradient(135deg, #a855f7 0%, #c084fc 100%)');
+    checkMilestone('vitD', totals.vitD, microTargets.vitD, 'Vitamin D', 'sun', 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)');
+    checkMilestone('potassium', totals.potassium, microTargets.potassium, 'Potassium', 'activity', 'linear-gradient(135deg, #10b981 0%, #34d399 100%)');
+    checkMilestone('iron', totals.iron, microTargets.iron, 'Iron', 'shield', 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)');
+    checkMilestone('calcium', totals.calcium, microTargets.calcium, 'Calcium', 'activity', 'linear-gradient(135deg, #64748b 0%, #94a3b8 100%)');
 
-    const curVitC = loggedMeals.reduce((acc, m) => acc + (m.vitaminC || 0), 0);
-    checkMilestone('vitC', curVitC, targets.vitC, 'Vitamin C', 'zap', 'linear-gradient(135deg, #eab308 0%, #facc15 100%)');
-
-    const curZinc = loggedMeals.reduce((acc, m) => acc + (m.zinc || 0), 0);
-    checkMilestone('zinc', curZinc, targets.zinc, 'Zinc', 'shield', 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)');
-
-    const curMag = loggedMeals.reduce((acc, m) => acc + (m.magnesium || 0), 0);
-    checkMilestone('magnesium', curMag, targets.mag, 'Magnesium', 'heart-pulse', 'linear-gradient(135deg, #a855f7 0%, #c084fc 100%)');
-
-    const curOmega = loggedMeals.reduce((acc, m) => acc + (m.omega3 || 0), 0);
-    checkMilestone('omega3', curOmega, targets.omega3, 'Omega-3', 'droplets', 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)');
-
-    // 7. Hydration
+    // 4. Hydration
     const curHyd = hydrationAmount / 1000;
     const tarHyd = goalData.hydrationTargetLiters || 3.0;
     checkMilestone('hydration', curHyd, tarHyd, 'Hydration', 'heart-pulse', 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)');
 
-    // 8. Steps
+    // 5. Steps
     checkMilestone('steps', stepsCount, 10000, 'Steps', 'zap', 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)');
 
   }, [loggedMeals, hydrationAmount, stepsCount, goalData, isLoaded]);

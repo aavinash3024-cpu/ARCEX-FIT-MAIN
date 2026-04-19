@@ -23,7 +23,11 @@ import {
   History,
   Clock,
   Check,
-  X
+  X,
+  Shield,
+  Star,
+  Sun,
+  Droplets
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -39,7 +43,11 @@ const ICON_MAP: Record<string, any> = {
   'trending-up': TrendingUp,
   'heart-pulse': HeartPulse,
   'dumbbell': Dumbbell,
-  'check': CheckCircle2
+  'check': CheckCircle2,
+  'shield': Shield,
+  'star': Star,
+  'sun': Sun,
+  'droplets': Droplets
 };
 
 export interface Notification {
@@ -62,8 +70,18 @@ interface NotificationsViewProps {
 }
 
 export function NotificationsView({ notifications, setNotifications, onBack }: NotificationsViewProps) {
-  const [autoDelete, setAutoDelete] = useState(() => localStorage.getItem('pulseflow_notif_autodelete') !== 'false');
-  const [autoDeletePeriod, setAutoDeletePeriod] = useState<'24h' | '1w'>(() => (localStorage.getItem('pulseflow_notif_period') as any) || '24h');
+  const [autoDelete, setAutoDelete] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return localStorage.getItem('pulseflow_notif_autodelete') !== 'false';
+    }
+    return true;
+  });
+  const [autoDeletePeriod, setAutoDeletePeriod] = useState<'24h' | '1w'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('pulseflow_notif_period') as any) || '24h';
+    }
+    return '24h';
+  });
 
   useEffect(() => {
     localStorage.setItem('pulseflow_notif_autodelete', autoDelete.toString());
@@ -164,13 +182,13 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
                 <CardContent className="p-4 flex items-start gap-4">
                   <div className="relative shrink-0 pt-1">
                     <div className={cn(
-                      "w-11 h-11 rounded-full p-[1.5px] shadow-sm transition-transform duration-500",
+                      "w-9 h-9 rounded-full p-[1.5px] shadow-sm transition-transform duration-500",
                       !n.isRead ? "scale-110" : "scale-100 opacity-60"
                     )}
                     style={{ background: n.gradient }}
                     >
                       <div className="w-full h-full rounded-full bg-card flex items-center justify-center">
-                        <IconComponent className={cn("w-5 h-5", !n.isRead ? "text-foreground" : "text-muted-foreground")} />
+                        <IconComponent className={cn("w-4 h-4", !n.isRead ? "text-foreground" : "text-muted-foreground")} />
                       </div>
                     </div>
                     {!n.isRead && (
