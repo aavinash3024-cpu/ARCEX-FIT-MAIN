@@ -377,10 +377,10 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   const renderSubscription = () => (
-    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-10">
+    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-24">
       {/* 1. MEMBERSHIP CARD (STATUS) */}
       <div className="px-1">
-        <div className="relative w-full h-52 rounded-[1.75rem] overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] active:scale-[0.98]">
+        <div className="relative w-full h-44 rounded-[1.75rem] overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] active:scale-[0.98]">
           <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] via-[#2d3436] to-[#0f172a]" />
           
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none" />
@@ -390,9 +390,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
             <div className="flex justify-between items-start">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-emerald-400 p-[0px] overflow-hidden flex items-center justify-center">
-                    <div className="w-full h-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
-                      <Activity className="w-6 h-6 text-white" />
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-primary to-emerald-400 p-[0.5px] overflow-hidden flex items-center justify-center">
+                    <div className="w-full h-full bg-black/40 backdrop-blur-sm flex items-center justify-center rounded-full">
+                      <Activity className="w-5 h-5 text-white" />
                     </div>
                   </div>
                   <span className="font-black text-sm uppercase tracking-tighter italic">ARCEX <span className="text-primary">FIT</span></span>
@@ -402,10 +402,10 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
               <Wifi className="w-5 h-5 text-white/20 rotate-90" />
             </div>
 
-            <div className="space-y-4">
-              <div className="space-y-1">
+            <div className="space-y-3">
+              <div className="space-y-0.5">
                 <p className="text-[7px] font-black text-white/30 uppercase tracking-[0.4em]">MEMBERSHIP HOLDER</p>
-                <h3 className="text-lg font-black uppercase tracking-tighter truncate">{profileName}</h3>
+                <h3 className="text-base font-black uppercase tracking-tighter truncate">{profileName}</h3>
               </div>
               
               <div className="flex justify-between items-end">
@@ -440,11 +440,11 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
           <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Subscription Plans</h3>
         </div>
         
-        <div className="grid gap-3">
+        <div className="grid grid-cols-3 gap-2">
           {[
-            { id: 'monthly', name: 'Monthly Elite', price: '229', original: '299', period: 'Month', label: 'Month-to-month access' },
-            { id: 'quarterly', name: 'Quarterly Elite', price: '599', original: '899', period: '3 Months', label: 'Most popular choice', popular: true, save: 'Save 15%' },
-            { id: 'half-year', name: 'Elite Performance', price: '1099', original: '1799', period: '6 Months', label: 'Professional standard', save: 'Save 20%' }
+            { id: 'monthly', name: 'Monthly', price: '229', original: '299', period: 'Mo', save: '' },
+            { id: 'quarterly', name: 'Quarterly', price: '599', original: '899', period: '3Mo', save: '15%' },
+            { id: 'half-year', name: 'Elite', price: '1099', original: '1799', period: '6Mo', save: '20%' }
           ].map((plan) => (
             <Card 
               key={plan.id} 
@@ -452,33 +452,24 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
               className={cn(
                 "border-none shadow-md rounded-2xl overflow-hidden border transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99]",
                 selectedPlanId === plan.id 
-                  ? "bg-gradient-to-r from-primary/10 via-primary/5 to-transparent ring-2 ring-primary ring-offset-2" 
+                  ? "bg-primary/5 ring-1 ring-primary" 
                   : "bg-card border-muted/10 opacity-70"
               )}
             >
-              <CardContent className="p-4 flex items-center justify-between">
-                <div className="space-y-0.5 min-w-0">
-                  <div className="flex items-center gap-2">
-                    <h5 className="font-black text-xs uppercase tracking-widest truncate">{plan.name}</h5>
-                    {plan.save && (
-                      <Badge className={cn("text-[7px] font-black uppercase px-1.5 h-4", selectedPlanId === plan.id ? "bg-primary text-white" : "bg-primary/10 text-primary")}>
-                        {plan.save}
-                      </Badge>
-                    )}
+              <CardContent className="p-3 flex flex-col items-center text-center gap-1.5">
+                <h5 className="font-black text-[9px] uppercase tracking-widest truncate w-full">{plan.name}</h5>
+                <div className="space-y-0.5">
+                  <div className="flex items-center justify-center gap-1">
+                    <span className="text-[7px] font-bold text-muted-foreground line-through opacity-40">{plan.original}</span>
+                    <span className="text-sm font-black text-foreground">{plan.price}</span>
                   </div>
-                  <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/60 truncate">
-                    {plan.label}
-                  </p>
+                  <p className="text-[7px] font-black uppercase text-muted-foreground opacity-60">/ {plan.period}</p>
                 </div>
-                <div className="text-right shrink-0">
-                  <div className="flex items-center justify-end gap-1.5">
-                    <span className="text-[9px] font-bold text-muted-foreground line-through decoration-muted-foreground/30 opacity-60">{plan.original}</span>
-                    <span className="text-lg font-black text-foreground">{plan.price}</span>
-                  </div>
-                  <p className="text-[7px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
-                    / {plan.period}
-                  </p>
-                </div>
+                {plan.save && (
+                  <Badge className="bg-primary text-white text-[7px] font-black uppercase px-1 h-3.5 border-none">
+                    SAVE {plan.save}
+                  </Badge>
+                )}
               </CardContent>
             </Card>
           ))}
