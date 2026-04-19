@@ -22,7 +22,7 @@ import { onAuthStateChanged } from 'firebase/auth';
 import { cn } from '@/lib/utils';
 
 export function AuthView() {
-  const { auth } = useAuth();
+  const auth = useAuth();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");

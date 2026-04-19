@@ -14,7 +14,8 @@ import {
   Settings2,
   Check,
   MapPin,
-  Loader2
+  Loader2,
+  X
 } from "lucide-react";
 import { 
   Select,
@@ -55,7 +56,7 @@ const INDIAN_STATES = [
 ].sort();
 
 export function OnboardingView({ onComplete }: OnboardingViewProps) {
-  const { firestore } = useFirestore();
+  const firestore = useFirestore();
   const { user } = useUser();
   const [step, setStep] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -111,6 +112,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
     const finalCalories = Math.round(tdee + calAdj[0]);
     const proteinGrams = Math.round(w * protAdj[0]);
     const proteinKcal = proteinGrams * 4;
+    
     const fiberGrams = Math.round((finalCalories / 1000) * 14);
     
     const remainingKcal = Math.max(0, finalCalories - proteinKcal);

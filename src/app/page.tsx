@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -40,7 +39,7 @@ import { useAuth, useUser } from '@/firebase';
 import { cn } from '@/lib/utils';
 
 export default function PulseFlowApp() {
-  const { auth } = useAuth();
+  const auth = useAuth();
   const { user, isUserLoading } = useUser();
   
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -323,7 +322,7 @@ export default function PulseFlowApp() {
       omega3: acc.omega3 + (m.omega3 || 0),
       vitC: acc.vitC + (m.vitaminC || 0),
       zinc: acc.zinc + (m.zinc || 0),
-      selenium: acc.selenium + (m.selenium || 0),
+      selenium: acc.selenium + (m.selenium || 0), 
       mag: acc.mag + (m.magnesium || 0),
       vitD: acc.vitD + (m.vitaminD || 0),
       potassium: acc.potassium + (m.potassium || 0),
@@ -367,14 +366,6 @@ export default function PulseFlowApp() {
     checkMilestone('potassium', totals.potassium, microTargets.potassium, 'Potassium', 'activity', 'linear-gradient(135deg, #10b981 0%, #34d399 100%)');
     checkMilestone('iron', totals.iron, microTargets.iron, 'Iron', 'shield', 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)');
     checkMilestone('calcium', totals.calcium, microTargets.calcium, 'Calcium', 'activity', 'linear-gradient(135deg, #64748b 0%, #94a3b8 100%)');
-
-    // 4. Hydration
-    const curHyd = hydrationAmount / 1000;
-    const tarHyd = goalData.hydrationTargetLiters || 3.0;
-    checkMilestone('hydration', curHyd, tarHyd, 'Hydration', 'heart-pulse', 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)');
-
-    // 5. Steps
-    checkMilestone('steps', stepsCount, 10000, 'Steps', 'zap', 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)');
 
   }, [loggedMeals, hydrationAmount, stepsCount, goalData, isLoaded]);
 

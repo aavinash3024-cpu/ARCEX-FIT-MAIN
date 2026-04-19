@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -86,9 +85,9 @@ interface ProfileViewProps {
 }
 
 export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSplash }: ProfileViewProps) {
-  const { firestore } = useFirestore();
+  const firestore = useFirestore();
   const { user } = useUser();
-  const { auth } = useAuth();
+  const auth = useAuth();
 
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
