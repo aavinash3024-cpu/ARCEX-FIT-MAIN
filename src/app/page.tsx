@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -9,7 +10,13 @@ import {
   Bell,
   User,
   Crown,
-  Loader2
+  Loader2,
+  Trophy,
+  Target,
+  Flame,
+  HeartPulse,
+  CheckCircle2,
+  Sparkles
 } from 'lucide-react';
 import { DashboardView } from '@/components/dashboard-view';
 import { NutritionView } from '@/components/nutrition-view';
@@ -22,7 +29,7 @@ import { CalculatorsView } from '@/components/calculators-view';
 import { GoalSettingView } from '@/components/goal-setting-view';
 import { ProfileView } from '@/components/profile-view';
 import { GuideView } from '@/components/guide-view';
-import { NotificationsView } from '@/components/notifications-view';
+import { NotificationsView, type Notification } from '@/components/notifications-view';
 import { Button } from '@/components/ui/button';
 import { format, isYesterday } from 'date-fns';
 import { useAuth, useUser, initiateAnonymousSignIn } from '@/firebase';
@@ -43,6 +50,41 @@ export default function PulseFlowApp() {
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
   const [streakData, setStreakData] = useState({ count: 0, history: [] as string[] });
+  const [notifications, setNotifications] = useState<Notification[]>([
+    {
+      id: '1',
+      title: 'New Peak: 100kg Bench Press',
+      description: 'Elite progress! You just smashed your previous Bench Press PR. Your strength growth is in the top 5% this week.',
+      time: 'Just now',
+      type: 'achievement',
+      subtype: 'pr',
+      isRead: false,
+      icon: Trophy,
+      gradient: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)'
+    },
+    {
+      id: '2',
+      title: 'Goal Master: 100% Protein',
+      description: 'You have hit your daily protein target of 160g. Perfect for muscle recovery and skin cell regeneration.',
+      time: '2 hours ago',
+      type: 'goal',
+      subtype: '100-percent',
+      isRead: false,
+      icon: Target,
+      gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+    },
+    {
+      id: '3',
+      title: 'Goal Momentum: 50% Calories',
+      description: 'You are halfway to your daily calorie budget. You have 1,100 kcal remaining for the day.',
+      time: '5 hours ago',
+      type: 'goal',
+      subtype: '50-percent',
+      isRead: true,
+      icon: Flame,
+      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+    }
+  ]);
   const [isLoaded, setIsLoaded] = useState(false);
   
   const mainRef = useRef<HTMLDivElement>(null);
@@ -54,8 +96,6 @@ export default function PulseFlowApp() {
     }
   }, [user, isUserLoading, auth]);
 
-  // STABLE SCROLL RESET - PRIMARY NAVIGATION
-  // This watcher handles all scroll resets because internal navigation is now "Official"
   useEffect(() => {
     if (mainRef.current) {
       mainRef.current.scrollTop = 0;
@@ -64,7 +104,6 @@ export default function PulseFlowApp() {
     window.scrollTo(0, 0);
   }, [activeTab]);
 
-  // Back Button / History Support
   useEffect(() => {
     if ('scrollRestoration' in window.history) {
       window.history.scrollRestoration = 'manual';
@@ -79,11 +118,9 @@ export default function PulseFlowApp() {
     };
 
     window.addEventListener('popstate', handlePopState);
-    
     if (window.history.state === null) {
       window.history.replaceState({ tab: 'dashboard' }, '');
     }
-
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
@@ -94,15 +131,11 @@ export default function PulseFlowApp() {
     }
   };
 
-  // Load data from localStorage on mount
   useEffect(() => {
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const lastResetDate = localStorage.getItem('pulseflow_last_reset_date');
-    
     const savedDarkMode = localStorage.getItem('pulseflow_dark_mode');
-    if (savedDarkMode === 'true') {
-      document.documentElement.classList.add('dark');
-    }
+    if (savedDarkMode === 'true') document.documentElement.classList.add('dark');
 
     const isNewDay = lastResetDate !== todayStr;
 
@@ -115,13 +148,10 @@ export default function PulseFlowApp() {
     const savedWeight = localStorage.getItem('pulseflow_weight_history');
     const savedMeals = localStorage.getItem('pulseflow_today_logged_meals');
     const savedStreak = localStorage.getItem('pulseflow_streak_v3');
+    const savedNotifications = localStorage.getItem('pulseflow_notifications_data');
     
     if (savedTasks) {
-      try {
-        setTask(JSON.parse(savedTasks));
-      } catch (e) {
-        console.error("Failed to parse saved tasks", e);
-      }
+      try { setTask(JSON.parse(savedTasks)); } catch (e) {}
     }
     
     if (isNewDay) {
@@ -129,53 +159,22 @@ export default function PulseFlowApp() {
       localStorage.setItem('pulseflow_hydration', '0');
       setStepsCount(0);
       localStorage.setItem('pulseflow_steps', '0');
-      localStorage.setItem('pulseflow_meal_credits_v2', '20');
     } else {
       if (savedHydration) setHydrationAmount(Number(savedHydration));
       if (savedSteps) setStepsCount(Number(savedSteps));
     }
 
-    if (savedHydrationHistory) {
-      try {
-        setHydrationHistory(JSON.parse(savedHydrationHistory));
-      } catch (e) {
-        console.error("Failed to parse hydration history", e);
-      }
-    }
-
-    if (savedStepsHistory) {
-      try {
-        setStepsHistory(JSON.parse(savedStepsHistory));
-      } catch (e) {
-        console.error("Failed to parse steps history", e);
-      }
-    }
-
-    if (savedGoal) {
-      try {
-        setGoalData(JSON.parse(savedGoal));
-      } catch (e) {
-        console.error("Failed to parse saved goal", e);
-      }
-    }
-
-    if (savedWeight) {
-      try {
-        setWeightHistory(JSON.parse(savedWeight));
-      } catch (e) {
-        console.error("Failed to parse weight history", e);
-      }
-    }
+    if (savedHydrationHistory) { try { setHydrationHistory(JSON.parse(savedHydrationHistory)); } catch (e) {} }
+    if (savedStepsHistory) { try { setStepsHistory(JSON.parse(savedStepsHistory)); } catch (e) {} }
+    if (savedGoal) { try { setGoalData(JSON.parse(savedGoal)); } catch (e) {} }
+    if (savedWeight) { try { setWeightHistory(JSON.parse(savedWeight)); } catch (e) {} }
+    if (savedNotifications) { try { setNotifications(JSON.parse(savedNotifications)); } catch (e) {} }
 
     if (isNewDay) {
       setLoggedMeals([]);
       localStorage.setItem('pulseflow_today_logged_meals', '[]');
     } else if (savedMeals) {
-      try {
-        setLoggedMeals(JSON.parse(savedMeals));
-      } catch (e) {
-        console.error("Failed to parse logged meals", e);
-      }
+      try { setLoggedMeals(JSON.parse(savedMeals)); } catch (e) {}
     }
 
     localStorage.setItem('pulseflow_last_reset_date', todayStr);
@@ -184,50 +183,36 @@ export default function PulseFlowApp() {
       try {
         const data = JSON.parse(savedStreak);
         const lastOpen = data.lastDate;
-        
         if (lastOpen === todayStr) {
           setStreakData({ count: data.count, history: data.history });
         } else {
           const lastDateObj = new Date(lastOpen);
           let newCount = 1;
-          
-          if (isYesterday(lastDateObj)) {
-            newCount = data.count + 1;
-          }
-          
+          if (isYesterday(lastDateObj)) newCount = data.count + 1;
           const newHistory = [...data.history, todayStr].slice(-30);
           const newData = { count: newCount, history: newHistory, lastDate: todayStr };
           setStreakData({ count: newCount, history: newHistory });
           localStorage.setItem('pulseflow_streak_v3', JSON.stringify(newData));
         }
-      } catch (e) {
-        console.error("Failed to parse streak", e);
-      }
+      } catch (e) {}
     } else {
       const newData = { count: 1, history: [todayStr], lastDate: todayStr };
       setStreakData({ count: 1, history: [todayStr] });
       localStorage.setItem('pulseflow_streak_v3', JSON.stringify(newData));
     }
-    
     setIsLoaded(true);
   }, []);
 
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('pulseflow_tasks', JSON.stringify(tasks));
-    }
+    if (isLoaded) localStorage.setItem('pulseflow_tasks', JSON.stringify(tasks));
   }, [tasks, isLoaded]);
 
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('pulseflow_hydration', hydrationAmount.toString());
-      
       const today = format(new Date(), 'yyyy-MM-dd');
       setHydrationHistory(prev => {
-        const newHistory = {
-          ...prev,
-          [today]: hydrationAmount
-        };
+        const newHistory = { ...prev, [today]: hydrationAmount };
         localStorage.setItem('pulseflow_hydration_history', JSON.stringify(newHistory));
         return newHistory;
       });
@@ -237,13 +222,9 @@ export default function PulseFlowApp() {
   useEffect(() => {
     if (isLoaded) {
       localStorage.setItem('pulseflow_steps', stepsCount.toString());
-      
       const today = format(new Date(), 'yyyy-MM-dd');
       setStepsHistory(prev => {
-        const newHistory = {
-          ...prev,
-          [today]: stepsCount
-        };
+        const newHistory = { ...prev, [today]: stepsCount };
         localStorage.setItem('pulseflow_steps_history', JSON.stringify(newHistory));
         return newHistory;
       });
@@ -251,22 +232,20 @@ export default function PulseFlowApp() {
   }, [stepsCount, isLoaded]);
 
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('pulseflow_weight_history', JSON.stringify(weightHistory));
-    }
+    if (isLoaded) localStorage.setItem('pulseflow_weight_history', JSON.stringify(weightHistory));
   }, [weightHistory, isLoaded]);
 
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('pulseflow_today_logged_meals', JSON.stringify(loggedMeals));
-    }
+    if (isLoaded) localStorage.setItem('pulseflow_today_logged_meals', JSON.stringify(loggedMeals));
   }, [loggedMeals, isLoaded]);
+
+  useEffect(() => {
+    if (isLoaded) localStorage.setItem('pulseflow_notifications_data', JSON.stringify(notifications));
+  }, [notifications, isLoaded]);
 
   const refreshGoalData = () => {
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
-    if (savedGoal) {
-      setGoalData(JSON.parse(savedGoal));
-    }
+    if (savedGoal) setGoalData(JSON.parse(savedGoal));
   };
 
   const toggleTask = (id: string) => {
@@ -301,6 +280,8 @@ export default function PulseFlowApp() {
   const handleDeleteWeight = (date: string) => {
     setWeightHistory(prev => prev.filter(entry => entry.date !== date));
   };
+
+  const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const renderContent = () => {
     if (!isLoaded || isUserLoading) {
@@ -443,58 +424,16 @@ export default function PulseFlowApp() {
           />
         );
       case 'profile':
-        return (
-          <ProfileView 
-            activeView="main"
-            onBack={() => window.history.back()}
-            onNavigate={navigateTo}
-          />
-        );
       case 'profile-personal':
-        return (
-          <ProfileView 
-            activeView="personal-info"
-            onBack={() => window.history.back()}
-            onNavigate={navigateTo}
-          />
-        );
       case 'profile-subscription':
-        return (
-          <ProfileView 
-            activeView="subscription"
-            onBack={() => window.history.back()}
-            onNavigate={navigateTo}
-          />
-        );
       case 'profile-legal':
-        return (
-          <ProfileView 
-            activeView="legal"
-            onBack={() => window.history.back()}
-            onNavigate={navigateTo}
-          />
-        );
       case 'profile-settings':
-        return (
-          <ProfileView 
-            activeView="settings"
-            onBack={() => window.history.back()}
-            onNavigate={navigateTo}
-          />
-        );
       case 'profile-reset':
+        const profileSub = activeTab === 'profile' ? 'main' : activeTab.replace('profile-', '') as any;
         return (
           <ProfileView 
-            activeView="reset"
-            onBack={() => window.history.back()}
-            onNavigate={navigateTo}
-          />
-        );
-      case 'subscription': // Legacy route for top-bar button
-        return (
-          <ProfileView 
-            activeView="subscription"
-            onBack={() => window.history.back()}
+            activeView={profileSub}
+            onBack={() => navigateTo('profile')}
             onNavigate={navigateTo}
           />
         );
@@ -511,6 +450,8 @@ export default function PulseFlowApp() {
       case 'notifications':
         return (
           <NotificationsView 
+            notifications={notifications}
+            setNotifications={setNotifications}
             onBack={() => window.history.back()}
           />
         );
@@ -578,7 +519,11 @@ export default function PulseFlowApp() {
             className="rounded-full bg-muted/50 w-9 h-9 relative flex items-center justify-center"
           >
             <Bell className="w-4 h-4 text-foreground" />
-            <span className="absolute top-2 right-2 w-1.5 h-1.5 bg-primary rounded-full border border-background"></span>
+            {unreadCount > 0 && (
+              <span className="absolute -top-1 -right-1 bg-destructive text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-background animate-in zoom-in">
+                {unreadCount > 99 ? '99+' : unreadCount}
+              </span>
+            )}
           </button>
         </div>
       </header>

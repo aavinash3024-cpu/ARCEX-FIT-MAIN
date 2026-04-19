@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -353,8 +354,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
 
   const renderSubscription = () => (
     <div className="space-y-2 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
-      {/* 1. SUBSCRIPTION PLANS (COMPACT 2-COLUMN GRID) */}
-      <div className="px-1 space-y-4">
+      <div className="px-1 space-y-4 pt-0">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3 text-center">See Subscription Plans</h3>
         <div className="grid grid-cols-2 gap-3 px-1 pt-4">
           {[
@@ -373,7 +373,6 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                     : "bg-muted/20"
                 )}
               >
-                {/* PER DAY PRICE ON BORDER */}
                 <div className={cn(
                   "absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-0.5 rounded-full z-10 border border-white/20 backdrop-blur-md shadow-sm transition-all",
                   isSelected ? "bg-gradient-to-r from-primary to-emerald-400" : "bg-muted text-muted-foreground"
@@ -405,7 +404,6 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         </div>
       </div>
 
-      {/* 2. PREMIUM & FREE FEATURES */}
       <div className="px-1 space-y-6 pt-6">
         <div className="space-y-4">
           <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-primary px-3">Elite Premium Coverage</h3>
@@ -415,8 +413,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 { label: 'Strength Growth', desc: 'Detailed power progress trends.', icon: TrendingUp, colors: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)' },
                 { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' },
                 { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
-                { label: 'Skin Based Micro Tracking', desc: 'Daily, weekly and monthly analysis of micros related to or helping the skin, recovery.', icon: HeartPulse, colors: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' },
-                { label: 'Recovery Based Micro Tracking', desc: 'Daily, weekly and monthly analysis of micros related to or helping the skin, recovery.', icon: Timer, colors: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' },
+                { label: 'Skin Based Micro Tracking', desc: 'Comprehensive analysis of micronutrients optimized for skin clarity and health.', icon: HeartPulse, colors: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' },
+                { label: 'Recovery Based Macro Tracking', desc: 'Advanced tracking of macronutrients vital for efficient muscle recovery and repair.', icon: Timer, colors: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' },
                 { label: 'Intake Reports', desc: 'Daily, Weekly, Monthly history.', icon: BarChart3, colors: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' },
                 { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED personal progress insights.', icon: Sparkles, colors: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', highlight: true }
               ].map((item, i) => (
