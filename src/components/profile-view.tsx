@@ -377,14 +377,14 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   const renderSubscription = () => (
-    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
+    <div className="space-y-4 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       {/* 1. SUBSCRIPTION PLANS (COMPACT 2-COLUMN GRID) */}
       <div className="px-1 space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3 text-center">See Subscription Plans</h3>
         <div className="grid grid-cols-2 gap-3 px-1">
           {[
-            { id: 'monthly', name: 'Monthly', price: '229', original: '299', save: '23%', perDay: '7.6', saveColor: "bg-rose-500/10 text-rose-500" },
-            { id: 'yearly', name: 'Yearly', price: '1299', original: '2748', save: '52%', perDay: '3.5', saveColor: "bg-emerald-500/10 text-emerald-500" }
+            { id: 'monthly', name: 'Monthly', price: '229', original: '299', save: '23%', perDay: '7.6' },
+            { id: 'yearly', name: 'Yearly', price: '1299', original: '2748', save: '52%', perDay: '3.5' }
           ].map((plan) => {
             const isSelected = selectedPlanId === plan.id;
             return (
@@ -419,7 +419,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                       <span className="text-xl font-black text-foreground">₹{plan.price}</span>
                     </div>
 
-                    <Badge className={cn("text-[8px] font-black uppercase px-2 h-4 border-none shadow-sm", plan.saveColor)}>
+                    <Badge className={cn("text-[8px] font-black uppercase px-2 h-4 border-none shadow-sm bg-emerald-500/10 text-emerald-500")}>
                       SAVE {plan.save}
                     </Badge>
                   </CardContent>
@@ -431,7 +431,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
       </div>
 
       {/* 2. PREMIUM & FREE FEATURES */}
-      <div className="px-1 space-y-6">
+      <div className="px-1 space-y-6 pt-4">
         <div className="space-y-4">
           <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-primary px-3">Elite Premium Coverage</h3>
           <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
@@ -440,8 +440,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 { label: 'Strength Growth', desc: 'Detailed power progress trends.', icon: TrendingUp, colors: 'from-amber-400 to-orange-500' },
                 { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'from-blue-400 to-indigo-600' },
                 { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'from-emerald-400 to-teal-600' },
-                { label: 'Skin Based Micro Tracking', desc: 'Texture, Acne & Inflammation audit.', icon: HeartPulse, colors: 'from-orange-400 to-rose-500' },
-                { label: 'Recovery Based Micro Tracking', desc: 'Muscle repair & contraction signals.', icon: Timer, colors: 'from-indigo-400 to-blue-600' },
+                { label: 'Skin Based Micro Tracking', desc: 'Daily, weekly and monthly analysis of micros related to or helping the skin, recovery.', icon: HeartPulse, colors: 'from-orange-400 to-rose-500' },
+                { label: 'Recovery Based Micro Tracking', desc: 'Daily, weekly and monthly analysis of micros related to or helping the skin, recovery.', icon: Timer, colors: 'from-indigo-400 to-blue-600' },
                 { label: 'Intake Reports', desc: 'Daily, Weekly, Monthly history.', icon: BarChart3, colors: 'from-purple-400 to-pink-600' },
                 { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED personal progress insights.', icon: Sparkles, colors: 'from-cyan-400 to-blue-600', highlight: true }
               ].map((item, i) => (
@@ -742,7 +742,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   return (
-    <div className="space-y-6 pb-2 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-4 pb-2 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2 px-1">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />
