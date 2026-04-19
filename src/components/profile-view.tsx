@@ -447,7 +447,6 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
           <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10 opacity-70">
             <CardContent className="p-6 grid gap-6">
               {[
-                { label: 'Unlimited Alerts', desc: 'Achievement & goal notifications.', icon: Bell, colors: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)' },
                 { label: 'Hydration Tracking', desc: 'Weekly water intake analysis.', icon: HeartPulse, colors: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)' },
                 { label: 'Steps Tracking', desc: 'Movement tracking & trends.', icon: Activity, colors: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)' },
                 { label: 'Streaks', desc: 'Daily consistency badges.', icon: Zap, colors: 'linear-gradient(135deg, #94a3b8 0%, #64748b 100%)' },
