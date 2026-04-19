@@ -50,45 +50,46 @@ const MACRO_COLORS = {
 };
 
 /**
- * Highly graphical continuous animation component for the header.
+ * Highly graphical continuous animation component for the full background.
  */
 const GraphicalHeaderAnimation = () => {
   return (
-    <div className="absolute top-0 left-0 right-0 h-64 overflow-hidden pointer-events-none z-0">
+    <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
       {/* Central Pulsating Glow */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
       
-      {/* Rotating Gradient Rings */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border border-primary/10 rounded-full animate-[spin_10s_linear_infinite]" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 border-t-2 border-primary/20 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-b-2 border-primary/5 rounded-full animate-[spin_20s_linear_infinite]" />
+      {/* Rotating Gradient Rings - Center/Full Page focus */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[120vw] border border-primary/5 rounded-full animate-[spin_40s_linear_infinite] opacity-30" />
+      <div className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-80 h-80 border-t-2 border-primary/10 rounded-full animate-[spin_25s_linear_infinite]" />
+      <div className="absolute bottom-1/4 right-1/4 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border-b-2 border-primary/5 rounded-full animate-[spin_30s_linear_infinite_reverse]" />
       
-      {/* Floating Particles */}
-      {[...Array(12)].map((_, i) => (
+      {/* Floating Particles spread across the whole screen */}
+      {[...Array(20)].map((_, i) => (
         <div 
           key={i}
-          className="absolute w-1 h-1 bg-primary/40 rounded-full animate-float"
+          className="absolute w-1.5 h-1.5 bg-primary/30 rounded-full animate-float"
           style={{
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,
             animationDelay: `${Math.random() * 5}s`,
-            animationDuration: `${3 + Math.random() * 7}s`
+            animationDuration: `${5 + Math.random() * 10}s`
           }}
         />
       ))}
 
-      {/* Scanning Line Effect */}
-      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-[scan_4s_ease-in-out_infinite]" />
+      {/* Full height Scanning Line Effect */}
+      <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-[scan_8s_ease-in-out_infinite]" />
 
       <style jsx>{`
         @keyframes scan {
           0% { transform: translateY(0); opacity: 0; }
-          50% { opacity: 1; }
-          100% { transform: translateY(256px); opacity: 0; }
+          10% { opacity: 1; }
+          90% { opacity: 1; }
+          100% { transform: translateY(100vh); opacity: 0; }
         }
         @keyframes float {
           0%, 100% { transform: translate(0, 0); }
-          50% { transform: translate(${Math.random() * 20}px, ${Math.random() * 20}px); }
+          50% { transform: translate(30px, 30px); }
         }
       `}</style>
     </div>
@@ -222,8 +223,16 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
       <GraphicalHeaderAnimation />
 
       <div className="relative z-10 flex flex-col h-full">
+        {/* Branding Title */}
+        <div className="pt-10 flex flex-col items-center justify-center shrink-0">
+          <div className="flex items-center gap-1.5">
+            <span className="font-black text-2xl tracking-tighter text-white">arcex</span>
+            <span className="font-black text-2xl tracking-tighter bg-gradient-to-br from-[#4ade80] via-[#2dd4bf] to-[#3b82f6] bg-clip-text text-transparent">fit</span>
+          </div>
+        </div>
+
         {/* Step Header */}
-        <div className="px-8 pt-12 pb-8 flex flex-col items-center gap-4 shrink-0">
+        <div className="px-8 pt-6 pb-6 flex flex-col items-center gap-4 shrink-0">
           <div className="flex justify-between items-center w-full max-w-sm gap-2">
             {[1, 2, 3, 4, 5].map((i) => {
               const isActive = step === i;
