@@ -21,7 +21,8 @@ import {
   Cpu,
   ArrowRight,
   PieChart,
-  Settings2
+  Settings2,
+  Check
 } from "lucide-react";
 import { 
   Select,
@@ -61,23 +62,16 @@ const GraphicalHeaderAnimation = () => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
       
       {/* CENTRAL CONCENTRIC RINGS */}
-      {/* Ring 1 - Large Slow Outer */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[120vw] border border-primary/5 rounded-full animate-[spin_60s_linear_infinite] opacity-30" />
-      
-      {/* Ring 2 - Large Reverse */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[100vw] border border-primary/10 border-dashed rounded-full animate-[spin_40s_linear_infinite_reverse] opacity-20" />
-      
-      {/* Ring 3 - Mid Counter-Rotate */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vw] border-2 border-primary/5 rounded-full animate-[spin_30s_linear_infinite]" />
-      
-      {/* Ring 4 - Inner Precision Ring */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[40vw] border border-t-primary/20 border-r-transparent border-b-primary/20 border-l-transparent rounded-full animate-[spin_15s_linear_infinite]" />
 
-      {/* PERIPHERAL RINGS */}
+      {/* Peripheral Rings */}
       <div className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-80 h-80 border-t-2 border-primary/10 rounded-full animate-[spin_25s_linear_infinite]" />
       <div className="absolute bottom-1/4 right-1/4 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border-b-2 border-primary/5 rounded-full animate-[spin_35s_linear_infinite_reverse]" />
       
-      {/* Floating Particles spread across the whole screen */}
+      {/* Floating Particles */}
       {[...Array(25)].map((_, i) => (
         <div 
           key={i}
@@ -304,9 +298,9 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     </div>
                     <div className="space-y-2">
                       <Label className="text-xs font-semibold text-white/70 pl-1">Sex</Label>
-                      <Select value={gender} onValueChange={(val: any) => setGender(val)}>
+                      <Select value={gender} onValueChange={(val: 'male' | 'female') => setGender(val)}>
                         <SelectTrigger className="h-14 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
-                          <SelectValue />
+                          <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent className="rounded-xl bg-slate-900 border-white/10 text-white">
                           <SelectItem value="male">Male</SelectItem>
@@ -351,9 +345,9 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                   </div>
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-white/70 pl-1">Daily Activity Level</Label>
-                    <Select value={activity} onValueChange={(val: any) => setActivity(val)}>
+                    <Select value={activity} onValueChange={(val: ActivityLevel) => setActivity(val)}>
                       <SelectTrigger className="h-14 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
-                        <SelectValue />
+                        <SelectValue placeholder="Select Activity" />
                       </SelectTrigger>
                       <SelectContent className="rounded-xl bg-slate-900 border-white/10 text-white">
                         <SelectItem value="sedentary">Sedentary</SelectItem>
@@ -449,28 +443,28 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
               </div>
 
               <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
-                <CardContent className="p-6 space-y-8">
-                  <div className="space-y-6">
-                    <div className="bg-primary/10 p-6 rounded-2xl text-center space-y-1 border border-primary/20 shadow-inner">
+                <CardContent className="p-6 space-y-6">
+                  <div className="space-y-4">
+                    <div className="bg-primary/10 p-5 rounded-xl text-center space-y-1 border border-primary/20 shadow-inner">
                       <p className="text-[9px] font-black text-primary uppercase tracking-[0.2em]">Calculated Daily Intake</p>
-                      <p className="text-4xl font-black text-white">{calculations.finalCalories} <span className="text-xs text-white/40">KCAL</span></p>
+                      <p className="text-3xl font-black text-white">{calculations.finalCalories} <span className="text-xs text-white/40">KCAL</span></p>
                     </div>
 
-                    <div className="bg-white/[0.02] p-5 rounded-2xl space-y-4 border border-white/5">
-                      <p className="text-[10px] font-black text-center text-white/30 uppercase tracking-widest">Real-time Macro Breakdown</p>
+                    <div className="bg-white/[0.02] p-4 rounded-xl space-y-4 border border-white/5">
+                      <p className="text-[10px] font-black text-center text-white/30 uppercase tracking-widest">Macro Targets</p>
                       <div className="grid grid-cols-3 gap-2">
                         <div className="text-center space-y-0.5">
-                          <p className="text-lg font-black" style={{ color: MACRO_COLORS.protein }}>{calculations.protein}g</p>
+                          <p className="text-base font-black" style={{ color: MACRO_COLORS.protein }}>{calculations.protein}g</p>
                           <p className="text-[8px] font-bold text-white/40 uppercase">Protein</p>
                           <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black bg-white/5 text-white border-none">{calculations.proteinPct}%</Badge>
                         </div>
                         <div className="text-center space-y-0.5">
-                          <p className="text-lg font-black" style={{ color: MACRO_COLORS.carbs }}>{calculations.carbs}g</p>
+                          <p className="text-base font-black" style={{ color: MACRO_COLORS.carbs }}>{calculations.carbs}g</p>
                           <p className="text-[8px] font-bold text-white/40 uppercase">Carbs</p>
                           <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black bg-white/5 text-white border-none">{calculations.carbPct}%</Badge>
                         </div>
                         <div className="text-center space-y-0.5">
-                          <p className="text-lg font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
+                          <p className="text-base font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
                           <p className="text-[8px] font-bold text-white/40 uppercase">Fats</p>
                           <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black bg-white/5 text-white border-none">{calculations.fatPct}%</Badge>
                         </div>
@@ -478,27 +472,27 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     </div>
                   </div>
 
-                  <div className="space-y-10 pt-4">
-                    <div className="space-y-5">
+                  <div className="space-y-6 pt-2">
+                    <div className="space-y-3">
                       <div className="flex justify-between items-center px-1">
-                        <Label className="text-xs font-semibold text-white/60">Calorie Adjustment</Label>
-                        <Badge variant="secondary" className="text-[10px] font-bold h-6 bg-primary/20 text-primary border-none">{calAdj[0] > 0 ? `+${calAdj[0]}` : calAdj[0]} kcal</Badge>
+                        <Label className="text-[10px] font-semibold text-white/60 uppercase tracking-widest">Energy Offset</Label>
+                        <Badge variant="secondary" className="text-[9px] font-bold h-5 bg-primary/20 text-primary border-none">{calAdj[0] > 0 ? `+${calAdj[0]}` : calAdj[0]} kcal</Badge>
                       </div>
                       <Slider value={calAdj} onValueChange={setCalAdj} min={objective === 'loss' ? -1100 : 0} max={objective === 'gain' ? 1100 : 0} step={20} className="[&_[role=slider]]:bg-primary" />
                     </div>
 
-                    <div className="space-y-5">
+                    <div className="space-y-3">
                       <div className="flex justify-between items-center px-1">
-                        <Label className="text-xs font-semibold text-white/60">Protein Intensity</Label>
-                        <Badge variant="secondary" className="text-[10px] font-bold h-6 bg-amber-500/20 text-amber-500 border-none">{protAdj[0]}g/kg</Badge>
+                        <Label className="text-[10px] font-semibold text-white/60 uppercase tracking-widest">Protein Goal</Label>
+                        <Badge variant="secondary" className="text-[9px] font-bold h-5 bg-amber-500/20 text-amber-500 border-none">{protAdj[0]}g/kg</Badge>
                       </div>
                       <Slider value={protAdj} onValueChange={setProtAdj} min={1.2} max={3.0} step={0.1} className="[&_[role=slider]]:bg-amber-500" />
                     </div>
 
-                    <div className="space-y-5">
+                    <div className="space-y-3">
                       <div className="flex justify-between items-center px-1">
-                        <Label className="text-xs font-semibold text-white/60">Carb:Fat Ratio</Label>
-                        <Badge variant="secondary" className="text-[10px] font-bold h-6 bg-blue-500/20 text-blue-500 border-none">{carbRatio[0]}:{100 - carbRatio[0]}</Badge>
+                        <Label className="text-[10px] font-semibold text-white/60 uppercase tracking-widest">Carb Balance</Label>
+                        <Badge variant="secondary" className="text-[9px] font-bold h-5 bg-blue-500/20 text-blue-500 border-none">{carbRatio[0]}:{100 - carbRatio[0]}</Badge>
                       </div>
                       <Slider value={carbRatio} onValueChange={setCarbRatio} min={20} max={80} step={5} className="[&_[role=slider]]:bg-blue-500" />
                     </div>
@@ -511,12 +505,12 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           {step === 5 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
               <div className="px-2 text-center space-y-1">
-                <h2 className="text-2xl font-bold text-white">Review Strategy</h2>
-                <p className="text-sm text-white/50">Confirm your setup to begin</p>
+                <h2 className="text-2xl font-bold text-white">Final Confirmation</h2>
+                <p className="text-sm text-white/50">Confirm your strategy to begin</p>
               </div>
 
               <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
-                <CardContent className="p-8 space-y-10">
+                <CardContent className="p-8 space-y-8">
                   <div className="space-y-6">
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
@@ -531,11 +525,11 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                       </div>
 
                       <div className="grid grid-cols-2 gap-3">
-                        <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                        <div className="bg-white/[0.02] p-4 rounded-xl border border-white/5">
                             <p className="text-[9px] font-semibold text-white/40 uppercase">Budget</p>
                             <p className="text-lg font-bold text-primary">{calculations.finalCalories} kcal</p>
                         </div>
-                        <div className="bg-white/[0.02] p-4 rounded-2xl border border-white/5">
+                        <div className="bg-white/[0.02] p-4 rounded-xl border border-white/5">
                             <p className="text-[9px] font-semibold text-white/40 uppercase">TDEE</p>
                             <p className="text-lg font-bold text-white/20">{calculations.tdee} kcal</p>
                         </div>
@@ -543,7 +537,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     </div>
 
                     <div className="space-y-5">
-                      <p className="text-[10px] font-black uppercase text-center tracking-widest text-white/30">MACROS BREAKDOWN</p>
+                      <p className="text-[10px] font-black uppercase text-center tracking-widest text-white/30">MACROS AUDIT</p>
                       <div className="grid grid-cols-4 gap-2">
                         <div className="text-center">
                             <p className="text-sm font-black" style={{ color: MACRO_COLORS.protein }}>{calculations.protein}g</p>
@@ -578,13 +572,16 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     </div>
                   </div>
 
-                  <div className="bg-emerald-500/10 p-6 rounded-2xl border border-emerald-500/20 flex gap-4 items-center">
-                    <div className="w-10 h-10 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg shrink-0">
-                      <CheckCircle2 className="w-5 h-5 text-white" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-emerald-400">Ready to go</p>
-                      <p className="text-xs text-white/40">Your personal profile is complete</p>
+                  {/* Integrated Completion Section */}
+                  <div className="pt-8 border-t border-white/5">
+                    <div className="flex items-center gap-4 bg-emerald-500/10 p-4 rounded-xl border border-emerald-500/20">
+                      <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center shadow-lg shrink-0">
+                        <Check className="w-4 h-4 text-white" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-black text-emerald-400 uppercase tracking-widest">System Ready</p>
+                        <p className="text-[10px] text-white/40 font-medium">Your personal biometric profile is complete.</p>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -609,7 +606,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
             disabled={step === 1 && !name.trim()}
             className="flex-[2] h-14 rounded-xl bg-primary text-slate-950 font-bold shadow-xl gap-2 active:scale-95 transition-all"
           >
-            {step === 5 ? "Get Started" : "Next"}
+            {step === 5 ? "Launch arcexfit" : "Next Step"}
             <ArrowRight className="w-4 h-4" />
           </Button>
         </div>
