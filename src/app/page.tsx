@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -59,7 +58,7 @@ export default function PulseFlowApp() {
       type: 'achievement',
       subtype: 'pr',
       isRead: false,
-      icon: Trophy,
+      icon: 'trophy',
       gradient: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)'
     },
     {
@@ -70,7 +69,7 @@ export default function PulseFlowApp() {
       type: 'goal',
       subtype: '100-percent',
       isRead: false,
-      icon: Target,
+      icon: 'target',
       gradient: 'linear-gradient(135deg, #10b981 0%, #059669 100%)'
     },
     {
@@ -81,7 +80,7 @@ export default function PulseFlowApp() {
       type: 'goal',
       subtype: '50-percent',
       isRead: true,
-      icon: Flame,
+      icon: 'flame',
       gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
     }
   ]);

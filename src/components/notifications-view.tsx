@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -26,6 +25,20 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
+// Icon Map to handle JSON serialization (React components can't be stored in localStorage)
+const ICON_MAP: Record<string, any> = {
+  'trophy': Trophy,
+  'target': Target,
+  'flame': Flame,
+  'zap': Zap,
+  'sparkles': Sparkles,
+  'bell': Bell,
+  'activity': Activity,
+  'trending-up': TrendingUp,
+  'heart-pulse': HeartPulse,
+  'dumbbell': Dumbbell
+};
+
 export interface Notification {
   id: string;
   title: string;
@@ -34,7 +47,7 @@ export interface Notification {
   type: 'achievement' | 'system' | 'goal';
   subtype?: '50-percent' | '100-percent' | 'pr';
   isRead: boolean;
-  icon: any;
+  icon: string; // Use string keys for persistence
   gradient: string;
 }
 
@@ -70,7 +83,12 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
       </div>
 
       <div className="px-1 mb-2">
-        <Button variant="ghost" size="sm" onClick={markAllRead} className="text-[10px] font-black uppercase tracking-widest text-primary hover:bg-primary/5 p-0 h-auto">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={markAllRead} 
+          className="text-[10px] font-black uppercase tracking-widest text-[#08A391] hover:bg-[#08A391]/5 p-0 h-auto"
+        >
           Mark all as read
         </Button>
       </div>
@@ -123,7 +141,7 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
           </div>
         ) : (
           notifications.map((n) => {
-            const Icon = n.icon;
+            const Icon = ICON_MAP[n.icon] || Bell;
             return (
               <Card 
                 key={n.id} 
