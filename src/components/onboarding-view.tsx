@@ -58,10 +58,22 @@ const GraphicalHeaderAnimation = () => {
       {/* Central Pulsating Glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-primary/10 rounded-full blur-[100px] animate-pulse" />
       
-      {/* Rotating Gradient Rings - Center/Full Page focus */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[120vw] border border-primary/5 rounded-full animate-[spin_40s_linear_infinite] opacity-30" />
+      {/* CENTRAL CONCENTRIC RINGS */}
+      {/* Ring 1 - Large Slow Outer */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[120vw] h-[120vw] border border-primary/5 rounded-full animate-[spin_60s_linear_infinite] opacity-30" />
+      
+      {/* Ring 2 - Large Reverse */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[100vw] h-[100vw] border border-primary/10 border-dashed rounded-full animate-[spin_40s_linear_infinite_reverse] opacity-20" />
+      
+      {/* Ring 3 - Mid Counter-Rotate */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vw] border-2 border-primary/5 rounded-full animate-[spin_30s_linear_infinite]" />
+      
+      {/* Ring 4 - Inner Precision Ring */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[40vw] border border-t-primary/20 border-r-transparent border-b-primary/20 border-l-transparent rounded-full animate-[spin_15s_linear_infinite]" />
+
+      {/* PERIPHERAL RINGS */}
       <div className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-80 h-80 border-t-2 border-primary/10 rounded-full animate-[spin_25s_linear_infinite]" />
-      <div className="absolute bottom-1/4 right-1/4 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border-b-2 border-primary/5 rounded-full animate-[spin_30s_linear_infinite_reverse]" />
+      <div className="absolute bottom-1/4 right-1/4 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border-b-2 border-primary/5 rounded-full animate-[spin_35s_linear_infinite_reverse]" />
       
       {/* Floating Particles spread across the whole screen */}
       {[...Array(20)].map((_, i) => (
