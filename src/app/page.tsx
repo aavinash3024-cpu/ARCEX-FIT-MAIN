@@ -391,33 +391,33 @@ export default function PulseFlowApp() {
       return (
         <div className="p-4 space-y-6 animate-pulse">
           {/* Top Banner Skeleton */}
-          <Skeleton className="h-28 w-full rounded-3xl bg-muted/30" />
+          <Skeleton className="h-28 w-full rounded-3xl bg-muted/60" />
           
           {/* Daily Overview Header */}
           <div className="flex justify-between items-center px-1">
-            <Skeleton className="h-6 w-32 bg-muted/20" />
-            <Skeleton className="h-4 w-12 bg-muted/10" />
+            <Skeleton className="h-6 w-32 bg-muted/50" />
+            <Skeleton className="h-4 w-12 bg-muted/40" />
           </div>
 
           {/* Metric Cards Skeleton */}
           <div className="flex gap-4 overflow-hidden">
-            <Skeleton className="h-32 w-[260px] rounded-2xl bg-muted/20 shrink-0" />
-            <Skeleton className="h-32 w-[260px] rounded-2xl bg-muted/20 shrink-0" />
+            <Skeleton className="h-32 w-[260px] rounded-2xl bg-muted/50 shrink-0" />
+            <Skeleton className="h-32 w-[260px] rounded-2xl bg-muted/50 shrink-0" />
           </div>
 
           {/* Macro Card Skeleton */}
-          <Skeleton className="h-40 w-full rounded-3xl bg-muted/30" />
+          <Skeleton className="h-40 w-full rounded-3xl bg-muted/60" />
 
           {/* Task Section Skeleton */}
           <div className="space-y-4">
              <div className="flex justify-between items-center px-1">
-               <Skeleton className="h-5 w-24 bg-muted/20" />
-               <Skeleton className="h-4 w-16 bg-muted/10" />
+               <Skeleton className="h-5 w-24 bg-muted/50" />
+               <Skeleton className="h-4 w-16 bg-muted/40" />
              </div>
              <div className="space-y-3">
-                <Skeleton className="h-14 w-full rounded-2xl bg-muted/15" />
-                <Skeleton className="h-14 w-full rounded-2xl bg-muted/15" />
-                <Skeleton className="h-14 w-full rounded-2xl bg-muted/15" />
+                <Skeleton className="h-14 w-full rounded-2xl bg-muted/40" />
+                <Skeleton className="h-14 w-full rounded-2xl bg-muted/40" />
+                <Skeleton className="h-14 w-full rounded-2xl bg-muted/40" />
              </div>
           </div>
         </div>
