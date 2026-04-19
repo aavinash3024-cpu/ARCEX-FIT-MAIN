@@ -49,7 +49,8 @@ import {
   Sparkles,
   Wifi,
   Timer,
-  Loader2
+  Loader2,
+  Rocket
 } from "lucide-react";
 import { 
   Select,
@@ -74,9 +75,10 @@ import {
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { doc } from 'firebase/firestore';
-import { useFirestore, useUser, useAuth, setDocumentNonBlocking } from '@/firebase';
+import { useFirestore, useUser, useAuth, setDocumentNonBlocking, initiatePasswordReset, initiateAccountDeletion } from '@/firebase';
+import { useToast } from "@/hooks/use-toast";
 
-export type ProfileSubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'reset';
+export type ProfileSubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'reset' | 'help';
 
 interface ProfileViewProps {
   onBack: () => void;
@@ -91,11 +93,13 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
   const firestore = useFirestore();
   const { user } = useUser();
   const auth = useAuth();
+  const { toast } = useToast();
 
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
   const [selectedPlanId, setSelectedPlanId] = useState('yearly');
 
   // Guard for theme/preference initialization to prevent layout shifts/accidental resets
@@ -356,6 +360,80 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
     window.location.reload();
   };
 
+  const handleExportData = () => {
+    if (!user) return;
+    triggerHaptic('success');
+    
+    const uid = user.uid;
+    const data: Record<string, any> = {};
+    for (let i = 0; i < localStorage.length; i++) {
+      const key = localStorage.key(i);
+      if (key?.startsWith(`arcex_${uid}`)) {
+        try {
+          data[key] = JSON.parse(localStorage.getItem(key) || "");
+        } catch {
+          data[key] = localStorage.getItem(key);
+        }
+      }
+    }
+
+    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `arcex_fit_data_${format(new Date(), 'yyyyMMdd')}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    
+    toast({ title: "Data Exported", description: "Your wellness data has been downloaded." });
+  };
+
+  const handleChangePassword = async () => {
+    if (!user || !user.email) return;
+    triggerHaptic('medium');
+    try {
+      await initiatePasswordReset(auth, user.email);
+      toast({ 
+        title: "Reset Link Sent", 
+        description: `Check your inbox (${user.email}) for instructions to update your key.` 
+      });
+    } catch (e) {
+      // Error handled by emitter
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    if (!user) return;
+    setIsDeleting(true);
+    triggerHaptic('warning');
+    
+    try {
+      await initiateAccountDeletion(auth);
+      // Clear local storage for this user
+      const uid = user.uid;
+      for (let i = localStorage.length - 1; i >= 0; i--) {
+        const key = localStorage.key(i);
+        if (key?.startsWith(`arcex_${uid}`)) {
+          localStorage.removeItem(key);
+        }
+      }
+      toast({ title: "Account Deleted", description: "All your data has been removed from our systems." });
+      window.location.reload();
+    } catch (e: any) {
+      if (e.code === 'auth/requires-recent-login') {
+        toast({ 
+          variant: "destructive", 
+          title: "Action Required", 
+          description: "Please log out and log back in before deleting your account for security reasons." 
+        });
+      }
+    } finally {
+      setIsDeleting(false);
+    }
+  };
+
   const renderPersonalInfo = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       <div className="px-1 space-y-4">
@@ -592,6 +670,27 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
     </div>
   );
 
+  const renderHelp = () => (
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1 pt-12 flex flex-col items-center justify-center min-h-[60vh]">
+      <div className="w-24 h-24 bg-primary/10 rounded-full flex items-center justify-center mb-6">
+        <Rocket className="w-12 h-12 text-primary animate-bounce" />
+      </div>
+      <div className="text-center space-y-3">
+        <h2 className="text-2xl font-black uppercase tracking-tighter text-foreground">Coming Soon</h2>
+        <p className="text-xs text-muted-foreground font-bold uppercase tracking-widest max-w-[200px] mx-auto leading-relaxed">
+          Our specialized help center is currently under development. 
+        </p>
+      </div>
+      <Card className="border-none shadow-sm bg-muted/5 rounded-2xl p-6 text-center border border-muted/10 mt-4 max-w-xs">
+         <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-2">EXPECTED RELEASE</p>
+         <p className="text-lg font-black text-foreground">PHASE 2.0</p>
+      </Card>
+      <Button variant="ghost" onClick={onBack} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-8 gap-2">
+        <ChevronLeft className="w-3 h-3" /> Return to Profile
+      </Button>
+    </div>
+  );
+
   const renderSettings = () => (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       <div className="px-1 space-y-3">
@@ -645,6 +744,14 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
             <SettingsButton icon={Zap} label="Health Connect" subLabel="Sync steps from your device" color="text-green-600" bg="bg-green-50" />
+            <SettingsButton 
+              icon={Database} 
+              label="Export Data" 
+              subLabel="Download your wellness history" 
+              color="text-amber-600" 
+              bg="bg-amber-50"
+              onClick={handleExportData}
+            />
           </CardContent>
         </Card>
       </div>
@@ -680,10 +787,52 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Data & Security</h3>
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
-            <SettingsButton icon={Database} label="Export Data" subLabel="Download your wellness history" />
-            <SettingsButton icon={Key} label="Change Password" subLabel="Update security credentials" />
-            <SettingsButton icon={LogOut} label="Logout" subLabel="Sign out of this session" color="text-amber-600" bg="bg-amber-50" onClick={handleLogout} />
-            <SettingsButton icon={Trash2} label="Delete Account" subLabel="Permanently remove all data" color="text-destructive" bg="bg-destructive/5" />
+            <SettingsButton 
+              icon={Key} 
+              label="Change Password" 
+              subLabel="Update security credentials" 
+              color="text-sky-500" 
+              bg="bg-sky-50"
+              onClick={handleChangePassword}
+            />
+            <SettingsButton icon={LogOut} label="Logout" subLabel="Sync and sign out" color="text-amber-600" bg="bg-amber-50" onClick={handleLogout} />
+            
+            <AlertDialog>
+              <AlertDialogTrigger asChild>
+                <button className="w-full p-4 flex items-center justify-between transition-all text-left group last:border-0">
+                  <div className="flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm bg-destructive/5 text-destructive">
+                      <Trash2 className="w-5 h-5" />
+                    </div>
+                    <div className="space-y-0.5">
+                      <span className="text-sm font-bold text-foreground/90 block leading-tight">Delete Account</span>
+                      <span className="text-[10px] font-medium text-muted-foreground">Permanently remove all data</span>
+                    </div>
+                  </div>
+                  <ChevronRight className="w-4 h-4 text-muted-foreground/20 group-hover:text-primary transition-all" />
+                </button>
+              </AlertDialogTrigger>
+              <AlertDialogContent className="rounded-[2.5rem] w-[90%] max-sm border-none shadow-2xl">
+                <AlertDialogHeader>
+                  <AlertDialogTitle className="text-center font-black uppercase tracking-tighter text-xl text-destructive">Purge Profile?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-center text-xs font-medium px-2 leading-relaxed">
+                    This will permanently delete your identity and all wellness history from arcexfit. This action is final.
+                  </AlertDialogDescription>
+                </AlertDialogHeader>
+                <AlertDialogFooter className="flex-col gap-2 sm:flex-col mt-4">
+                  <AlertDialogAction 
+                    onClick={handleDeleteAccount}
+                    disabled={isDeleting}
+                    className="w-full h-12 rounded-2xl bg-destructive hover:bg-destructive/90 text-white font-black uppercase text-[10px] tracking-widest"
+                  >
+                    {isDeleting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Yes, Purge My Data"}
+                  </AlertDialogAction>
+                  <AlertDialogCancel className="w-full h-12 rounded-2xl border-muted/20 font-black uppercase text-[10px] tracking-widest mt-0">
+                    Cancel
+                  </AlertDialogCancel>
+                </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
           </CardContent>
         </Card>
       </div>
@@ -885,7 +1034,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
     {
       title: "Security & Privacy",
       items: [
-        { id: 'help', icon: HelpCircle, label: "Help Center", subLabel: "FAQs and troubleshooting", color: "text-sky-500", bg: "bg-sky-50" },
+        { id: 'profile-help', icon: HelpCircle, label: "Help Center", subLabel: "FAQs and troubleshooting", color: "text-sky-500", bg: "bg-sky-50" },
         { id: 'profile-legal', icon: Shield, label: "Legal", subLabel: "Privacy policy & terms", color: "text-green-500", bg: "bg-green-50" },
       ]
     },
@@ -912,7 +1061,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
            activeView === 'subscription' ? 'Subscription' :
            activeView === 'legal' ? 'Legal' :
            activeView === 'settings' ? 'Settings' : 
-           activeView === 'reset' ? 'Start Fresh' : 'Profile'}
+           activeView === 'reset' ? 'Start Fresh' : 
+           activeView === 'help' ? 'Help' : 'Profile'}
         </h1>
       </div>
 
@@ -922,6 +1072,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
       {activeView === 'legal' && renderLegal()}
       {activeView === 'settings' && renderSettings()}
       {activeView === 'reset' && renderReset()}
+      {activeView === 'help' && renderHelp()}
     </div>
   );
 }

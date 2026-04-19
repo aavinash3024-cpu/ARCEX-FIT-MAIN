@@ -14,15 +14,18 @@ import {
   User, 
   AlertCircle,
   Loader2,
-  CheckCircle2
+  CheckCircle2,
+  KeyRound
 } from 'lucide-react';
 import { AnimatedBackground } from './animated-background';
-import { useAuth, initiateEmailSignIn, initiateEmailSignUp, initiateAnonymousSignIn, errorEmitter } from '@/firebase';
+import { useAuth, initiateEmailSignIn, initiateEmailSignUp, initiateAnonymousSignIn, initiatePasswordReset, errorEmitter } from '@/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { cn } from '@/lib/utils';
+import { useToast } from "@/hooks/use-toast";
 
 export function AuthView() {
   const auth = useAuth();
+  const { toast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -56,6 +59,7 @@ export function AuthView() {
       if (err.code === 'auth/weak-password') message = "Password must be at least 6 characters.";
       if (err.code === 'auth/invalid-credential') message = "Invalid credentials. Please check your details.";
       if (err.code === 'auth/operation-not-allowed') message = "Auth provider not enabled in Firebase Console.";
+      if (err.code === 'auth/too-many-requests') message = "Too many attempts. Try again later.";
       
       setError(message);
     };
@@ -75,6 +79,28 @@ export function AuthView() {
       initiateEmailSignIn(auth, email, password);
     } else {
       initiateEmailSignUp(auth, email, password);
+    }
+  };
+
+  const handleForgotPassword = async () => {
+    if (!email) {
+      setError("Please enter your email first.");
+      return;
+    }
+    if (!auth || isLoading) return;
+    
+    setIsLoading(true);
+    setError(null);
+    try {
+      await initiatePasswordReset(auth, email);
+      toast({
+        title: "Reset Link Sent",
+        description: `A password reset link has been sent to ${email}.`,
+      });
+    } catch (e) {
+      // Error handled by emitter
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -137,7 +163,18 @@ export function AuthView() {
                       </div>
 
                       <div className="space-y-2">
-                        <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest pl-1">Security Key</Label>
+                        <div className="flex justify-between items-center px-1">
+                          <Label className="text-[10px] font-black text-white/40 uppercase tracking-widest">Security Key</Label>
+                          {isLogin && (
+                            <button 
+                              type="button"
+                              onClick={handleForgotPassword}
+                              className="text-[8px] font-black text-primary uppercase tracking-widest hover:opacity-70"
+                            >
+                              Forgot Key?
+                            </button>
+                          )}
+                        </div>
                         <div className="relative">
                           <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-white/20" />
                           <Input 
