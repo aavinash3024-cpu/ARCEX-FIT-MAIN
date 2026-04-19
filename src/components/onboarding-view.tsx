@@ -76,7 +76,7 @@ const GraphicalHeaderAnimation = () => {
       <div className="absolute bottom-1/4 right-1/4 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border-b-2 border-primary/5 rounded-full animate-[spin_35s_linear_infinite_reverse]" />
       
       {/* Floating Particles spread across the whole screen */}
-      {[...Array(20)].map((_, i) => (
+      {[...Array(25)].map((_, i) => (
         <div 
           key={i}
           className="absolute w-1.5 h-1.5 bg-primary/30 rounded-full animate-float"
@@ -225,11 +225,11 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           src={bgImage?.imageUrl || "https://images.unsplash.com/photo-1551288049-bbbda536339a?q=80&w=1200&auto=format&fit=crop"} 
           alt="Background"
           fill
-          className="object-cover opacity-15"
+          className="object-cover opacity-20"
           data-ai-hint="fitness technology"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-[#065A54]/40 via-slate-950/95 to-slate-950" />
+        <div className="absolute inset-0 bg-gradient-to-b from-[#065A54]/70 via-[#065A54]/30 to-slate-950/95" />
       </div>
 
       <GraphicalHeaderAnimation />
@@ -276,7 +276,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                 <p className="text-sm text-white/50">Let's start with the basics</p>
               </div>
               
-              <Card className="border-white/5 bg-white/[0.04] backdrop-blur-3xl shadow-xl rounded-2xl overflow-hidden">
+              <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
                 <CardContent className="p-8 space-y-8">
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-white/70 pl-1">Full Name</Label>
@@ -325,7 +325,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                 <p className="text-sm text-white/50">Details used for metabolic calculations</p>
               </div>
 
-              <Card className="border-white/5 bg-white/[0.04] backdrop-blur-3xl shadow-xl rounded-2xl overflow-hidden">
+              <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
                 <CardContent className="p-8 space-y-8">
                   <div className="grid grid-cols-2 gap-6">
                     <div className="space-y-2">
@@ -391,7 +391,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                 ))}
               </div>
 
-              <Card className="border-white/5 bg-white/[0.04] backdrop-blur-3xl shadow-xl rounded-2xl overflow-hidden">
+              <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
                 <CardContent className="p-8 space-y-10">
                   <div className="space-y-4">
                     <Label className="text-xs font-semibold text-white/70 text-center block">Target Weight (kg)</Label>
@@ -446,7 +446,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                 <p className="text-sm text-white/50">Your customized nutritional strategy</p>
               </div>
 
-              <Card className="border-white/5 bg-white/[0.04] backdrop-blur-3xl shadow-xl rounded-2xl overflow-hidden">
+              <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
                 <CardContent className="p-8 space-y-12">
                   <div className="bg-white/[0.02] p-8 rounded-2xl text-center border border-white/5 shadow-inner">
                     <p className="text-xs font-semibold text-primary/70 mb-2">Target Calories</p>
@@ -493,7 +493,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                 <p className="text-sm text-white/50">Confirm your setup to begin</p>
               </div>
 
-              <Card className="border-white/5 bg-white/[0.04] backdrop-blur-3xl shadow-xl rounded-2xl overflow-hidden">
+              <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
                 <CardContent className="p-8 space-y-10">
                   <div className="grid grid-cols-2 gap-4">
                     <div className="bg-white/[0.02] p-6 rounded-xl border border-white/5">
