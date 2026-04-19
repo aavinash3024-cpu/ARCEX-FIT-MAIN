@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -73,7 +74,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { cn } from "@/lib/utils";
 import { doc } from 'firebase/firestore';
-import { useFirestore, useUser, setDocumentNonBlocking } from '@/firebase';
+import { useFirestore, useUser, useAuth, setDocumentNonBlocking } from '@/firebase';
 
 export type ProfileSubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'reset';
 
@@ -87,6 +88,7 @@ interface ProfileViewProps {
 export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSplash }: ProfileViewProps) {
   const { firestore } = useFirestore();
   const { user } = useUser();
+  const { auth } = useAuth();
 
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
@@ -268,6 +270,13 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
       setIsSaving(false);
       onBack();
     }, 800);
+  };
+
+  const handleLogout = async () => {
+    if (auth) {
+      await auth.signOut();
+      window.location.reload();
+    }
   };
 
   const handleResetApp = () => {
@@ -633,7 +642,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
           <CardContent className="p-0">
             <SettingsButton icon={Database} label="Export Data" subLabel="Download your wellness history" />
             <SettingsButton icon={Key} label="Change Password" subLabel="Update security credentials" />
-            <SettingsButton icon={LogOut} label="Logout" subLabel="Sign out of this session" color="text-amber-600" bg="bg-amber-50" />
+            <SettingsButton icon={LogOut} label="Logout" subLabel="Sign out of this session" color="text-amber-600" bg="bg-amber-50" onClick={handleLogout} />
             <SettingsButton icon={Trash2} label="Delete Account" subLabel="Permanently remove all data" color="text-destructive" bg="bg-destructive/5" />
           </CardContent>
         </Card>
@@ -785,7 +794,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
                     key={i} 
                     onClick={() => {
                       triggerHaptic('light');
-                      onNavigate(item.id);
+                      if (item.onClick) item.onClick();
+                      else onNavigate(item.id);
                     }}
                     className="w-full p-4 flex items-center justify-between transition-all text-left group border-b border-muted/5 last:border-0"
                   >
@@ -831,7 +841,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
       title: "App Settings",
       items: [
         { id: 'profile-settings', icon: Settings, label: "Settings", subLabel: "Units and app preferences", color: "text-slate-500", bg: "bg-slate-50" },
-        { id: 'rate', icon: Star, label: "Rate the App", subLabel: "Share your feedback", color: "text-amber-500", bg: "bg-amber-50" },
+        { id: 'logout', icon: LogOut, label: "Logout", subLabel: "End current session", color: "text-amber-600", bg: "bg-amber-50", onClick: handleLogout },
       ]
     }
   ];

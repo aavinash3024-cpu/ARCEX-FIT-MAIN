@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -29,12 +30,13 @@ import { GoalSettingView } from '@/components/goal-setting-view';
 import { ProfileView } from '@/components/profile-view';
 import { GuideView } from '@/components/guide-view';
 import { OnboardingView } from '@/components/onboarding-view';
+import { AuthView } from '@/components/auth-view';
 import { SplashScreen } from '@/components/splash-screen';
 import { NotificationsView, type Notification } from '@/components/notifications-view';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, isYesterday, isSameDay, subHours, subDays } from 'date-fns';
-import { useAuth, useUser, initiateAnonymousSignIn } from '@/firebase';
+import { useAuth, useUser } from '@/firebase';
 import { cn } from '@/lib/utils';
 
 export default function PulseFlowApp() {
@@ -79,13 +81,6 @@ export default function PulseFlowApp() {
     }, 2500);
     return () => clearTimeout(timer);
   }, []);
-
-  // Initialize Anonymous Auth
-  useEffect(() => {
-    if (!isUserLoading && !user && auth) {
-      initiateAnonymousSignIn(auth);
-    }
-  }, [user, isUserLoading, auth]);
 
   useEffect(() => {
     if (mainRef.current) {
@@ -400,7 +395,7 @@ export default function PulseFlowApp() {
       return <SplashScreen />;
     }
 
-    if (!isLoaded || isUserLoading) {
+    if (isUserLoading) {
       return (
         <div className="p-4 space-y-6 animate-pulse">
           <Skeleton className="h-28 w-full rounded-3xl bg-muted/60" />
@@ -413,19 +408,12 @@ export default function PulseFlowApp() {
             <Skeleton className="h-32 w-[260px] rounded-2xl bg-muted/50 shrink-0" />
           </div>
           <Skeleton className="h-40 w-full rounded-3xl bg-muted/60" />
-          <div className="space-y-4">
-             <div className="flex justify-between items-center px-1">
-               <Skeleton className="h-5 w-24 bg-muted/50" />
-               <Skeleton className="h-4 w-16 bg-muted/40" />
-             </div>
-             <div className="space-y-3">
-                <Skeleton className="h-14 w-full rounded-2xl bg-muted/40" />
-                <Skeleton className="h-14 w-full rounded-2xl bg-muted/40" />
-                <Skeleton className="h-14 w-full rounded-2xl bg-muted/40" />
-             </div>
-          </div>
         </div>
       );
+    }
+
+    if (!user) {
+      return <AuthView />;
     }
 
     if (showOnboarding) {
@@ -537,34 +525,36 @@ export default function PulseFlowApp() {
         </defs>
       </svg>
 
-      <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b relative">
-        <button onClick={() => navigateTo('profile')} className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center">
-          <User className="w-4 h-4 text-foreground" />
-        </button>
-        <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none">
-          <span className="font-black text-xl tracking-tighter">arcex</span>
-          <span className="font-black text-xl tracking-tighter bg-gradient-to-br from-[#4ade80] via-[#2dd4bf] to-[#3b82f6] bg-clip-text text-transparent">fit</span>
-        </div>
-        <div className="flex gap-2">
-          <button onClick={() => navigateTo('profile-subscription')} className="rounded-full bg-muted/50 w-9 h-9 flex items-center justify-center">
-            <Crown className="w-4 h-4 text-amber-500" />
+      {user && !showOnboarding && !showSplash && (
+        <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b relative">
+          <button onClick={() => navigateTo('profile')} className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center">
+            <User className="w-4 h-4 text-foreground" />
           </button>
-          <button onClick={() => navigateTo('notifications')} className="rounded-full bg-muted/50 w-9 h-9 relative flex items-center justify-center">
-            <Bell className="w-4 h-4 text-foreground" />
-            {unreadCount > 0 && (
-              <span className="absolute -top-1 -right-1 bg-destructive text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-background">
-                {unreadCount > 99 ? '99+' : unreadCount}
-              </span>
-            )}
-          </button>
-        </div>
-      </header>
+          <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none">
+            <span className="font-black text-xl tracking-tighter">arcex</span>
+            <span className="font-black text-xl tracking-tighter bg-gradient-to-br from-[#4ade80] via-[#2dd4bf] to-[#3b82f6] bg-clip-text text-transparent">fit</span>
+          </div>
+          <div className="flex gap-2">
+            <button onClick={() => navigateTo('profile-subscription')} className="rounded-full bg-muted/50 w-9 h-9 flex items-center justify-center">
+              <Crown className="w-4 h-4 text-amber-500" />
+            </button>
+            <button onClick={() => navigateTo('notifications')} className="rounded-full bg-muted/50 w-9 h-9 relative flex items-center justify-center">
+              <Bell className="w-4 h-4 text-foreground" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-destructive text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-background">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+          </div>
+        </header>
+      )}
 
       <main ref={mainRef} id="main-scroll-container" className="flex-1 px-4 overflow-y-auto swipe-container">
         {renderContent()}
       </main>
 
-      {!showOnboarding && !showSplash && (
+      {user && !showOnboarding && !showSplash && (
         <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card/90 backdrop-blur-xl border-t px-4 py-3 flex justify-between items-center z-50">
           {[
             { id: 'dashboard', icon: LayoutDashboard, label: 'Home' },
