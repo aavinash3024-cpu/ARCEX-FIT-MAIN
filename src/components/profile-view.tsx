@@ -382,14 +382,12 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   const renderSubscription = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1 pb-24">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
       {/* CREDIT CARD STYLE STATUS CARD */}
       <div className="px-1">
         <div className="relative w-full h-52 rounded-[1.75rem] overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] active:scale-[0.98]">
-          {/* Main Gradient Background */}
           <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] via-[#2d3436] to-[#0f172a]" />
           
-          {/* Decorative Gloss & Accents */}
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none" />
           <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-[60px] -ml-24 -mb-24 pointer-events-none" />
           
@@ -399,12 +397,12 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-emerald-400 p-[1.5px]">
                     <div className="w-full h-full rounded-[7px] bg-black/40 backdrop-blur-sm flex items-center justify-center">
-                      <Crown className="w-4 h-4 text-white" />
+                      <Activity className="w-4 h-4 text-white" />
                     </div>
                   </div>
-                  <span className="font-black text-sm uppercase tracking-tighter italic">PulseFlow <span className="text-primary">Elite</span></span>
+                  <span className="font-black text-sm uppercase tracking-tighter italic">ARCEX <span className="text-primary">FIT</span></span>
                 </div>
-                <p className="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] pl-0.5">ESTABLISHED 2024</p>
+                <p className="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] pl-0.5">UPGRADE YOUR LIFESTYLE</p>
               </div>
               <Wifi className="w-5 h-5 text-white/20 rotate-90" />
             </div>
@@ -442,19 +440,19 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
       </div>
 
       <div className="space-y-2 px-3 pt-4">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Tier Intelligence</h3>
+        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Tier Comparison</h3>
         <p className="text-sm font-bold text-foreground/80">Swipe to compare strategy features.</p>
       </div>
 
       {/* FEATURES SLIDER */}
       <div className="px-1">
         <Carousel className="w-full">
-          <CarouselContent className="-ml-2">
+          <CarouselContent className="ml-0">
             {/* PREMIUM CARD */}
-            <CarouselItem className="pl-2 basis-[92%]">
+            <CarouselItem className="pl-0 basis-full px-1">
               <Card className="border-none bg-gradient-to-br from-card to-muted/20 rounded-[2rem] border border-muted/10 shadow-xl overflow-hidden relative h-full">
                 <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
-                  <Crown className="w-32 h-32 text-primary" />
+                  <Activity className="w-32 h-32 text-primary" />
                 </div>
                 <CardContent className="p-6 space-y-6">
                   <div className="flex items-center justify-between">
@@ -471,9 +469,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                     {[
                       { label: 'Workout Strength Growth Analytics', icon: TrendingUp },
                       { label: 'Advanced Workout Split Analysis', icon: Layout },
-                      { label: 'AI Meal Logging (Unlimited)', icon: UtensilsCrossed },
+                      { label: 'AI Meal Logging (20 Credits/Day)', icon: UtensilsCrossed },
                       { label: 'Full Nutrient Breakdown History', icon: BarChart3 },
-                      { label: 'PERSONAL AI PROGRESS ANALYSIS', icon: Sparkles, highlight: true }
+                      { label: 'UNLIMITED PERSONAL AI ANALYSIS', icon: Sparkles, highlight: true }
                     ].map((item, i) => (
                       <div key={i} className={cn("flex items-start gap-3", item.highlight && "bg-primary/10 p-2.5 -mx-2 rounded-xl border border-primary/10")}>
                         <div className="mt-0.5">
@@ -497,7 +495,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
             </CarouselItem>
 
             {/* FREE CARD */}
-            <CarouselItem className="pl-2 basis-[92%]">
+            <CarouselItem className="pl-0 basis-full px-1">
               <Card className="border-none bg-card rounded-[2rem] border border-muted/10 shadow-sm overflow-hidden h-full">
                 <CardContent className="p-6 space-y-6">
                   <div className="flex items-center gap-2">
@@ -532,8 +530,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
       </div>
 
       {/* COMMITMENT PLANS */}
-      <div className="space-y-4 pt-4 px-1 pb-12">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Elite Commitment Plans</h3>
+      <div className="space-y-4 pt-4 px-1">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">See Subscription Plans</h3>
         
         <div className="grid gap-3">
           {[
