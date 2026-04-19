@@ -76,8 +76,7 @@ const GraphicalHeaderAnimation = () => {
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] h-[70vw] border-2 border-primary/5 rounded-full animate-[spin_30s_linear_infinite]" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[40vw] h-[40vw] border border-t-primary/20 border-r-transparent border-b-primary/20 border-l-transparent rounded-full animate-[spin_15s_linear_infinite]" />
 
-      {/* Peripheral Rings */}
-      <div className="absolute top-1/3 left-1/4 -translate-x-1/2 -translate-y-1/2 w-80 h-80 border-t-2 border-primary/10 rounded-full animate-[spin_25s_linear_infinite]" />
+      {/* Peripheral Rings - Bottom Right Only */}
       <div className="absolute bottom-1/4 right-1/4 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] border-b-2 border-primary/5 rounded-full animate-[spin_35s_linear_infinite_reverse]" />
       
       {/* Floating Particles */}
@@ -94,16 +93,7 @@ const GraphicalHeaderAnimation = () => {
         />
       ))}
 
-      {/* Full height Scanning Line Effect */}
-      <div className="absolute left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-[scan_8s_ease-in-out_infinite]" />
-
       <style jsx>{`
-        @keyframes scan {
-          0% { transform: translateY(0); opacity: 0; }
-          10% { opacity: 1; }
-          90% { opacity: 1; }
-          100% { transform: translateY(100vh); opacity: 0; }
-        }
         @keyframes float {
           0%, 100% { transform: translate(0, 0); }
           50% { transform: translate(30px, 30px); }
