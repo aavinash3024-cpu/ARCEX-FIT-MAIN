@@ -22,7 +22,8 @@ import {
   ArrowRight,
   PieChart,
   Settings2,
-  Check
+  Check,
+  MapPin
 } from "lucide-react";
 import { 
   Select,
@@ -50,6 +51,40 @@ const MACRO_COLORS = {
   carbs: "#42A5F5",
   fat: "#FF7043",
   fiber: "#10b981"
+};
+
+const INDIAN_STATES = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh", "Goa", "Gujarat", "Haryana", 
+  "Himachal Pradesh", "Jharkhand", "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur", 
+  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab", "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", 
+  "Tripura", "Uttar Pradesh", "Uttarakhand", "West Bengal", "Andaman and Nicobar Islands", "Chandigarh", 
+  "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
+].sort();
+
+const STATE_DISTRICTS: Record<string, string[]> = {
+  "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Aurangabad"],
+  "Delhi": ["New Delhi", "North Delhi", "South Delhi", "East Delhi", "West Delhi"],
+  "Karnataka": ["Bengaluru", "Mysuru", "Hubballi", "Mangaluru", "Belagavi"],
+  "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Salem", "Tiruchirappalli"],
+  "Uttar Pradesh": ["Lucknow", "Kanpur", "Noida", "Agra", "Varanasi", "Ghaziabad"],
+  "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Gandhinagar"],
+  "West Bengal": ["Kolkata", "Howrah", "Asansol", "Siliguri", "Durgapur"],
+  "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Kota", "Ajmer"],
+  "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Khammam"],
+  "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kollam"],
+  "Punjab": ["Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Mohali"],
+  "Haryana": ["Gurugram", "Faridabad", "Panipat", "Ambala", "Panchkula"],
+  "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur"],
+  "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur", "Ujjain"],
+  "Assam": ["Guwahati", "Dibrugarh", "Silchar", "Jorhat"],
+  "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur"],
+  "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Nellore", "Tirupati"],
+  "Goa": ["North Goa", "South Goa", "Panaji"],
+  "Uttarakhand": ["Dehradun", "Haridwar", "Nainital", "Rishikesh"],
+  "Himachal Pradesh": ["Shimla", "Dharamshala", "Manali", "Solan"],
+  "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro"],
+  "Chhattisgarh": ["Raipur", "Bhilai", "Bilaspur"],
+  "Jammu and Kashmir": ["Srinagar", "Jammu", "Anantnag"],
 };
 
 /**
@@ -112,6 +147,8 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
   const [name, setName] = useState("");
   const [age, setAge] = useState("25");
   const [gender, setGender] = useState<'male' | 'female'>('male');
+  const [userState, setUserState] = useState("");
+  const [district, setDistrict] = useState("");
 
   // Step 2: Body Status
   const [weight, setWeight] = useState("75");
@@ -185,7 +222,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
   }, [weight, height, age, gender, activity, objective, targetWeight, calAdj, protAdj, carbRatio]);
 
   const handleNext = () => {
-    if (step === 1 && !name.trim()) return;
+    if (step === 1 && (!name.trim() || !userState || !district)) return;
     if (step === 3 && !calculations.isWeightValid) return;
     
     if (step === 3) {
@@ -203,7 +240,12 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
         ...calculations
       };
       localStorage.setItem('pulseflow_goal_data', JSON.stringify(dataToSave));
-      localStorage.setItem('pulseflow_user_profile', JSON.stringify({ name, email: `${name.toLowerCase().replace(/\s/g, '.')}@pulseflow.ai`, dob: "1998-05-15", location: "Global" }));
+      localStorage.setItem('pulseflow_user_profile', JSON.stringify({ 
+        name, 
+        email: `${name.toLowerCase().replace(/\s/g, '.')}@pulseflow.ai`, 
+        dob: "1998-05-15", 
+        location: `${district}, ${userState}` 
+      }));
       onComplete();
     } else {
       setStep(step + 1);
@@ -211,6 +253,11 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
   };
 
   const bgImage = PlaceHolderImages.find(img => img.id === 'analyzer-bg');
+
+  const districtList = useMemo(() => {
+    if (!userState) return [];
+    return STATE_DISTRICTS[userState] || ["Other"];
+  }, [userState]);
 
   if (!isLoaded) return null;
 
@@ -273,7 +320,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
               </div>
               
               <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
-                <CardContent className="p-8 space-y-8">
+                <CardContent className="p-6 space-y-6">
                   <div className="space-y-2">
                     <Label className="text-xs font-semibold text-white/70 pl-1">Full Name</Label>
                     <div className="relative group">
@@ -282,24 +329,25 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                         placeholder="Alex Johnson"
                         value={name} 
                         onChange={(e) => setName(e.target.value)}
-                        className="pl-12 h-14 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium focus:ring-primary/20 placeholder:text-white/10"
+                        className="pl-12 h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium focus:ring-primary/20 placeholder:text-white/10"
                       />
                     </div>
                   </div>
-                  <div className="grid grid-cols-2 gap-6">
+
+                  <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
                       <Label className="text-xs font-semibold text-white/70 pl-1">Age</Label>
                       <Input 
                         type="number"
                         value={age} 
                         onChange={(e) => setAge(e.target.value)}
-                        className="h-14 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium text-center"
+                        className="h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium text-center"
                       />
                     </div>
                     <div className="space-y-2">
                       <Label className="text-xs font-semibold text-white/70 pl-1">Sex</Label>
                       <Select value={gender} onValueChange={(val: 'male' | 'female') => setGender(val)}>
-                        <SelectTrigger className="h-14 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
+                        <SelectTrigger className="h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
                           <SelectValue placeholder="Select" />
                         </SelectTrigger>
                         <SelectContent className="z-[200] rounded-xl bg-slate-900 border-white/10 text-white">
@@ -307,6 +355,43 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                           <SelectItem value="female">Female</SelectItem>
                         </SelectContent>
                       </Select>
+                    </div>
+                  </div>
+
+                  <div className="space-y-4 pt-2 border-t border-white/5">
+                    <div className="flex items-center gap-2 mb-1">
+                      <MapPin className="w-3.5 h-3.5 text-primary" />
+                      <span className="text-[10px] font-black uppercase tracking-widest text-white/40">Your Location</span>
+                    </div>
+                    
+                    <div className="space-y-4">
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-semibold text-white/60 pl-1 uppercase">State</Label>
+                        <Select value={userState} onValueChange={(val) => { setUserState(val); setDistrict(""); }}>
+                          <SelectTrigger className="h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
+                            <SelectValue placeholder="Select State" />
+                          </SelectTrigger>
+                          <SelectContent className="z-[200] rounded-xl bg-slate-900 border-white/10 text-white max-h-[250px]">
+                            {INDIAN_STATES.map(s => (
+                              <SelectItem key={s} value={s}>{s}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label className="text-[10px] font-semibold text-white/60 pl-1 uppercase">District</Label>
+                        <Select value={district} onValueChange={setDistrict} disabled={!userState}>
+                          <SelectTrigger className="h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
+                            <SelectValue placeholder={userState ? "Select District" : "Choose state first"} />
+                          </SelectTrigger>
+                          <SelectContent className="z-[200] rounded-xl bg-slate-900 border-white/10 text-white max-h-[250px]">
+                            {districtList.map(d => (
+                              <SelectItem key={d} value={d}>{d}</SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
                     </div>
                   </div>
                 </CardContent>
@@ -505,8 +590,8 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           {step === 5 && (
             <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 space-y-6">
               <div className="px-2 text-center space-y-1">
-                <h2 className="text-2xl font-bold text-white">Final Confirmation</h2>
-                <p className="text-sm text-white/50">Confirm your strategy to begin</p>
+                <h2 className="text-2xl font-bold text-white">Everything's Ready</h2>
+                <p className="text-sm text-white/50">Check your plan one last time</p>
               </div>
 
               <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-2xl overflow-hidden">
@@ -582,7 +667,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                       </div>
                       <div className="space-y-1">
                         <h3 className="text-sm font-black text-white uppercase tracking-[0.2em]">Your Profile is Ready</h3>
-                        <p className="text-[10px] text-white/40 font-bold uppercase tracking-tight">Initialization Complete</p>
+                        <p className="text-[10px] text-white/40 font-bold uppercase tracking-tight">Setup Finished</p>
                       </div>
                     </div>
                   </div>
@@ -605,7 +690,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           )}
           <Button 
             onClick={handleNext}
-            disabled={step === 1 && !name.trim()}
+            disabled={step === 1 && (!name.trim() || !userState || !district)}
             className="flex-[2] h-14 rounded-xl bg-primary text-slate-950 font-bold shadow-xl gap-2 active:scale-95 transition-all"
           >
             {step === 5 ? "Launch arcexfit" : "Next Step"}
