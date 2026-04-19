@@ -32,6 +32,7 @@ import { GuideView } from '@/components/guide-view';
 import { OnboardingView } from '@/components/onboarding-view';
 import { NotificationsView, type Notification } from '@/components/notifications-view';
 import { Button } from '@/components/ui/button';
+import { Skeleton } from '@/components/ui/skeleton';
 import { format, isYesterday, isSameDay, subHours, subDays } from 'date-fns';
 import { useAuth, useUser, initiateAnonymousSignIn } from '@/firebase';
 import { cn } from '@/lib/utils';
@@ -388,9 +389,37 @@ export default function PulseFlowApp() {
   const renderContent = () => {
     if (!isLoaded || isUserLoading) {
       return (
-        <div className="flex-1 flex flex-col items-center justify-center space-y-4 opacity-40">
-          <Loader2 className="w-8 h-8 animate-spin text-primary" />
-          <p className="text-[10px] font-black uppercase tracking-[0.2em]">Initializing Cloud Flow...</p>
+        <div className="p-4 space-y-6 animate-pulse">
+          {/* Top Banner Skeleton */}
+          <Skeleton className="h-28 w-full rounded-3xl bg-muted/30" />
+          
+          {/* Daily Overview Header */}
+          <div className="flex justify-between items-center px-1">
+            <Skeleton className="h-6 w-32 bg-muted/20" />
+            <Skeleton className="h-4 w-12 bg-muted/10" />
+          </div>
+
+          {/* Metric Cards Skeleton */}
+          <div className="flex gap-4 overflow-hidden">
+            <Skeleton className="h-32 w-[260px] rounded-2xl bg-muted/20 shrink-0" />
+            <Skeleton className="h-32 w-[260px] rounded-2xl bg-muted/20 shrink-0" />
+          </div>
+
+          {/* Macro Card Skeleton */}
+          <Skeleton className="h-40 w-full rounded-3xl bg-muted/30" />
+
+          {/* Task Section Skeleton */}
+          <div className="space-y-4">
+             <div className="flex justify-between items-center px-1">
+               <Skeleton className="h-5 w-24 bg-muted/20" />
+               <Skeleton className="h-4 w-16 bg-muted/10" />
+             </div>
+             <div className="space-y-3">
+                <Skeleton className="h-14 w-full rounded-2xl bg-muted/15" />
+                <Skeleton className="h-14 w-full rounded-2xl bg-muted/15" />
+                <Skeleton className="h-14 w-full rounded-2xl bg-muted/15" />
+             </div>
+          </div>
         </div>
       );
     }
@@ -554,4 +583,3 @@ export default function PulseFlowApp() {
     </div>
   );
 }
-

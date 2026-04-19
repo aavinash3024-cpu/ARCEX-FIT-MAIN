@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -35,8 +36,6 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
-import Image from "next/image";
-import { PlaceHolderImages } from "@/lib/placeholder-images";
 
 type Objective = 'maintain' | 'gain' | 'loss';
 type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'extreme';
@@ -215,21 +214,11 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
     }
   };
 
-  const bgImage = PlaceHolderImages.find(img => img.id === 'analyzer-bg');
-
   if (!isLoaded) return null;
 
   return (
     <div className="fixed inset-0 z-[100] flex flex-col bg-slate-950 overflow-hidden font-sans">
       <div className="absolute inset-0 z-0">
-        <Image 
-          src={bgImage?.imageUrl || "https://images.unsplash.com/photo-1551288049-bbbda536339a?q=80&w=1200&auto=format&fit=crop"} 
-          alt="" 
-          fill
-          className="object-cover opacity-20"
-          data-ai-hint="fitness technology"
-          priority
-        />
         <div className="absolute inset-0 bg-gradient-to-b from-[#065A54]/70 via-[#065A54]/30 to-slate-950/95" />
       </div>
 
