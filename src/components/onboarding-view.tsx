@@ -49,6 +49,52 @@ const MACRO_COLORS = {
   fiber: "#10b981"
 };
 
+/**
+ * Highly graphical continuous animation component for the header.
+ */
+const GraphicalHeaderAnimation = () => {
+  return (
+    <div className="absolute top-0 left-0 right-0 h-64 overflow-hidden pointer-events-none z-0">
+      {/* Central Pulsating Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-32 h-32 bg-primary/20 rounded-full blur-3xl animate-pulse" />
+      
+      {/* Rotating Gradient Rings */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-48 border border-primary/10 rounded-full animate-[spin_10s_linear_infinite]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-56 h-56 border-t-2 border-primary/20 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 border-b-2 border-primary/5 rounded-full animate-[spin_20s_linear_infinite]" />
+      
+      {/* Floating Particles */}
+      {[...Array(12)].map((_, i) => (
+        <div 
+          key={i}
+          className="absolute w-1 h-1 bg-primary/40 rounded-full animate-float"
+          style={{
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            animationDelay: `${Math.random() * 5}s`,
+            animationDuration: `${3 + Math.random() * 7}s`
+          }}
+        />
+      ))}
+
+      {/* Scanning Line Effect */}
+      <div className="absolute top-0 left-0 right-0 h-[1px] bg-gradient-to-r from-transparent via-primary/30 to-transparent animate-[scan_4s_ease-in-out_infinite]" />
+
+      <style jsx>{`
+        @keyframes scan {
+          0% { transform: translateY(0); opacity: 0; }
+          50% { opacity: 1; }
+          100% { transform: translateY(256px); opacity: 0; }
+        }
+        @keyframes float {
+          0%, 100% { transform: translate(0, 0); }
+          50% { transform: translate(${Math.random() * 20}px, ${Math.random() * 20}px); }
+        }
+      `}</style>
+    </div>
+  );
+};
+
 export function OnboardingView({ onComplete }: OnboardingViewProps) {
   const [step, setStep] = useState(1);
   const [isLoaded, setIsLoaded] = useState(false);
@@ -173,6 +219,8 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
         <div className="absolute inset-0 bg-gradient-to-b from-[#065A54]/40 via-slate-950/95 to-slate-950" />
       </div>
 
+      <GraphicalHeaderAnimation />
+
       <div className="relative z-10 flex flex-col h-full">
         {/* Step Header */}
         <div className="px-8 pt-12 pb-8 flex flex-col items-center gap-4 shrink-0">
@@ -183,8 +231,8 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
               return (
                 <div key={i} className="flex-1 flex flex-col gap-2">
                    <div className={cn(
-                     "h-1 w-full rounded-full transition-all duration-500", 
-                     isCompleted ? "bg-primary/60" : isActive ? "bg-primary shadow-[0_0_10px_rgba(74,222,128,0.3)]" : "bg-white/10"
+                     "h-1.5 w-full rounded-full transition-all duration-500", 
+                     isCompleted ? "bg-primary/60" : isActive ? "bg-primary shadow-[0_0_15px_rgba(74,222,128,0.5)]" : "bg-white/10"
                    )} />
                    <p className={cn(
                      "text-[10px] font-bold text-center transition-all duration-500",
@@ -359,7 +407,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                             "h-7 text-[10px] font-bold transition-all px-3 rounded-full",
                             weeklyRate === rate ? "border-primary text-primary" : "border-white/10 text-white/20"
                           )}>
-                            {(calculations.weightDiff / rate).toFixed(1)} weeks
+                            {(calculations.weightDiff / rate).toFixed(1) === "Infinity" ? "0" : (calculations.weightDiff / rate).toFixed(1)} weeks
                           </Badge>
                         </button>
                       ))}
