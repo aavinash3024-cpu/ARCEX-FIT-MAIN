@@ -271,7 +271,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
       'pulseflow_streak_v3',
       'pulseflow_last_reset_date',
       'pulseflow_sent_milestones',
-      'pulseflow_notifications_data_v2'
+      'pulseflow_notifications_data_v2',
+      'pulseflow_onboarding_complete'
     ];
 
     keysToRemove.forEach(key => localStorage.removeItem(key));
@@ -280,6 +281,12 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
       setIsResetting(false);
       window.location.reload();
     }, 1500);
+  };
+
+  const handleRestartOnboarding = () => {
+    triggerHaptic('medium');
+    localStorage.removeItem('pulseflow_onboarding_complete');
+    window.location.reload();
   };
 
   const renderPersonalInfo = () => (
@@ -324,7 +331,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Sex</Label>
-                <Select value={profileGender} onValueChange={setProfileGender}>
+                <Select value={profileGender} onValueChange={profileGender}>
                   <SelectTrigger className="h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs">
                     <SelectValue />
                   </SelectTrigger>
@@ -440,8 +447,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 { label: 'Strength Growth', desc: 'Detailed power progress trends.', icon: TrendingUp, colors: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)' },
                 { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' },
                 { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
-                { label: 'Skin-Based Micro Tracking', desc: 'Track micronutrients optimized for skin clarity and health.', icon: HeartPulse, colors: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' },
-                { label: 'Recovery-Based Macro Tracking', desc: 'Advanced tracking of macronutrients vital for efficient muscle recovery.', icon: Zap, colors: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
+                { label: 'Skin-Based Micro Tracking', desc: 'Track micronutrients optimized for skin health and clarity.', icon: HeartPulse, colors: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' },
+                { label: 'Recovery-Based Macro Tracking', desc: 'Track macronutrients vital for muscle repair and recovery.', icon: Zap, colors: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
                 { label: 'Intake Reports', desc: 'Daily, Weekly, Monthly history.', icon: BarChart3, colors: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' },
                 { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED progress insights.', icon: Sparkles, colors: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', highlight: true }
               ].map((item, i) => (
@@ -567,6 +574,22 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
             <SettingsButton icon={Zap} label="Health Connect" subLabel="Sync steps from your device" color="text-green-600" bg="bg-green-50" />
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="px-1 space-y-3">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Testing & Development</h3>
+        <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
+          <CardContent className="p-0">
+            <SettingsButton 
+              icon={RefreshCw} 
+              label="Restart Setup Process" 
+              subLabel="Re-run the compulsory onboarding" 
+              color="text-amber-500" 
+              bg="bg-amber-50"
+              onClick={handleRestartOnboarding}
+            />
           </CardContent>
         </Card>
       </div>
@@ -822,9 +845,9 @@ function LegalItem({ icon: Icon, label, color, bg }: { icon: any, label: string,
   );
 }
 
-function SettingsButton({ icon: Icon, label, subLabel, color, bg }: { icon: any, label: string, subLabel: string, color?: string, bg?: string }) {
+function SettingsButton({ icon: Icon, label, subLabel, color, bg, onClick }: { icon: any, label: string, subLabel: string, color?: string, bg?: string, onClick?: () => void }) {
   return (
-    <button className="w-full p-4 flex items-center justify-between transition-all text-left group border-b border-muted/5 last:border-0">
+    <button onClick={onClick} className="w-full p-4 flex items-center justify-between transition-all text-left group border-b border-muted/5 last:border-0">
       <div className="flex items-center gap-4">
         <div className={cn("w-10 h-10 rounded-2xl flex items-center justify-center shadow-sm", bg || "bg-muted/30", color || "text-muted-foreground")}>
           <Icon className="w-5 h-5" />
@@ -863,3 +886,4 @@ function SettingsSwitch({ icon: Icon, label, subLabel, color, bg, checked, onChe
     </div>
   );
 }
+

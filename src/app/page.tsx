@@ -29,6 +29,7 @@ import { CalculatorsView } from '@/components/calculators-view';
 import { GoalSettingView } from '@/components/goal-setting-view';
 import { ProfileView } from '@/components/profile-view';
 import { GuideView } from '@/components/guide-view';
+import { OnboardingView } from '@/components/onboarding-view';
 import { NotificationsView, type Notification } from '@/components/notifications-view';
 import { Button } from '@/components/ui/button';
 import { format, isYesterday, isSameDay, subHours, subDays } from 'date-fns';
@@ -54,6 +55,7 @@ export default function PulseFlowApp() {
   const [sentMilestones, setSentMilestones] = useState<Record<string, string[]>>({});
   
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
 
   const triggerHaptic = (type: 'light' | 'medium' | 'success' | 'warning' = 'light') => {
@@ -147,6 +149,11 @@ export default function PulseFlowApp() {
       document.documentElement.classList.remove('dark');
     }
 
+    const onboardingComplete = localStorage.getItem('pulseflow_onboarding_complete') === 'true';
+    if (!onboardingComplete) {
+      setShowOnboarding(true);
+    }
+
     const isNewDay = lastResetDate !== todayStr;
 
     const savedTasks = localStorage.getItem('pulseflow_tasks');
@@ -238,6 +245,12 @@ export default function PulseFlowApp() {
     }
     setIsLoaded(true);
   }, []);
+
+  const handleOnboardingComplete = () => {
+    localStorage.setItem('pulseflow_onboarding_complete', 'true');
+    setGoalData(JSON.parse(localStorage.getItem('pulseflow_goal_data') || '{}'));
+    setShowOnboarding(false);
+  };
 
   // Persistent storage sync
   useEffect(() => { if (isLoaded) localStorage.setItem('pulseflow_tasks', JSON.stringify(tasks)); }, [tasks, isLoaded]);
@@ -382,6 +395,10 @@ export default function PulseFlowApp() {
       );
     }
 
+    if (showOnboarding) {
+      return <OnboardingView onComplete={handleOnboardingComplete} />;
+    }
+
     switch(activeTab) {
       case 'dashboard': 
         return (
@@ -509,29 +526,32 @@ export default function PulseFlowApp() {
         {renderContent()}
       </main>
 
-      <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card/90 backdrop-blur-xl border-t px-4 py-3 flex justify-between items-center z-50">
-        {[
-          { id: 'dashboard', icon: LayoutDashboard, label: 'Home' },
-          { id: 'nutrition', icon: UtensilsCrossed, label: 'Food' },
-          { id: 'workout', icon: Dumbbell, label: 'Gym' },
-          { id: 'rank', icon: ChartIcon, label: 'Progress' },
-        ].map((item) => {
-          const Icon = item.icon;
-          const isNutrition = item.id === 'nutrition' && ['nutrition-summary', 'nutrition-micro', 'nutrition-macro', 'nutrition-micro-detail'].includes(activeTab);
-          const isWorkout = item.id === 'workout' && ['workout-library', 'workout-split', 'workout-history', 'workout-pr', 'workout-pr-detail'].includes(activeTab);
-          const isActive = activeTab === item.id || isNutrition || isWorkout;
-          return (
-            <button
-              key={item.id}
-              onClick={() => navigateTo(item.id)}
-              className={cn("flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 flex-1 justify-center max-w-[110px]", isActive ? "bg-primary/10" : "text-muted-foreground")}
-            >
-              <Icon className="w-4 h-4" style={isActive ? { stroke: 'url(#icon-gradient)', fill: 'none' } : {}} />
-              <span className={cn("text-[10px] font-black uppercase tracking-tight transition-all", isActive ? "opacity-100 ml-1" : "opacity-0 w-0 h-0 overflow-hidden")}>{item.label}</span>
-            </button>
-          );
-        })}
-      </nav>
+      {!showOnboarding && (
+        <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card/90 backdrop-blur-xl border-t px-4 py-3 flex justify-between items-center z-50">
+          {[
+            { id: 'dashboard', icon: LayoutDashboard, label: 'Home' },
+            { id: 'nutrition', icon: UtensilsCrossed, label: 'Food' },
+            { id: 'workout', icon: Dumbbell, label: 'Gym' },
+            { id: 'rank', icon: ChartIcon, label: 'Progress' },
+          ].map((item) => {
+            const Icon = item.icon;
+            const isNutrition = item.id === 'nutrition' && ['nutrition-summary', 'nutrition-micro', 'nutrition-macro', 'nutrition-micro-detail'].includes(activeTab);
+            const isWorkout = item.id === 'workout' && ['workout-library', 'workout-split', 'workout-history', 'workout-pr', 'workout-pr-detail'].includes(activeTab);
+            const isActive = activeTab === item.id || isNutrition || isWorkout;
+            return (
+              <button
+                key={item.id}
+                onClick={() => navigateTo(item.id)}
+                className={cn("flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 flex-1 justify-center max-w-[110px]", isActive ? "bg-primary/10" : "text-muted-foreground")}
+              >
+                <Icon className="w-4 h-4" style={isActive ? { stroke: 'url(#icon-gradient)', fill: 'none' } : {}} />
+                <span className={cn("text-[10px] font-black uppercase tracking-tight transition-all", isActive ? "opacity-100 ml-1" : "opacity-0 w-0 h-0 overflow-hidden")}>{item.label}</span>
+              </button>
+            );
+          })}
+        </nav>
+      )}
     </div>
   );
 }
+
