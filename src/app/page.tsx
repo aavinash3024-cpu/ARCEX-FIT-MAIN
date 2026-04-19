@@ -263,7 +263,7 @@ export default function PulseFlowApp() {
       // 50% Milestone
       if (pct >= 50 && !milestones.includes('50')) {
         addNotification(
-          `Goal: 50% ${label}`,
+          `50% ${label} Achieved`,
           `You've reached the halfway mark for your daily ${label.toLowerCase()} target. Keep going!`,
           'goal',
           '50-percent',
@@ -276,8 +276,8 @@ export default function PulseFlowApp() {
       // 100% Milestone
       if (pct >= 100 && !milestones.includes('100')) {
         addNotification(
-          `Goal Master: 100% ${label}`,
-          `Achievement unlocked! You have successfully mastered your daily ${label.toLowerCase()} goal.`,
+          `100% ${label} Achieved`,
+          `Outstanding! You have successfully reached your full daily ${label.toLowerCase()} goal.`,
           'goal',
           '100-percent',
           icon,

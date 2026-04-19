@@ -2,7 +2,7 @@
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -440,7 +440,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 { label: 'Strength Growth', desc: 'Detailed power progress trends.', icon: TrendingUp, colors: 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)' },
                 { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)' },
                 { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
-                { label: 'Skin Health', desc: 'Micronutrient analysis for clarity.', icon: HeartPulse, colors: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' },
+                { label: 'Skin-Based Micro Tracking', desc: 'Track micronutrients optimized for skin clarity and health.', icon: HeartPulse, colors: 'linear-gradient(135deg, #f43f5e 0%, #e11d48 100%)' },
+                { label: 'Recovery-Based Macro Tracking', desc: 'Advanced tracking of macronutrients vital for efficient muscle recovery.', icon: Zap, colors: 'linear-gradient(135deg, #10b981 0%, #059669 100%)' },
                 { label: 'Intake Reports', desc: 'Daily, Weekly, Monthly history.', icon: BarChart3, colors: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)' },
                 { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED progress insights.', icon: Sparkles, colors: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)', highlight: true }
               ].map((item, i) => (
@@ -671,7 +672,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                   <span className="text-xl font-black text-white">{profileName.charAt(0)}</span>
                 </div>
                 <div className="absolute -bottom-0.5 -right-0.5 z-20 bg-[#6b85a3] text-white p-1 rounded-full border-2 border-white shadow-lg">
-                  <Trophy className="w-2 h-2" />
+                  <Trophy className="w-2" />
                 </div>
               </div>
               

@@ -120,7 +120,9 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
               </div>
               <div className="space-y-0.5">
                 <h4 className="text-[11px] font-black uppercase tracking-tight text-foreground/80 leading-none">Auto-Cleanup</h4>
-                <p className="text-[9px] font-bold text-muted-foreground/60 uppercase">Default: 24 Hours</p>
+                <p className="text-[9px] font-bold text-muted-foreground/60 uppercase">
+                  {autoDeletePeriod === '24h' ? 'Current: 24 Hours' : 'Current: 1 Week'}
+                </p>
               </div>
             </div>
             <Switch checked={autoDelete} onCheckedChange={setAutoDelete} className="data-[state=checked]:bg-primary" />
