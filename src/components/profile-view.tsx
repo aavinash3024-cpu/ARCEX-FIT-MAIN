@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -46,7 +47,9 @@ import {
   Activity,
   Dumbbell,
   TrendingUp,
-  Sparkles
+  Sparkles,
+  Wifi,
+  Contact
 } from "lucide-react";
 import { 
   Select,
@@ -69,6 +72,11 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+} from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 
 export type ProfileSubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'reset';
@@ -375,94 +383,156 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
 
   const renderSubscription = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1 pb-24">
-      {/* Current Status Card */}
-      <Card className="border-none bg-primary/10 rounded-[2rem] border border-primary/20 shadow-sm overflow-hidden mx-1">
-        <CardContent className="p-5 flex items-center justify-between">
-          <div className="flex items-center gap-4">
-            <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center shadow-lg shadow-primary/20">
-              <Crown className="w-6 h-6 text-white" />
-            </div>
-            <div>
-              <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Active Membership</p>
-              <h3 className="text-lg font-black text-foreground uppercase tracking-tighter">ELITE PREMIUM</h3>
-            </div>
-          </div>
-          <div className="text-right">
-            <Badge variant="outline" className="border-primary/30 text-primary text-[8px] font-black uppercase tracking-widest">PRO</Badge>
-            <p className="text-[8px] font-bold text-muted-foreground uppercase mt-1 tracking-tighter">Renews 24 Oct</p>
-          </div>
-        </CardContent>
-      </Card>
-
-      <div className="space-y-2 px-3 pt-2">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Choose Your Strategy</h3>
-        <p className="text-sm font-bold text-foreground/80">Unlock the full power of ARCEX Elite.</p>
-      </div>
-
-      <div className="grid gap-4">
-        {/* Elite Card */}
-        <Card className="border-none bg-card rounded-[2rem] border border-muted/10 shadow-xl overflow-hidden relative">
-          <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
-            <Sparkles className="w-32 h-32 text-primary" />
-          </div>
-          <CardContent className="p-6 space-y-6">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
-                <Crown className="w-4 h-4 text-primary" />
-              </div>
-              <h4 className="text-sm font-black uppercase tracking-tight text-primary">Elite Benefits (Premium)</h4>
-            </div>
-            
-            <div className="grid gap-3">
-              {[
-                { label: 'Workout Strength Growth Analytics', icon: TrendingUp },
-                { label: 'Advanced Workout Split Analysis', icon: Layout },
-                { label: 'AI-Powered Meal Logging (Unlimited)', icon: UtensilsCrossed },
-                { label: 'Daily, Weekly & Monthly Meal Reports', icon: BarChart3 },
-                { label: 'Full Micro & Macro Nutrient Analysis', icon: LineChart },
-                { label: 'YOUR PERSONAL AI PROGRESS ANALYSIS', icon: Sparkles, highlight: true }
-              ].map((item, i) => (
-                <div key={i} className={cn("flex items-start gap-3", item.highlight && "bg-primary/10 p-2.5 -mx-2 rounded-xl border border-primary/10")}>
-                  <div className="mt-0.5">
-                    <CheckCircle2 className={cn("w-4 h-4", item.highlight ? "text-primary fill-primary/20" : "text-primary/40")} />
+      {/* CREDIT CARD STYLE STATUS CARD */}
+      <div className="px-1">
+        <div className="relative w-full h-52 rounded-[1.75rem] overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] active:scale-[0.98]">
+          {/* Main Gradient Background */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] via-[#2d3436] to-[#0f172a]" />
+          
+          {/* Decorative Gloss & Accents */}
+          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none" />
+          <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-[60px] -ml-24 -mb-24 pointer-events-none" />
+          
+          <div className="relative h-full p-6 flex flex-col justify-between text-white">
+            <div className="flex justify-between items-start">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-emerald-400 p-[1.5px]">
+                    <div className="w-full h-full rounded-[7px] bg-black/40 backdrop-blur-sm flex items-center justify-center">
+                      <Crown className="w-4 h-4 text-white" />
+                    </div>
                   </div>
-                  <span className={cn("text-xs font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground/80")}>
-                    {item.label}
-                  </span>
+                  <span className="font-black text-sm uppercase tracking-tighter italic">PulseFlow <span className="text-primary">Elite</span></span>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* Standard Card */}
-        <Card className="border-none bg-card rounded-[2rem] border border-muted/10 shadow-sm overflow-hidden opacity-80">
-          <CardContent className="p-6 space-y-4">
-            <div className="flex items-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center">
-                <Shield className="w-4 h-4 text-muted-foreground" />
+                <p className="text-[8px] font-black text-white/40 uppercase tracking-[0.3em] pl-0.5">ESTABLISHED 2024</p>
               </div>
-              <h4 className="text-sm font-black uppercase tracking-tight">Standard Features (Free)</h4>
+              <Wifi className="w-5 h-5 text-white/20 rotate-90" />
             </div>
-            <div className="grid gap-2.5">
-              {[
-                { label: 'Hydration Tracking with Weekly Analysis' },
-                { label: 'Steps Tracking with Weekly Analysis' },
-                { label: 'Activity Streak & Badges' },
-                { label: 'Daily Task Manager' },
-                { label: 'Custom Workout Creation' }
-              ].map((item, i) => (
-                <div key={i} className="flex items-start gap-3">
-                  <Check className="w-3.5 h-3.5 text-muted-foreground/30 mt-0.5" />
-                  <span className="text-[11px] font-bold text-foreground/50 uppercase tracking-tight">{item.label}</span>
+
+            <div className="space-y-4">
+              <div className="space-y-1">
+                <p className="text-[7px] font-black text-white/30 uppercase tracking-[0.4em]">MEMBERSHIP HOLDER</p>
+                <h3 className="text-lg font-black uppercase tracking-tighter truncate">{profileName}</h3>
+              </div>
+              
+              <div className="flex justify-between items-end">
+                <div className="flex items-center gap-4">
+                  <div>
+                    <p className="text-[6px] font-black text-white/30 uppercase tracking-[0.2em]">CURRENT TIER</p>
+                    <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/20 text-[8px] font-black uppercase px-2 h-4 rounded-md">PREMIUM</Badge>
+                  </div>
+                  <div>
+                    <p className="text-[6px] font-black text-white/30 uppercase tracking-[0.2em]">EXPIRY</p>
+                    <p className="text-[10px] font-black tracking-widest">10 / 25</p>
+                  </div>
                 </div>
-              ))}
+                <div className="flex flex-col items-end">
+                   <div className="w-10 h-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded flex items-center justify-center overflow-hidden">
+                      <div className="w-full h-full flex">
+                         <div className="w-1/2 bg-white/10" />
+                         <div className="w-1/2 bg-primary/20" />
+                      </div>
+                   </div>
+                   <p className="text-[6px] font-black text-white/20 uppercase mt-1">SECURE ACCESS</p>
+                </div>
+              </div>
             </div>
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
-      <div className="space-y-4 pt-4">
+      <div className="space-y-2 px-3 pt-4">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Tier Intelligence</h3>
+        <p className="text-sm font-bold text-foreground/80">Swipe to compare strategy features.</p>
+      </div>
+
+      {/* FEATURES SLIDER */}
+      <div className="px-1">
+        <Carousel className="w-full">
+          <CarouselContent className="-ml-2">
+            {/* PREMIUM CARD */}
+            <CarouselItem className="pl-2 basis-[92%]">
+              <Card className="border-none bg-gradient-to-br from-card to-muted/20 rounded-[2rem] border border-muted/10 shadow-xl overflow-hidden relative h-full">
+                <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
+                  <Crown className="w-32 h-32 text-primary" />
+                </div>
+                <CardContent className="p-6 space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
+                        <Crown className="w-4 h-4 text-primary" />
+                      </div>
+                      <h4 className="text-sm font-black uppercase tracking-tight text-primary">Elite Premium</h4>
+                    </div>
+                    <Badge className="bg-primary text-white text-[7px] font-black uppercase">POWERED BY AI</Badge>
+                  </div>
+                  
+                  <div className="grid gap-3">
+                    {[
+                      { label: 'Workout Strength Growth Analytics', icon: TrendingUp },
+                      { label: 'Advanced Workout Split Analysis', icon: Layout },
+                      { label: 'AI Meal Logging (Unlimited)', icon: UtensilsCrossed },
+                      { label: 'Full Nutrient Breakdown History', icon: BarChart3 },
+                      { label: 'PERSONAL AI PROGRESS ANALYSIS', icon: Sparkles, highlight: true }
+                    ].map((item, i) => (
+                      <div key={i} className={cn("flex items-start gap-3", item.highlight && "bg-primary/10 p-2.5 -mx-2 rounded-xl border border-primary/10")}>
+                        <div className="mt-0.5">
+                          <CheckCircle2 className={cn("w-4 h-4", item.highlight ? "text-primary fill-primary/20" : "text-primary/40")} />
+                        </div>
+                        <span className={cn("text-xs font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground/80")}>
+                          {item.label}
+                        </span>
+                      </div>
+                    ))}
+                    
+                    <div className="pt-2 border-t border-muted/10">
+                      <div className="flex items-center gap-2 opacity-50">
+                        <Check className="w-3 h-3 text-muted-foreground" />
+                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Includes all Standard features</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </CarouselItem>
+
+            {/* FREE CARD */}
+            <CarouselItem className="pl-2 basis-[92%]">
+              <Card className="border-none bg-card rounded-[2rem] border border-muted/10 shadow-sm overflow-hidden h-full">
+                <CardContent className="p-6 space-y-6">
+                  <div className="flex items-center gap-2">
+                    <div className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center">
+                      <Shield className="w-4 h-4 text-muted-foreground" />
+                    </div>
+                    <h4 className="text-sm font-black uppercase tracking-tight text-muted-foreground">Standard Free</h4>
+                  </div>
+                  <div className="grid gap-3">
+                    {[
+                      { label: 'Hydration Tracking with Weekly Analysis', icon: HeartPulse },
+                      { label: 'Steps Tracking with Weekly Analysis', icon: Activity },
+                      { label: 'Activity Streak & Badges', icon: Zap },
+                      { label: 'Daily Task Management System', icon: ListTodo },
+                      { label: 'Custom Workout Creation', icon: Dumbbell }
+                    ].map((item, i) => (
+                      <div key={i} className="flex items-start gap-3">
+                        <div className="mt-0.5">
+                          <Check className="w-3.5 h-3.5 text-muted-foreground/30" />
+                        </div>
+                        <span className="text-xs font-bold text-foreground/50 uppercase tracking-tight">
+                          {item.label}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                </CardContent>
+              </Card>
+            </CarouselItem>
+          </CarouselContent>
+        </Carousel>
+      </div>
+
+      {/* COMMITMENT PLANS */}
+      <div className="space-y-4 pt-4 px-1 pb-12">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Elite Commitment Plans</h3>
         
         <div className="grid gap-3">
@@ -473,19 +543,21 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
           ].map((plan) => (
             <Card key={plan.id} className={cn(
               "border-none shadow-md rounded-2xl overflow-hidden border transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99]",
-              plan.popular ? "bg-primary text-primary-foreground ring-2 ring-primary ring-offset-2" : "bg-card border-muted/10"
+              plan.popular 
+                ? "bg-gradient-to-r from-primary/10 via-primary/5 to-transparent text-foreground ring-2 ring-primary ring-offset-2" 
+                : "bg-card border-muted/10"
             )}>
               <CardContent className="p-4 flex items-center justify-between">
                 <div className="space-y-0.5">
                   <div className="flex items-center gap-2">
                     <h5 className="font-black text-xs uppercase tracking-widest">{plan.name}</h5>
                     {plan.save && (
-                      <Badge className={cn("text-[7px] font-black uppercase px-1.5 h-4", plan.popular ? "bg-white text-primary" : "bg-primary text-white")}>
+                      <Badge className={cn("text-[7px] font-black uppercase px-1.5 h-4", plan.popular ? "bg-primary text-white" : "bg-primary/10 text-primary")}>
                         {plan.save}
                       </Badge>
                     )}
                   </div>
-                  <p className={cn("text-[8px] font-black uppercase tracking-widest opacity-60", plan.popular ? "text-white" : "text-muted-foreground")}>
+                  <p className={cn("text-[8px] font-black uppercase tracking-widest opacity-60")}>
                     {plan.label}
                   </p>
                 </div>
@@ -493,7 +565,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                   <div className="flex items-baseline justify-end gap-1">
                     <span className="text-lg font-black">{plan.price}</span>
                   </div>
-                  <p className={cn("text-[7px] font-black uppercase tracking-widest opacity-60", plan.popular ? "text-white" : "text-muted-foreground")}>
+                  <p className={cn("text-[7px] font-black uppercase tracking-widest opacity-60")}>
                     / {plan.period}
                   </p>
                 </div>
