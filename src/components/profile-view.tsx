@@ -86,7 +86,7 @@ import { doc } from 'firebase/firestore';
 import { useFirestore, useUser, useAuth, setDocumentNonBlocking, initiatePasswordReset, initiateAccountDeletion } from '@/firebase';
 import { useToast } from "@/hooks/use-toast";
 
-export type ProfileSubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'reset' | 'help';
+export type ProfileSubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'reset' | 'help' | 'privacy' | 'terms' | 'medical';
 
 interface ProfileViewProps {
   onBack: () => void;
@@ -699,9 +699,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Documentation</h3>
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
-            <LegalItem icon={FileText} label="Terms and Conditions" color="text-blue-600" bg="bg-blue-50" />
-            <LegalItem icon={Lock} label="Privacy Policy" color="text-indigo-600" bg="bg-indigo-50" />
-            <LegalItem icon={Stethoscope} label="Health and Medical Disclaimer" color="text-rose-600" bg="bg-rose-50" />
+            <LegalItem icon={FileText} label="Terms and Conditions" color="text-blue-600" bg="bg-blue-50" onClick={() => onNavigate('profile-terms')} />
+            <LegalItem icon={Lock} label="Privacy Policy" color="text-indigo-600" bg="bg-indigo-50" onClick={() => onNavigate('profile-privacy')} />
+            <LegalItem icon={Stethoscope} label="Health and Medical Disclaimer" color="text-rose-600" bg="bg-rose-50" onClick={() => onNavigate('profile-medical')} />
           </CardContent>
         </Card>
       </div>
@@ -723,9 +723,136 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
          <p className="text-[10px] font-black uppercase tracking-widest text-primary mb-2">EXPECTED RELEASE</p>
          <p className="text-lg font-black text-foreground">PHASE 2.0</p>
       </Card>
-      <Button variant="ghost" onClick={onBack} className="text-[10px] font-black uppercase tracking-widest text-muted-foreground mt-8 gap-2">
-        <ChevronLeft className="w-3 h-3" /> Return to Profile
-      </Button>
+    </div>
+  );
+
+  const renderPrivacyPolicy = () => (
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1">
+      <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
+        <CardContent className="p-6 space-y-6">
+          <div className="space-y-2 border-b border-muted/10 pb-4">
+            <h2 className="text-lg font-black uppercase tracking-tighter">Privacy Policy</h2>
+            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Last Updated: October 2023</p>
+          </div>
+          
+          <div className="space-y-6 text-sm leading-relaxed text-foreground/80 font-medium">
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">1. Our Commitment</h3>
+              <p>Welcome to arcex fit. Your privacy is our top priority. This policy explains how we handle your data, how we keep it safe, and how you stay in control.</p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">2. Data We Collect</h3>
+              <p>To help you reach your fitness goals, we collect basic details like your name, email, age, and gender. We also track health metrics like weight, height, food logs, water intake, and workouts.</p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">3. Private Storage</h3>
+              <p>We use a "Local-First" approach. Most of your logs stay on your device’s private memory. We use special keys to ensure that if multiple people use the same phone, their data is kept in separate, locked buckets.</p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">4. Cloud Backups</h3>
+              <p>We use Google Firebase to securely back up your profile and daily summaries. This ensures you don't lose your progress if you change phones.</p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">5. AI and Privacy</h3>
+              <p>We use AI to understand your food descriptions. When you type a meal, only the text of that meal is analyzed. Your personal identity (name or email) is never sent to the AI during this process.</p>
+            </section>
+
+            <section className="space-y-2 border-t border-muted/5 pt-4">
+              <p className="text-[10px] font-bold text-muted-foreground italic">We never sell your personal data to advertisers or third parties.</p>
+            </section>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderTermsConditions = () => (
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1">
+      <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
+        <CardContent className="p-6 space-y-6">
+          <div className="space-y-2 border-b border-muted/10 pb-4">
+            <h2 className="text-lg font-black uppercase tracking-tighter">Terms & Conditions</h2>
+            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Agreement of Use</p>
+          </div>
+          
+          <div className="space-y-6 text-sm leading-relaxed text-foreground/80 font-medium">
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">1. Your Responsibility</h3>
+              <p>You agree to provide honest information (like weight and age) to ensure the app’s calculations remain as safe as possible for you.</p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">2. Account Safety</h3>
+              <p>You are responsible for keeping your login details safe. Please do not share your password with others.</p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">3. Data & Storage</h3>
+              <p>We provide cloud backups for your convenience, but your primary data lives on your phone. We are not responsible for data lost if you clear your browser cache without syncing.</p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">4. Usage Limits</h3>
+              <p>To keep the app fast and fair, we limit AI meal logs to 20 per day. Abusing the system or attempting to hack the app will result in account deletion.</p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">5. Results</h3>
+              <p>While we strive to help you reach your goals, we cannot guarantee specific fitness results. Your progress depends on your consistency and personal health factors.</p>
+            </section>
+          </div>
+        </CardContent>
+      </Card>
+    </div>
+  );
+
+  const renderMedicalDisclaimer = () => (
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1">
+      <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
+        <CardContent className="p-6 space-y-6">
+          <div className="space-y-2 border-b border-muted/10 pb-4">
+            <h2 className="text-lg font-black uppercase tracking-tighter">Health Disclaimer</h2>
+            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Read Before Starting</p>
+          </div>
+          
+          <div className="space-y-6 text-sm leading-relaxed text-foreground/80 font-medium">
+            <div className="bg-amber-500/10 p-4 rounded-2xl border border-amber-500/20 flex gap-3 items-start">
+              <AlertTriangle className="w-5 h-5 text-amber-600 shrink-0 mt-0.5" />
+              <p className="text-xs font-bold text-amber-900 leading-relaxed uppercase tracking-tight">
+                This app is for information only and is not a substitute for professional medical advice.
+              </p>
+            </div>
+
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">Not a Medical Provider</h3>
+              <p>arcex fit is a digital tool. We are not doctors, nutritionists, or medical professionals.</p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">Consult Your Physician</h3>
+              <p>Always talk to a doctor before starting any new workout routine or changing your diet, especially if you have existing health conditions or are pregnant.</p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">AI Estimations</h3>
+              <p>Our AI provides "smart estimates." While we aim for accuracy, these numbers should not be used to manage medical conditions like diabetes or severe allergies.</p>
+            </section>
+
+            <section className="space-y-2">
+              <h3 className="text-xs font-black uppercase text-primary">Listen to Your Body</h3>
+              <p>If you feel pain, dizziness, or shortness of breath during any workout, stop immediately and seek medical help.</p>
+            </section>
+
+            <section className="space-y-2 border-t border-muted/5 pt-4">
+              <p className="text-[10px] font-bold text-muted-foreground italic">By using this app, you assume all risk of injury or health complications.</p>
+            </section>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 
@@ -1097,6 +1224,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
            activeView === 'legal' ? 'Legal' :
            activeView === 'settings' ? 'Settings' : 
            activeView === 'reset' ? 'Start Fresh' : 
+           activeView === 'privacy' ? 'Privacy Policy' :
+           activeView === 'terms' ? 'Terms of Use' :
+           activeView === 'medical' ? 'Health Disclaimer' :
            activeView === 'help' ? 'Help' : 'Profile'}
         </h1>
       </div>
@@ -1108,13 +1238,16 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
       {activeView === 'settings' && renderSettings()}
       {activeView === 'reset' && renderReset()}
       {activeView === 'help' && renderHelp()}
+      {activeView === 'privacy' && renderPrivacyPolicy()}
+      {activeView === 'terms' && renderTermsConditions()}
+      {activeView === 'medical' && renderMedicalDisclaimer()}
     </div>
   );
 }
 
-function LegalItem({ icon: Icon, label, color, bg }: { icon: any, label: string, color?: string, bg?: string }) {
+function LegalItem({ icon: Icon, label, color, bg, onClick }: { icon: any, label: string, color?: string, bg?: string, onClick?: () => void }) {
   return (
-    <button className="w-full p-4 flex items-center justify-between transition-all text-left group border-b border-muted/5 last:border-0">
+    <button onClick={onClick} className="w-full p-4 flex items-center justify-between transition-all text-left group border-b border-muted/5 last:border-0">
       <div className="flex items-center gap-4">
         <div className={cn("w-9 h-9 rounded-xl flex items-center justify-center shadow-sm", bg || "bg-blue-50", color || "text-blue-600")}>
           <Icon className="w-4 h-4" />

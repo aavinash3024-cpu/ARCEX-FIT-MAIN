@@ -568,6 +568,9 @@ export default function PulseFlowApp() {
       case 'profile-settings':
       case 'profile-reset':
       case 'profile-help':
+      case 'profile-privacy':
+      case 'profile-terms':
+      case 'profile-medical':
         const profileSub = activeTab === 'profile' ? 'main' : activeTab.replace('profile-', '') as any;
         return (
           <ProfileView 
@@ -575,6 +578,8 @@ export default function PulseFlowApp() {
             onBack={() => {
               triggerHaptic('light');
               if (activeTab === 'profile') setActiveTab('dashboard');
+              else if (activeTab === 'profile-personal-info' || activeTab === 'profile-subscription' || activeTab === 'profile-legal' || activeTab === 'profile-settings' || activeTab === 'profile-reset' || activeTab === 'profile-help') setActiveTab('profile');
+              else if (activeTab === 'profile-privacy' || activeTab === 'profile-terms' || activeTab === 'profile-medical') setActiveTab('profile-legal');
               else setActiveTab('profile');
             }} 
             onNavigate={navigateTo} 
