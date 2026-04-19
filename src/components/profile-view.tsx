@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -86,7 +85,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [selectedPlanId, setSelectedPlanId] = useState('quarterly');
+  const [selectedPlanId, setSelectedPlanId] = useState('half-year');
 
   // Preference States
   const [darkMode, setDarkMode] = useState(false);
@@ -378,13 +377,11 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
 
   const renderSubscription = () => (
     <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-24">
-      {/* 1. MEMBERSHIP CARD (STATUS) */}
+      {/* 1. MEMBERSHIP STATUS CARD (CREDIT CARD STYLE) */}
       <div className="px-1">
-        <div className="relative w-full h-44 rounded-[1.75rem] overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] active:scale-[0.98]">
+        <div className="relative w-full h-40 rounded-[2rem] overflow-hidden shadow-2xl">
           <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] via-[#2d3436] to-[#0f172a]" />
-          
           <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-48 h-48 bg-purple-500/10 rounded-full blur-[60px] -ml-24 -mb-24 pointer-events-none" />
           
           <div className="relative h-full p-6 flex flex-col justify-between text-white">
             <div className="flex justify-between items-start">
@@ -415,18 +412,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                     <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/20 text-[8px] font-black uppercase px-2 h-4 rounded-md">PREMIUM ELITE</Badge>
                   </div>
                   <div>
-                    <p className="text-[6px] font-black text-white/30 uppercase tracking-[0.2em]">EXPIRY</p>
-                    <p className="text-[10px] font-black tracking-widest">10 / 25</p>
+                    <p className="text-[6px] font-black text-white/30 uppercase tracking-[0.2em]">RENEWAL</p>
+                    <p className="text-[10px] font-black tracking-widest uppercase">OCT 2025</p>
                   </div>
-                </div>
-                <div className="flex flex-col items-end">
-                   <div className="w-10 h-6 bg-white/5 backdrop-blur-sm border border-white/10 rounded flex items-center justify-center overflow-hidden">
-                      <div className="w-full h-full flex">
-                         <div className="w-1/2 bg-white/10" />
-                         <div className="w-1/2 bg-primary/20" />
-                      </div>
-                   </div>
-                   <p className="text-[6px] font-black text-white/20 uppercase mt-1">SECURE ACCESS</p>
                 </div>
               </div>
             </div>
@@ -434,17 +422,14 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         </div>
       </div>
 
-      {/* 2. PRICING PLANS */}
+      {/* 2. SUBSCRIPTION PLANS (HORIZONTAL GRID) */}
       <div className="px-1 space-y-4">
-        <div className="px-3 flex justify-between items-baseline">
-          <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Subscription Plans</h3>
-        </div>
-        
-        <div className="grid grid-cols-3 gap-2">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Subscription Plans</h3>
+        <div className="grid grid-cols-3 gap-2.5">
           {[
-            { id: 'monthly', name: 'Monthly', price: '229', original: '299', period: 'Mo', save: '' },
-            { id: 'quarterly', name: 'Quarterly', price: '599', original: '899', period: '3Mo', save: '15%' },
-            { id: 'half-year', name: 'Elite', price: '1099', original: '1799', period: '6Mo', save: '20%' }
+            { id: 'monthly', name: 'Monthly', price: '299', original: '399', period: 'MO', save: '25%' },
+            { id: 'half-year', name: 'Half-Year', price: '1499', original: '2399', period: '6MO', save: '37%' },
+            { id: 'yearly', name: 'Yearly', price: '2499', original: '4799', period: '12MO', save: '48%' }
           ].map((plan) => (
             <Card 
               key={plan.id} 
@@ -452,38 +437,38 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
               className={cn(
                 "border-none shadow-md rounded-2xl overflow-hidden border transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99]",
                 selectedPlanId === plan.id 
-                  ? "bg-primary/5 ring-1 ring-primary" 
+                  ? "bg-primary/5 ring-1 ring-primary border-primary/20" 
                   : "bg-card border-muted/10 opacity-70"
               )}
             >
-              <CardContent className="p-3 flex flex-col items-center text-center gap-1.5">
-                <h5 className="font-black text-[9px] uppercase tracking-widest truncate w-full">{plan.name}</h5>
-                <div className="space-y-0.5">
-                  <div className="flex items-center justify-center gap-1">
-                    <span className="text-[7px] font-bold text-muted-foreground line-through opacity-40">{plan.original}</span>
-                    <span className="text-sm font-black text-foreground">{plan.price}</span>
+              <CardContent className="p-3 flex flex-col items-center text-center gap-2">
+                <h5 className="font-black text-[9px] uppercase tracking-widest text-muted-foreground">{plan.name}</h5>
+                <div className="space-y-1 flex flex-col items-center">
+                  <span className="text-[8px] font-bold text-muted-foreground/50 line-through">₹{plan.original}</span>
+                  <div className="flex items-baseline gap-0.5">
+                    <span className="text-sm font-black text-foreground">₹{plan.price}</span>
                   </div>
-                  <p className="text-[7px] font-black uppercase text-muted-foreground opacity-60">/ {plan.period}</p>
-                </div>
-                {plan.save && (
-                  <Badge className="bg-primary text-white text-[7px] font-black uppercase px-1 h-3.5 border-none">
+                  <Badge className="bg-primary/10 text-primary text-[7px] font-black uppercase px-1.5 h-3.5 border-none mt-1">
                     SAVE {plan.save}
                   </Badge>
-                )}
+                </div>
               </CardContent>
             </Card>
           ))}
         </div>
       </div>
 
-      {/* 3. PREMIUM COVERAGE SECTION */}
+      {/* 3. PREMIUM COVERAGE (WITH HEADER & FOOTER) */}
       <div className="px-1 space-y-4">
-        <div className="bg-primary/5 rounded-[2rem] border border-primary/10 overflow-hidden">
-          <div className="p-6 border-b border-primary/5 bg-primary/10">
-            <h4 className="text-sm font-black uppercase tracking-tight text-primary flex items-center gap-2">
-              <Crown className="w-4 h-4" /> Elite Premium Coverage
-            </h4>
-            <p className="text-[9px] font-black text-primary/60 uppercase tracking-widest mt-1">THE COMPLETE ARCEX STRATEGY</p>
+        <div className="bg-card rounded-[2.25rem] border border-muted/10 overflow-hidden shadow-lg">
+          <div className="p-5 border-b border-primary/10 bg-primary/10 flex items-center justify-between">
+            <div className="space-y-0.5">
+              <h4 className="text-sm font-black uppercase tracking-tight text-primary flex items-center gap-2">
+                <Crown className="w-4 h-4" /> Elite Premium Coverage
+              </h4>
+              <p className="text-[8px] font-black text-primary/60 uppercase tracking-widest">FOR THE ULTIMATE PERFORMANCE</p>
+            </div>
+            <Zap className="w-5 h-5 text-primary opacity-20" />
           </div>
           
           <div className="p-6 space-y-6">
@@ -492,61 +477,63 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 { label: 'Workout Strength Growth Analytics', desc: 'Track your volume and power progress over time.', icon: TrendingUp },
                 { label: 'Advanced Workout Split Analysis', desc: 'Deep dive into muscle coverage and target gaps.', icon: Layout },
                 { label: 'AI-Powered Meal Logging', desc: 'Fast, natural language meal tracking (20 credits/day).', icon: UtensilsCrossed },
-                { label: 'Daily, Weekly & Monthly Meal Reports', desc: 'Comprehensive nutrient trends and full summaries.', icon: BarChart3 },
-                { label: 'UNLIMITED PERSONAL AI ANALYSIS', desc: 'Professional-grade wellness insights on demand.', icon: Sparkles, highlight: true }
+                { label: 'Daily, Weekly & Monthly Meal Reports', desc: 'Comprehensive nutrient trends with micro/macro data.', icon: BarChart3 },
+                { label: 'UNLIMITED PERSONAL AI ANALYSIS', desc: 'Professional-grade wellness insights on your daily progress.', icon: Sparkles, highlight: true }
               ].map((item, i) => (
                 <div key={i} className="flex gap-4">
-                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm", item.highlight ? "bg-primary text-white" : "bg-card border border-primary/10 text-primary")}>
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm", item.highlight ? "bg-primary text-white" : "bg-muted/30 border border-muted/10 text-primary")}>
                     <item.icon className="w-5 h-5" />
                   </div>
-                  <div className="space-y-0.5">
-                    <h5 className={cn("text-[11px] font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground")}>{item.label}</h5>
+                  <div className="space-y-0.5 flex-1 min-w-0">
+                    <h5 className={cn("text-[11px] font-black uppercase tracking-tight truncate", item.highlight ? "text-primary" : "text-foreground")}>{item.label}</h5>
                     <p className="text-[9px] font-bold text-muted-foreground leading-tight">{item.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
+          </div>
 
-            <div className="pt-4 border-t border-primary/10">
-              <div className="flex items-center gap-2 bg-primary/10 p-3 rounded-xl border border-primary/10">
-                <CheckCircle2 className="w-4 h-4 text-primary fill-primary/10" />
-                <span className="text-[9px] font-black uppercase text-primary tracking-widest">Includes all Standard features below</span>
-              </div>
-            </div>
+          <div className="p-4 bg-primary/5 border-t border-primary/10 flex items-center justify-center gap-2">
+             <CheckCircle2 className="w-4 h-4 text-primary" />
+             <span className="text-[9px] font-black uppercase text-primary tracking-[0.2em]">INCLUDES EVERY FEATURE IN FREE TIER</span>
           </div>
         </div>
       </div>
 
-      {/* 4. FREE FEATURES SECTION */}
+      {/* 4. STANDARD FEATURES (WITH HEADER & FOOTER) */}
       <div className="px-1 space-y-4">
-        <div className="bg-card rounded-[2rem] border border-muted/10 overflow-hidden shadow-sm">
-          <div className="p-6 border-b border-muted/5 bg-muted/5">
+        <div className="bg-card rounded-[2.25rem] border border-muted/10 overflow-hidden shadow-sm">
+          <div className="p-5 border-b border-muted/10 bg-muted/10">
             <h4 className="text-sm font-black uppercase tracking-tight text-muted-foreground flex items-center gap-2">
-              <Shield className="w-4 h-4" /> Standard Free Features
+              <Shield className="w-4 h-4" /> Standard Free Tier
             </h4>
-            <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest mt-1">ESSENTIAL TRACKING TOOLS</p>
+            <p className="text-[8px] font-black text-muted-foreground/40 uppercase tracking-widest mt-1">ESSENTIAL FITNESS TRACKING</p>
           </div>
           
           <div className="p-6 space-y-5">
             <div className="grid gap-5">
               {[
-                { label: 'Hydration Tracking', desc: 'Monitor water intake with weekly trend analysis.', icon: HeartPulse },
-                { label: 'Steps Tracking', desc: 'Daily step counter with performance progress charts.', icon: Activity },
-                { label: 'Activity Streak & Badges', desc: 'Stay consistent and earn performance milestones.', icon: Zap },
-                { label: 'Daily Task Management System', desc: 'Organize your daily fitness and wellness objectives.', icon: ListTodo },
-                { label: 'Custom Workout Creation', desc: 'Build your own custom routines from the library.', icon: Dumbbell }
+                { label: 'Hydration Tracking with Weekly Analysis', desc: 'Monitor daily intake and track your performance trends.', icon: HeartPulse },
+                { label: 'Steps Tracking with Weekly Analysis', desc: 'Sync and analyze your daily movement patterns.', icon: Activity },
+                { label: 'Activity Streak & Performance Badges', desc: 'Stay consistent and unlock unique milestone rewards.', icon: Zap },
+                { label: 'Daily Task Management System', desc: 'Organize your daily fitness and health goals.', icon: ListTodo },
+                { label: 'Custom Workout Creation', desc: 'Build and save your own personalized routines.', icon: Dumbbell }
               ].map((item, i) => (
                 <div key={i} className="flex gap-4 opacity-70">
                   <div className="w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center shrink-0 border border-muted/10">
                     <item.icon className="w-5 h-5 text-muted-foreground/60" />
                   </div>
-                  <div className="space-y-0.5">
-                    <h5 className="text-[11px] font-black uppercase tracking-tight text-foreground/80">{item.label}</h5>
+                  <div className="space-y-0.5 flex-1 min-w-0">
+                    <h5 className="text-[11px] font-black uppercase tracking-tight text-foreground/80 truncate">{item.label}</h5>
                     <p className="text-[9px] font-bold text-muted-foreground/60 leading-tight">{item.desc}</p>
                   </div>
                 </div>
               ))}
             </div>
+          </div>
+
+          <div className="p-4 bg-muted/5 border-t border-muted/10 text-center">
+             <span className="text-[9px] font-black uppercase text-muted-foreground/30 tracking-[0.2em]">FREE FOREVER FOR ALL USERS</span>
           </div>
         </div>
       </div>
