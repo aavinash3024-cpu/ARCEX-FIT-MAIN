@@ -419,7 +419,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
     
-    toast({ title: "Data Exported", description: "Your wellness data has been downloaded." });
+    toast({ title: "Data Exported", description: "Your wellness history has been downloaded." });
   };
 
   const handleChangePassword = async () => {
@@ -727,46 +727,86 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
   );
 
   const renderPrivacyPolicy = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-1">
-      <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
-        <CardContent className="p-6 space-y-6">
-          <div className="space-y-2 border-b border-muted/10 pb-4">
-            <h2 className="text-lg font-black uppercase tracking-tighter">Privacy Policy</h2>
-            <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Last Updated: October 2023</p>
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-4">
+      <div className="space-y-2 border-b border-muted/10 pb-6">
+        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">May 22, 2024</p>
+        <h2 className="text-3xl font-black uppercase tracking-tighter">Privacy Policy</h2>
+      </div>
+      
+      <div className="space-y-8 text-sm leading-relaxed text-foreground/80 font-medium">
+        <p className="text-base font-bold text-foreground leading-relaxed">
+          Welcome to arcex fit. Your privacy is not just a policy for us; it is a core technical requirement. We build our app using a "Local-First" philosophy, ensuring that your most sensitive health data remains under your control on your own device whenever possible.
+        </p>
+
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">1. Data Architecture: UID Namespacing</h3>
+          <p>
+            We use a sophisticated system called **UID Namespacing** to keep your data safe. Even if multiple people log into their accounts on the same phone, our app partitions the local storage using your unique Firebase ID (UID). This ensures that User A's meal logs and weight history are physically isolated from User B's, and neither can ever "see" the other's private records.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">2. Information We Collect</h3>
+          <div className="space-y-4">
+            <div className="bg-muted/5 p-4 rounded-2xl border border-muted/10">
+              <p className="text-[10px] font-black uppercase text-foreground mb-1">Identity & Account</p>
+              <p className="text-xs">Your name, email address, and basic profile details required for authentication and account recovery via Google Firebase.</p>
+            </div>
+            <div className="bg-muted/5 p-4 rounded-2xl border border-muted/10">
+              <p className="text-[10px] font-black uppercase text-foreground mb-1">Biological Metrics</p>
+              <p className="text-xs">Age, gender, height, and weight. These are used locally to calculate your Basal Metabolic Rate (BMR) and Total Daily Energy Expenditure (TDEE).</p>
+            </div>
+            <div className="bg-muted/5 p-4 rounded-2xl border border-muted/10">
+              <p className="text-[10px] font-black uppercase text-foreground mb-1">Wellness History</p>
+              <p className="text-xs">Daily logs of your meals (macros and micros), water intake, step counts, and exercise routines.</p>
+            </div>
           </div>
-          
-          <div className="space-y-6 text-sm leading-relaxed text-foreground/80 font-medium">
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">1. Our Commitment</h3>
-              <p>Welcome to arcex fit. Your privacy is our top priority. This policy explains how we handle your data, how we keep it safe, and how you stay in control.</p>
-            </section>
+        </section>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">2. Data We Collect</h3>
-              <p>To help you reach your fitness goals, we collect basic details like your name, email, age, and gender. We also track health metrics like weight, height, food logs, water intake, and workouts.</p>
-            </section>
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">3. Artificial Intelligence & Data Processing</h3>
+          <p>
+            Our app utilizes **Gemini 2.5 Flash AI** to parse your natural language meal descriptions (e.g., "I ate two eggs and a slice of toast").
+          </p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li><span className="font-bold">Privacy Filtering:</span> When you log a meal, only the text of the meal description is sent to the AI processing engine.</li>
+            <li><span className="font-bold">No Personal Linkage:</span> Your name, email, and biological metrics are NEVER sent to the AI during nutritional analysis.</li>
+            <li><span className="font-bold">Local Learning:</span> Once the AI identifies a food, we save that result to your private "AI Food Cache" on your device, reducing the need for future external processing.</li>
+          </ul>
+        </section>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">3. Private Storage</h3>
-              <p>We use a "Local-First" approach. Most of your logs stay on your device’s private memory. We use special keys to ensure that if multiple people use the same phone, their data is kept in separate, locked buckets.</p>
-            </section>
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">4. Cloud Synchronization & Backups</h3>
+          <p>
+            While your primary database lives on your phone, we use **Google Firebase Firestore** for secure cloud backups.
+          </p>
+          <ul className="list-disc pl-5 space-y-2">
+            <li><span className="font-bold">Encryption:</span> All data is encrypted during transit (using SSL/TLS) and while resting on Google's highly secure servers.</li>
+            <li><span className="font-bold">Security Rules:</span> We enforce server-side code that forbids any person or machine from reading a record unless their verified Authentication ID matches the owner of that record.</li>
+          </ul>
+        </section>
 
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">4. Cloud Backups</h3>
-              <p>We use Google Firebase to securely back up your profile and daily summaries. This ensures you don't lose your progress if you change phones.</p>
-            </section>
-
-            <section className="space-y-2">
-              <h3 className="text-xs font-black uppercase text-primary">5. AI and Privacy</h3>
-              <p>We use AI to understand your food descriptions. When you type a meal, only the text of that meal is analyzed. Your personal identity (name or email) is never sent to the AI during this process.</p>
-            </section>
-
-            <section className="space-y-2 border-t border-muted/5 pt-4">
-              <p className="text-[10px] font-bold text-muted-foreground italic">We never sell your personal data to advertisers or third parties.</p>
-            </section>
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">5. Data Retention & Your Rights</h3>
+          <p>You have absolute sovereignty over your wellness data:</p>
+          <div className="grid gap-3">
+            <div className="flex gap-3 items-start">
+              <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5"><Check className="w-3 h-3 text-primary" /></div>
+              <p><span className="font-bold">Right to Export:</span> Use the "Export Data" button in Settings to download your entire history as a structured JSON file at any time.</p>
+            </div>
+            <div className="flex gap-3 items-start">
+              <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5"><Check className="w-3 h-3 text-primary" /></div>
+              <p><span className="font-bold">Right to Erasure:</span> Deleting your account will trigger a purge of your data from both your local device and our cloud backup servers.</p>
+            </div>
           </div>
-        </CardContent>
-      </Card>
+        </section>
+
+        <section className="space-y-3 pt-4 border-t border-muted/5">
+          <p className="text-[11px] font-bold text-muted-foreground italic text-center">
+            At arcex fit, we do not sell, trade, or rent your personal health information to third-party advertisers. Our business model is based on helping you reach your goals, not selling your privacy.
+          </p>
+        </section>
+      </div>
     </div>
   );
 
