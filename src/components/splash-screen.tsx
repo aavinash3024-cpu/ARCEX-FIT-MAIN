@@ -7,7 +7,7 @@ import { Loader2 } from 'lucide-react';
 export function SplashScreen() {
   return (
     <div className="fixed inset-0 z-[500] flex flex-col items-center bg-slate-950 overflow-hidden">
-      <AnimatedBackground />
+      <AnimatedBackground showElements={false} />
 
       {/* Centered Logo Section */}
       <div className="flex-1 flex items-center justify-center relative z-10">
