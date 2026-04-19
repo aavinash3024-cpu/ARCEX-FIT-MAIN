@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -80,9 +79,10 @@ interface ProfileViewProps {
   onBack: () => void;
   activeView?: ProfileSubView;
   onNavigate: (tab: string) => void;
+  onShowSplash?: () => void;
 }
 
-export function ProfileView({ onBack, activeView = 'main', onNavigate }: ProfileViewProps) {
+export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSplash }: ProfileViewProps) {
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
@@ -331,7 +331,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Sex</Label>
-                <Select value={profileGender} onValueChange={profileGender}>
+                <Select value={profileGender} onValueChange={setProfileGender}>
                   <SelectTrigger className="h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs">
                     <SelectValue />
                   </SelectTrigger>
@@ -589,6 +589,17 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
               color="text-amber-500" 
               bg="bg-amber-50"
               onClick={handleRestartOnboarding}
+            />
+            <SettingsButton 
+              icon={Layout} 
+              label="Preview Splash Screen" 
+              subLabel="Test the app entry animation" 
+              color="text-primary" 
+              bg="bg-primary/5"
+              onClick={() => {
+                triggerHaptic('light');
+                onShowSplash?.();
+              }}
             />
           </CardContent>
         </Card>
@@ -886,4 +897,3 @@ function SettingsSwitch({ icon: Icon, label, subLabel, color, bg, checked, onChe
     </div>
   );
 }
-

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
@@ -30,6 +29,7 @@ import { GoalSettingView } from '@/components/goal-setting-view';
 import { ProfileView } from '@/components/profile-view';
 import { GuideView } from '@/components/guide-view';
 import { OnboardingView } from '@/components/onboarding-view';
+import { SplashScreen } from '@/components/splash-screen';
 import { NotificationsView, type Notification } from '@/components/notifications-view';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
@@ -56,6 +56,7 @@ export default function PulseFlowApp() {
   const [sentMilestones, setSentMilestones] = useState<Record<string, string[]>>({});
   
   const [isLoaded, setIsLoaded] = useState(false);
+  const [showSplash, setShowSplash] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
 
@@ -70,6 +71,14 @@ export default function PulseFlowApp() {
       case 'warning': window.navigator.vibrate([40, 40, 40]); break;
     }
   };
+
+  // Splash Screen Timeout
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
 
   // Initialize Anonymous Auth
   useEffect(() => {
@@ -387,28 +396,23 @@ export default function PulseFlowApp() {
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const renderContent = () => {
+    if (showSplash) {
+      return <SplashScreen />;
+    }
+
     if (!isLoaded || isUserLoading) {
       return (
         <div className="p-4 space-y-6 animate-pulse">
-          {/* Top Banner Skeleton */}
           <Skeleton className="h-28 w-full rounded-3xl bg-muted/60" />
-          
-          {/* Daily Overview Header */}
           <div className="flex justify-between items-center px-1">
             <Skeleton className="h-6 w-32 bg-muted/50" />
             <Skeleton className="h-4 w-12 bg-muted/40" />
           </div>
-
-          {/* Metric Cards Skeleton */}
           <div className="flex gap-4 overflow-hidden">
             <Skeleton className="h-32 w-[260px] rounded-2xl bg-muted/50 shrink-0" />
             <Skeleton className="h-32 w-[260px] rounded-2xl bg-muted/50 shrink-0" />
           </div>
-
-          {/* Macro Card Skeleton */}
           <Skeleton className="h-40 w-full rounded-3xl bg-muted/60" />
-
-          {/* Task Section Skeleton */}
           <div className="space-y-4">
              <div className="flex justify-between items-center px-1">
                <Skeleton className="h-5 w-24 bg-muted/50" />
@@ -455,6 +459,7 @@ export default function PulseFlowApp() {
             }}
             onViewGoalSetting={() => navigateTo('goal-setting')}
             onViewProgress={() => navigateTo('rank')}
+            onViewGoal={() => navigateTo('goal-setting')}
             onViewGuide={() => navigateTo('guide')}
             onViewNutritionSummary={() => navigateTo('nutrition-summary')}
           />
@@ -508,6 +513,10 @@ export default function PulseFlowApp() {
               }
             }} 
             onNavigate={navigateTo} 
+            onShowSplash={() => {
+              setShowSplash(true);
+              setTimeout(() => setShowSplash(false), 2500);
+            }}
           />
         );
       case 'guide': return <GuideView goalData={goalData} loggedMeals={loggedMeals} hydrationAmount={hydrationAmount} weightHistory={weightHistory} onBack={() => window.history.back()} />;
@@ -555,7 +564,7 @@ export default function PulseFlowApp() {
         {renderContent()}
       </main>
 
-      {!showOnboarding && (
+      {!showOnboarding && !showSplash && (
         <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card/90 backdrop-blur-xl border-t px-4 py-3 flex justify-between items-center z-50">
           {[
             { id: 'dashboard', icon: LayoutDashboard, label: 'Home' },
