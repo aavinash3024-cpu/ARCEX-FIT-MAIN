@@ -109,19 +109,9 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
           </Button>
           <h1 className="text-2xl font-bold font-headline">Notifications</h1>
         </div>
-        <div className="pl-12 mt-1">
-          <Button 
-            variant="ghost" 
-            size="sm" 
-            onClick={markAllRead} 
-            className="text-[10px] font-black uppercase tracking-widest text-[#08A391] hover:bg-[#08A391]/5 p-0 h-auto"
-          >
-            Mark all as read
-          </Button>
-        </div>
       </div>
 
-      <Card className="border-none shadow-sm bg-muted/5 rounded-2xl mx-1 mb-6">
+      <Card className="border-none shadow-sm bg-muted/5 rounded-2xl mx-1">
         <CardContent className="p-4 space-y-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -160,6 +150,17 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
           )}
         </CardContent>
       </Card>
+
+      <div className="px-4 flex justify-end">
+        <Button 
+          variant="ghost" 
+          size="sm" 
+          onClick={markAllRead} 
+          className="text-[10px] font-black uppercase tracking-widest text-[#08A391] hover:bg-[#08A391]/5 p-0 h-auto"
+        >
+          Mark all as read
+        </Button>
+      </div>
 
       <div className="space-y-3 px-1">
         {notifications.length === 0 ? (
