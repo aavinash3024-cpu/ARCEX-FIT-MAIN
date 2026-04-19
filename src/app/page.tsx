@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
@@ -79,7 +78,8 @@ export default function PulseFlowApp() {
     notifications: `arcex_${uid}_notifications_data_v2`,
     milestones: `arcex_${uid}_sent_milestones`,
     lastReset: `arcex_${uid}_last_reset_date`,
-    onboarding: `arcex_${uid}_onboarding_complete`
+    onboarding: `arcex_${uid}_onboarding_complete`,
+    userProfile: `arcex_${uid}_user_profile`
   }), []);
 
   const triggerHaptic = (type: 'light' | 'medium' | 'success' | 'warning' = 'light') => {
@@ -138,10 +138,19 @@ export default function PulseFlowApp() {
   // Splash Screen Timeout
   useEffect(() => {
     const timer = setTimeout(() => {
-      setShowSplash(false);
+      // Only release splash if auth loading is done
+      if (!isUserLoading) setShowSplash(false);
     }, 2500);
     return () => clearTimeout(timer);
-  }, []);
+  }, [isUserLoading]);
+
+  // Ensure splash stays until user state is certain
+  useEffect(() => {
+    if (!isUserLoading && isLoaded) {
+      const timer = setTimeout(() => setShowSplash(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isUserLoading, isLoaded]);
 
   useEffect(() => {
     if (mainRef.current) {
@@ -207,7 +216,10 @@ export default function PulseFlowApp() {
 
   // CORE DATA LOADING WITH UID NAMESPACING
   useEffect(() => {
-    if (!user) return;
+    if (!user) {
+      setIsLoaded(false);
+      return;
+    }
 
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const keys = getKeys(user.uid);
@@ -333,7 +345,6 @@ export default function PulseFlowApp() {
     const data = JSON.parse(localStorage.getItem(keys.goal) || '{}');
     setGoalData(data);
     setShowOnboarding(false);
-    // CHOICE B: Sync initial onboarding to cloud
     syncDataToFirestore();
   };
 
@@ -480,7 +491,6 @@ export default function PulseFlowApp() {
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const renderContent = () => {
-    // FIX: Keep splash screen until auth state is definitively known to prevent dashboard flickering
     if (showSplash || isUserLoading) return <SplashScreen />;
     if (!user) return <AuthView />;
     if (showOnboarding) return <OnboardingView onComplete={handleOnboardingComplete} />;
@@ -551,6 +561,7 @@ export default function PulseFlowApp() {
         setGoalData(JSON.parse(localStorage.getItem(keys.goal) || '{}'));
       }} />;
       case 'profile':
+      case 'profile-personal-info':
       case 'profile-personal':
       case 'profile-subscription':
       case 'profile-legal':
@@ -559,7 +570,7 @@ export default function PulseFlowApp() {
         const profileSub = activeTab === 'profile' ? 'main' : activeTab.replace('profile-', '') as any;
         return (
           <ProfileView 
-            activeView={profileSub} 
+            activeView={profileSub === 'personal' ? 'personal-info' : profileSub} 
             onBack={() => {
               triggerHaptic('light');
               if (activeTab === 'profile') setActiveTab('dashboard');
@@ -636,7 +647,8 @@ export default function PulseFlowApp() {
             const Icon = item.icon;
             const isNutrition = item.id === 'nutrition' && ['nutrition-summary', 'nutrition-micro', 'nutrition-macro', 'nutrition-micro-detail'].includes(activeTab);
             const isWorkout = item.id === 'workout' && ['workout-library', 'workout-split', 'workout-history', 'workout-pr', 'workout-pr-detail'].includes(activeTab);
-            const isActive = activeTab === item.id || isNutrition || isWorkout;
+            const isProfile = item.id === 'profile' && activeTab.startsWith('profile');
+            const isActive = activeTab === item.id || isNutrition || isWorkout || isProfile;
             return (
               <button
                 key={item.id}

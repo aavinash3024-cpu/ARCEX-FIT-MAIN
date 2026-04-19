@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -344,12 +343,16 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-6 space-y-5">
             <div className="space-y-2">
-              <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Username</Label>
+              <div className="flex justify-between items-center px-1">
+                <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest">Username</Label>
+                <span className="text-[9px] font-black text-muted-foreground/40">{profileName.length}/20</span>
+              </div>
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
                 <Input 
                   value={profileName} 
-                  onChange={(e) => setProfileName(e.target.value)}
+                  onChange={(e) => setProfileName(e.target.value.substring(0, 20))}
+                  maxLength={20}
                   className="pl-10 h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs"
                 />
               </div>
@@ -854,7 +857,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
     {
       title: "My Account",
       items: [
-        { id: 'profile-personal', icon: User, label: "Personal Information", subLabel: "Name, email, and identity", color: "text-blue-500", bg: "bg-blue-50" },
+        { id: 'profile-personal-info', icon: User, label: "Personal Information", subLabel: "Name, email, and identity", color: "text-blue-500", bg: "bg-blue-50" },
         { id: 'profile-subscription', icon: CreditCard, label: "Subscription Plan", subLabel: "Elite Premium", color: "text-purple-500", bg: "bg-purple-50" },
         { id: 'profile-reset', icon: RefreshCw, label: "Reset Progress", subLabel: "Fresh start, keep profile", color: "text-rose-500", bg: "bg-rose-50" },
       ]
