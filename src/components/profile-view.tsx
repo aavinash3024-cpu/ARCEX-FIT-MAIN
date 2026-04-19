@@ -48,8 +48,7 @@ import {
   Dumbbell,
   TrendingUp,
   Sparkles,
-  Wifi,
-  Contact
+  Wifi
 } from "lucide-react";
 import { 
   Select,
@@ -72,11 +71,6 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
-import {
-  Carousel,
-  CarouselContent,
-  CarouselItem,
-} from "@/components/ui/carousel";
 import { cn } from "@/lib/utils";
 
 export type ProfileSubView = 'main' | 'personal-info' | 'subscription' | 'legal' | 'settings' | 'reset';
@@ -92,6 +86,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
+  const [selectedPlanId, setSelectedPlanId] = useState('quarterly');
 
   // Preference States
   const [darkMode, setDarkMode] = useState(false);
@@ -288,7 +283,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   ];
 
   const renderPersonalInfo = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       <div className="px-1 space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Identity Details</h3>
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
@@ -382,8 +377,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   const renderSubscription = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
-      {/* CREDIT CARD STYLE STATUS CARD */}
+    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-10">
+      {/* 1. MEMBERSHIP CARD (STATUS) */}
       <div className="px-1">
         <div className="relative w-full h-52 rounded-[1.75rem] overflow-hidden shadow-2xl transition-transform hover:scale-[1.02] active:scale-[0.98]">
           <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] via-[#2d3436] to-[#0f172a]" />
@@ -395,9 +390,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
             <div className="flex justify-between items-start">
               <div className="space-y-1">
                 <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-primary to-emerald-400 p-[1.5px]">
-                    <div className="w-full h-full rounded-[7px] bg-black/40 backdrop-blur-sm flex items-center justify-center">
-                      <Activity className="w-4 h-4 text-white" />
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-emerald-400 p-[0px] overflow-hidden flex items-center justify-center">
+                    <div className="w-full h-full bg-black/40 backdrop-blur-sm flex items-center justify-center">
+                      <Activity className="w-6 h-6 text-white" />
                     </div>
                   </div>
                   <span className="font-black text-sm uppercase tracking-tighter italic">ARCEX <span className="text-primary">FIT</span></span>
@@ -417,7 +412,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 <div className="flex items-center gap-4">
                   <div>
                     <p className="text-[6px] font-black text-white/30 uppercase tracking-[0.2em]">CURRENT TIER</p>
-                    <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/20 text-[8px] font-black uppercase px-2 h-4 rounded-md">PREMIUM</Badge>
+                    <Badge variant="secondary" className="bg-primary/20 text-primary border-primary/20 text-[8px] font-black uppercase px-2 h-4 rounded-md">PREMIUM ELITE</Badge>
                   </div>
                   <div>
                     <p className="text-[6px] font-black text-white/30 uppercase tracking-[0.2em]">EXPIRY</p>
@@ -439,131 +434,48 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         </div>
       </div>
 
-      <div className="space-y-2 px-3 pt-4">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Tier Comparison</h3>
-        <p className="text-sm font-bold text-foreground/80">Swipe to compare strategy features.</p>
-      </div>
-
-      {/* FEATURES SLIDER */}
-      <div className="px-1">
-        <Carousel className="w-full">
-          <CarouselContent className="ml-0">
-            {/* PREMIUM CARD */}
-            <CarouselItem className="pl-0 basis-full px-1">
-              <Card className="border-none bg-gradient-to-br from-card to-muted/20 rounded-[2rem] border border-muted/10 shadow-xl overflow-hidden relative h-full">
-                <div className="absolute top-0 right-0 p-6 opacity-[0.03] pointer-events-none">
-                  <Activity className="w-32 h-32 text-primary" />
-                </div>
-                <CardContent className="p-6 space-y-6">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2">
-                      <div className="w-8 h-8 rounded-xl bg-primary/20 flex items-center justify-center">
-                        <Crown className="w-4 h-4 text-primary" />
-                      </div>
-                      <h4 className="text-sm font-black uppercase tracking-tight text-primary">Elite Premium</h4>
-                    </div>
-                    <Badge className="bg-primary text-white text-[7px] font-black uppercase">POWERED BY AI</Badge>
-                  </div>
-                  
-                  <div className="grid gap-3">
-                    {[
-                      { label: 'Workout Strength Growth Analytics', icon: TrendingUp },
-                      { label: 'Advanced Workout Split Analysis', icon: Layout },
-                      { label: 'AI Meal Logging (20 Credits/Day)', icon: UtensilsCrossed },
-                      { label: 'Full Nutrient Breakdown History', icon: BarChart3 },
-                      { label: 'UNLIMITED PERSONAL AI ANALYSIS', icon: Sparkles, highlight: true }
-                    ].map((item, i) => (
-                      <div key={i} className={cn("flex items-start gap-3", item.highlight && "bg-primary/10 p-2.5 -mx-2 rounded-xl border border-primary/10")}>
-                        <div className="mt-0.5">
-                          <CheckCircle2 className={cn("w-4 h-4", item.highlight ? "text-primary fill-primary/20" : "text-primary/40")} />
-                        </div>
-                        <span className={cn("text-xs font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground/80")}>
-                          {item.label}
-                        </span>
-                      </div>
-                    ))}
-                    
-                    <div className="pt-2 border-t border-muted/10">
-                      <div className="flex items-center gap-2 opacity-50">
-                        <Check className="w-3 h-3 text-muted-foreground" />
-                        <span className="text-[10px] font-bold text-muted-foreground uppercase">Includes all Standard features</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-            </CarouselItem>
-
-            {/* FREE CARD */}
-            <CarouselItem className="pl-0 basis-full px-1">
-              <Card className="border-none bg-card rounded-[2rem] border border-muted/10 shadow-sm overflow-hidden h-full">
-                <CardContent className="p-6 space-y-6">
-                  <div className="flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-xl bg-muted flex items-center justify-center">
-                      <Shield className="w-4 h-4 text-muted-foreground" />
-                    </div>
-                    <h4 className="text-sm font-black uppercase tracking-tight text-muted-foreground">Standard Free</h4>
-                  </div>
-                  <div className="grid gap-3">
-                    {[
-                      { label: 'Hydration Tracking with Weekly Analysis', icon: HeartPulse },
-                      { label: 'Steps Tracking with Weekly Analysis', icon: Activity },
-                      { label: 'Activity Streak & Badges', icon: Zap },
-                      { label: 'Daily Task Management System', icon: ListTodo },
-                      { label: 'Custom Workout Creation', icon: Dumbbell }
-                    ].map((item, i) => (
-                      <div key={i} className="flex items-start gap-3">
-                        <div className="mt-0.5">
-                          <Check className="w-3.5 h-3.5 text-muted-foreground/30" />
-                        </div>
-                        <span className="text-xs font-bold text-foreground/50 uppercase tracking-tight">
-                          {item.label}
-                        </span>
-                      </div>
-                    ))}
-                  </div>
-                </CardContent>
-              </Card>
-            </CarouselItem>
-          </CarouselContent>
-        </Carousel>
-      </div>
-
-      {/* COMMITMENT PLANS */}
-      <div className="space-y-4 pt-4 px-1">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">See Subscription Plans</h3>
+      {/* 2. PRICING PLANS */}
+      <div className="px-1 space-y-4">
+        <div className="px-3 flex justify-between items-baseline">
+          <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60">Subscription Plans</h3>
+        </div>
         
         <div className="grid gap-3">
           {[
-            { id: 'monthly', name: 'Monthly Elite', price: '229', period: 'Month', label: 'Basic Strategy' },
-            { id: 'quarterly', name: 'Quarterly Elite', price: '599', period: '3 Months', label: 'Recommended', popular: true, save: 'Save 15%' },
-            { id: 'half-year', name: 'Elite Performance', price: '1099', period: '6 Months', label: 'Best Value', save: 'Save 20%' }
+            { id: 'monthly', name: 'Monthly Elite', price: '229', original: '299', period: 'Month', label: 'Month-to-month access' },
+            { id: 'quarterly', name: 'Quarterly Elite', price: '599', original: '899', period: '3 Months', label: 'Most popular choice', popular: true, save: 'Save 15%' },
+            { id: 'half-year', name: 'Elite Performance', price: '1099', original: '1799', period: '6 Months', label: 'Professional standard', save: 'Save 20%' }
           ].map((plan) => (
-            <Card key={plan.id} className={cn(
-              "border-none shadow-md rounded-2xl overflow-hidden border transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99]",
-              plan.popular 
-                ? "bg-gradient-to-r from-primary/10 via-primary/5 to-transparent text-foreground ring-2 ring-primary ring-offset-2" 
-                : "bg-card border-muted/10"
-            )}>
+            <Card 
+              key={plan.id} 
+              onClick={() => setSelectedPlanId(plan.id)}
+              className={cn(
+                "border-none shadow-md rounded-2xl overflow-hidden border transition-all cursor-pointer hover:scale-[1.01] active:scale-[0.99]",
+                selectedPlanId === plan.id 
+                  ? "bg-gradient-to-r from-primary/10 via-primary/5 to-transparent ring-2 ring-primary ring-offset-2" 
+                  : "bg-card border-muted/10 opacity-70"
+              )}
+            >
               <CardContent className="p-4 flex items-center justify-between">
-                <div className="space-y-0.5">
+                <div className="space-y-0.5 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h5 className="font-black text-xs uppercase tracking-widest">{plan.name}</h5>
+                    <h5 className="font-black text-xs uppercase tracking-widest truncate">{plan.name}</h5>
                     {plan.save && (
-                      <Badge className={cn("text-[7px] font-black uppercase px-1.5 h-4", plan.popular ? "bg-primary text-white" : "bg-primary/10 text-primary")}>
+                      <Badge className={cn("text-[7px] font-black uppercase px-1.5 h-4", selectedPlanId === plan.id ? "bg-primary text-white" : "bg-primary/10 text-primary")}>
                         {plan.save}
                       </Badge>
                     )}
                   </div>
-                  <p className={cn("text-[8px] font-black uppercase tracking-widest opacity-60")}>
+                  <p className="text-[8px] font-black uppercase tracking-widest text-muted-foreground/60 truncate">
                     {plan.label}
                   </p>
                 </div>
-                <div className="text-right">
-                  <div className="flex items-baseline justify-end gap-1">
-                    <span className="text-lg font-black">{plan.price}</span>
+                <div className="text-right shrink-0">
+                  <div className="flex items-center justify-end gap-1.5">
+                    <span className="text-[9px] font-bold text-muted-foreground line-through decoration-muted-foreground/30 opacity-60">{plan.original}</span>
+                    <span className="text-lg font-black text-foreground">{plan.price}</span>
                   </div>
-                  <p className={cn("text-[7px] font-black uppercase tracking-widest opacity-60")}>
+                  <p className="text-[7px] font-black uppercase tracking-widest text-muted-foreground opacity-60">
                     / {plan.period}
                   </p>
                 </div>
@@ -572,11 +484,86 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
           ))}
         </div>
       </div>
+
+      {/* 3. PREMIUM COVERAGE SECTION */}
+      <div className="px-1 space-y-4">
+        <div className="bg-primary/5 rounded-[2rem] border border-primary/10 overflow-hidden">
+          <div className="p-6 border-b border-primary/5 bg-primary/10">
+            <h4 className="text-sm font-black uppercase tracking-tight text-primary flex items-center gap-2">
+              <Crown className="w-4 h-4" /> Elite Premium Coverage
+            </h4>
+            <p className="text-[9px] font-black text-primary/60 uppercase tracking-widest mt-1">THE COMPLETE ARCEX STRATEGY</p>
+          </div>
+          
+          <div className="p-6 space-y-6">
+            <div className="grid gap-5">
+              {[
+                { label: 'Workout Strength Growth Analytics', desc: 'Track your volume and power progress over time.', icon: TrendingUp },
+                { label: 'Advanced Workout Split Analysis', desc: 'Deep dive into muscle coverage and target gaps.', icon: Layout },
+                { label: 'AI-Powered Meal Logging', desc: 'Fast, natural language meal tracking (20 credits/day).', icon: UtensilsCrossed },
+                { label: 'Daily, Weekly & Monthly Meal Reports', desc: 'Comprehensive nutrient trends and full summaries.', icon: BarChart3 },
+                { label: 'UNLIMITED PERSONAL AI ANALYSIS', desc: 'Professional-grade wellness insights on demand.', icon: Sparkles, highlight: true }
+              ].map((item, i) => (
+                <div key={i} className="flex gap-4">
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm", item.highlight ? "bg-primary text-white" : "bg-card border border-primary/10 text-primary")}>
+                    <item.icon className="w-5 h-5" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <h5 className={cn("text-[11px] font-black uppercase tracking-tight", item.highlight ? "text-primary" : "text-foreground")}>{item.label}</h5>
+                    <p className="text-[9px] font-bold text-muted-foreground leading-tight">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <div className="pt-4 border-t border-primary/10">
+              <div className="flex items-center gap-2 bg-primary/10 p-3 rounded-xl border border-primary/10">
+                <CheckCircle2 className="w-4 h-4 text-primary fill-primary/10" />
+                <span className="text-[9px] font-black uppercase text-primary tracking-widest">Includes all Standard features below</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* 4. FREE FEATURES SECTION */}
+      <div className="px-1 space-y-4">
+        <div className="bg-card rounded-[2rem] border border-muted/10 overflow-hidden shadow-sm">
+          <div className="p-6 border-b border-muted/5 bg-muted/5">
+            <h4 className="text-sm font-black uppercase tracking-tight text-muted-foreground flex items-center gap-2">
+              <Shield className="w-4 h-4" /> Standard Free Features
+            </h4>
+            <p className="text-[9px] font-black text-muted-foreground/40 uppercase tracking-widest mt-1">ESSENTIAL TRACKING TOOLS</p>
+          </div>
+          
+          <div className="p-6 space-y-5">
+            <div className="grid gap-5">
+              {[
+                { label: 'Hydration Tracking', desc: 'Monitor water intake with weekly trend analysis.', icon: HeartPulse },
+                { label: 'Steps Tracking', desc: 'Daily step counter with performance progress charts.', icon: Activity },
+                { label: 'Activity Streak & Badges', desc: 'Stay consistent and earn performance milestones.', icon: Zap },
+                { label: 'Daily Task Management System', desc: 'Organize your daily fitness and wellness objectives.', icon: ListTodo },
+                { label: 'Custom Workout Creation', desc: 'Build your own custom routines from the library.', icon: Dumbbell }
+              ].map((item, i) => (
+                <div key={i} className="flex gap-4 opacity-70">
+                  <div className="w-10 h-10 rounded-xl bg-muted/30 flex items-center justify-center shrink-0 border border-muted/10">
+                    <item.icon className="w-5 h-5 text-muted-foreground/60" />
+                  </div>
+                  <div className="space-y-0.5">
+                    <h5 className="text-[11px] font-black uppercase tracking-tight text-foreground/80">{item.label}</h5>
+                    <p className="text-[9px] font-bold text-muted-foreground/60 leading-tight">{item.desc}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 
   const renderLegal = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       <div className="px-1 space-y-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Documentation</h3>
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
@@ -592,7 +579,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   const renderSettings = () => (
-    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
       <div className="px-1 space-y-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Preferences</h3>
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
@@ -652,7 +639,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   const renderReset = () => (
-    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1">
+    <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 px-1 pb-10">
       <Card className="border-none shadow-xl bg-card rounded-[2.5rem] overflow-hidden border border-muted/10">
         <CardContent className="p-8 space-y-8">
           <div className="w-20 h-20 bg-rose-50 rounded-full flex items-center justify-center mx-auto border-4 border-white shadow-lg">
@@ -782,7 +769,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         )}
       </div>
 
-      <div className="space-y-8 px-1 mt-6">
+      <div className="space-y-8 px-1 mt-6 pb-20">
         {menuSections.map((section, idx) => (
           <div key={idx} className="space-y-3">
             <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">
@@ -819,7 +806,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   return (
-    <div className="space-y-6 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
+    <div className="space-y-6 pb-2 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       <div className="flex items-center gap-4 pt-2 px-1">
         <Button variant="ghost" size="icon" onClick={onBack} className="rounded-full bg-muted/50 w-9 h-9">
           <ChevronLeft className="w-5 h-5" />

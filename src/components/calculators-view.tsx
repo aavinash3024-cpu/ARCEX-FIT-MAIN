@@ -112,7 +112,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
     const wa = parseFloat(waist);
     const hi = parseFloat(hip);
 
-    if (isNaN(h) || isNaN(n) || isNaN(wa) || isNaN(w)) return;
+    if (isNaN(h) || i(n) || isNaN(wa) || i(w)) return;
 
     let bf = 0;
     if (gender === 'male') {
