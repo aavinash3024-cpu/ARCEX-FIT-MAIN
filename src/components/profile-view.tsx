@@ -377,7 +377,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   const renderSubscription = () => (
-    <div className="space-y-8 animate-in fade-in slide-in-from-right-4 duration-500 pb-24">
+    <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500 pb-24">
       {/* 1. MEMBERSHIP STATUS CARD (CREDIT CARD STYLE) */}
       <div className="px-1">
         <div className="relative w-full h-32 rounded-[1.75rem] overflow-hidden shadow-2xl">
@@ -413,7 +413,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         </div>
       </div>
 
-      {/* 2. SUBSCRIPTION PLANS (2-COLUMN GRID) */}
+      {/* 2. SUBSCRIPTION PLANS (COMPACT 2-COLUMN GRID) */}
       <div className="px-1 space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">See Subscription Plans</h3>
         <div className="grid grid-cols-2 gap-3">
@@ -427,30 +427,34 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 key={plan.id}
                 onClick={() => setSelectedPlanId(plan.id)}
                 className={cn(
-                  "relative p-[2px] rounded-2xl transition-all cursor-pointer",
+                  "relative p-[1.5px] rounded-2xl transition-all cursor-pointer",
                   isSelected 
                     ? "bg-gradient-to-br from-[#4ade80] via-[#2dd4bf] to-[#3b82f6] shadow-lg scale-[1.02]" 
                     : "bg-muted/20"
                 )}
               >
+                {/* PER DAY PRICE ON BORDER */}
+                <div className={cn(
+                  "absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-0.5 rounded-full z-10 border border-white/20 backdrop-blur-md shadow-sm",
+                  isSelected ? "bg-gradient-to-r from-primary to-emerald-400" : "bg-muted text-muted-foreground"
+                )}>
+                  <p className={cn("text-[8px] font-black uppercase tracking-widest whitespace-nowrap", isSelected ? "text-white" : "text-muted-foreground/80")}>
+                    JUST ₹{plan.perDay} / DAY
+                  </p>
+                </div>
+
                 <Card className="border-none bg-card rounded-[calc(1rem-0.5px)] h-full overflow-hidden">
-                  <CardContent className="p-4 flex flex-col items-center text-center gap-1">
-                    <div className="bg-primary/5 px-2 py-0.5 rounded-full mb-1">
-                      <p className={cn("text-[9px] font-black uppercase tracking-widest", isSelected ? "text-primary" : "text-muted-foreground/60")}>
-                        JUST ₹{plan.perDay} / DAY
-                      </p>
-                    </div>
-                    
-                    <h5 className={cn("font-black text-[10px] uppercase tracking-[0.2em] mb-1", isSelected ? "text-primary" : "text-muted-foreground")}>
+                  <CardContent className="p-3 pt-4 flex flex-col items-center text-center gap-1.5">
+                    <h5 className={cn("font-black text-[10px] uppercase tracking-[0.2em]", isSelected ? "text-primary" : "text-muted-foreground")}>
                       {plan.name}
                     </h5>
 
-                    <div className="flex items-center gap-2">
-                      <span className="text-[10px] font-bold text-red-500 line-through">₹{plan.original}</span>
+                    <div className="flex items-center justify-center gap-1.5 flex-wrap">
+                      <span className="text-[10px] font-bold text-red-500 line-through opacity-80">₹{plan.original}</span>
                       <span className="text-xl font-black text-foreground">₹{plan.price}</span>
                     </div>
 
-                    <Badge className="bg-red-500/10 text-red-500 text-[8px] font-black uppercase px-2 h-4 border-none mt-1 shadow-sm">
+                    <Badge className="bg-red-500/10 text-red-500 text-[8px] font-black uppercase px-2 h-4 border-none shadow-sm">
                       SAVE {plan.save}
                     </Badge>
                   </CardContent>
@@ -471,8 +475,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 { label: 'Strength Growth', desc: 'Detailed power progress trends.', icon: TrendingUp, colors: 'from-amber-400 to-orange-500' },
                 { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'from-blue-400 to-indigo-600' },
                 { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'from-emerald-400 to-teal-600' },
-                { label: 'Skin Micro Tracking', desc: 'Texture, Acne & Inflammation audit.', icon: HeartPulse, colors: 'from-orange-400 to-rose-500' },
-                { label: 'Recovery Micro Tracking', desc: 'Muscle repair & contraction signals.', icon: Timer, colors: 'from-indigo-400 to-blue-600' },
+                { label: 'Skin Based Micro Tracking', desc: 'Texture, Acne & Inflammation audit.', icon: HeartPulse, colors: 'from-orange-400 to-rose-500' },
+                { label: 'Recovery Based Micro Tracking', desc: 'Muscle repair & contraction signals.', icon: Timer, colors: 'from-indigo-400 to-blue-600' },
                 { label: 'Intake Reports', desc: 'Daily, Weekly, Monthly history.', icon: BarChart3, colors: 'from-purple-400 to-pink-600' },
                 { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED personal progress insights.', icon: Sparkles, colors: 'from-cyan-400 to-blue-600', highlight: true }
               ].map((item, i) => (
