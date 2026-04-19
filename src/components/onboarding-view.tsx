@@ -61,32 +61,6 @@ const INDIAN_STATES = [
   "Dadra and Nagar Haveli and Daman and Diu", "Delhi", "Jammu and Kashmir", "Ladakh", "Lakshadweep", "Puducherry"
 ].sort();
 
-const STATE_DISTRICTS: Record<string, string[]> = {
-  "Maharashtra": ["Mumbai", "Pune", "Nagpur", "Thane", "Nashik", "Aurangabad"],
-  "Delhi": ["New Delhi", "North Delhi", "South Delhi", "East Delhi", "West Delhi"],
-  "Karnataka": ["Bengaluru", "Mysuru", "Hubballi", "Mangaluru", "Belagavi"],
-  "Tamil Nadu": ["Chennai", "Coimbatore", "Madurai", "Salem", "Tiruchirappalli"],
-  "Uttar Pradesh": ["Lucknow", "Kanpur", "Noida", "Agra", "Varanasi", "Ghaziabad"],
-  "Gujarat": ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Gandhinagar"],
-  "West Bengal": ["Kolkata", "Howrah", "Asansol", "Siliguri", "Durgapur"],
-  "Rajasthan": ["Jaipur", "Jodhpur", "Udaipur", "Kota", "Ajmer"],
-  "Telangana": ["Hyderabad", "Warangal", "Nizamabad", "Khammam"],
-  "Kerala": ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kollam"],
-  "Punjab": ["Ludhiana", "Amritsar", "Jalandhar", "Patiala", "Mohali"],
-  "Haryana": ["Gurugram", "Faridabad", "Panipat", "Ambala", "Panchkula"],
-  "Bihar": ["Patna", "Gaya", "Bhagalpur", "Muzaffarpur"],
-  "Madhya Pradesh": ["Bhopal", "Indore", "Gwalior", "Jabalpur", "Ujjain"],
-  "Assam": ["Guwahati", "Dibrugarh", "Silchar", "Jorhat"],
-  "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur"],
-  "Andhra Pradesh": ["Visakhapatnam", "Vijayawada", "Guntur", "Nellore", "Tirupati"],
-  "Goa": ["North Goa", "South Goa", "Panaji"],
-  "Uttarakhand": ["Dehradun", "Haridwar", "Nainital", "Rishikesh"],
-  "Himachal Pradesh": ["Shimla", "Dharamshala", "Manali", "Solan"],
-  "Jharkhand": ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro"],
-  "Chhattisgarh": ["Raipur", "Bhilai", "Bilaspur"],
-  "Jammu and Kashmir": ["Srinagar", "Jammu", "Anantnag"],
-};
-
 /**
  * Highly graphical continuous animation component for the full background.
  */
@@ -148,7 +122,6 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
   const [age, setAge] = useState("25");
   const [gender, setGender] = useState<'male' | 'female'>('male');
   const [userState, setUserState] = useState("");
-  const [district, setDistrict] = useState("");
 
   // Step 2: Body Status
   const [weight, setWeight] = useState("75");
@@ -222,7 +195,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
   }, [weight, height, age, gender, activity, objective, targetWeight, calAdj, protAdj, carbRatio]);
 
   const handleNext = () => {
-    if (step === 1 && (!name.trim() || !userState || !district)) return;
+    if (step === 1 && (!name.trim() || !userState)) return;
     if (step === 3 && !calculations.isWeightValid) return;
     
     if (step === 3) {
@@ -244,7 +217,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
         name, 
         email: `${name.toLowerCase().replace(/\s/g, '.')}@pulseflow.ai`, 
         dob: "1998-05-15", 
-        location: `${district}, ${userState}` 
+        location: userState 
       }));
       onComplete();
     } else {
@@ -253,11 +226,6 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
   };
 
   const bgImage = PlaceHolderImages.find(img => img.id === 'analyzer-bg');
-
-  const districtList = useMemo(() => {
-    if (!userState) return [];
-    return STATE_DISTRICTS[userState] || ["Other"];
-  }, [userState]);
 
   if (!isLoaded) return null;
 
@@ -367,27 +335,13 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     <div className="space-y-4">
                       <div className="space-y-2">
                         <Label className="text-[10px] font-semibold text-white/60 pl-1 uppercase">State</Label>
-                        <Select value={userState} onValueChange={(val) => { setUserState(val); setDistrict(""); }}>
+                        <Select value={userState} onValueChange={(val) => setUserState(val)}>
                           <SelectTrigger className="h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
                             <SelectValue placeholder="Select State" />
                           </SelectTrigger>
                           <SelectContent className="z-[200] rounded-xl bg-slate-900 border-white/10 text-white max-h-[250px]">
                             {INDIAN_STATES.map(s => (
                               <SelectItem key={s} value={s}>{s}</SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-
-                      <div className="space-y-2">
-                        <Label className="text-[10px] font-semibold text-white/60 pl-1 uppercase">District</Label>
-                        <Select value={district} onValueChange={setDistrict} disabled={!userState}>
-                          <SelectTrigger className="h-12 rounded-xl bg-white/[0.02] border-white/10 text-white font-medium">
-                            <SelectValue placeholder={userState ? "Select District" : "Choose state first"} />
-                          </SelectTrigger>
-                          <SelectContent className="z-[200] rounded-xl bg-slate-900 border-white/10 text-white max-h-[250px]">
-                            {districtList.map(d => (
-                              <SelectItem key={d} value={d}>{d}</SelectItem>
                             ))}
                           </SelectContent>
                         </Select>
@@ -549,7 +503,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                           <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black bg-white/5 text-white border-none">{calculations.carbPct}%</Badge>
                         </div>
                         <div className="text-center space-y-0.5">
-                          <p className="text-base font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
+                          <p className="text-base font-black" style={{ color: MACRO_COLORS.fats }}>{calculations.fats}g</p>
                           <p className="text-[8px] font-bold text-white/40 uppercase">Fats</p>
                           <Badge variant="secondary" className="text-[8px] h-3.5 py-0 px-1.5 opacity-60 font-black bg-white/5 text-white border-none">{calculations.fatPct}%</Badge>
                         </div>
@@ -690,7 +644,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
           )}
           <Button 
             onClick={handleNext}
-            disabled={step === 1 && (!name.trim() || !userState || !district)}
+            disabled={step === 1 && (!name.trim() || !userState)}
             className="flex-[2] h-14 rounded-xl bg-primary text-slate-950 font-bold shadow-xl gap-2 active:scale-95 transition-all"
           >
             {step === 5 ? "Launch arcexfit" : "Next Step"}
