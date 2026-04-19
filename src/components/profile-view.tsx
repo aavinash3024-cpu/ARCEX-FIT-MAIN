@@ -165,7 +165,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
       }
     }
 
-    // Load Preferences (These stay global per device usually)
+    // Load Preferences
     const savedDarkMode = localStorage.getItem('pulseflow_dark_mode') === 'true';
     setDarkMode(savedDarkMode);
     
@@ -178,7 +178,27 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
     setIsReady(true);
   }, [user]);
 
-  // Theme Side Effect - Controlled by isReady guard to prevent un-darkening on profile entry
+  // Track changes to enable/disable save button
+  const hasChanges = useMemo(() => {
+    if (!isReady || !user) return false;
+    const uid = user.uid;
+    
+    const storedProfileStr = localStorage.getItem(`arcex_${uid}_user_profile`);
+    const storedProfile = storedProfileStr ? JSON.parse(storedProfileStr) : {};
+    
+    const storedGoalStr = localStorage.getItem(`arcex_${uid}_goal_data`);
+    const storedGoal = storedGoalStr ? JSON.parse(storedGoalStr) : {};
+
+    const nameDiff = profileName !== (storedProfile.name || "Alex Johnson");
+    const locationDiff = profileLocation !== (storedProfile.location || "London, UK");
+    const dobDiff = profileDob !== (storedProfile.dob || "1998-05-15");
+    const genderDiff = profileGender !== (storedGoal.gender || "male");
+    const ageDiff = profileAge !== (storedGoal.age?.toString() || "25");
+
+    return nameDiff || locationDiff || dobDiff || genderDiff || ageDiff;
+  }, [profileName, profileLocation, profileDob, profileGender, profileAge, user, isReady]);
+
+  // Theme Side Effect
   useEffect(() => {
     if (!isReady) return;
     if (darkMode) {
@@ -364,8 +384,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
                 <FileText className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground/40" />
                 <Input 
                   value={profileEmail} 
-                  onChange={(e) => setProfileEmail(e.target.value)}
-                  className="pl-10 h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs"
+                  readOnly
+                  className="pl-10 h-12 rounded-xl bg-muted/10 border-muted-foreground/10 font-bold text-xs opacity-60 cursor-not-allowed"
                 />
               </div>
             </div>
@@ -424,8 +444,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
 
         <Button 
           onClick={handleSaveProfile}
-          disabled={isSaving}
-          className="w-full h-14 rounded-2xl bg-primary text-white font-black uppercase text-[11px] tracking-widest shadow-xl shadow-primary/20 gap-2 mt-4"
+          disabled={isSaving || !hasChanges}
+          className="w-full h-14 rounded-2xl bg-primary text-white font-black uppercase text-[11px] tracking-widest shadow-xl shadow-primary/20 gap-2 mt-4 disabled:opacity-50"
         >
           {isSaving ? <RefreshCw className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           Save Personal Details
