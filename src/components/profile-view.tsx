@@ -413,9 +413,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         </div>
       </div>
 
-      {/* 2. SUBSCRIPTION PLANS (HORIZONTAL GRID) */}
+      {/* 2. SUBSCRIPTION PLANS (2-COLUMN GRID) */}
       <div className="px-1 space-y-4">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Subscription Plans</h3>
+        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">See Subscription Plans</h3>
         <div className="grid grid-cols-2 gap-3">
           {[
             { id: 'monthly', name: 'Monthly', price: '229', original: '299', save: '23%', perDay: '7.6' },
@@ -427,25 +427,32 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 key={plan.id}
                 onClick={() => setSelectedPlanId(plan.id)}
                 className={cn(
-                  "relative p-[1.5px] rounded-2xl transition-all cursor-pointer",
-                  isSelected ? "bg-gradient-to-br from-[#4ade80] via-[#2dd4bf] to-[#3b82f6] shadow-lg scale-[1.02]" : "bg-muted/20"
+                  "relative p-[2px] rounded-2xl transition-all cursor-pointer",
+                  isSelected 
+                    ? "bg-gradient-to-br from-[#4ade80] via-[#2dd4bf] to-[#3b82f6] shadow-lg scale-[1.02]" 
+                    : "bg-muted/20"
                 )}
               >
                 <Card className="border-none bg-card rounded-[calc(1rem-0.5px)] h-full overflow-hidden">
-                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
-                    <h5 className={cn("font-black text-[10px] uppercase tracking-widest", isSelected ? "text-primary" : "text-muted-foreground")}>
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-1">
+                    <div className="bg-primary/5 px-2 py-0.5 rounded-full mb-1">
+                      <p className={cn("text-[9px] font-black uppercase tracking-widest", isSelected ? "text-primary" : "text-muted-foreground/60")}>
+                        JUST ₹{plan.perDay} / DAY
+                      </p>
+                    </div>
+                    
+                    <h5 className={cn("font-black text-[10px] uppercase tracking-[0.2em] mb-1", isSelected ? "text-primary" : "text-muted-foreground")}>
                       {plan.name}
                     </h5>
-                    <div className="space-y-0.5 flex flex-col items-center">
-                      <span className="text-[9px] font-bold text-rose-500 line-through">₹{plan.original}</span>
-                      <div className="flex items-baseline gap-0.5">
-                        <span className="text-xl font-black text-foreground">₹{plan.price}</span>
-                      </div>
-                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest opacity-60">₹{plan.perDay} / DAY</p>
-                      <Badge className="bg-rose-500/10 text-rose-500 text-[8px] font-black uppercase px-2 h-4 border-none mt-2 shadow-sm">
-                        SAVE {plan.save}
-                      </Badge>
+
+                    <div className="flex items-center gap-2">
+                      <span className="text-[10px] font-bold text-red-500 line-through">₹{plan.original}</span>
+                      <span className="text-xl font-black text-foreground">₹{plan.price}</span>
                     </div>
+
+                    <Badge className="bg-red-500/10 text-red-500 text-[8px] font-black uppercase px-2 h-4 border-none mt-1 shadow-sm">
+                      SAVE {plan.save}
+                    </Badge>
                   </CardContent>
                 </Card>
               </div>
@@ -465,7 +472,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'from-blue-400 to-indigo-600' },
                 { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'from-emerald-400 to-teal-600' },
                 { label: 'Skin Micro Tracking', desc: 'Texture, Acne & Inflammation audit.', icon: HeartPulse, colors: 'from-orange-400 to-rose-500' },
-                { label: 'Recovery Tracking', desc: 'Muscle repair & contraction signals.', icon: Timer, colors: 'from-indigo-400 to-blue-600' },
+                { label: 'Recovery Micro Tracking', desc: 'Muscle repair & contraction signals.', icon: Timer, colors: 'from-indigo-400 to-blue-600' },
                 { label: 'Intake Reports', desc: 'Daily, Weekly, Monthly history.', icon: BarChart3, colors: 'from-purple-400 to-pink-600' },
                 { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED personal progress insights.', icon: Sparkles, colors: 'from-cyan-400 to-blue-600', highlight: true }
               ].map((item, i) => (
@@ -497,8 +504,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
           <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10 opacity-70">
             <CardContent className="p-6 grid gap-6">
               {[
-                { label: 'Hydration', desc: 'Weekly water intake analysis.', icon: HeartPulse, colors: 'from-blue-300 to-blue-500' },
-                { label: 'Steps', desc: 'Movement tracking & trends.', icon: Activity, colors: 'from-green-300 to-green-500' },
+                { label: 'Hydration Tracking', desc: 'Weekly water intake analysis.', icon: HeartPulse, colors: 'from-blue-300 to-blue-500' },
+                { label: 'Steps Tracking', desc: 'Movement tracking & trends.', icon: Activity, colors: 'from-green-300 to-green-500' },
                 { label: 'Streaks', desc: 'Daily consistency badges.', icon: Zap, colors: 'from-yellow-300 to-orange-400' },
                 { label: 'Tasks', desc: 'Objective manager system.', icon: ListTodo, colors: 'from-slate-300 to-slate-500' },
                 { label: 'Workouts', desc: 'Custom routine creation.', icon: Dumbbell, colors: 'from-red-300 to-red-500' }
