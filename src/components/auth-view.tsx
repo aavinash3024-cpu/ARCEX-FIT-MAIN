@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useState } from 'react';
@@ -14,7 +13,7 @@ import {
   LogIn, 
   User, 
   AlertCircle,
-  Sparkles
+  Loader2
 } from 'lucide-react';
 import { AnimatedBackground } from './animated-background';
 import { useAuth, initiateEmailSignIn, initiateEmailSignUp, initiateAnonymousSignIn } from '@/firebase';
@@ -28,12 +27,15 @@ export function AuthView() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!email || !password || !auth) return;
     
     setIsLoading(true);
     setError(null);
+    
+    // Safety fallback: re-enable UI if no state change occurs
+    const safetyTimer = setTimeout(() => setIsLoading(false), 4000);
     
     try {
       if (isLogin) {
@@ -41,9 +43,9 @@ export function AuthView() {
       } else {
         initiateEmailSignUp(auth, email, password);
       }
-      // Auth state will change and trigger re-render in page.tsx
     } catch (err: any) {
-      setError(err.message || "Authentication failed. Please check your credentials.");
+      clearTimeout(safetyTimer);
+      setError(err.message || "Authentication failed.");
       setIsLoading(false);
     }
   };
@@ -52,13 +54,14 @@ export function AuthView() {
     if (!auth) return;
     setIsLoading(true);
     initiateAnonymousSignIn(auth);
+    setTimeout(() => setIsLoading(false), 4000);
   };
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-slate-950 overflow-hidden font-sans">
+    <div className="fixed inset-0 z-[40] flex flex-col bg-slate-950 overflow-hidden font-sans">
       <AnimatedBackground />
 
-      <div className="relative z-10 flex flex-col h-full px-8 pt-20 pb-12">
+      <div className="relative z-10 flex flex-col h-full px-8 pt-20 pb-12 overflow-y-auto">
         {/* Branding */}
         <div className="flex flex-col items-center justify-center mb-12 shrink-0">
           <div className="flex items-center gap-2 mb-2">
@@ -69,7 +72,7 @@ export function AuthView() {
         </div>
 
         {/* Auth Card */}
-        <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full">
+        <div className="flex-1 flex flex-col justify-center max-w-sm mx-auto w-full pb-12">
           <Card className="border-white/10 bg-white/[0.03] backdrop-blur-2xl shadow-2xl rounded-3xl overflow-hidden">
             <CardContent className="p-8 space-y-8">
               <div className="text-center space-y-1">

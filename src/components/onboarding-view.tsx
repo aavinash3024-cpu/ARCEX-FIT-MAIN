@@ -1,4 +1,4 @@
-"use client";
+"use use client";
 
 import React, { useState, useMemo, useEffect } from 'react';
 import { Card, CardContent } from "@/components/ui/card";
@@ -240,7 +240,7 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
   if (!isLoaded) return null;
 
   return (
-    <div className="fixed inset-0 z-[100] flex flex-col bg-slate-950 overflow-hidden font-sans">
+    <div className="fixed inset-0 z-[40] flex flex-col bg-slate-950 overflow-hidden font-sans">
       <AnimatedBackground />
 
       <div className="relative z-10 flex flex-col h-full">
