@@ -182,7 +182,7 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
                 <CardContent className="p-4 flex items-start gap-4">
                   <div className="relative shrink-0 pt-1">
                     <div className={cn(
-                      "w-9 h-9 rounded-full p-[1.5px] shadow-sm transition-transform duration-500",
+                      "w-8 h-8 rounded-full p-[1.5px] shadow-sm transition-transform duration-500",
                       !n.isRead ? "scale-110" : "scale-100 opacity-60"
                     )}
                     style={{ background: n.gradient }}
@@ -192,7 +192,7 @@ export function NotificationsView({ notifications, setNotifications, onBack }: N
                       </div>
                     </div>
                     {!n.isRead && (
-                      <span className="absolute -top-0.5 -right-0.5 w-2.5 h-2.5 bg-primary rounded-full border-2 border-background animate-pulse" />
+                      <span className="absolute -top-0.5 -right-0.5 w-2 h-2 bg-primary rounded-full border-2 border-background animate-pulse" />
                     )}
                   </div>
 
