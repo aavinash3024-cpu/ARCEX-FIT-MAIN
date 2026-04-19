@@ -119,6 +119,9 @@ export default function PulseFlowApp() {
     icon: string = 'bell', 
     gradient: string = 'linear-gradient(135deg, #4ade80 0%, #3b82f6 100%)'
   ) => {
+    const enabled = localStorage.getItem('pulseflow_notifications') !== 'false';
+    if (!enabled) return;
+
     const newNotif: Notification = {
       id: Math.random().toString(36).substr(2, 9),
       title,
