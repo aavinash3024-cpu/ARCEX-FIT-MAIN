@@ -927,11 +927,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
           <CardContent className="p-4 relative z-10">
             <div className="flex items-center gap-4">
               <div className="relative shrink-0">
-                <div className="w-16 h-16 rounded-full bg-[#6b85a3] flex items-center justify-center shadow-xl border-4 border-white relative z-10">
+                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-[#4ade80] to-[#3b82f6] flex items-center justify-center shadow-xl border-4 border-white relative z-10">
                   <span className="text-xl font-black text-white">{profileName.charAt(0)}</span>
-                </div>
-                <div className="absolute -bottom-0.5 -right-0.5 z-20 bg-[#6b85a3] text-white p-1 rounded-full border-2 border-white shadow-lg">
-                  <Trophy className="w-2" />
                 </div>
               </div>
               
