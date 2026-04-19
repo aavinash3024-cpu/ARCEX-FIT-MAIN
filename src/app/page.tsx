@@ -480,23 +480,8 @@ export default function PulseFlowApp() {
   const unreadCount = notifications.filter(n => !n.isRead).length;
 
   const renderContent = () => {
-    if (showSplash) return <SplashScreen />;
-    if (isUserLoading) {
-      return (
-        <div className="p-4 space-y-6 animate-pulse">
-          <Skeleton className="h-28 w-full rounded-3xl bg-muted/60" />
-          <div className="flex justify-between items-center px-1">
-            <Skeleton className="h-6 w-32 bg-muted/50" />
-            <Skeleton className="h-4 w-12 bg-muted/40" />
-          </div>
-          <div className="flex gap-4 overflow-hidden">
-            <Skeleton className="h-32 w-[260px] rounded-2xl bg-muted/50 shrink-0" />
-            <Skeleton className="h-32 w-[260px] rounded-2xl bg-muted/50 shrink-0" />
-          </div>
-          <Skeleton className="h-40 w-full rounded-3xl bg-muted/60" />
-        </div>
-      );
-    }
+    // FIX: Keep splash screen until auth state is definitively known to prevent dashboard flickering
+    if (showSplash || isUserLoading) return <SplashScreen />;
     if (!user) return <AuthView />;
     if (showOnboarding) return <OnboardingView onComplete={handleOnboardingComplete} />;
 
@@ -561,6 +546,7 @@ export default function PulseFlowApp() {
       case 'tasks': return <TasksView tasks={tasks} setTasks={setTask} onBack={() => window.history.back()} />;
       case 'calculators': return <CalculatorsView initialType={activeCalculator} onBack={() => window.history.back()} />;
       case 'goal-setting': return <GoalSettingView onBack={() => window.history.back()} onGoalSaved={() => {
+        if (!user) return;
         const keys = getKeys(user.uid);
         setGoalData(JSON.parse(localStorage.getItem(keys.goal) || '{}'));
       }} />;
@@ -610,7 +596,7 @@ export default function PulseFlowApp() {
         </defs>
       </svg>
 
-      {user && !showOnboarding && !showSplash && (
+      {user && !showOnboarding && !showSplash && !isUserLoading && (
         <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b relative">
           <button onClick={() => navigateTo('profile')} className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center">
             <User className="w-4 h-4 text-foreground" />
@@ -639,7 +625,7 @@ export default function PulseFlowApp() {
         {renderContent()}
       </main>
 
-      {user && !showOnboarding && !showSplash && (
+      {user && !showOnboarding && !showSplash && !isUserLoading && (
         <nav className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-lg bg-card/90 backdrop-blur-xl border-t px-4 py-3 flex justify-between items-center z-50">
           {[
             { id: 'dashboard', icon: LayoutDashboard, label: 'Home' },

@@ -16,7 +16,12 @@ import {
   Check,
   MapPin,
   Loader2,
-  X
+  X,
+  Calendar,
+  Zap,
+  TrendingUp,
+  Timer,
+  PieChart
 } from "lucide-react";
 import { 
   Select,
@@ -489,16 +494,14 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
 
               <Card className="border-white/20 bg-white/[0.08] backdrop-blur-2xl shadow-2xl rounded-3xl overflow-hidden">
                 <CardContent className="p-8 space-y-10">
-                  <div className="flex flex-col items-center justify-center text-center space-y-6 py-6">
+                  <div className="flex flex-col items-center justify-center text-center space-y-6 py-2">
                     <div className="relative">
                       <div className="absolute inset-0 bg-primary/20 rounded-full blur-2xl animate-pulse" />
-                      <div className="w-24 h-24 bg-emerald-500/20 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.3)] border-2 border-emerald-500/30 relative z-10">
-                        <div className="w-16 h-16 bg-emerald-500 rounded-full flex items-center justify-center shadow-xl border-4 border-white/20">
-                          <Check className="w-10 h-10 text-white" strokeWidth={4} />
+                      <div className="w-20 h-20 bg-emerald-500/20 rounded-full flex items-center justify-center shadow-[0_0_50px_rgba(16,185,129,0.3)] border-2 border-emerald-500/30 relative z-10">
+                        <div className="w-14 h-14 bg-emerald-500 rounded-full flex items-center justify-center shadow-xl border-4 border-white/20">
+                          <Check className="w-8 h-8 text-white" strokeWidth={4} />
                         </div>
                       </div>
-                      <div className="absolute -inset-4 border border-emerald-500/10 rounded-full animate-[spin_10s_linear_infinite]" />
-                      <div className="absolute -inset-8 border border-emerald-500/5 rounded-full animate-[spin_15s_linear_infinite_reverse]" />
                     </div>
                     
                     <div className="space-y-2">
@@ -507,15 +510,63 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
                     </div>
                   </div>
 
-                  <div className="bg-white/[0.02] p-6 rounded-2xl border border-white/5 space-y-4">
-                     <div className="flex justify-between items-center border-b border-white/5 pb-3">
-                        <span className="text-[10px] font-black text-white/30 uppercase">DAILY BUDGET</span>
-                        <span className="text-lg font-black text-primary">{calculations.finalCalories} KCAL</span>
-                     </div>
-                     <div className="flex justify-between items-center">
-                        <span className="text-[10px] font-black text-white/30 uppercase">TARGET WEIGHT</span>
-                        <span className="text-lg font-black text-white">{targetWeight} KG</span>
-                     </div>
+                  <div className="space-y-6">
+                    <div className="space-y-3">
+                      <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Strategy Overview</p>
+                      <div className="grid grid-cols-2 gap-3">
+                        <div className="bg-white/[0.02] p-4 rounded-xl border border-white/5">
+                           <p className="text-[8px] font-bold text-white/40 uppercase">Weight Goal</p>
+                           <p className="text-lg font-black text-white">{weight} → {targetWeight} kg</p>
+                        </div>
+                        <div className="bg-white/[0.02] p-4 rounded-xl border border-white/5">
+                           <p className="text-[8px] font-bold text-white/40 uppercase">Daily Budget</p>
+                           <p className="text-lg font-black text-primary">{calculations.finalCalories} kcal</p>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <div className="flex justify-between items-center">
+                        <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Journey Pace</p>
+                        <Badge variant="outline" className="h-5 text-[8px] font-black text-primary border-primary/20">{calculations.derivedWeeklyRate} kg / week</Badge>
+                      </div>
+                      <div className="bg-white/[0.02] p-4 rounded-xl border border-white/5 flex justify-between items-center">
+                        <div className="flex items-center gap-2">
+                          <Timer className="w-4 h-4 text-white/40" />
+                          <span className="text-xs font-bold text-white/60">Estimated Duration</span>
+                        </div>
+                        <span className="text-sm font-black text-white">{calculations.weeksToGoal} Weeks</span>
+                      </div>
+                    </div>
+
+                    <div className="space-y-3">
+                      <p className="text-[10px] font-black text-white/30 uppercase tracking-widest">Macro Distribution</p>
+                      <div className="space-y-2">
+                        <div className="flex h-1.5 w-full rounded-full overflow-hidden bg-white/5">
+                           <div style={{ width: `${calculations.proteinPct}%`, backgroundColor: MACRO_COLORS.protein }} />
+                           <div style={{ width: `${calculations.carbPct}%`, backgroundColor: MACRO_COLORS.carbs }} />
+                           <div style={{ width: `${calculations.fatPct}%`, backgroundColor: MACRO_COLORS.fat }} />
+                        </div>
+                        <div className="grid grid-cols-4 gap-1 text-center">
+                           <div>
+                              <p className="text-[10px] font-black" style={{ color: MACRO_COLORS.protein }}>{calculations.protein}g</p>
+                              <p className="text-[7px] font-bold text-white/30 uppercase">Prot</p>
+                           </div>
+                           <div>
+                              <p className="text-[10px] font-black" style={{ color: MACRO_COLORS.carbs }}>{calculations.carbs}g</p>
+                              <p className="text-[7px] font-bold text-white/30 uppercase">Carb</p>
+                           </div>
+                           <div>
+                              <p className="text-[10px] font-black" style={{ color: MACRO_COLORS.fat }}>{calculations.fats}g</p>
+                              <p className="text-[7px] font-bold text-white/30 uppercase">Fat</p>
+                           </div>
+                           <div>
+                              <p className="text-[10px] font-black" style={{ color: MACRO_COLORS.fiber }}>{calculations.fiber}g</p>
+                              <p className="text-[7px] font-bold text-white/30 uppercase">Fib</p>
+                           </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 </CardContent>
               </Card>
