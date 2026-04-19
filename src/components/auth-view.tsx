@@ -30,7 +30,7 @@ export function AuthView() {
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Success detection: If auth state changes to a user, stop loading
+  // Success detection: If auth state changes to a user, show success state
   useEffect(() => {
     if (!auth) return;
     const unsubscribe = onAuthStateChanged(auth, (user) => {
@@ -45,15 +45,19 @@ export function AuthView() {
   // Error detection
   useEffect(() => {
     const handleAuthError = (err: any) => {
+      setIsLoading(false);
       let message = "Authentication failed.";
+      
+      // Handle Firebase specific error codes
       if (err.code === 'auth/wrong-password') message = "Incorrect password.";
       if (err.code === 'auth/user-not-found') message = "No account found with this email.";
       if (err.code === 'auth/invalid-email') message = "Invalid email format.";
       if (err.code === 'auth/email-already-in-use') message = "Email already registered. Try logging in.";
       if (err.code === 'auth/weak-password') message = "Password must be at least 6 characters.";
+      if (err.code === 'auth/invalid-credential') message = "Invalid credentials. Please check your details.";
+      if (err.code === 'auth/operation-not-allowed') message = "Auth provider not enabled in Firebase Console.";
       
       setError(message);
-      setIsLoading(false);
     };
 
     errorEmitter.on('auth-error', handleAuthError);
@@ -67,15 +71,10 @@ export function AuthView() {
     setIsLoading(true);
     setError(null);
     
-    try {
-      if (isLogin) {
-        initiateEmailSignIn(auth, email, password);
-      } else {
-        initiateEmailSignUp(auth, email, password);
-      }
-    } catch (err: any) {
-      setError(err.message || "An unexpected error occurred.");
-      setIsLoading(false);
+    if (isLogin) {
+      initiateEmailSignIn(auth, email, password);
+    } else {
+      initiateEmailSignUp(auth, email, password);
     }
   };
 
@@ -90,7 +89,7 @@ export function AuthView() {
     <div className="fixed inset-0 z-[40] flex flex-col bg-slate-950 overflow-hidden font-sans">
       <AnimatedBackground />
 
-      <div className="relative z-10 flex flex-col h-full px-8 pt-20 pb-12 overflow-y-auto">
+      <div className="relative z-10 flex flex-col h-full px-8 pt-20 pb-12 overflow-y-auto swipe-container">
         <div className="flex flex-col items-center justify-center mb-12 shrink-0">
           <div className="flex items-center gap-2 mb-2">
             <span className="font-black text-4xl tracking-tighter text-white">arcex</span>
@@ -104,15 +103,15 @@ export function AuthView() {
             <CardContent className="p-8 space-y-8">
               <div className="text-center space-y-1">
                 <h2 className="text-xl font-bold text-white uppercase tracking-tight">
-                  {isSuccess ? "Welcome" : isLogin ? "Welcome Back" : "Create Account"}
+                  {isSuccess ? "Access Granted" : isLogin ? "Welcome Back" : "Create Account"}
                 </h2>
                 <p className="text-[10px] font-bold text-white/40 uppercase tracking-widest">
-                  {isSuccess ? "Redirecting to dashboard..." : isLogin ? "Enter your credentials" : "Join the performance community"}
+                  {isSuccess ? "Establishing Connection..." : isLogin ? "Enter your credentials" : "Join the performance community"}
                 </p>
               </div>
 
               {isSuccess ? (
-                <div className="flex flex-col items-center py-8 animate-in zoom-in-95">
+                <div className="flex flex-col items-center py-8 animate-in zoom-in-95 fade-in duration-500">
                   <div className="w-16 h-16 bg-primary rounded-full flex items-center justify-center shadow-lg shadow-primary/20">
                     <CheckCircle2 className="w-8 h-8 text-slate-950" />
                   </div>
