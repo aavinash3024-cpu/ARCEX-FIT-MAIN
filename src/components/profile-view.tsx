@@ -47,7 +47,8 @@ import {
   Dumbbell,
   TrendingUp,
   Sparkles,
-  Wifi
+  Wifi,
+  Timer
 } from "lucide-react";
 import { 
   Select,
@@ -85,7 +86,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [isSaving, setIsSaving] = useState(false);
   const [isResetting, setIsResetting] = useState(false);
-  const [selectedPlanId, setSelectedPlanId] = useState('half-year');
+  const [selectedPlanId, setSelectedPlanId] = useState('yearly');
 
   // Preference States
   const [darkMode, setDarkMode] = useState(false);
@@ -412,14 +413,13 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         </div>
       </div>
 
-      {/* 2. SUBSCRIPTION PLANS (HORIZONTAL GRID WITH GRADIENT BOUNDARY) */}
+      {/* 2. SUBSCRIPTION PLANS (HORIZONTAL GRID) */}
       <div className="px-1 space-y-4">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Subscription Plans</h3>
-        <div className="grid grid-cols-3 gap-2.5">
+        <div className="grid grid-cols-2 gap-3">
           {[
-            { id: 'monthly', name: 'Monthly', price: '229', original: '299', save: '23%' },
-            { id: 'half-year', name: 'Half-Year', price: '699', original: '1374', save: '49%' },
-            { id: 'yearly', name: 'Yearly', price: '1299', original: '2748', save: '52%' }
+            { id: 'monthly', name: 'Monthly', price: '229', original: '299', save: '23%', perDay: '7.6' },
+            { id: 'yearly', name: 'Yearly', price: '1299', original: '2748', save: '52%', perDay: '3.5' }
           ].map((plan) => {
             const isSelected = selectedPlanId === plan.id;
             return (
@@ -428,20 +428,21 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 onClick={() => setSelectedPlanId(plan.id)}
                 className={cn(
                   "relative p-[1.5px] rounded-2xl transition-all cursor-pointer",
-                  isSelected ? "bg-gradient-to-br from-primary via-emerald-400 to-primary shadow-lg scale-[1.02]" : "bg-muted/20"
+                  isSelected ? "bg-gradient-to-br from-[#4ade80] via-[#2dd4bf] to-[#3b82f6] shadow-lg scale-[1.02]" : "bg-muted/20"
                 )}
               >
                 <Card className="border-none bg-card rounded-[calc(1rem-0.5px)] h-full overflow-hidden">
-                  <CardContent className="p-3 flex flex-col items-center text-center gap-2">
-                    <h5 className={cn("font-black text-[9px] uppercase tracking-widest", isSelected ? "text-primary" : "text-muted-foreground")}>
+                  <CardContent className="p-4 flex flex-col items-center text-center gap-2">
+                    <h5 className={cn("font-black text-[10px] uppercase tracking-widest", isSelected ? "text-primary" : "text-muted-foreground")}>
                       {plan.name}
                     </h5>
                     <div className="space-y-0.5 flex flex-col items-center">
-                      <span className="text-[8px] font-bold text-rose-500 line-through">₹{plan.original}</span>
+                      <span className="text-[9px] font-bold text-rose-500 line-through">₹{plan.original}</span>
                       <div className="flex items-baseline gap-0.5">
-                        <span className="text-sm font-black text-foreground">₹{plan.price}</span>
+                        <span className="text-xl font-black text-foreground">₹{plan.price}</span>
                       </div>
-                      <Badge className="bg-rose-500/10 text-rose-500 text-[7px] font-black uppercase px-1.5 h-3.5 border-none mt-1 shadow-sm">
+                      <p className="text-[8px] font-black text-muted-foreground uppercase tracking-widest opacity-60">₹{plan.perDay} / DAY</p>
+                      <Badge className="bg-rose-500/10 text-rose-500 text-[8px] font-black uppercase px-2 h-4 border-none mt-2 shadow-sm">
                         SAVE {plan.save}
                       </Badge>
                     </div>
@@ -453,9 +454,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         </div>
       </div>
 
-      {/* 3. PREMIUM & FREE FEATURES (CLEAN CARDS, NO HEADER/FOOTER) */}
+      {/* 3. PREMIUM & FREE FEATURES */}
       <div className="px-1 space-y-6">
-        {/* PREMIUM CARD */}
         <div className="space-y-4">
           <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-primary px-3">Elite Premium Coverage</h3>
           <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
@@ -464,6 +464,8 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 { label: 'Strength Growth', desc: 'Detailed power progress trends.', icon: TrendingUp, colors: 'from-amber-400 to-orange-500' },
                 { label: 'Split Analysis', desc: 'Muscle coverage & target gaps.', icon: Layout, colors: 'from-blue-400 to-indigo-600' },
                 { label: 'Meal Logging', desc: '20 daily AI parse credits.', icon: UtensilsCrossed, colors: 'from-emerald-400 to-teal-600' },
+                { label: 'Skin Micro Tracking', desc: 'Texture, Acne & Inflammation audit.', icon: HeartPulse, colors: 'from-orange-400 to-rose-500' },
+                { label: 'Recovery Tracking', desc: 'Muscle repair & contraction signals.', icon: Timer, colors: 'from-indigo-400 to-blue-600' },
                 { label: 'Intake Reports', desc: 'Daily, Weekly, Monthly history.', icon: BarChart3, colors: 'from-purple-400 to-pink-600' },
                 { label: 'PERSONAL ANALYZER', desc: 'UNLIMITED personal progress insights.', icon: Sparkles, colors: 'from-cyan-400 to-blue-600', highlight: true }
               ].map((item, i) => (
@@ -482,15 +484,14 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                   </div>
                 </div>
               ))}
-              <div className="pt-4 border-t border-muted/5 flex items-center gap-2">
+              <div className="pt-4 border-t border-muted/5 flex items-center justify-center gap-2">
                 <CheckCircle2 className="w-3 h-3 text-primary" />
-                <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest">Includes everything in Free</span>
+                <span className="text-[8px] font-black text-muted-foreground uppercase tracking-widest text-center">Includes everything in Free</span>
               </div>
             </CardContent>
           </Card>
         </div>
 
-        {/* FREE CARD */}
         <div className="space-y-4">
           <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">Standard Free Features</h3>
           <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10 opacity-70">
