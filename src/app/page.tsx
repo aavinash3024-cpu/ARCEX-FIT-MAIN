@@ -280,12 +280,52 @@ export default function PulseFlowApp() {
     const tarProt = goalData.protein || 150;
     checkMilestone('protein', curProt, tarProt, 'Protein', 'target', 'linear-gradient(135deg, #10b981 0%, #059669 100%)');
 
-    // 3. Hydration
+    // 3. Carbs
+    const curCarbs = loggedMeals.reduce((acc, m) => acc + (m.carbs || 0), 0);
+    const tarCarbs = goalData.carbs || 250;
+    checkMilestone('carbs', curCarbs, tarCarbs, 'Carbohydrates', 'activity', 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)');
+
+    // 4. Fats
+    const curFats = loggedMeals.reduce((acc, m) => acc + (m.fat || 0), 0);
+    const tarFats = goalData.fats || 70;
+    checkMilestone('fats', curFats, tarFats, 'Fats', 'flame', 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)');
+
+    // 5. Fiber
+    const curFiber = loggedMeals.reduce((acc, m) => acc + (m.fiber || 0), 0);
+    const tarFiber = goalData.fiber || 30;
+    checkMilestone('fiber', curFiber, tarFiber, 'Fiber', 'zap', 'linear-gradient(135deg, #10b981 0%, #059669 100%)');
+
+    // 6. Micros (Key focus)
+    const userGender = goalData?.gender || 'male';
+    const targets = {
+      vitA: userGender === 'male' ? 900 : 700,
+      vitC: userGender === 'male' ? 90 : 75,
+      zinc: userGender === 'male' ? 11 : 8,
+      mag: userGender === 'male' ? 420 : 320,
+      omega3: userGender === 'male' ? 1.6 : 1.1
+    };
+
+    const curVitA = loggedMeals.reduce((acc, m) => acc + (m.vitaminA || 0), 0);
+    checkMilestone('vitA', curVitA, targets.vitA, 'Vitamin A', 'sparkles', 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)');
+
+    const curVitC = loggedMeals.reduce((acc, m) => acc + (m.vitaminC || 0), 0);
+    checkMilestone('vitC', curVitC, targets.vitC, 'Vitamin C', 'zap', 'linear-gradient(135deg, #eab308 0%, #facc15 100%)');
+
+    const curZinc = loggedMeals.reduce((acc, m) => acc + (m.zinc || 0), 0);
+    checkMilestone('zinc', curZinc, targets.zinc, 'Zinc', 'shield', 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)');
+
+    const curMag = loggedMeals.reduce((acc, m) => acc + (m.magnesium || 0), 0);
+    checkMilestone('magnesium', curMag, targets.mag, 'Magnesium', 'heart-pulse', 'linear-gradient(135deg, #a855f7 0%, #c084fc 100%)');
+
+    const curOmega = loggedMeals.reduce((acc, m) => acc + (m.omega3 || 0), 0);
+    checkMilestone('omega3', curOmega, targets.omega3, 'Omega-3', 'droplets', 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)');
+
+    // 7. Hydration
     const curHyd = hydrationAmount / 1000;
     const tarHyd = goalData.hydrationTargetLiters || 3.0;
     checkMilestone('hydration', curHyd, tarHyd, 'Hydration', 'heart-pulse', 'linear-gradient(135deg, #0ea5e9 0%, #2563eb 100%)');
 
-    // 4. Steps
+    // 8. Steps
     checkMilestone('steps', stepsCount, 10000, 'Steps', 'zap', 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)');
 
   }, [loggedMeals, hydrationAmount, stepsCount, goalData, isLoaded]);
@@ -348,12 +388,12 @@ export default function PulseFlowApp() {
         return <NutritionView loggedMeals={loggedMeals} setLoggedMeals={setLoggedMeals} activeView="micro-detail" onNavigate={navigateTo} />;
       case 'nutrition-macro':
         return <NutritionView loggedMeals={loggedMeals} setLoggedMeals={setLoggedMeals} activeView="macro" onNavigate={navigateTo} />;
-      case 'workout': return <WorkoutView activeView="main" onNavigate={navigateTo} />;
-      case 'workout-library': return <WorkoutView activeView="library" onNavigate={navigateTo} />;
-      case 'workout-split': return <WorkoutView activeView="split" onNavigate={navigateTo} />;
-      case 'workout-history': return <WorkoutView activeView="history" onNavigate={navigateTo} />;
-      case 'workout-pr': return <WorkoutView activeView="pr" onNavigate={navigateTo} />;
-      case 'workout-pr-detail': return <WorkoutView activeView="pr-detail" onNavigate={navigateTo} />;
+      case 'workout': return <WorkoutView activeView="main" onNavigate={navigateTo} onAddNotification={addNotification} />;
+      case 'workout-library': return <WorkoutView activeView="library" onNavigate={navigateTo} onAddNotification={addNotification} />;
+      case 'workout-split': return <WorkoutView activeView="split" onNavigate={navigateTo} onAddNotification={addNotification} />;
+      case 'workout-history': return <WorkoutView activeView="history" onNavigate={navigateTo} onAddNotification={addNotification} />;
+      case 'workout-pr': return <WorkoutView activeView="pr" onNavigate={navigateTo} onAddNotification={addNotification} />;
+      case 'workout-pr-detail': return <WorkoutView activeView="pr-detail" onNavigate={navigateTo} onAddNotification={addNotification} />;
       case 'rank': 
         return (
           <ProgressView 

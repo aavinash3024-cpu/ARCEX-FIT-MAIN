@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useMemo, useEffect } from 'react';
@@ -66,6 +67,7 @@ import {
   AccordionTrigger,
   AccordionContent
 } from "@/components/ui/accordion";
+import { type Notification } from '@/components/notifications-view';
 
 type WeeklySplit = Record<string, Exercise[]>;
 
@@ -88,9 +90,10 @@ const formatExerciseTime = (seconds: any) => {
 interface WorkoutViewProps {
   activeView?: 'main' | 'library' | 'split' | 'history' | 'pr' | 'pr-detail';
   onNavigate: (tab: string) => void;
+  onAddNotification?: (title: string, desc: string, type: Notification['type'], subtype?: Notification['subtype'], icon?: string, grad?: string) => void;
 }
 
-export function WorkoutView({ activeView = 'main', onNavigate }: WorkoutViewProps) {
+export function WorkoutView({ activeView = 'main', onNavigate, onAddNotification }: WorkoutViewProps) {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedPR, setSelectedPR] = useState<any | null>(null);
   
@@ -206,6 +209,43 @@ export function WorkoutView({ activeView = 'main', onNavigate }: WorkoutViewProp
   }, [split, todayName, extraMoves]);
 
   const handleLogSet = (exerciseName: string, setData: any) => {
+    // 1. PR Check Logic
+    const savedHistory = localStorage.getItem('pulseflow_workout_history');
+    const historyObj = savedHistory ? JSON.parse(savedHistory) : {};
+    
+    let currentBest = 0;
+    Object.entries(historyObj).forEach(([date, logs]: any) => {
+      if (logs[exerciseName]) {
+        logs[exerciseName].forEach((s: any) => {
+          if (s.type === setData.type) {
+            if (s.type === 'strength') {
+              const val = parseFloat(s.weight);
+              if (val > currentBest) currentBest = val;
+            } else {
+              const val = parseFloat(s.time);
+              if (currentBest === 0 || val < currentBest) currentBest = val;
+            }
+          }
+        });
+      }
+    });
+
+    const isPR = setData.type === 'strength' 
+      ? (parseFloat(setData.weight) > currentBest)
+      : (currentBest === 0 || parseFloat(setData.time) < currentBest);
+
+    if (isPR && onAddNotification) {
+      const label = setData.type === 'strength' ? `${setData.weight}kg` : formatExerciseTime(setData.time);
+      onAddNotification(
+        `New Peak: ${exerciseName}`,
+        `Incredible! You just smashed your personal record with ${label}. Keep rising!`,
+        'achievement',
+        'pr',
+        'trophy',
+        'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)'
+      );
+    }
+
     setLoggedSets(prev => {
       const current = prev[exerciseName] || [];
       if (current.length >= 20) return prev;
