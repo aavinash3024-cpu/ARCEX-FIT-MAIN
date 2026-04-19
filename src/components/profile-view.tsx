@@ -377,49 +377,14 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
   );
 
   const renderSubscription = () => (
-    <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500 pb-24">
-      {/* 1. MEMBERSHIP STATUS CARD (CREDIT CARD STYLE) */}
-      <div className="px-1">
-        <div className="relative w-full h-32 rounded-[1.75rem] overflow-hidden shadow-2xl">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#1a1a1a] via-[#2d3436] to-[#0f172a]" />
-          <div className="absolute top-0 right-0 w-64 h-64 bg-primary/20 rounded-full blur-[80px] -mr-32 -mt-32 pointer-events-none" />
-          
-          <div className="relative h-full p-5 flex flex-col justify-between text-white">
-            <div className="flex justify-between items-start">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-primary to-emerald-400 p-[0.5px] overflow-hidden flex items-center justify-center shadow-lg">
-                  <div className="w-full h-full bg-black/40 backdrop-blur-sm flex items-center justify-center rounded-full">
-                    <Activity className="w-5 h-5 text-white" />
-                  </div>
-                </div>
-                <div>
-                  <h3 className="font-black text-lg uppercase tracking-tighter italic leading-none">ARCEX <span className="text-primary">FIT</span></h3>
-                  <Badge variant="secondary" className="mt-1 bg-primary/20 text-primary border-none text-[7px] font-black uppercase px-1.5 h-3.5 rounded-md">PREMIUM ELITE</Badge>
-                </div>
-              </div>
-              <Wifi className="w-5 h-5 text-white/20 rotate-90" />
-            </div>
-
-            <div className="flex justify-between items-end">
-              <div className="space-y-0.5">
-                <h3 className="text-sm font-black uppercase tracking-tighter truncate opacity-90">{profileName}</h3>
-              </div>
-              <div className="text-right">
-                <p className="text-[6px] font-black text-white/30 uppercase tracking-[0.2em]">RENEWAL</p>
-                <p className="text-[9px] font-black tracking-widest uppercase">OCT 2025</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. SUBSCRIPTION PLANS (COMPACT 2-COLUMN GRID) */}
-      <div className="px-1 space-y-4">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">See Subscription Plans</h3>
-        <div className="grid grid-cols-2 gap-3">
+    <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500 pb-20">
+      {/* 1. SUBSCRIPTION PLANS (COMPACT 2-COLUMN GRID) */}
+      <div className="px-1 space-y-4 pt-4">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3 text-center">See Subscription Plans</h3>
+        <div className="grid grid-cols-2 gap-3 px-1">
           {[
-            { id: 'monthly', name: 'Monthly', price: '229', original: '299', save: '23%', perDay: '7.6' },
-            { id: 'yearly', name: 'Yearly', price: '1299', original: '2748', save: '52%', perDay: '3.5' }
+            { id: 'monthly', name: 'Monthly', price: '229', original: '299', save: '23%', perDay: '7.6', saveColor: "bg-rose-500/10 text-rose-500" },
+            { id: 'yearly', name: 'Yearly', price: '1299', original: '2748', save: '52%', perDay: '3.5', saveColor: "bg-emerald-500/10 text-emerald-500" }
           ].map((plan) => {
             const isSelected = selectedPlanId === plan.id;
             return (
@@ -427,7 +392,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                 key={plan.id}
                 onClick={() => setSelectedPlanId(plan.id)}
                 className={cn(
-                  "relative p-[1.5px] rounded-2xl transition-all cursor-pointer",
+                  "relative p-[1.5px] rounded-2xl transition-all cursor-pointer group",
                   isSelected 
                     ? "bg-gradient-to-br from-[#4ade80] via-[#2dd4bf] to-[#3b82f6] shadow-lg scale-[1.02]" 
                     : "bg-muted/20"
@@ -435,7 +400,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
               >
                 {/* PER DAY PRICE ON BORDER */}
                 <div className={cn(
-                  "absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-0.5 rounded-full z-10 border border-white/20 backdrop-blur-md shadow-sm",
+                  "absolute top-0 left-1/2 -translate-x-1/2 -translate-y-1/2 px-2 py-0.5 rounded-full z-10 border border-white/20 backdrop-blur-md shadow-sm transition-all",
                   isSelected ? "bg-gradient-to-r from-primary to-emerald-400" : "bg-muted text-muted-foreground"
                 )}>
                   <p className={cn("text-[8px] font-black uppercase tracking-widest whitespace-nowrap", isSelected ? "text-white" : "text-muted-foreground/80")}>
@@ -454,7 +419,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
                       <span className="text-xl font-black text-foreground">₹{plan.price}</span>
                     </div>
 
-                    <Badge className="bg-red-500/10 text-red-500 text-[8px] font-black uppercase px-2 h-4 border-none shadow-sm">
+                    <Badge className={cn("text-[8px] font-black uppercase px-2 h-4 border-none shadow-sm", plan.saveColor)}>
                       SAVE {plan.save}
                     </Badge>
                   </CardContent>
@@ -465,7 +430,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate }: Profile
         </div>
       </div>
 
-      {/* 3. PREMIUM & FREE FEATURES */}
+      {/* 2. PREMIUM & FREE FEATURES */}
       <div className="px-1 space-y-6">
         <div className="space-y-4">
           <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-primary px-3">Elite Premium Coverage</h3>
