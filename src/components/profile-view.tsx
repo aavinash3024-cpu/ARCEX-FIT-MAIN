@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -516,14 +517,13 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
               </div>
               <div className="space-y-2">
                 <Label className="text-[10px] font-black text-muted-foreground uppercase tracking-widest pl-1">Sex</Label>
-                <Select value={profileGender} onValueChange={setProfileGender}>
+                <Select value={profileGender} onValueChange={(value: 'male' | 'female') => setProfileGender(value)}>
                   <SelectTrigger className="h-12 rounded-xl bg-muted/5 border-muted-foreground/10 font-bold text-xs">
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent className="rounded-xl">
                     <SelectItem value="male" className="text-xs font-bold">Male</SelectItem>
                     <SelectItem value="female" className="text-xs font-bold">Female</SelectItem>
-                    <SelectItem value="other" className="text-xs font-bold">Other</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
@@ -645,7 +645,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
                     "w-9 h-9 rounded-full flex items-center justify-center shrink-0 shadow-sm border p-[1.5px]",
                     item.highlight ? "border-primary/40" : "border-muted/20"
                     )}>
-                    <div className={cn("w-full h-full rounded-full flex items-center justify-center text-white")} style={{ background: item.colors }}>
+                    <div className="w-full h-full rounded-full flex items-center justify-center text-white" style={{ background: item.colors }}>
                       <item.icon className="w-4 h-4" />
                     </div>
                   </div>
@@ -676,7 +676,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
               ].map((item, i) => (
                 <div key={i} className="flex gap-4">
                   <div className="w-9 h-9 rounded-full border border-muted/20 p-[1.5px] shrink-0">
-                    <div className={cn("w-full h-full rounded-full flex items-center justify-center text-white shadow-inner")} style={{ background: item.colors }}>
+                    <div className="w-full h-full rounded-full flex items-center justify-center text-white shadow-inner" style={{ background: item.colors }}>
                       <item.icon className="w-4 h-4" />
                     </div>
                   </div>
@@ -729,80 +729,63 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
   const renderPrivacyPolicy = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-4">
       <div className="space-y-2 border-b border-muted/10 pb-6">
-        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">20 April, 2026</p>
+        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Last Updated on 21 April, 2026</p>
+        <p className="text-base font-bold text-foreground leading-relaxed">
+          Welcome to arcex fit. We are committed to protecting your privacy. This policy explains how your personal data is collected, stored, and used within the app, ensuring you remain in full control.
+        </p>
       </div>
       
       <div className="space-y-8 text-sm leading-relaxed text-foreground/80 font-medium">
-        <p className="text-base font-bold text-foreground leading-relaxed">
-          Welcome to arcex fit. Your privacy is not just a policy for us; it is a core technical requirement. We build our app using a "Local-First" philosophy, ensuring that your most sensitive health data remains under your control on your own device whenever possible.
-        </p>
-
         <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">1. Data Architecture: UID Namespacing</h3>
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">1. The "Local-First" Philosophy</h3>
           <p>
-            We use a sophisticated system called **UID Namespacing** to keep your data safe. Even if multiple people log into their accounts on the same phone, our app partitions the local storage using your unique Firebase ID (UID). This ensures that User A's meal logs and weight history are physically isolated from User B's, and neither can ever "see" the other's private records.
+            Your most sensitive health data lives on your device. We use a system called **UID Namespacing**, which creates a separate, locked "bucket" for each user account on a single phone. This ensures that your data remains completely isolated and private, even on a shared device.
           </p>
         </section>
 
         <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">2. Information We Collect</h3>
-          <div className="space-y-4">
-            <div className="bg-muted/5 p-4 rounded-2xl border border-muted/10">
-              <p className="text-[10px] font-black uppercase text-foreground mb-1">Identity & Account</p>
-              <p className="text-xs">Your name, email address, and basic profile details required for authentication and account recovery via Google Firebase.</p>
-            </div>
-            <div className="bg-muted/5 p-4 rounded-2xl border border-muted/10">
-              <p className="text-[10px] font-black uppercase text-foreground mb-1">Biological Metrics</p>
-              <p className="text-xs">Age, gender, height, and weight. These are used locally to calculate your Basal Metabolic Rate (BMR) and Total Daily Energy Expenditure (TDEE).</p>
-            </div>
-            <div className="bg-muted/5 p-4 rounded-2xl border border-muted/10">
-              <p className="text-[10px] font-black uppercase text-foreground mb-1">Wellness History</p>
-              <p className="text-xs">Daily logs of your meals (macros and micros), water intake, step counts, and exercise routines.</p>
-            </div>
-          </div>
-        </section>
-
-        <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">3. Artificial Intelligence & Data Processing</h3>
-          <p>
-            Our app utilizes **Gemini 2.5 Flash AI** to parse your natural language meal descriptions (e.g., "I ate two eggs and a slice of toast").
-          </p>
-          <ul className="list-disc pl-5 space-y-2">
-            <li><span className="font-bold">Privacy Filtering:</span> When you log a meal, only the text of the meal description is sent to the AI processing engine.</li>
-            <li><span className="font-bold">No Personal Linkage:</span> Your name, email, and biological metrics are NEVER sent to the AI during nutritional analysis.</li>
-            <li><span className="font-bold">Local Learning:</span> Once the AI identifies a food, we save that result to your private "AI Food Cache" on your device, reducing the need for future external processing.</li>
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">2. What We Collect & Why</h3>
+          <ul className="list-disc pl-5 space-y-3">
+            <li><span className="font-bold">Identity Info (Name, Email):</span> Used for account management, personalization, and password recovery.</li>
+            <li><span className="font-bold">Biological Metrics (Age, Gender, Weight):</span> This data is essential for the app's core function—calculating your Basal Metabolic Rate (BMR) and energy expenditure (TDEE).</li>
+            <li><span className="font-bold">Wellness History (Logs):</span> Your food logs, workouts, and other metrics are used to show you your progress over time.</li>
           </ul>
         </section>
 
         <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">4. Cloud Synchronization & Backups</h3>
-          <p>
-            While your primary database lives on your phone, we use **Google Firebase Firestore** for secure cloud backups.
-          </p>
-          <ul className="list-disc pl-5 space-y-2">
-            <li><span className="font-bold">Encryption:</span> All data is encrypted during transit (using SSL/TLS) and while resting on Google's highly secure servers.</li>
-            <li><span className="font-bold">Security Rules:</span> We enforce server-side code that forbids any person or machine from reading a record unless their verified Authentication ID matches the owner of that record.</li>
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">3. Artificial Intelligence (AI) and Your Data</h3>
+          <p>We use Google's Gemini AI for one specific purpose: to parse your meal descriptions. Here’s how we protect you:</p>
+          <ul className="list-disc pl-5 space-y-3">
+            <li><span className="font-bold">Anonymized Requests:</span> When you type "I ate 3 eggs," only that text is sent to the AI. Your name, email, or any other personal information is **never** included in the request.</li>
+            <li><span className="font-bold">Local Learning:</span> Once the AI identifies a food, we save its nutritional data to a private "AI Food Cache" on your device. This makes future logging faster and reduces the need to contact the AI, further protecting your privacy.</li>
           </ul>
         </section>
 
         <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">5. Data Retention & Your Rights</h3>
-          <p>You have absolute sovereignty over your wellness data:</p>
-          <div className="grid gap-3">
-            <div className="flex gap-3 items-start">
-              <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5"><Check className="w-3 h-3 text-primary" /></div>
-              <p><span className="font-bold">Right to Export:</span> Use the "Export Data" button in Settings to download your entire history as a structured JSON file at any time.</p>
-            </div>
-            <div className="flex gap-3 items-start">
-              <div className="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center shrink-0 mt-0.5"><Check className="w-3 h-3 text-primary" /></div>
-              <p><span className="font-bold">Right to Erasure:</span> Deleting your account will trigger a purge of your data from both your local device and our cloud backup servers.</p>
-            </div>
-          </div>
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">4. Cloud Sync & Security</h3>
+          <p>
+            For your convenience, we back up essential data to Google's Firestore. This is protected by multiple layers of security:
+          </p>
+          <ul className="list-disc pl-5 space-y-3">
+            <li><span className="font-bold">Encryption:</span> Your data is encrypted both while traveling to the cloud (HTTPS) and while stored on Google's servers.</li>
+            <li><span className="font-bold">Firestore Security Rules:</span> We enforce a strict server-side rule: `request.auth.uid == resource.data.userId`. This means it is technically impossible for anyone but you to read or write to your cloud records.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">5. Your Rights and Control</h3>
+          <p>You have absolute sovereignty over your data:</p>
+          <ul className="list-disc pl-5 space-y-3">
+            <li><span className="font-bold">Right to Export:</span> Download a complete JSON file of your history from the Settings menu at any time.</li>
+            <li><span className="font-bold">Right to Edit:</span> You can update your personal profile information whenever you wish.</li>
+            <li><span className="font-bold">Right to Erasure:</span> Deleting your account will permanently purge all data from your device and our cloud backups.</li>
+          </ul>
         </section>
 
         <section className="space-y-3 pt-4 border-t border-muted/5">
-          <p className="text-[11px] font-bold text-muted-foreground italic text-center">
-            At arcex fit, we do not sell, trade, or rent your personal health information to third-party advertisers. Our business model is based on helping you reach your goals, not selling your privacy.
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">6. Our Business Model</h3>
+          <p className="text-base font-bold text-foreground leading-relaxed">
+            We do not sell, trade, or rent your personal data to advertisers. Our business is built on offering valuable premium features, not on monetizing your information.
           </p>
         </section>
       </div>
@@ -812,7 +795,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
   const renderTermsConditions = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-4">
       <div className="space-y-2 border-b border-muted/10 pb-6">
-        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">20 April, 2026</p>
+         <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">21 April, 2026</p>
       </div>
       
       <div className="space-y-8 text-sm leading-relaxed text-foreground/80 font-medium">
@@ -821,43 +804,40 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
         </p>
 
         <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">1. Your Responsibility</h3>
-          <p>
-            You agree to provide honest and accurate information (such as weight, age, and biological sex) to ensure the app’s calculations remain as safe as possible for you. You are responsible for any activity that occurs under your account.
-          </p>
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">1. Account and Responsibility</h3>
+          <ul className="list-disc pl-5 space-y-3">
+            <li>You agree to provide accurate information (like age and weight) to ensure the app's calculations are safe and effective for you.</li>
+            <li>You are responsible for all activity that occurs under your account and for keeping your password secure.</li>
+          </ul>
         </section>
 
         <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">2. Account Safety</h3>
-          <p>
-            You are responsible for keeping your login credentials (email and password) safe. Please do not share your password with others. If you suspect your account has been compromised, please change your password immediately in the settings.
-          </p>
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">2. Service Usage</h3>
+          <ul className="list-disc pl-5 space-y-3">
+            <li>The app is intended for personal, non-commercial use.</li>
+            <li>Abusing the service, attempting to hack the AI, or scraping data is strictly prohibited and will result in immediate account termination.</li>
+          </ul>
+        </section>
+        
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">3. AI and Data Storage</h3>
+          <ul className="list-disc pl-5 space-y-3">
+            <li>We provide a limit of 20 AI-powered meal logs per day to ensure fair usage and control costs.</li>
+            <li>While we offer cloud backups, we are not liable for data loss resulting from user actions like clearing browser data or losing a device.</li>
+          </ul>
         </section>
 
         <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">3. Data & Storage</h3>
-          <p>
-            We provide cloud backups via Firebase for your convenience, but your primary data lives on your phone. We are not responsible for data loss resulting from clearing your browser cache, changing devices without syncing, or technical failures outside our control.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">4. Usage Limits & Abuse</h3>
-          <p>
-            To ensure the app remains fast and fair for all users, we limit AI-powered meal logging to 20 requests per day. Abusing the system, attempting to scrape data, or hacking the application will result in immediate account termination and permanent banning.
-          </p>
-        </section>
-
-        <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">5. Performance & Results</h3>
-          <p>
-            While arcex fit provides tools to help you reach your goals, we cannot guarantee specific fitness or weight-loss results. Your success depends on your own consistency, diet, exercise habits, and unique physiological factors.
-          </p>
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">4. Disclaimers</h3>
+          <ul className="list-disc pl-5 space-y-3">
+            <li>The arcex fit app is provided "as is," without any warranties.</li>
+            <li>We do not guarantee specific fitness or weight-loss results, as your progress depends on your own efforts and individual health factors.</li>
+          </ul>
         </section>
 
         <section className="space-y-3 pt-4 border-t border-muted/5">
           <p className="text-[10px] font-bold text-muted-foreground italic text-center uppercase tracking-tight">
-            We reserve the right to update these terms at any time to improve the service.
+            We reserve the right to update these terms at any time.
           </p>
         </section>
       </div>
@@ -867,7 +847,7 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
   const renderMedicalDisclaimer = () => (
     <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500 pb-20 px-4">
       <div className="space-y-2 border-b border-muted/10 pb-6">
-        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">20 April, 2026</p>
+        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">21 April, 2026</p>
       </div>
       
       <div className="space-y-8 text-sm leading-relaxed text-foreground/80 font-medium">
@@ -876,36 +856,30 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
         </p>
 
         <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">Not a Medical Provider</h3>
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">1. Not a Medical Provider</h3>
           <p>
-            The creators of arcex fit are not doctors, nutritionists, or certified medical professionals. The information provided by the app, including calorie targets and macro/micro suggestions, is generated by mathematical formulas and AI models, not a personalized medical assessment.
+            The creators of arcex fit are not doctors or certified medical professionals. The information provided, including calorie targets and nutritional data, is generated by formulas and AI models, not a personalized medical assessment.
           </p>
         </section>
 
         <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">Consult Your Physician</h3>
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">2. Consult Your Doctor</h3>
           <p>
-            Always consult with a qualified healthcare provider before starting any new exercise routine, making significant changes to your diet, or following nutritional advice. This is especially critical if you are pregnant, nursing, have existing heart conditions, diabetes, or severe allergies.
+            Always consult with a qualified healthcare provider before starting any new exercise routine or making significant dietary changes, especially if you have pre-existing health conditions.
           </p>
         </section>
 
         <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">AI & Data Estimation</h3>
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">3. AI for Estimation Only</h3>
           <p>
-            Our AI meal parser provides "smart estimates." While we strive for precision using standard nutritional databases, these numbers are approximations. Do not rely solely on these estimates to manage medical conditions that require strict dose-based nutrition.
+            Nutritional data from our AI is an estimate. It should not be used to manage medical conditions that require strict, precise nutrition.
           </p>
         </section>
 
         <section className="space-y-3">
-          <h3 className="text-xs font-black uppercase text-primary tracking-widest">Listen to Your Body</h3>
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">4. Assumption of Risk</h3>
           <p>
-            Exercise can be physically demanding. If at any time you feel faint, dizzy, experience chest pain, or shortness of breath, stop immediately and seek medical attention. You perform all exercises suggested or tracked in this app at your own risk.
-          </p>
-        </section>
-
-        <section className="space-y-3 pt-4 border-t border-muted/5 text-center">
-          <p className="text-[10px] font-bold text-muted-foreground italic uppercase tracking-tight">
-            By using arcex fit, you assume full responsibility for your health and physical safety.
+            If you feel pain, dizziness, or shortness of breath during any exercise, stop immediately and seek medical attention. You perform all activities suggested or tracked in this app at your own risk.
           </p>
         </section>
       </div>
@@ -1036,6 +1010,9 @@ export function ProfileView({ onBack, activeView = 'main', onNavigate, onShowSpl
               <AlertDialogContent className="rounded-[2.5rem] w-[90%] max-sm border-none shadow-2xl">
                 <AlertDialogHeader>
                   <AlertDialogTitle className="text-center font-black uppercase tracking-tighter text-xl text-destructive">Delete Account?</AlertDialogTitle>
+                  <AlertDialogDescription className="text-center text-xs font-medium px-2">
+                    This will permanently delete your progress history and goals. This action cannot be undone.
+                  </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter className="flex-col gap-2 sm:flex-col mt-4">
                   <AlertDialogAction 
@@ -1353,3 +1330,5 @@ function SettingsSwitch({ icon: Icon, label, subLabel, color, bg, checked, onChe
     </div>
   );
 }
+
+    
