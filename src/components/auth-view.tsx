@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useState, useEffect } from 'react';
@@ -35,10 +36,10 @@ import {
 import { ScrollArea } from '@/components/ui/scroll-area';
 
 const PrivacyPolicyContent = () => (
-    <div className="space-y-6 text-white/90">
-      <div className="space-y-2 border-b border-white/10 pb-6">
+    <div className="space-y-6 text-card-foreground/90">
+      <div className="space-y-2 border-b border-border pb-6">
         <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Last Updated on 21 April, 2026</p>
-        <p className="text-base font-bold text-white leading-relaxed">
+        <p className="text-base font-bold text-card-foreground leading-relaxed">
           Welcome to arcex fit. We are committed to protecting your privacy. This policy explains how your personal data is collected, stored, and used within the app, ensuring you remain in full control.
         </p>
       </div>
@@ -90,9 +91,9 @@ const PrivacyPolicyContent = () => (
           </ul>
         </section>
 
-        <section className="space-y-3 pt-4 border-t border-white/10">
+        <section className="space-y-3 pt-4 border-t border-border">
           <h3 className="text-xs font-black uppercase text-primary tracking-widest">6. Our Business Model</h3>
-          <p className="text-base font-bold text-white leading-relaxed">
+          <p className="text-base font-bold text-card-foreground leading-relaxed">
             We do not sell, trade, or rent your personal data to advertisers. Our business is built on offering valuable premium features, not on monetizing your information.
           </p>
         </section>
@@ -100,13 +101,13 @@ const PrivacyPolicyContent = () => (
     </div>
   );
 const TermsAndConditionsContent = () => (
-    <div className="space-y-6 text-white/90">
-      <div className="space-y-2 border-b border-white/10 pb-6">
+    <div className="space-y-6 text-card-foreground/90">
+      <div className="space-y-2 border-b border-border pb-6">
         <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Last Updated on 21 April, 2026</p>
       </div>
       
       <div className="space-y-8 text-sm leading-relaxed font-medium">
-        <p className="text-base font-bold text-white leading-relaxed">
+        <p className="text-base font-bold text-card-foreground leading-relaxed">
           These Terms of Use govern your access to and use of the arcex fit application. By creating an account, you agree to follow these rules.
         </p>
 
@@ -142,8 +143,8 @@ const TermsAndConditionsContent = () => (
           </ul>
         </section>
 
-        <section className="space-y-3 pt-4 border-t border-white/10">
-          <p className="text-[10px] font-bold text-white/60 italic text-center uppercase tracking-tight">
+        <section className="space-y-3 pt-4 border-t border-border">
+          <p className="text-[10px] font-bold text-card-foreground/60 italic text-center uppercase tracking-tight">
             We reserve the right to update these terms at any time.
           </p>
         </section>
@@ -151,13 +152,13 @@ const TermsAndConditionsContent = () => (
     </div>
 );
 const MedicalDisclaimerContent = () => (
-    <div className="space-y-6 text-white/90">
-        <div className="space-y-2 border-b border-white/10 pb-6">
+    <div className="space-y-6 text-card-foreground/90">
+        <div className="space-y-2 border-b border-border pb-6">
             <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Last Updated on 21 April, 2026</p>
         </div>
         
         <div className="space-y-8 text-sm leading-relaxed font-medium">
-            <p className="text-base font-bold text-white leading-relaxed uppercase tracking-tight">
+            <p className="text-base font-bold text-card-foreground leading-relaxed uppercase tracking-tight">
             arcex fit is a digital tracking tool for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment.
             </p>
 
@@ -220,9 +221,9 @@ const LegalDocDialog = ({ doc }: { doc: 'terms' | 'privacy' | 'medical'}) => {
             <DialogTrigger asChild>
                 <button className="text-primary underline hover:text-primary/80 transition-colors mx-1">{triggerText}</button>
             </DialogTrigger>
-            <DialogContent className="max-w-lg h-[80svh] flex flex-col p-0 bg-slate-950 border-white/10 rounded-3xl">
-                <DialogHeader className="p-6 pb-4 text-left border-b border-white/10">
-                    <DialogTitle className="text-xl font-bold text-white flex items-center gap-3">
+            <DialogContent className="max-w-lg h-[80svh] flex flex-col p-0 bg-card border-border rounded-3xl">
+                <DialogHeader className="p-6 pb-4 text-left border-b border-border">
+                    <DialogTitle className="text-xl font-bold text-card-foreground flex items-center gap-3">
                         <Icon className="w-5 h-5 text-primary" />
                         {title}
                     </DialogTitle>
