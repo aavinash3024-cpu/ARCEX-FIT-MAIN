@@ -15,13 +15,225 @@ import {
   AlertCircle,
   Loader2,
   CheckCircle2,
-  KeyRound
+  KeyRound,
+  FileText,
+  Stethoscope
 } from 'lucide-react';
 import { AnimatedBackground } from './animated-background';
 import { useAuth, initiateEmailSignIn, initiateEmailSignUp, initiateAnonymousSignIn, initiatePasswordReset, errorEmitter } from '@/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { cn } from '@/lib/utils';
 import { useToast } from "@/hooks/use-toast";
+import { Checkbox } from '@/components/ui/checkbox';
+import { 
+  Dialog, 
+  DialogTrigger, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle 
+} from '@/components/ui/dialog';
+import { ScrollArea } from '@/components/ui/scroll-area';
+
+const PrivacyPolicyContent = () => (
+    <div className="space-y-6 text-white/90">
+      <div className="space-y-2 border-b border-white/10 pb-6">
+        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Last Updated on 21 April, 2026</p>
+        <p className="text-base font-bold text-white leading-relaxed">
+          Welcome to arcex fit. We are committed to protecting your privacy. This policy explains how your personal data is collected, stored, and used within the app, ensuring you remain in full control.
+        </p>
+      </div>
+      
+      <div className="space-y-8 text-sm leading-relaxed font-medium">
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">1. The "Local-First" Philosophy</h3>
+          <p>
+            Your most sensitive health data lives on your device. We use a system called **UID Namespacing**, which creates a separate, locked "bucket" for each user account on a single phone. This ensures that your data remains completely isolated and private, even on a shared device.
+          </p>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">2. What We Collect & Why</h3>
+          <ul className="list-disc pl-5 space-y-3">
+            <li><span className="font-bold">Identity Info (Name, Email):</span> Used for account management, personalization, and password recovery.</li>
+            <li><span className="font-bold">Biological Metrics (Age, Gender, Weight):</span> This data is essential for the app's core function—calculating your Basal Metabolic Rate (BMR) and energy expenditure (TDEE).</li>
+            <li><span className="font-bold">Wellness History (Logs):</span> Your food logs, workouts, and other metrics are used to show you your progress over time.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">3. Artificial Intelligence (AI) and Your Data</h3>
+          <p>We use Google's Gemini AI for one specific purpose: to parse your meal descriptions. Here’s how we protect you:</p>
+          <ul className="list-disc pl-5 space-y-3">
+            <li><span className="font-bold">Anonymized Requests:</span> When you type "I ate 3 eggs," only that text is sent to the AI. Your name, email, or any other personal information is **never** included in the request.</li>
+            <li><span className="font-bold">Local Learning:</span> Once the AI identifies a food, we save its nutritional data to a private "AI Food Cache" on your device. This makes future logging faster and reduces the need to contact the AI, further protecting your privacy.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">4. Cloud Sync & Security</h3>
+          <p>
+            For your convenience, we back up essential data to Google's Firestore. This is protected by multiple layers of security:
+          </p>
+          <ul className="list-disc pl-5 space-y-3">
+            <li><span className="font-bold">Encryption:</span> Your data is encrypted both while traveling to the cloud (HTTPS) and while stored on Google's servers.</li>
+            <li><span className="font-bold">Firestore Security Rules:</span> We enforce a strict server-side rule: `request.auth.uid == resource.data.userId`. This means it is technically impossible for anyone but you to read or write to your cloud records.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">5. Your Rights and Control</h3>
+          <p>You have absolute sovereignty over your data:</p>
+          <ul className="list-disc pl-5 space-y-3">
+            <li><span className="font-bold">Right to Export:</span> Download a complete JSON file of your history from the Settings menu at any time.</li>
+            <li><span className="font-bold">Right to Edit:</span> You can update your personal profile information whenever you wish.</li>
+            <li><span className="font-bold">Right to Erasure:</span> Deleting your account will permanently purge all data from your device and our cloud backups.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-3 pt-4 border-t border-white/10">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">6. Our Business Model</h3>
+          <p className="text-base font-bold text-white leading-relaxed">
+            We do not sell, trade, or rent your personal data to advertisers. Our business is built on offering valuable premium features, not on monetizing your information.
+          </p>
+        </section>
+      </div>
+    </div>
+  );
+const TermsAndConditionsContent = () => (
+    <div className="space-y-6 text-white/90">
+      <div className="space-y-2 border-b border-white/10 pb-6">
+        <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Last Updated on 21 April, 2026</p>
+      </div>
+      
+      <div className="space-y-8 text-sm leading-relaxed font-medium">
+        <p className="text-base font-bold text-white leading-relaxed">
+          These Terms of Use govern your access to and use of the arcex fit application. By creating an account, you agree to follow these rules.
+        </p>
+
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">1. Account and Responsibility</h3>
+          <ul className="list-disc pl-5 space-y-3">
+            <li>You agree to provide accurate information (like age and weight) to ensure the app's calculations are safe and effective for you.</li>
+            <li>You are responsible for all activity that occurs under your account and for keeping your password secure.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">2. Service Usage</h3>
+          <ul className="list-disc pl-5 space-y-3">
+            <li>The app is intended for personal, non-commercial use.</li>
+            <li>Abusing the service, attempting to hack the AI, or scraping data is strictly prohibited and will result in immediate account termination.</li>
+          </ul>
+        </section>
+        
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">3. AI and Data Storage</h3>
+          <ul className="list-disc pl-5 space-y-3">
+            <li>We provide a limit of 20 AI-powered meal logs per day to ensure fair usage and control costs.</li>
+            <li>While we offer cloud backups, we are not liable for data loss resulting from user actions like clearing browser data or losing a device.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-3">
+          <h3 className="text-xs font-black uppercase text-primary tracking-widest">4. Disclaimers</h3>
+          <ul className="list-disc pl-5 space-y-3">
+            <li>The arcex fit app is provided "as is," without any warranties.</li>
+            <li>We do not guarantee specific fitness or weight-loss results, as your progress depends on your own efforts and individual health factors.</li>
+          </ul>
+        </section>
+
+        <section className="space-y-3 pt-4 border-t border-white/10">
+          <p className="text-[10px] font-bold text-white/60 italic text-center uppercase tracking-tight">
+            We reserve the right to update these terms at any time.
+          </p>
+        </section>
+      </div>
+    </div>
+);
+const MedicalDisclaimerContent = () => (
+    <div className="space-y-6 text-white/90">
+        <div className="space-y-2 border-b border-white/10 pb-6">
+            <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em]">Last Updated on 21 April, 2026</p>
+        </div>
+        
+        <div className="space-y-8 text-sm leading-relaxed font-medium">
+            <p className="text-base font-bold text-white leading-relaxed uppercase tracking-tight">
+            arcex fit is a digital tracking tool for informational purposes only and is not a substitute for professional medical advice, diagnosis, or treatment.
+            </p>
+
+            <section className="space-y-3">
+            <h3 className="text-xs font-black uppercase text-primary tracking-widest">1. Not a Medical Provider</h3>
+            <p>
+                The creators of arcex fit are not doctors or certified medical professionals. The information provided, including calorie targets and nutritional data, is generated by formulas and AI models, not a personalized medical assessment.
+            </p>
+            </section>
+
+            <section className="space-y-3">
+            <h3 className="text-xs font-black uppercase text-primary tracking-widest">2. Consult Your Doctor</h3>
+            <p>
+                Always consult with a qualified healthcare provider before starting any new exercise routine or making significant dietary changes, especially if you have pre-existing health conditions.
+            </p>
+            </section>
+
+            <section className="space-y-3">
+            <h3 className="text-xs font-black uppercase text-primary tracking-widest">3. AI for Estimation Only</h3>
+            <p>
+                Nutritional data from our AI is an estimate. It should not be used to manage medical conditions that require strict, precise nutrition.
+            </p>
+            </section>
+
+            <section className="space-y-3">
+            <h3 className="text-xs font-black uppercase text-primary tracking-widest">4. Assumption of Risk</h3>
+            <p>
+                If you feel pain, dizziness, or shortness of breath during any exercise, stop immediately and seek medical attention. You perform all activities suggested or tracked in this app at your own risk.
+            </p>
+            </section>
+        </div>
+    </div>
+);
+
+const LegalDocDialog = ({ doc }: { doc: 'terms' | 'privacy' | 'medical'}) => {
+    let title = '';
+    let content = null;
+    let triggerText = '';
+    let Icon = FileText;
+
+    if (doc === 'terms') {
+        title = 'Terms and Conditions';
+        triggerText = 'Terms';
+        content = <TermsAndConditionsContent />;
+        Icon = FileText;
+    } else if (doc === 'privacy') {
+        title = 'Privacy Policy';
+        triggerText = 'Privacy Policy';
+        content = <PrivacyPolicyContent />;
+        Icon = Lock;
+    } else {
+        title = 'Health & Medical Disclaimer';
+        triggerText = 'Disclaimer';
+        content = <MedicalDisclaimerContent />;
+        Icon = Stethoscope;
+    }
+
+    return (
+        <Dialog>
+            <DialogTrigger asChild>
+                <button className="text-primary underline hover:text-primary/80 transition-colors mx-1">{triggerText}</button>
+            </DialogTrigger>
+            <DialogContent className="max-w-lg h-[80svh] flex flex-col p-0 bg-slate-950 border-white/10 rounded-3xl">
+                <DialogHeader className="p-6 pb-4 text-left border-b border-white/10">
+                    <DialogTitle className="text-xl font-bold text-white flex items-center gap-3">
+                        <Icon className="w-5 h-5 text-primary" />
+                        {title}
+                    </DialogTitle>
+                </DialogHeader>
+                <ScrollArea className="flex-1 px-6 py-4">
+                    {content}
+                </ScrollArea>
+            </DialogContent>
+        </Dialog>
+    )
+}
 
 export function AuthView() {
   const auth = useAuth();
@@ -32,6 +244,7 @@ export function AuthView() {
   const [isLoading, setIsLoading] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [agreedToTerms, setAgreedToTerms] = useState(false);
 
   // Success detection: If auth state changes to a user, show success state
   useEffect(() => {
@@ -190,6 +403,32 @@ export function AuthView() {
                       </div>
                     </div>
 
+                    {!isLogin && (
+                        <div className="items-top flex space-x-3 pt-2">
+                            <Checkbox 
+                                id="terms" 
+                                checked={agreedToTerms} 
+                                onCheckedChange={(checked) => setAgreedToTerms(checked as boolean)}
+                                className="mt-0.5 border-white/20 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                            />
+                            <div className="grid gap-1.5 leading-none">
+                                <label
+                                    htmlFor="terms"
+                                    className="text-xs font-bold text-white/80 peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                >
+                                    I agree to the legal terms.
+                                </label>
+                                <p className="text-[10px] text-white/50">
+                                    View our 
+                                    <LegalDocDialog doc="terms" />, 
+                                    <LegalDocDialog doc="privacy" /> and 
+                                    <LegalDocDialog doc="medical" />.
+                                </p>
+                            </div>
+                        </div>
+                    )}
+
+
                     {error && (
                       <div className="flex items-center gap-3 p-3 rounded-xl bg-destructive/10 border border-destructive/20 animate-in fade-in zoom-in-95">
                         <AlertCircle className="w-4 h-4 text-destructive shrink-0" />
@@ -199,7 +438,7 @@ export function AuthView() {
 
                     <Button 
                       type="submit" 
-                      disabled={isLoading}
+                      disabled={isLoading || (!isLogin && !agreedToTerms)}
                       className="w-full h-14 rounded-2xl bg-primary text-slate-950 font-black uppercase tracking-widest shadow-xl shadow-primary/20 gap-2 transition-all active:scale-95"
                     >
                       {isLoading ? <Loader2 className="w-4 h-4 animate-spin" /> : isLogin ? <LogIn className="w-4 h-4" /> : <UserPlus className="w-4 h-4" />}

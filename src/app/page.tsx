@@ -233,24 +233,32 @@ export default function PulseFlowApp() {
 
     // CLOUD ONBOARDING CHECK
     const checkOnboarding = async () => {
-      if (!firestore) return;
-      const userRef = doc(firestore, 'userProfiles', user.uid);
-      const userSnap = await getDoc(userRef);
-      
-      let isComplete = false;
-      if (userSnap.exists()) {
-        isComplete = userSnap.data().onboardingComplete === true;
-      } else {
-        // Check local as backup
-        isComplete = localStorage.getItem(keys.onboarding) === 'true';
-      }
+        if (!firestore) return;
 
-      if (!isComplete) {
-        setShowOnboarding(true);
-      } else {
-        localStorage.setItem(keys.onboarding, 'true');
-        setShowOnboarding(false);
-      }
+        // For anonymous users, rely solely on localStorage.
+        if (user.isAnonymous) {
+            const localOnboardingComplete = localStorage.getItem(keys.onboarding) === 'true';
+            setShowOnboarding(!localOnboardingComplete);
+            return;
+        }
+
+        // For authenticated users, Firestore is the source of truth.
+        const userRef = doc(firestore, 'userProfiles', user.uid);
+        try {
+            const userSnap = await getDoc(userRef);
+            if (userSnap.exists() && userSnap.data().onboardingComplete) {
+                setShowOnboarding(false);
+            } else {
+                // If doc doesn't exist OR onboarding isn't marked complete, show onboarding.
+                // OnboardingView will create/update the document upon completion.
+                setShowOnboarding(true);
+            }
+        } catch (e) {
+            console.error("Error fetching user profile for onboarding check:", e);
+            // As a fallback, if there's an error, don't block the user.
+            const localOnboardingComplete = localStorage.getItem(keys.onboarding) === 'true';
+            setShowOnboarding(!localOnboardingComplete);
+        }
     };
     checkOnboarding();
 
