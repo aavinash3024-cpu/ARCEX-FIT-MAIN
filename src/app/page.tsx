@@ -73,6 +73,7 @@ export default function PulseFlowApp() {
   const [sentMilestones, setSentMilestones] = useState<
     Record<string, string[]>
   >({});
+  const [credits, setCredits] = useState(20);
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
@@ -97,6 +98,7 @@ export default function PulseFlowApp() {
       lastReset: `arcex_${uid}_last_reset_date`,
       onboarding: `arcex_${uid}_onboarding_complete`,
       userProfile: `arcex_${uid}_user_profile`,
+      credits: `arcex_${uid}_meal_credits_v2`,
     }),
     []
   );
@@ -331,6 +333,7 @@ export default function PulseFlowApp() {
     const savedStreak = localStorage.getItem(keys.streak);
     const savedNotifications = localStorage.getItem(keys.notifications);
     const savedMilestones = localStorage.getItem(keys.milestones);
+    const savedCreditsData = localStorage.getItem(keys.credits);
 
     if (savedTasks) {
       try {
@@ -346,6 +349,21 @@ export default function PulseFlowApp() {
     } else {
       if (savedHydration) setHydrationAmount(Number(savedHydration));
       if (savedSteps) setStepsCount(Number(savedSteps));
+    }
+    
+    if (savedCreditsData) {
+      try {
+        const data = JSON.parse(savedCreditsData);
+        if (data.date === todayStr) {
+          setCredits(data.credits);
+        } else {
+          setCredits(20); // Reset on new day
+        }
+      } catch (e) {
+        setCredits(20); // Corrupted data, reset
+      }
+    } else {
+      setCredits(20);
     }
 
     if (savedHydrationHistory) {
@@ -486,6 +504,14 @@ export default function PulseFlowApp() {
       );
     }
   }, [sentMilestones, isLoaded, user, getKeys]);
+  
+  useEffect(() => {
+    if (isLoaded && user) {
+        const todayStr = format(new Date(), 'yyyy-MM-dd');
+        const keys = getKeys(user.uid);
+        localStorage.setItem(keys.credits, JSON.stringify({ credits: credits, date: todayStr }));
+    }
+  }, [credits, isLoaded, user, getKeys]);
 
   // ACHIEVEMENT MONITORING ENGINE
   useEffect(() => {
@@ -779,6 +805,8 @@ export default function PulseFlowApp() {
           <NutritionView
             loggedMeals={loggedMeals}
             setLoggedMeals={setLoggedMeals}
+            credits={credits}
+            setCredits={setCredits}
             activeView={nutrView === 'nutrition' ? 'log' : nutrView}
             onNavigate={navigateTo}
           />

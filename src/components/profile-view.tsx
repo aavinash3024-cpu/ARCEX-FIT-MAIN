@@ -772,7 +772,7 @@ export function ProfileView({
                   desc: 'Muscle coverage & target gaps.',
                   icon: Layout,
                   colors:
-                    'linear-gradient(135deg, #3b82f6) 0%, #2563eb 100%)',
+                    'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
                 },
                 {
                   label: 'Meal Logging',

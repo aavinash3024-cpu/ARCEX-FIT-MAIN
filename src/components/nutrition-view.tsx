@@ -127,6 +127,8 @@ interface CachedFoodItem {
 interface NutritionViewProps {
   loggedMeals: LoggedMeal[];
   setLoggedMeals: React.Dispatch<React.SetStateAction<LoggedMeal[]>>;
+  credits: number;
+  setCredits: React.Dispatch<React.SetStateAction<number>>;
   activeView?: 'log' | 'summary' | 'micro' | 'macro' | 'micro-detail';
   onNavigate: (tab: string) => void;
   initialShowSummary?: boolean; // Maintain compatibility
@@ -142,6 +144,8 @@ const MACRO_COLORS = {
 export function NutritionView({
   loggedMeals,
   setLoggedMeals,
+  credits,
+  setCredits,
   activeView = 'log',
   onNavigate,
   initialShowSummary,
@@ -155,8 +159,7 @@ export function NutritionView({
   const [mealInput, setMealInput] = useState('');
   const [isParsing, setIsParsing] = useState(false);
   const [isListening, setIsListening] = useState(false);
-  const [credits, setCredits] = useState(20);
-
+  
   const [recentMeals, setRecentMeals] = useState<LoggedMeal[]>([]);
   const [savedMeals, setSavedMeals] = useState<LoggedMeal[]>([]);
   const [allHistory, setAllHistory] = useState<LoggedMeal[]>([]);
@@ -170,7 +173,6 @@ export function NutritionView({
     const savedRecent = localStorage.getItem('pulseflow_recent_meals');
     const savedFavorites = localStorage.getItem('pulseflow_saved_meals');
     const savedHistory = localStorage.getItem('pulseflow_all_meals_history');
-    const savedCreditsData = localStorage.getItem('pulseflow_meal_credits_v2');
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
     const savedCache = localStorage.getItem('pulseflow_food_cache');
 
@@ -179,22 +181,6 @@ export function NutritionView({
     if (savedHistory) setAllHistory(JSON.parse(savedHistory));
     if (savedGoal) setGoalData(JSON.parse(savedGoal));
     if (savedCache) setFoodCache(JSON.parse(savedCache));
-
-    const todayStr = format(new Date(), 'yyyy-MM-dd');
-    if (savedCreditsData) {
-      try {
-        const data = JSON.parse(savedCreditsData);
-        if (data.date === todayStr) {
-          setCredits(data.credits);
-        } else {
-          setCredits(20); // Reset on new day
-        }
-      } catch (e) {
-        setCredits(20); // Corrupted data, reset
-      }
-    } else {
-      setCredits(20);
-    }
 
     setIsLoaded(true);
   }, []);
@@ -207,14 +193,9 @@ export function NutritionView({
         'pulseflow_all_meals_history',
         JSON.stringify(allHistory)
       );
-      const todayStr = format(new Date(), 'yyyy-MM-dd');
-      localStorage.setItem(
-        'pulseflow_meal_credits_v2',
-        JSON.stringify({ credits: credits, date: todayStr })
-      );
       localStorage.setItem('pulseflow_food_cache', JSON.stringify(foodCache));
     }
-  }, [recentMeals, savedMeals, allHistory, credits, foodCache, isLoaded]);
+  }, [recentMeals, savedMeals, allHistory, foodCache, isLoaded]);
 
   const tryLocalParse = (input: string): LoggedMeal | null | 'INVALID' => {
     const normalized = input.toLowerCase();
