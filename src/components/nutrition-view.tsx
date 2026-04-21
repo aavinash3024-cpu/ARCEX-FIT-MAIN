@@ -1,3 +1,4 @@
+
 'use client';
 
 import React, { useState, useEffect, useMemo } from 'react';
@@ -56,8 +57,6 @@ import {
   endOfMonth,
   addWeeks,
   subWeeks,
-  addMonths,
-  subMonths,
   addDays,
   eachDayOfInterval,
 } from 'date-fns';
@@ -946,7 +945,7 @@ export function NutritionView({
           <div className="flex-1 min-w-0">
             <div className="flex items-center justify-between">
               <div className="space-y-0.5">
-                <h2 className="text-xs font-black uppercase tracking-tight text-foreground">
+                <h2 className="text-xs font-black uppercase tracking-tighter text-foreground">
                   Meal Logging
                 </h2>
                 <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-tight">
@@ -2093,7 +2092,7 @@ function TrendsContent({
             </Card>
             <Card className="border-none shadow-sm bg-card p-4 space-y-1">
               <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">
-                Daily Balance
+                {period === 'weekly' ? 'Weekly Balance' : 'Monthly Balance'}
               </p>
               <div
                 className={cn(
@@ -2109,7 +2108,8 @@ function TrendsContent({
                   <ArrowDownRight className="w-3.5 h-3.5" />
                 )}
                 <span className="text-sm font-black">
-                  {Math.abs(stats.netSurplusDeficit)} kcal
+                  {stats.netSurplusDeficit >= 0 ? '+' : ''}
+                  {stats.netSurplusDeficit} kcal
                 </span>
               </div>
             </Card>
