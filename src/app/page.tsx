@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { 
-  LayoutDashboard, 
-  UtensilsCrossed, 
-  Dumbbell, 
+import {
+  LayoutDashboard,
+  UtensilsCrossed,
+  Dumbbell,
   LineChart as ChartIcon,
   Bell,
   User,
@@ -15,7 +15,7 @@ import {
   Flame,
   HeartPulse,
   CheckCircle2,
-  Sparkles
+  Sparkles,
 } from 'lucide-react';
 import { DashboardView } from '@/components/dashboard-view';
 import { NutritionView } from '@/components/nutrition-view';
@@ -31,11 +31,19 @@ import { GuideView } from '@/components/guide-view';
 import { OnboardingView } from '@/components/onboarding-view';
 import { AuthView } from '@/components/auth-view';
 import { SplashScreen } from '@/components/splash-screen';
-import { NotificationsView, type Notification } from '@/components/notifications-view';
+import {
+  NotificationsView,
+  type Notification,
+} from '@/components/notifications-view';
 import { Button } from '@/components/ui/button';
 import { Skeleton } from '@/components/ui/skeleton';
 import { format, isYesterday, isSameDay, subHours, subDays } from 'date-fns';
-import { useAuth, useUser, useFirestore, setDocumentNonBlocking } from '@/firebase';
+import {
+  useAuth,
+  useUser,
+  useFirestore,
+  setDocumentNonBlocking,
+} from '@/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { cn } from '@/lib/utils';
 
@@ -43,21 +51,29 @@ export default function PulseFlowApp() {
   const auth = useAuth();
   const firestore = useFirestore();
   const { user, isUserLoading } = useUser();
-  
+
   const [activeTab, setActiveTab] = useState('dashboard');
-  const [activeCalculator, setActiveCalculator] = useState<'bmr' | '1rm' | 'bodyfat'>('bmr');
+  const [activeCalculator, setActiveCalculator] =
+    useState<'bmr' | '1rm' | 'bodyfat'>('bmr');
   const [tasks, setTask] = useState<Task[]>([]);
   const [hydrationAmount, setHydrationAmount] = useState(0);
-  const [hydrationHistory, setHydrationHistory] = useState<Record<string, number>>({});
+  const [hydrationHistory, setHydrationHistory] = useState<
+    Record<string, number>
+  >({});
   const [stepsCount, setStepsCount] = useState(0);
   const [stepsHistory, setStepsHistory] = useState<Record<string, number>>({});
   const [goalData, setGoalData] = useState<any>(null);
   const [weightHistory, setWeightHistory] = useState<any[]>([]);
   const [loggedMeals, setLoggedMeals] = useState<any[]>([]);
-  const [streakData, setStreakData] = useState({ count: 0, history: [] as string[] });
+  const [streakData, setStreakData] = useState({
+    count: 0,
+    history: [] as string[],
+  });
   const [notifications, setNotifications] = useState<Notification[]>([]);
-  const [sentMilestones, setSentMilestones] = useState<Record<string, string[]>>({});
-  
+  const [sentMilestones, setSentMilestones] = useState<
+    Record<string, string[]>
+  >({});
+
   const [isLoaded, setIsLoaded] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
@@ -65,32 +81,46 @@ export default function PulseFlowApp() {
   const mainRef = useRef<HTMLDivElement>(null);
 
   // Helper to get UID namespaced keys
-  const getKeys = useCallback((uid: string) => ({
-    tasks: `arcex_${uid}_tasks`,
-    hydration: `arcex_${uid}_hydration`,
-    hydrationHistory: `arcex_${uid}_hydration_history`,
-    steps: `arcex_${uid}_steps`,
-    stepsHistory: `arcex_${uid}_steps_history`,
-    goal: `arcex_${uid}_goal_data`,
-    weight: `arcex_${uid}_weight_history`,
-    meals: `arcex_${uid}_today_logged_meals`,
-    streak: `arcex_${uid}_streak_v3`,
-    notifications: `arcex_${uid}_notifications_data_v2`,
-    milestones: `arcex_${uid}_sent_milestones`,
-    lastReset: `arcex_${uid}_last_reset_date`,
-    onboarding: `arcex_${uid}_onboarding_complete`,
-    userProfile: `arcex_${uid}_user_profile`
-  }), []);
+  const getKeys = useCallback(
+    (uid: string) => ({
+      tasks: `arcex_${uid}_tasks`,
+      hydration: `arcex_${uid}_hydration`,
+      hydrationHistory: `arcex_${uid}_hydration_history`,
+      steps: `arcex_${uid}_steps`,
+      stepsHistory: `arcex_${uid}_steps_history`,
+      goal: `arcex_${uid}_goal_data`,
+      weight: `arcex_${uid}_weight_history`,
+      meals: `arcex_${uid}_today_logged_meals`,
+      streak: `arcex_${uid}_streak_v3`,
+      notifications: `arcex_${uid}_notifications_data_v2`,
+      milestones: `arcex_${uid}_sent_milestones`,
+      lastReset: `arcex_${uid}_last_reset_date`,
+      onboarding: `arcex_${uid}_onboarding_complete`,
+      userProfile: `arcex_${uid}_user_profile`,
+    }),
+    []
+  );
 
-  const triggerHaptic = (type: 'light' | 'medium' | 'success' | 'warning' = 'light') => {
+  const triggerHaptic = (
+    type: 'light' | 'medium' | 'success' | 'warning' = 'light'
+  ) => {
     const enabled = localStorage.getItem('pulseflow_haptics') !== 'false';
-    if (!enabled || typeof window === 'undefined' || !window.navigator.vibrate) return;
+    if (!enabled || typeof window === 'undefined' || !window.navigator.vibrate)
+      return;
 
-    switch(type) {
-      case 'light': window.navigator.vibrate(15); break;
-      case 'medium': window.navigator.vibrate(30); break;
-      case 'success': window.navigator.vibrate([20, 40, 20]); break;
-      case 'warning': window.navigator.vibrate([40, 40, 40]); break;
+    switch (type) {
+      case 'light':
+        window.navigator.vibrate(15);
+        break;
+      case 'medium':
+        window.navigator.vibrate(30);
+        break;
+      case 'success':
+        window.navigator.vibrate([20, 40, 20]);
+        break;
+      case 'warning':
+        window.navigator.vibrate([40, 40, 40]);
+        break;
     }
   };
 
@@ -100,36 +130,59 @@ export default function PulseFlowApp() {
     setIsSyncing(true);
     try {
       const todayStr = format(new Date(), 'yyyy-MM-dd');
-      
+
       // 1. Sync Daily Metrics
-      const metricsRef = doc(firestore, `userProfiles/${user.uid}/dailyMetrics`, todayStr);
-      await setDoc(metricsRef, {
-        userId: user.uid,
-        date: todayStr,
-        caloriesConsumed: loggedMeals.reduce((acc, m) => acc + (m.calories || 0), 0),
-        hydrationMl: hydrationAmount,
-        stepsCount: stepsCount,
-        meals: loggedMeals,
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
+      const metricsRef = doc(
+        firestore,
+        `userProfiles/${user.uid}/dailyMetrics`,
+        todayStr
+      );
+      await setDoc(
+        metricsRef,
+        {
+          userId: user.uid,
+          date: todayStr,
+          caloriesConsumed: loggedMeals.reduce(
+            (acc, m) => acc + (m.calories || 0),
+            0
+          ),
+          hydrationMl: hydrationAmount,
+          stepsCount: stepsCount,
+          meals: loggedMeals,
+          updatedAt: new Date().toISOString(),
+        },
+        { merge: true }
+      );
 
       // 2. Sync Goal
       if (goalData) {
-        const goalRef = doc(firestore, `userProfiles/${user.uid}/goals`, 'primary_goal');
-        await setDoc(goalRef, {
-          ...goalData,
-          userId: user.uid,
-          updatedAt: new Date().toISOString()
-        }, { merge: true });
+        const goalRef = doc(
+          firestore,
+          `userProfiles/${user.uid}/goals`,
+          'primary_goal'
+        );
+        await setDoc(
+          goalRef,
+          {
+            ...goalData,
+            userId: user.uid,
+            updatedAt: new Date().toISOString(),
+          },
+          { merge: true }
+        );
       }
 
       // 3. Sync Profile Onboarding
       const userRef = doc(firestore, 'userProfiles', user.uid);
-      await setDoc(userRef, { onboardingComplete: true, updatedAt: new Date().toISOString() }, { merge: true });
-      
-      console.log("Firestore Sync Complete");
+      await setDoc(
+        userRef,
+        { onboardingComplete: true, updatedAt: new Date().toISOString() },
+        { merge: true }
+      );
+
+      console.log('Firestore Sync Complete');
     } catch (e) {
-      console.error("Sync failed", e);
+      console.error('Sync failed', e);
     } finally {
       setIsSyncing(false);
     }
@@ -189,11 +242,11 @@ export default function PulseFlowApp() {
   };
 
   const addNotification = (
-    title: string, 
-    description: string, 
-    type: Notification['type'], 
-    subtype?: Notification['subtype'], 
-    icon: string = 'bell', 
+    title: string,
+    description: string,
+    type: Notification['type'],
+    subtype?: Notification['subtype'],
+    icon: string = 'bell',
     gradient: string = 'linear-gradient(135deg, #4ade80 0%, #3b82f6 100%)'
   ) => {
     const enabled = localStorage.getItem('pulseflow_notifications') !== 'false';
@@ -209,9 +262,9 @@ export default function PulseFlowApp() {
       subtype,
       isRead: false,
       icon,
-      gradient
+      gradient,
     };
-    setNotifications(prev => [newNotif, ...prev]);
+    setNotifications((prev) => [newNotif, ...prev]);
   };
 
   // CORE DATA LOADING WITH UID NAMESPACING
@@ -223,7 +276,7 @@ export default function PulseFlowApp() {
 
     const todayStr = format(new Date(), 'yyyy-MM-dd');
     const keys = getKeys(user.uid);
-    
+
     const savedDarkMode = localStorage.getItem('pulseflow_dark_mode');
     if (savedDarkMode === 'true') {
       document.documentElement.classList.add('dark');
@@ -233,32 +286,34 @@ export default function PulseFlowApp() {
 
     // CLOUD ONBOARDING CHECK
     const checkOnboarding = async () => {
-        if (!firestore) return;
+      if (!firestore) return;
 
-        // For anonymous users, rely solely on localStorage.
-        if (user.isAnonymous) {
-            const localOnboardingComplete = localStorage.getItem(keys.onboarding) === 'true';
-            setShowOnboarding(!localOnboardingComplete);
-            return;
-        }
+      // For anonymous users, rely solely on localStorage.
+      if (user.isAnonymous) {
+        const localOnboardingComplete =
+          localStorage.getItem(keys.onboarding) === 'true';
+        setShowOnboarding(!localOnboardingComplete);
+        return;
+      }
 
-        // For authenticated users, Firestore is the source of truth.
-        const userRef = doc(firestore, 'userProfiles', user.uid);
-        try {
-            const userSnap = await getDoc(userRef);
-            if (userSnap.exists() && userSnap.data().onboardingComplete) {
-                setShowOnboarding(false);
-            } else {
-                // If doc doesn't exist OR onboarding isn't marked complete, show onboarding.
-                // OnboardingView will create/update the document upon completion.
-                setShowOnboarding(true);
-            }
-        } catch (e) {
-            console.error("Error fetching user profile for onboarding check:", e);
-            // As a fallback, if there's an error, don't block the user.
-            const localOnboardingComplete = localStorage.getItem(keys.onboarding) === 'true';
-            setShowOnboarding(!localOnboardingComplete);
+      // For authenticated users, Firestore is the source of truth.
+      const userRef = doc(firestore, 'userProfiles', user.uid);
+      try {
+        const userSnap = await getDoc(userRef);
+        if (userSnap.exists() && userSnap.data().onboardingComplete) {
+          setShowOnboarding(false);
+        } else {
+          // If doc doesn't exist OR onboarding isn't marked complete, show onboarding.
+          // OnboardingView will create/update the document upon completion.
+          setShowOnboarding(true);
         }
+      } catch (e) {
+        console.error('Error fetching user profile for onboarding check:', e);
+        // As a fallback, if there's an error, don't block the user.
+        const localOnboardingComplete =
+          localStorage.getItem(keys.onboarding) === 'true';
+        setShowOnboarding(!localOnboardingComplete);
+      }
     };
     checkOnboarding();
 
@@ -276,9 +331,13 @@ export default function PulseFlowApp() {
     const savedStreak = localStorage.getItem(keys.streak);
     const savedNotifications = localStorage.getItem(keys.notifications);
     const savedMilestones = localStorage.getItem(keys.milestones);
-    
-    if (savedTasks) { try { setTask(JSON.parse(savedTasks)); } catch (e) {} }
-    
+
+    if (savedTasks) {
+      try {
+        setTask(JSON.parse(savedTasks));
+      } catch (e) {}
+    }
+
     if (isNewDay) {
       setHydrationAmount(0);
       localStorage.setItem(keys.hydration, '0');
@@ -289,26 +348,38 @@ export default function PulseFlowApp() {
       if (savedSteps) setStepsCount(Number(savedSteps));
     }
 
-    if (savedHydrationHistory) { try { setHydrationHistory(JSON.parse(savedHydrationHistory)); } catch (e) {} }
-    if (savedStepsHistory) { try { setStepsHistory(JSON.parse(savedStepsHistory)); } catch (e) {} }
-    if (savedGoal) { try { setGoalData(JSON.parse(savedGoal)); } catch (e) {} }
-    if (savedWeight) { try { setWeightHistory(JSON.parse(savedWeight)); } catch (e) {} }
-    
-    if (savedNotifications) { 
-      try { 
-        let parsed = JSON.parse(savedNotifications);
-        const autoDelete = localStorage.getItem('pulseflow_notif_autodelete') !== 'false';
-        const period = localStorage.getItem('pulseflow_notif_period') || '24h';
-        const cutoff = period === '24h' ? subHours(new Date(), 24).getTime() : subDays(new Date(), 7).getTime();
-        if (autoDelete) parsed = parsed.filter((n: any) => (n.timestamp || 0) > cutoff);
-        setNotifications(parsed); 
-      } catch (e) {} 
+    if (savedHydrationHistory) {
+      try {
+        setHydrationHistory(JSON.parse(savedHydrationHistory));
+      } catch (e) {}
+    }
+    if (savedStepsHistory) {
+      try {
+        setStepsHistory(JSON.parse(savedStepsHistory));
+      } catch (e) {}
+    }
+    if (savedGoal) {
+      try {
+        setGoalData(JSON.parse(savedGoal));
+      } catch (e) {}
+    }
+    if (savedWeight) {
+      try {
+        setWeightHistory(JSON.parse(savedWeight));
+      } catch (e) {}
+    }
+
+    if (savedNotifications) {
+      try {
+        setNotifications(JSON.parse(savedNotifications));
+      } catch (e) {}
     }
 
     if (savedMilestones) {
-      try { 
+      try {
         const parsed = JSON.parse(savedMilestones);
-        if (parsed.date === todayStr) setSentMilestones(parsed.milestones || {});
+        if (parsed.date === todayStr)
+          setSentMilestones(parsed.milestones || {});
         else setSentMilestones({});
       } catch (e) {}
     }
@@ -317,7 +388,9 @@ export default function PulseFlowApp() {
       setLoggedMeals([]);
       localStorage.setItem(keys.meals, '[]');
     } else if (savedMeals) {
-      try { setLoggedMeals(JSON.parse(savedMeals)); } catch (e) {}
+      try {
+        setLoggedMeals(JSON.parse(savedMeals));
+      } catch (e) {}
     }
 
     localStorage.setItem(keys.lastReset, todayStr);
@@ -333,7 +406,11 @@ export default function PulseFlowApp() {
           let newCount = 1;
           if (isYesterday(lastDateObj)) newCount = data.count + 1;
           const newHistory = [...data.history, todayStr].slice(-30);
-          const newData = { count: newCount, history: newHistory, lastDate: todayStr };
+          const newData = {
+            count: newCount,
+            history: newHistory,
+            lastDate: todayStr,
+          };
           setStreakData({ count: newCount, history: newHistory });
           localStorage.setItem(keys.streak, JSON.stringify(newData));
         }
@@ -357,53 +434,56 @@ export default function PulseFlowApp() {
   };
 
   // Persistent storage sync WITH UID
-  useEffect(() => { 
+  useEffect(() => {
     if (isLoaded && user) {
       const keys = getKeys(user.uid);
-      localStorage.setItem(keys.tasks, JSON.stringify(tasks)); 
+      localStorage.setItem(keys.tasks, JSON.stringify(tasks));
     }
   }, [tasks, isLoaded, user, getKeys]);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (isLoaded && user) {
       const keys = getKeys(user.uid);
-      localStorage.setItem(keys.hydration, hydrationAmount.toString()); 
+      localStorage.setItem(keys.hydration, hydrationAmount.toString());
     }
   }, [hydrationAmount, isLoaded, user, getKeys]);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (isLoaded && user) {
       const keys = getKeys(user.uid);
-      localStorage.setItem(keys.steps, stepsCount.toString()); 
+      localStorage.setItem(keys.steps, stepsCount.toString());
     }
   }, [stepsCount, isLoaded, user, getKeys]);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (isLoaded && user) {
       const keys = getKeys(user.uid);
-      localStorage.setItem(keys.weight, JSON.stringify(weightHistory)); 
+      localStorage.setItem(keys.weight, JSON.stringify(weightHistory));
     }
   }, [weightHistory, isLoaded, user, getKeys]);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (isLoaded && user) {
       const keys = getKeys(user.uid);
-      localStorage.setItem(keys.meals, JSON.stringify(loggedMeals)); 
+      localStorage.setItem(keys.meals, JSON.stringify(loggedMeals));
     }
   }, [loggedMeals, isLoaded, user, getKeys]);
 
-  useEffect(() => { 
+  useEffect(() => {
     if (isLoaded && user) {
       const keys = getKeys(user.uid);
-      localStorage.setItem(keys.notifications, JSON.stringify(notifications)); 
+      localStorage.setItem(keys.notifications, JSON.stringify(notifications));
     }
   }, [notifications, isLoaded, user, getKeys]);
-  
+
   useEffect(() => {
     if (isLoaded && user) {
       const todayStr = format(new Date(), 'yyyy-MM-dd');
       const keys = getKeys(user.uid);
-      localStorage.setItem(keys.milestones, JSON.stringify({ date: todayStr, milestones: sentMilestones }));
+      localStorage.setItem(
+        keys.milestones,
+        JSON.stringify({ date: todayStr, milestones: sentMilestones })
+      );
     }
   }, [sentMilestones, isLoaded, user, getKeys]);
 
@@ -412,54 +492,130 @@ export default function PulseFlowApp() {
     if (!isLoaded || !goalData) return;
 
     const todayStr = format(new Date(), 'yyyy-MM-dd');
-    const checkMilestone = (key: string, current: number, target: number, label: string, icon: string, grad: string) => {
+    const checkMilestone = (
+      key: string,
+      current: number,
+      target: number,
+      label: string,
+      icon: string,
+      grad: string
+    ) => {
       const milestones = sentMilestones[key] || [];
       const pct = (current / target) * 100;
 
       if (pct >= 50 && !milestones.includes('50')) {
-        addNotification(`50% ${label} Achieved`, `You've reached the halfway mark for your daily ${label.toLowerCase()} target. Keep going!`, 'goal', '50-percent', icon, grad);
-        setSentMilestones(prev => ({ ...prev, [key]: [...(prev[key] || []), '50'] }));
+        addNotification(
+          `50% ${label} Achieved`,
+          `You've reached the halfway mark for your daily ${label.toLowerCase()} target. Keep going!`,
+          'goal',
+          '50-percent',
+          icon,
+          grad
+        );
+        setSentMilestones((prev) => ({
+          ...prev,
+          [key]: [...(prev[key] || []), '50'],
+        }));
       }
-      
+
       if (pct >= 100 && !milestones.includes('100')) {
-        addNotification(`100% ${label} Achieved`, `Outstanding! You have successfully reached your full daily ${label.toLowerCase()} goal.`, 'goal', '100-percent', icon, grad);
-        setSentMilestones(prev => ({ ...prev, [key]: [...(prev[key] || []), '100'] }));
+        addNotification(
+          `100% ${label} Achieved`,
+          `Outstanding! You have successfully reached your full daily ${label.toLowerCase()} goal.`,
+          'goal',
+          '100-percent',
+          icon,
+          grad
+        );
+        setSentMilestones((prev) => ({
+          ...prev,
+          [key]: [...(prev[key] || []), '100'],
+        }));
       }
     };
 
     const curCal = loggedMeals.reduce((acc, m) => acc + (m.calories || 0), 0);
     const tarCal = goalData.finalCalories || 2200;
-    checkMilestone('calories', curCal, tarCal, 'Calories', 'flame', 'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)');
+    checkMilestone(
+      'calories',
+      curCal,
+      tarCal,
+      'Calories',
+      'flame',
+      'linear-gradient(135deg, #f59e0b 0%, #ea580c 100%)'
+    );
 
-    const totals = loggedMeals.reduce((acc, m) => ({
-      protein: acc.protein + (m.protein || 0),
-      carbs: acc.carbs + (m.carbs || 0),
-      fat: acc.fat + (m.fat || 0),
-      fiber: acc.fiber + (m.fiber || 0),
-      vitA: acc.vitA + (m.vitaminA || 0),
-      omega3: acc.omega3 + (m.omega3 || 0),
-      vitC: acc.vitC + (m.vitaminC || 0),
-      zinc: acc.zinc + (m.zinc || 0),
-      selenium: acc.selenium + (m.selenium || 0), 
-      mag: acc.mag + (m.magnesium || 0),
-      vitD: acc.vitD + (m.vitaminD || 0),
-      potassium: acc.potassium + (m.potassium || 0),
-      iron: acc.iron + (m.iron || 0),
-      calcium: acc.calcium + (m.calcium || 0),
-    }), { 
-      protein: 0, carbs: 0, fat: 0, fiber: 0,
-      vitA: 0, omega3: 0, vitC: 0, zinc: 0, selenium: 0, 
-      mag: 0, vitD: 0, potassium: 0, iron: 0, calcium: 0 
-    });
+    const totals = loggedMeals.reduce(
+      (acc, m) => ({
+        protein: acc.protein + (m.protein || 0),
+        carbs: acc.carbs + (m.carbs || 0),
+        fat: acc.fat + (m.fat || 0),
+        fiber: acc.fiber + (m.fiber || 0),
+        vitA: acc.vitA + (m.vitaminA || 0),
+        omega3: acc.omega3 + (m.omega3 || 0),
+        vitC: acc.vitC + (m.vitaminC || 0),
+        zinc: acc.zinc + (m.zinc || 0),
+        selenium: acc.selenium + (m.selenium || 0),
+        mag: acc.mag + (m.magnesium || 0),
+        vitD: acc.vitD + (m.vitaminD || 0),
+        potassium: acc.potassium + (m.potassium || 0),
+        iron: acc.iron + (m.iron || 0),
+        calcium: acc.calcium + (m.calcium || 0),
+      }),
+      {
+        protein: 0,
+        carbs: 0,
+        fat: 0,
+        fiber: 0,
+        vitA: 0,
+        omega3: 0,
+        vitC: 0,
+        zinc: 0,
+        selenium: 0,
+        mag: 0,
+        vitD: 0,
+        potassium: 0,
+        iron: 0,
+        calcium: 0,
+      }
+    );
 
-    checkMilestone('protein', totals.protein, goalData.protein || 150, 'Protein', 'target', 'linear-gradient(135deg, #10b981 0%, #059669 100%)');
-    checkMilestone('carbs', totals.carbs, goalData.carbs || 250, 'Carbohydrates', 'zap', 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)');
-    checkMilestone('fats', totals.fat, goalData.fats || 70, 'Fats', 'flame', 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)');
-    checkMilestone('fiber', totals.fiber, goalData.fiber || 30, 'Fiber', 'zap', 'linear-gradient(135deg, #10b981 0%, #059669 100%)');
+    checkMilestone(
+      'protein',
+      totals.protein,
+      goalData.protein || 150,
+      'Protein',
+      'target',
+      'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+    );
+    checkMilestone(
+      'carbs',
+      totals.carbs,
+      goalData.carbs || 250,
+      'Carbohydrates',
+      'zap',
+      'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)'
+    );
+    checkMilestone(
+      'fats',
+      totals.fat,
+      goalData.fats || 70,
+      'Fats',
+      'flame',
+      'linear-gradient(135deg, #f97316 0%, #ea580c 100%)'
+    );
+    checkMilestone(
+      'fiber',
+      totals.fiber,
+      goalData.fiber || 30,
+      'Fiber',
+      'zap',
+      'linear-gradient(135deg, #10b981 0%, #059669 100%)'
+    );
 
     const userGender = goalData?.gender || 'male';
     const userAge = parseInt(goalData?.age) || 25;
-    
+
     const microTargets = {
       vitA: userGender === 'male' ? 900 : 700,
       omega3: userGender === 'male' ? 1.6 : 1.1,
@@ -469,48 +625,122 @@ export default function PulseFlowApp() {
       mag: userGender === 'male' ? 420 : 320,
       vitD: userAge > 70 ? 20 : 15,
       potassium: userGender === 'male' ? 3400 : 2600,
-      iron: userGender === 'male' ? 8 : (userAge < 50 ? 18 : 8),
+      iron: userGender === 'male' ? 8 : userAge < 50 ? 18 : 8,
       calcium: userAge > 50 && userGender === 'female' ? 1200 : 1000,
     };
 
-    checkMilestone('vitA', totals.vitA, microTargets.vitA, 'Vitamin A', 'sparkles', 'linear-gradient(135deg, #f97316 0%, #fb923c 100%)');
-    checkMilestone('omega3', totals.omega3, microTargets.omega3, 'Omega-3', 'droplets', 'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)');
-    checkMilestone('vitC', totals.vitC, microTargets.vitC, 'Vitamin C', 'zap', 'linear-gradient(135deg, #eab308 0%, #facc15 100%)');
-    checkMilestone('zinc', totals.zinc, microTargets.zinc, 'Zinc', 'shield', 'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)');
-    checkMilestone('selenium', totals.selenium, microTargets.selenium, 'Selenium', 'star', 'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)');
-    checkMilestone('magnesium', totals.mag, microTargets.mag, 'Magnesium', 'heart-pulse', 'linear-gradient(135deg, #a855f7 0%, #c084fc 100%)');
-    checkMilestone('vitD', totals.vitD, microTargets.vitD, 'Vitamin D', 'sun', 'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)');
-    checkMilestone('potassium', totals.potassium, microTargets.potassium, 'Potassium', 'activity', 'linear-gradient(135deg, #10b981 0%, #34d399 100%)');
-    checkMilestone('iron', totals.iron, microTargets.iron, 'Iron', 'shield', 'linear-gradient(135deg, #ef4444 0%, #f87171 100%)');
-    checkMilestone('calcium', totals.calcium, microTargets.calcium, 'Calcium', 'activity', 'linear-gradient(135deg, #64748b 0%, #94a3b8 100%)');
-
+    checkMilestone(
+      'vitA',
+      totals.vitA,
+      microTargets.vitA,
+      'Vitamin A',
+      'sparkles',
+      'linear-gradient(135deg, #f97316 0%, #fb923c 100%)'
+    );
+    checkMilestone(
+      'omega3',
+      totals.omega3,
+      microTargets.omega3,
+      'Omega-3',
+      'droplets',
+      'linear-gradient(135deg, #0ea5e9 0%, #38bdf8 100%)'
+    );
+    checkMilestone(
+      'vitC',
+      totals.vitC,
+      microTargets.vitC,
+      'Vitamin C',
+      'zap',
+      'linear-gradient(135deg, #eab308 0%, #facc15 100%)'
+    );
+    checkMilestone(
+      'zinc',
+      totals.zinc,
+      microTargets.zinc,
+      'Zinc',
+      'shield',
+      'linear-gradient(135deg, #6366f1 0%, #818cf8 100%)'
+    );
+    checkMilestone(
+      'selenium',
+      totals.selenium,
+      microTargets.selenium,
+      'Selenium',
+      'star',
+      'linear-gradient(135deg, #f43f5e 0%, #fb7185 100%)'
+    );
+    checkMilestone(
+      'magnesium',
+      totals.mag,
+      microTargets.mag,
+      'Magnesium',
+      'heart-pulse',
+      'linear-gradient(135deg, #a855f7 0%, #c084fc 100%)'
+    );
+    checkMilestone(
+      'vitD',
+      totals.vitD,
+      microTargets.vitD,
+      'Vitamin D',
+      'sun',
+      'linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%)'
+    );
+    checkMilestone(
+      'potassium',
+      totals.potassium,
+      microTargets.potassium,
+      'Potassium',
+      'activity',
+      'linear-gradient(135deg, #10b981 0%, #34d399 100%)'
+    );
+    checkMilestone(
+      'iron',
+      totals.iron,
+      microTargets.iron,
+      'Iron',
+      'shield',
+      'linear-gradient(135deg, #ef4444 0%, #f87171 100%)'
+    );
+    checkMilestone(
+      'calcium',
+      totals.calcium,
+      microTargets.calcium,
+      'Calcium',
+      'activity',
+      'linear-gradient(135deg, #64748b 0%, #94a3b8 100%)'
+    );
   }, [loggedMeals, hydrationAmount, stepsCount, goalData, isLoaded, sentMilestones]);
 
   const updateHydration = (amount: number) => {
     triggerHaptic('light');
-    setHydrationAmount(prev => Math.min(50000, Math.max(0, prev + amount)));
+    setHydrationAmount((prev) => Math.min(50000, Math.max(0, prev + amount)));
   };
 
   const updateSteps = (amount: number) => {
     triggerHaptic('light');
-    setStepsCount(prev => Math.max(0, prev + amount));
+    setStepsCount((prev) => Math.max(0, prev + amount));
   };
 
-  const unreadCount = notifications.filter(n => !n.isRead).length;
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const renderContent = () => {
     if (showSplash || isUserLoading) return <SplashScreen />;
     if (!user) return <AuthView />;
-    if (showOnboarding) return <OnboardingView onComplete={handleOnboardingComplete} />;
+    if (showOnboarding)
+      return <OnboardingView onComplete={handleOnboardingComplete} />;
 
-    switch(activeTab) {
-      case 'dashboard': 
+    switch (activeTab) {
+      case 'dashboard':
         return (
-          <DashboardView 
+          <DashboardView
             tasks={tasks}
             onToggleTask={(id) => {
-               triggerHaptic('light');
-               setTask(prev => prev.map(t => t.id === id ? { ...t, completed: !t.completed } : t));
+              triggerHaptic('light');
+              setTask((prev) =>
+                prev.map((t) =>
+                  t.id === id ? { ...t, completed: !t.completed } : t
+                )
+              );
             }}
             hydrationAmount={hydrationAmount}
             onUpdateHydration={updateHydration}
@@ -520,13 +750,17 @@ export default function PulseFlowApp() {
             weightHistory={weightHistory}
             loggedMeals={loggedMeals}
             streakData={streakData}
-            onViewHydration={() => navigateTo('hydration')} 
+            onViewHydration={() => navigateTo('hydration')}
             onViewSteps={() => navigateTo('steps')}
-            onViewTasks={() => navigateTo('tasks')} 
+            onViewTasks={() => navigateTo('tasks')}
             onViewCalculators={(type) => {
-               const map: any = {'1 Rep Max': '1rm', 'Body Fat %': 'bodyfat', 'BMR / TDEE': 'bmr'};
-               setActiveCalculator(map[type] || 'bmr');
-               navigateTo('calculators');
+              const map: any = {
+                '1 Rep Max': '1rm',
+                'Body Fat %': 'bodyfat',
+                'BMR / TDEE': 'bmr',
+              };
+              setActiveCalculator(map[type] || 'bmr');
+              navigateTo('calculators');
             }}
             onViewGoalSetting={() => navigateTo('goal-setting')}
             onViewProgress={() => navigateTo('rank')}
@@ -535,39 +769,96 @@ export default function PulseFlowApp() {
             onViewNutritionSummary={() => navigateTo('nutrition-summary')}
           />
         );
-      case 'nutrition': 
+      case 'nutrition':
       case 'nutrition-summary':
       case 'nutrition-micro':
       case 'nutrition-micro-detail':
       case 'nutrition-macro':
         const nutrView = activeTab.replace('nutrition-', '') as any;
-        return <NutritionView loggedMeals={loggedMeals} setLoggedMeals={setLoggedMeals} activeView={nutrView === 'nutrition' ? 'log' : nutrView} onNavigate={navigateTo} />;
-      case 'workout': 
-      case 'workout-library': 
-      case 'workout-split': 
-      case 'workout-history': 
-      case 'workout-pr': 
-      case 'workout-pr-detail':
-        const workoutView = activeTab.replace('workout-', '') as any;
-        return <WorkoutView activeView={workoutView === 'workout' ? 'main' : workoutView} onNavigate={navigateTo} onAddNotification={addNotification} />;
-      case 'rank': 
         return (
-          <ProgressView 
-            goalData={goalData} 
-            weightHistory={weightHistory}
-            onLogWeight={(entry) => setWeightHistory(prev => [...prev, entry].sort((a,b) => new Date(a.date).getTime() - new Date(b.date).getTime()))}
-            onDeleteWeight={(date) => setWeightHistory(prev => prev.filter(e => e.date !== date))}
+          <NutritionView
+            loggedMeals={loggedMeals}
+            setLoggedMeals={setLoggedMeals}
+            activeView={nutrView === 'nutrition' ? 'log' : nutrView}
+            onNavigate={navigateTo}
           />
         );
-      case 'hydration': return <HydrationView currentMl={hydrationAmount} history={hydrationHistory} onUpdateMl={updateHydration} onBack={() => window.history.back()} />;
-      case 'steps': return <StepsView currentSteps={stepsCount} history={stepsHistory} onUpdateSteps={updateSteps} onBack={() => window.history.back()} />;
-      case 'tasks': return <TasksView tasks={tasks} setTasks={setTask} onBack={() => window.history.back()} />;
-      case 'calculators': return <CalculatorsView initialType={activeCalculator} onBack={() => window.history.back()} />;
-      case 'goal-setting': return <GoalSettingView onBack={() => window.history.back()} onGoalSaved={() => {
-        if (!user) return;
-        const keys = getKeys(user.uid);
-        setGoalData(JSON.parse(localStorage.getItem(keys.goal) || '{}'));
-      }} />;
+      case 'workout':
+      case 'workout-library':
+      case 'workout-split':
+      case 'workout-history':
+      case 'workout-pr':
+      case 'workout-pr-detail':
+        const workoutView = activeTab.replace('workout-', '') as any;
+        return (
+          <WorkoutView
+            activeView={workoutView === 'workout' ? 'main' : workoutView}
+            onNavigate={navigateTo}
+            onAddNotification={addNotification}
+          />
+        );
+      case 'rank':
+        return (
+          <ProgressView
+            goalData={goalData}
+            weightHistory={weightHistory}
+            onLogWeight={(entry) =>
+              setWeightHistory((prev) =>
+                [...prev, entry].sort(
+                  (a, b) =>
+                    new Date(a.date).getTime() - new Date(b.date).getTime()
+                )
+              )
+            }
+            onDeleteWeight={(date) =>
+              setWeightHistory((prev) => prev.filter((e) => e.date !== date))
+            }
+          />
+        );
+      case 'hydration':
+        return (
+          <HydrationView
+            currentMl={hydrationAmount}
+            history={hydrationHistory}
+            onUpdateMl={updateHydration}
+            onBack={() => window.history.back()}
+          />
+        );
+      case 'steps':
+        return (
+          <StepsView
+            currentSteps={stepsCount}
+            history={stepsHistory}
+            onUpdateSteps={updateSteps}
+            onBack={() => window.history.back()}
+          />
+        );
+      case 'tasks':
+        return (
+          <TasksView
+            tasks={tasks}
+            setTasks={setTask}
+            onBack={() => window.history.back()}
+          />
+        );
+      case 'calculators':
+        return (
+          <CalculatorsView
+            initialType={activeCalculator}
+            onBack={() => window.history.back()}
+          />
+        );
+      case 'goal-setting':
+        return (
+          <GoalSettingView
+            onBack={() => window.history.back()}
+            onGoalSaved={() => {
+              if (!user) return;
+              const keys = getKeys(user.uid);
+              setGoalData(JSON.parse(localStorage.getItem(keys.goal) || '{}'));
+            }}
+          />
+        );
       case 'profile':
       case 'profile-personal-info':
       case 'profile-personal':
@@ -579,18 +870,34 @@ export default function PulseFlowApp() {
       case 'profile-privacy':
       case 'profile-terms':
       case 'profile-medical':
-        const profileSub = activeTab === 'profile' ? 'main' : activeTab.replace('profile-', '') as any;
+        const profileSub =
+          activeTab === 'profile'
+            ? 'main'
+            : (activeTab.replace('profile-', '') as any);
         return (
-          <ProfileView 
-            activeView={profileSub === 'personal' ? 'personal-info' : profileSub} 
+          <ProfileView
+            activeView={profileSub === 'personal' ? 'personal-info' : profileSub}
             onBack={() => {
               triggerHaptic('light');
               if (activeTab === 'profile') setActiveTab('dashboard');
-              else if (activeTab === 'profile-personal-info' || activeTab === 'profile-subscription' || activeTab === 'profile-legal' || activeTab === 'profile-settings' || activeTab === 'profile-reset' || activeTab === 'profile-help') setActiveTab('profile');
-              else if (activeTab === 'profile-privacy' || activeTab === 'profile-terms' || activeTab === 'profile-medical') setActiveTab('profile-legal');
+              else if (
+                activeTab === 'profile-personal-info' ||
+                activeTab === 'profile-subscription' ||
+                activeTab === 'profile-legal' ||
+                activeTab === 'profile-settings' ||
+                activeTab === 'profile-reset' ||
+                activeTab === 'profile-help'
+              )
+                setActiveTab('profile');
+              else if (
+                activeTab === 'profile-privacy' ||
+                activeTab === 'profile-terms' ||
+                activeTab === 'profile-medical'
+              )
+                setActiveTab('profile-legal');
               else setActiveTab('profile');
-            }} 
-            onNavigate={navigateTo} 
+            }}
+            onNavigate={navigateTo}
             onShowSplash={() => {
               setShowSplash(true);
               setTimeout(() => setShowSplash(false), 2500);
@@ -603,9 +910,26 @@ export default function PulseFlowApp() {
             isSyncing={isSyncing}
           />
         );
-      case 'guide': return <GuideView goalData={goalData} loggedMeals={loggedMeals} hydrationAmount={hydrationAmount} weightHistory={weightHistory} onBack={() => window.history.back()} />;
-      case 'notifications': return <NotificationsView notifications={notifications} setNotifications={setNotifications} onBack={() => window.history.back()} />;
-      default: return null;
+      case 'guide':
+        return (
+          <GuideView
+            goalData={goalData}
+            loggedMeals={loggedMeals}
+            hydrationAmount={hydrationAmount}
+            weightHistory={weightHistory}
+            onBack={() => window.history.back()}
+          />
+        );
+      case 'notifications':
+        return (
+          <NotificationsView
+            notifications={notifications}
+            setNotifications={setNotifications}
+            onBack={() => window.history.back()}
+          />
+        );
+      default:
+        return null;
     }
   };
 
@@ -623,18 +947,29 @@ export default function PulseFlowApp() {
 
       {user && !showOnboarding && !showSplash && !isUserLoading && (
         <header className="p-4 flex items-center justify-between sticky top-0 bg-background/80 backdrop-blur-md z-50 border-b relative">
-          <button onClick={() => navigateTo('profile')} className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center">
+          <button
+            onClick={() => navigateTo('profile')}
+            className="w-9 h-9 rounded-full bg-muted/50 flex items-center justify-center"
+          >
             <User className="w-4 h-4 text-foreground" />
           </button>
           <div className="absolute left-1/2 -translate-x-1/2 flex items-center gap-1.5 pointer-events-none">
             <span className="font-black text-xl tracking-tighter">arcex</span>
-            <span className="font-black text-xl tracking-tighter bg-gradient-to-br from-[#4ade80] via-[#2dd4bf] to-[#3b82f6] bg-clip-text text-transparent">fit</span>
+            <span className="font-black text-xl tracking-tighter bg-gradient-to-br from-[#4ade80] via-[#2dd4bf] to-[#3b82f6] bg-clip-text text-transparent">
+              fit
+            </span>
           </div>
           <div className="flex gap-2">
-            <button onClick={() => navigateTo('profile-subscription')} className="rounded-full bg-muted/50 w-9 h-9 flex items-center justify-center">
+            <button
+              onClick={() => navigateTo('profile-subscription')}
+              className="rounded-full bg-muted/50 w-9 h-9 flex items-center justify-center"
+            >
               <Crown className="w-4 h-4 text-amber-500" />
             </button>
-            <button onClick={() => navigateTo('notifications')} className="rounded-full bg-muted/50 w-9 h-9 relative flex items-center justify-center">
+            <button
+              onClick={() => navigateTo('notifications')}
+              className="rounded-full bg-muted/50 w-9 h-9 relative flex items-center justify-center"
+            >
               <Bell className="w-4 h-4 text-foreground" />
               {unreadCount > 0 && (
                 <span className="absolute -top-1 -right-1 bg-destructive text-white text-[8px] font-black w-4 h-4 rounded-full flex items-center justify-center border-2 border-background">
@@ -646,7 +981,11 @@ export default function PulseFlowApp() {
         </header>
       )}
 
-      <main ref={mainRef} id="main-scroll-container" className="flex-1 px-4 overflow-y-auto swipe-container">
+      <main
+        ref={mainRef}
+        id="main-scroll-container"
+        className="flex-1 px-4 overflow-y-auto swipe-container"
+      >
         {renderContent()}
       </main>
 
@@ -659,18 +998,50 @@ export default function PulseFlowApp() {
             { id: 'rank', icon: ChartIcon, label: 'Progress' },
           ].map((item) => {
             const Icon = item.icon;
-            const isNutrition = item.id === 'nutrition' && ['nutrition-summary', 'nutrition-micro', 'nutrition-macro', 'nutrition-micro-detail'].includes(activeTab);
-            const isWorkout = item.id === 'workout' && ['workout-library', 'workout-split', 'workout-history', 'workout-pr', 'workout-pr-detail'].includes(activeTab);
-            const isProfile = item.id === 'profile' && activeTab.startsWith('profile');
-            const isActive = activeTab === item.id || isNutrition || isWorkout || isProfile;
+            const isNutrition =
+              item.id === 'nutrition' &&
+              [
+                'nutrition-summary',
+                'nutrition-micro',
+                'nutrition-macro',
+                'nutrition-micro-detail',
+              ].includes(activeTab);
+            const isWorkout =
+              item.id === 'workout' &&
+              [
+                'workout-library',
+                'workout-split',
+                'workout-history',
+                'workout-pr',
+                'workout-pr-detail',
+              ].includes(activeTab);
+            const isProfile =
+              item.id === 'profile' && activeTab.startsWith('profile');
+            const isActive =
+              activeTab === item.id || isNutrition || isWorkout || isProfile;
             return (
               <button
                 key={item.id}
                 onClick={() => navigateTo(item.id)}
-                className={cn("flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 flex-1 justify-center max-w-[110px]", isActive ? "bg-primary/10" : "text-muted-foreground")}
+                className={cn(
+                  'flex items-center gap-2 px-4 py-2 rounded-full transition-all duration-300 flex-1 justify-center max-w-[110px]',
+                  isActive ? 'bg-primary/10' : 'text-muted-foreground'
+                )}
               >
-                <Icon className="w-4 h-4" style={isActive ? { stroke: 'url(#icon-gradient)', fill: 'none' } : {}} />
-                <span className={cn("text-[10px] font-black uppercase tracking-tight transition-all", isActive ? "opacity-100 ml-1" : "opacity-0 w-0 h-0 overflow-hidden")}>{item.label}</span>
+                <Icon
+                  className="w-4 h-4"
+                  style={isActive ? { stroke: 'url(#icon-gradient)', fill: 'none' } : {}}
+                />
+                <span
+                  className={cn(
+                    'text-[10px] font-black uppercase tracking-tight transition-all',
+                    isActive
+                      ? 'opacity-100 ml-1'
+                      : 'opacity-0 w-0 h-0 overflow-hidden'
+                  )}
+                >
+                  {item.label}
+                </span>
               </button>
             );
           })}
