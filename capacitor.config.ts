@@ -5,8 +5,7 @@ const config: CapacitorConfig = {
   appName: 'Arcex Fit',
   webDir: 'out',
   server: {
-    url: 'http://10.0.2.2:9002',
-    cleartext: true
+    url: 'https://arcex-fit-backend--studio-2595206625-a47c6.us-east4.hosted.app'
   }
 };
 
