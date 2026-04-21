@@ -9,8 +9,12 @@ import {
   Calendar,
   CheckCircle2,
   Footprints,
-  TrendingUp
+  TrendingUp,
+  Bell,
+  BellOff
 } from "lucide-react";
+import { Pedometer } from "@capgo/capacitor-pedometer";
+import { LocalNotifications } from "@capacitor/local-notifications";
 import { 
   BarChart, 
   Bar, 
@@ -43,6 +47,83 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
   const [targetSteps, setTargetSteps] = useState(10000);
   const [isEditing, setIsEditing] = useState(false);
   const [tempTarget, setTempTarget] = useState(targetSteps);
+  const [isPinned, setIsPinned] = useState(false);
+  const [pedometerError, setPedometerError] = useState<string | null>(null);
+
+  // --- NATIVE HARDWARE PEDOMETER INTEGRATION ---
+  React.useEffect(() => {
+    let active = true;
+    const initHardware = async () => {
+      try {
+        const support = await Pedometer.isSupported();
+        if (!support.supported) {
+          setPedometerError("Hardware not supported");
+          return;
+        }
+
+        // Request physical activity permissions
+        await Pedometer.requestPermissions();
+        
+        // Start Android hardware listener
+        await Pedometer.start();
+        
+        // Real-time hook into accelerometer
+        Pedometer.addListener("step", (data: any) => {
+          if (data.steps && active) {
+            // Push hardware steps to our Next.js global state
+            onUpdateSteps(data.steps - currentSteps);
+          }
+        });
+      } catch (e: any) {
+        setPedometerError(e.message || "Failed to sync sensor");
+      }
+    };
+    
+    initHardware();
+    
+    return () => {
+      active = false;
+      Pedometer.removeAllListeners();
+      Pedometer.stop();
+    };
+  }, [currentSteps, onUpdateSteps]);
+
+  // Sync steps to Notification Bar magically
+  React.useEffect(() => {
+    if (isPinned) {
+      updateNotification(currentSteps);
+    }
+  }, [currentSteps, isPinned]);
+
+  const togglePin = async () => {
+    try {
+      if (!isPinned) {
+        await LocalNotifications.requestPermissions();
+        setIsPinned(true);
+      } else {
+        await LocalNotifications.cancel({ notifications: [{ id: 101 }] });
+        setIsPinned(false);
+      }
+    } catch(e) {
+      setPedometerError("Notification permission denied");
+    }
+  };
+
+  const updateNotification = async (count: number) => {
+    await LocalNotifications.schedule({
+      notifications: [
+        {
+          id: 101,
+          title: "Arcex Fit - Active Tracker",
+          body: `You are at ${count.toLocaleString()} steps today! Keep it up!`,
+          ongoing: true, // Prevents Android user from swiping it away natively
+          smallIcon: "ic_launcher_round",
+          schedule: { at: new Date(Date.now() + 100) }
+        }
+      ]
+    });
+  };
+  // ---------------------------------------------
 
   const percentage = Math.min(Math.round((currentSteps / targetSteps) * 100), 100);
 
@@ -281,6 +362,33 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
                 Consistent
               </div>
             </div>
+          </CardContent>
+        </Card>
+
+        {/* 4. Native Notification Integration */}
+        <Card className="border border-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.1)] bg-card overflow-hidden relative">
+          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500"></div>
+          <CardContent className="p-5 flex justify-between items-center">
+            <div className="space-y-1 py-1">
+              <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
+                <Footprints className="w-3.5 h-3.5 text-indigo-500" /> 
+                System Tracker
+              </h3>
+              <p className="text-[10px] text-muted-foreground max-w-[180px]">
+                {pedometerError ? <span className="text-destructive">{pedometerError}</span> : "Pin your live step count permanently to the Android Notification Bar."}
+              </p>
+            </div>
+            <Button
+              onClick={togglePin}
+              variant={isPinned ? "default" : "outline"}
+              className={`h-10 px-4 rounded-xl shadow-sm transition-all text-xs font-bold tracking-wide uppercase ${
+                isPinned 
+                ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/30" 
+                : ""
+              }`}
+            >
+              {isPinned ? <span className="flex items-center"><Bell className="w-3 h-3 mr-1.5 opacity-80" /> Pinned</span> : <span className="flex items-center"><BellOff className="w-3 h-3 mr-1.5 opacity-60" /> Pin</span>}
+            </Button>
           </CardContent>
         </Card>
       </div>
