@@ -1068,8 +1068,6 @@ export default function PulseFlowApp() {
     setStepsCount((prev) => Math.max(0, prev + amount));
   };
 
-  const unreadCount = notifications.filter((n) => !n.isRead).length;
-
   const renderContent = () => {
     if (showSplash || isUserLoading || (user && !isOnboardingChecked)) return <SplashScreen />;
     if (!user) return <AuthView />;
