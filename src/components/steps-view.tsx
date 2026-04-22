@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { subDays, format } from 'date-fns';
+import { useToast } from '@/hooks/use-toast';
 
 interface StepsViewProps {
   currentSteps: number;
@@ -49,6 +50,8 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
   const [tempTarget, setTempTarget] = useState(targetSteps);
   const [isPinned, setIsPinned] = useState(false);
   const [pedometerError, setPedometerError] = useState<string | null>(null);
+  const [cachedStartSteps, setCachedStartSteps] = useState<number | null>(null);
+  const { toast } = useToast();
 
   // --- NATIVE HARDWARE PEDOMETER INTEGRATION ---
   React.useEffect(() => {
@@ -88,10 +91,10 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
     
     return () => {
       active = false;
-      Pedometer.removeAllListeners();
-      Pedometer.stop();
+      CapacitorPedometer.removeAllListeners();
+      CapacitorPedometer.stop();
     };
-  }, [currentSteps, onUpdateSteps]);
+  }, [currentSteps, onUpdateSteps, cachedStartSteps]);
 
   // Sync steps to Notification Bar magically
   React.useEffect(() => {
