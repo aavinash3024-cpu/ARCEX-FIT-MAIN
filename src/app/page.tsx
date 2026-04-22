@@ -89,6 +89,11 @@ export default function PulseFlowApp() {
   const [isSyncing, setIsSyncing] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
 
+  const unreadCount = useMemo(
+    () => notifications.filter((n) => !n.isRead).length,
+    [notifications]
+  );
+
   // Helper to get UID namespaced keys
   const getKeys = useCallback(
     (uid: string) => ({
@@ -317,22 +322,23 @@ export default function PulseFlowApp() {
     if (window.history.state === null) {
       window.history.replaceState({ tab: 'dashboard' }, '');
     }
-    // CHOICE C: NATIVE HARDWARE BACK BUTTON (ANDROID)
+  }, [user, firestore, getKeys]);
+
+  // CHOICE C: NATIVE HARDWARE BACK BUTTON (ANDROID)
+  useEffect(() => {
     let backListener: any;
+    
     const initNativeApp = async () => {
       try {
         const { App } = await import('@capacitor/app');
         backListener = await App.addListener('backButton', ({ canGoBack }) => {
-          // If we have a sub-view open (history entries), go back
           if (canGoBack) {
             window.history.back();
           } else {
-            // Otherwise, if we are on a tab other than dashboard, return to dashboard
             const currentTab = localStorage.getItem('arcex_last_tab') || 'dashboard';
             if (currentTab !== 'dashboard') {
               navigateTo('dashboard');
             } else {
-              // On dashboard, we let the app exit
               App.exitApp();
             }
           }
@@ -341,21 +347,31 @@ export default function PulseFlowApp() {
         console.warn('Native App integration not available');
       }
     };
+    
+    initHardwareHaptics();
     initNativeApp();
 
     return () => {
-      window.removeEventListener('popstate', handlePopState);
       if (backListener) backListener.remove();
     };
-  }, [user, firestore, getKeys, navigateTo]);
+  }, [navigateTo]);
 
-  const navigateTo = (tab: string) => {
-    if (tab !== activeTab) {
-      triggerHaptic('light');
-      window.history.pushState({ tab }, '');
-      setActiveTab(tab);
-    }
+  const initHardwareHaptics = async () => {
+    try {
+      await import('@capacitor/haptics');
+    } catch (e) {}
   };
+
+  const navigateTo = useCallback(
+    (tab: string) => {
+      if (tab !== activeTab) {
+        triggerHaptic('light');
+        window.history.pushState({ tab }, '');
+        setActiveTab(tab);
+      }
+    },
+    [activeTab]
+  );
 
   const addNotification = (
     title: string,
