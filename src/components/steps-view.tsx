@@ -13,8 +13,6 @@ import {
   Bell,
   BellOff
 } from "lucide-react";
-import { CapacitorPedometer } from "@capgo/capacitor-pedometer";
-import { LocalNotifications } from "@capacitor/local-notifications";
 import { 
   BarChart, 
   Bar, 
@@ -56,8 +54,13 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
   // --- NATIVE HARDWARE PEDOMETER INTEGRATION ---
   React.useEffect(() => {
     let active = true;
+    let _pedometer: any = null;
+
     const initHardware = async () => {
       try {
+        const { CapacitorPedometer } = await import('@capgo/capacitor-pedometer');
+        _pedometer = CapacitorPedometer;
+
         const support = await CapacitorPedometer.isSupported();
         if (!support.supported) {
           setPedometerError("Hardware not supported");
@@ -91,8 +94,10 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
     
     return () => {
       active = false;
-      CapacitorPedometer.removeAllListeners();
-      CapacitorPedometer.stop();
+      if (_pedometer) {
+        _pedometer.removeAllListeners();
+        _pedometer.stop();
+      }
     };
   }, [currentSteps, onUpdateSteps, cachedStartSteps]);
 
@@ -105,6 +110,7 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
 
   const togglePin = async () => {
     try {
+      const { LocalNotifications } = await import('@capacitor/local-notifications');
       if (!isPinned) {
         await LocalNotifications.requestPermissions();
         setIsPinned(true);
@@ -118,18 +124,21 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
   };
 
   const updateNotification = async (count: number) => {
-    await LocalNotifications.schedule({
-      notifications: [
-        {
-          id: 101,
-          title: "Arcex Fit - Active Tracker",
-          body: `You are at ${count.toLocaleString()} steps today! Keep it up!`,
-          ongoing: true, // Prevents Android user from swiping it away natively
-          smallIcon: "ic_launcher_round",
-          schedule: { at: new Date(Date.now() + 100) }
-        }
-      ]
-    });
+    try {
+      const { LocalNotifications } = await import('@capacitor/local-notifications');
+      await LocalNotifications.schedule({
+        notifications: [
+          {
+            id: 101,
+            title: "Arcex Fit - Active Tracker",
+            body: `You are at ${count.toLocaleString()} steps today! Keep it up!`,
+            ongoing: true, // Prevents Android user from swiping it away natively
+            smallIcon: "ic_launcher_round",
+            schedule: { at: new Date(Date.now() + 100) }
+          }
+        ]
+      });
+    } catch (e) {}
   };
   // ---------------------------------------------
 
@@ -354,6 +363,7 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
             <div 
               onClick={async () => {
                 try {
+                  const { CapacitorPedometer } = await import('@capgo/capacitor-pedometer');
                   const req = await CapacitorPedometer.requestPermissions();
                   if (req.activity === 'granted') {
                     await CapacitorPedometer.start();
