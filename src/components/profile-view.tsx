@@ -150,24 +150,31 @@ export function ProfileView({
   const [profileGender, setProfileGender] = useState('male');
   const [profileAge, setProfileAge] = useState('25');
 
-  const triggerHaptic = (
+  const triggerHaptic = async (
     type: 'light' | 'medium' | 'success' | 'warning' = 'light'
   ) => {
-    if (!hapticsEnabled || typeof window === 'undefined' || !window.navigator.vibrate)
-      return;
-    switch (type) {
-      case 'light':
-        window.navigator.vibrate(15);
-        break;
-      case 'medium':
-        window.navigator.vibrate(30);
-        break;
-      case 'success':
-        window.navigator.vibrate([20, 40, 20]);
-        break;
-      case 'warning':
-        window.navigator.vibrate([40, 40, 40]);
-        break;
+    if (!hapticsEnabled) return;
+    try {
+      const { Haptics, ImpactStyle } = await import('@capacitor/haptics');
+      switch (type) {
+        case 'light':
+          await Haptics.impact({ style: ImpactStyle.Light });
+          break;
+        case 'medium':
+          await Haptics.impact({ style: ImpactStyle.Medium });
+          break;
+        case 'success':
+          await Haptics.notification({ type: (await import('@capacitor/haptics')).NotificationType.Success });
+          break;
+        case 'warning':
+          await Haptics.notification({ type: (await import('@capacitor/haptics')).NotificationType.Warning });
+          break;
+      }
+    } catch (e) {
+      // Fallback to browser vibration if Capacitor is not available
+      if (typeof window !== 'undefined' && window.navigator.vibrate) {
+        window.navigator.vibrate(type === 'light' ? 15 : 30);
+      }
     }
   };
 
@@ -1290,9 +1297,7 @@ export function ProfileView({
               checked={hapticsEnabled}
               onCheckedChange={(val) => {
                 setHapticsEnabled(val);
-                if (val && typeof window !== 'undefined' && window.navigator.vibrate) {
-                  window.navigator.vibrate(15);
-                }
+                if (val) triggerHaptic('light');
               }}
             />
             <SettingsSwitch
@@ -1371,34 +1376,6 @@ export function ProfileView({
         </Card>
       </div>
 
-      <div className="px-1 space-y-3">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">
-          Testing & Development
-        </h3>
-        <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
-          <CardContent className="p-0">
-            <SettingsButton
-              icon={RefreshCw}
-              label="Restart Setup Process"
-              subLabel="Re-run the compulsory onboarding"
-              color="text-amber-500"
-              bg="bg-amber-50"
-              onClick={handleRestartOnboarding}
-            />
-            <SettingsButton
-              icon={Layout}
-              label="Preview Splash Screen"
-              subLabel="Test the app entry animation"
-              color="text-primary"
-              bg="bg-primary/5"
-              onClick={() => {
-                triggerHaptic('light');
-                onShowSplash?.();
-              }}
-            />
-          </CardContent>
-        </Card>
-      </div>
 
       <div className="px-1 space-y-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">

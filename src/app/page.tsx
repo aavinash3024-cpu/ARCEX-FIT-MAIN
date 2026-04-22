@@ -16,13 +16,14 @@ import {
   HeartPulse,
   CheckCircle2,
   Sparkles,
+  Droplets,
+  Zap,
 } from 'lucide-react';
 import { DashboardView } from '@/components/dashboard-view';
 import { NutritionView } from '@/components/nutrition-view';
 import { WorkoutView } from '@/components/workout-view';
 import { ProgressView } from '@/components/progress-view';
 import { HydrationView } from '@/components/hydration-view';
-import { StepsView } from '@/components/steps-view';
 import { TasksView, type Task } from '@/components/tasks-view';
 import { CalculatorsView } from '@/components/calculators-view';
 import { GoalSettingView } from '@/components/goal-setting-view';
@@ -45,6 +46,7 @@ import {
   setDocumentNonBlocking,
 } from '@/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { useToast } from '@/hooks/use-toast';
 import { cn } from '@/lib/utils';
 
 export default function PulseFlowApp() {
@@ -76,11 +78,6 @@ export default function PulseFlowApp() {
   const [credits, setCredits] = useState(20);
   const [foodCache, setFoodCache] = useState<Record<string, any>>({});
   
-  // Notification Logic
-  const unreadCount = useMemo(() => {
-    return notifications.filter(n => !n.isRead).length;
-  }, [notifications]);
-
   // Workout State (Lifted from WorkoutView)
   const [workoutSplit, setWorkoutSplit] = useState<Record<string, any>>({});
   const [extraMoves, setExtraMoves] = useState<any[]>([]);
@@ -121,26 +118,32 @@ export default function PulseFlowApp() {
     []
   );
 
-  const triggerHaptic = (
+  const triggerHaptic = async (
     type: 'light' | 'medium' | 'success' | 'warning' = 'light'
   ) => {
     const enabled = localStorage.getItem('pulseflow_haptics') !== 'false';
-    if (!enabled || typeof window === 'undefined' || !window.navigator.vibrate)
-      return;
+    if (!enabled) return;
 
-    switch (type) {
-      case 'light':
-        window.navigator.vibrate(15);
-        break;
-      case 'medium':
-        window.navigator.vibrate(30);
-        break;
-      case 'success':
-        window.navigator.vibrate([20, 40, 20]);
-        break;
-      case 'warning':
-        window.navigator.vibrate([40, 40, 40]);
-        break;
+    try {
+      const { Haptics, ImpactStyle } = await import('@capacitor/haptics');
+      switch (type) {
+        case 'light':
+          await Haptics.impact({ style: ImpactStyle.Light });
+          break;
+        case 'medium':
+          await Haptics.impact({ style: ImpactStyle.Medium });
+          break;
+        case 'success':
+          await Haptics.notification({ type: (await import('@capacitor/haptics')).NotificationType.Success });
+          break;
+        case 'warning':
+          await Haptics.notification({ type: (await import('@capacitor/haptics')).NotificationType.Warning });
+          break;
+      }
+    } catch (e) {
+      if (typeof window !== 'undefined' && window.navigator.vibrate) {
+        window.navigator.vibrate(type === 'light' ? 15 : 30);
+      }
     }
   };
 
@@ -533,11 +536,12 @@ export default function PulseFlowApp() {
       localStorage.setItem(keys.workoutHistory, JSON.stringify(oldWorkoutHistory));
       setWorkoutHistory(oldWorkoutHistory);
       
+      // Daily state reset logic (Step removal)
       setHydrationAmount(0);
-      localStorage.setItem(keys.hydration, '0');
-      setStepsCount(0);
-      localStorage.setItem(keys.steps, '0');
       setLoggedMeals([]);
+      setTask((prev) => prev.map((t) => ({ ...t, completed: false })));
+
+      localStorage.setItem(keys.hydration, '0');
       localStorage.setItem(keys.meals, '[]');
       setLoggedSets({});
       localStorage.setItem(keys.workoutLogs, JSON.stringify({ date: todayStr, data: {} }));
@@ -1127,15 +1131,6 @@ export default function PulseFlowApp() {
             currentMl={hydrationAmount}
             history={hydrationHistory}
             onUpdateMl={updateHydration}
-            onBack={() => window.history.back()}
-          />
-        );
-      case 'steps':
-        return (
-          <StepsView
-            currentSteps={stepsCount}
-            history={stepsHistory}
-            onUpdateSteps={updateSteps}
             onBack={() => window.history.back()}
           />
         );
