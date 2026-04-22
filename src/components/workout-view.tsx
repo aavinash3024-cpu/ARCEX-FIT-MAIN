@@ -89,18 +89,33 @@ const formatExerciseTime = (seconds: any) => {
 
 interface WorkoutViewProps {
   activeView?: 'main' | 'library' | 'split' | 'history' | 'pr' | 'pr-detail';
+  split: WeeklySplit;
+  setSplit: React.Dispatch<React.SetStateAction<WeeklySplit>>;
+  extraMoves: Exercise[];
+  setExtraMoves: React.Dispatch<React.SetStateAction<Exercise[]>>;
+  loggedSets: Record<string, any[]>;
+  setLoggedSets: React.Dispatch<React.SetStateAction<Record<string, any[]>>>;
+  workoutHistory: Record<string, any>;
   onNavigate: (tab: string) => void;
   onAddNotification?: (title: string, desc: string, type: Notification['type'], subtype?: Notification['subtype'], icon?: string, grad?: string) => void;
 }
 
-export function WorkoutView({ activeView = 'main', onNavigate, onAddNotification }: WorkoutViewProps) {
+export function WorkoutView({ 
+  activeView = 'main', 
+  split,
+  setSplit,
+  extraMoves,
+  setExtraMoves,
+  loggedSets,
+  setLoggedSets,
+  workoutHistory,
+  onNavigate, 
+  onAddNotification 
+}: WorkoutViewProps) {
   const [selectedExercise, setSelectedExercise] = useState<Exercise | null>(null);
   const [selectedPR, setSelectedPR] = useState<any | null>(null);
   
-  const [split, setSplit] = useState<WeeklySplit>({});
-  const [extraMoves, setExtraMoves] = useState<Exercise[]>([]);
   const [loggingExercise, setLoggingExercise] = useState<Exercise | null>(null);
-  const [loggedSets, setLoggedSets] = useState<Record<string, any[]>>({});
   
   const [searchQuery, setSearchQuery] = useState("");
   const [muscleFilter, setMuscleFilter] = useState<string>("ALL");
@@ -115,63 +130,8 @@ export function WorkoutView({ activeView = 'main', onNavigate, onAddNotification
   const todayName = format(new Date(), 'EEEE');
 
   useEffect(() => {
-    const savedSplit = localStorage.getItem('pulseflow_workout_split');
-    if (savedSplit) {
-      try {
-        setSplit(JSON.parse(savedSplit));
-      } catch (e) {
-        console.error("Failed to load split", e);
-      }
-    }
-
-    const todayStr = format(new Date(), 'yyyy-MM-dd');
-    const savedExtra = localStorage.getItem('pulseflow_extra_moves');
-    if (savedExtra) {
-      try {
-        const parsed = JSON.parse(savedExtra);
-        if (parsed.date === todayStr) setExtraMoves(parsed.moves);
-      } catch (e) {
-        console.error("Failed to load extra moves", e);
-      }
-    }
-
-    const savedLogs = localStorage.getItem('pulseflow_workout_logs');
-    if (savedLogs) {
-      try {
-        const parsed = JSON.parse(savedLogs);
-        if (parsed.date === todayStr) setLoggedSets(parsed.data);
-      } catch (e) {
-        console.error("Failed to load workout logs", e);
-      }
-    }
-    
     setIsLoaded(true);
   }, []);
-
-  useEffect(() => {
-    if (isLoaded && Object.keys(split).length > 0) {
-      localStorage.setItem('pulseflow_workout_split', JSON.stringify(split));
-    }
-  }, [split, isLoaded]);
-
-  useEffect(() => {
-    if (isLoaded) {
-      const todayStr = format(new Date(), 'yyyy-MM-dd');
-      localStorage.setItem('pulseflow_extra_moves', JSON.stringify({ date: todayStr, moves: extraMoves }));
-    }
-  }, [extraMoves, isLoaded]);
-
-  useEffect(() => {
-    if (isLoaded) {
-      const todayStr = format(new Date(), 'yyyy-MM-dd');
-      localStorage.setItem('pulseflow_workout_logs', JSON.stringify({ date: todayStr, data: loggedSets }));
-      
-      const savedHistory = localStorage.getItem('pulseflow_workout_history');
-      const historyObj = savedHistory ? JSON.parse(savedHistory) : {};
-      historyObj[todayStr] = loggedSets;
-      localStorage.setItem('pulseflow_workout_history', JSON.stringify(historyObj));
-    }
-  }, [loggedSets, isLoaded]);
 
   const muscleGroups = useMemo(() => {
     const groups = Array.from(new Set(EXERCISES_DATA.map(e => e.muscle)));
@@ -210,8 +170,7 @@ export function WorkoutView({ activeView = 'main', onNavigate, onAddNotification
 
   const handleLogSet = (exerciseName: string, setData: any) => {
     // 1. PR Check Logic
-    const savedHistory = localStorage.getItem('pulseflow_workout_history');
-    const historyObj = savedHistory ? JSON.parse(savedHistory) : {};
+    const historyObj = workoutHistory || {};
     
     let currentBest = 0;
     Object.entries(historyObj).forEach(([date, logs]: any) => {
@@ -430,12 +389,13 @@ export function WorkoutView({ activeView = 'main', onNavigate, onAddNotification
   }
 
   if (activeView === 'history') {
-    return <WorkoutHistoryView onBack={() => onNavigate('workout')} />;
+    return <WorkoutHistoryView workoutHistory={workoutHistory} onBack={() => onNavigate('workout')} />;
   }
 
   if (activeView === 'pr') {
     return (
       <PersonalRecordsView 
+        workoutHistory={workoutHistory}
         onBack={() => onNavigate('workout')} 
         onViewDetail={(pr) => {
           setSelectedPR(pr);
@@ -895,21 +855,12 @@ function ExtraMovesModal({ muscleGroups, filteredLibrary, onAdd, searchQuery, se
   );
 }
 
-function PersonalRecordsView({ onBack, onViewDetail }: { onBack: () => void, onViewDetail: (pr: any) => void }) {
-  const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
+function PersonalRecordsView({ workoutHistory, onBack, onViewDetail }: { workoutHistory: any, onBack: () => void, onViewDetail: (pr: any) => void }) {
+  const history = workoutHistory || {};
   const [activeType, setActiveType] = useState<'strength' | 'time'| 'reps'>(() => 'strength');
   const [activeMuscle, setActiveMuscle] = useState<string>("CHEST");
 
-  useEffect(() => {
-    const saved = localStorage.getItem('pulseflow_workout_history');
-    if (saved) {
-      try {
-        setHistory(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to load history", e);
-      }
-    }
-  }, []);
+
 
   const filteredMuscles = useMemo(() => {
     const muscles = new Set<string>();
@@ -1549,20 +1500,11 @@ function SplitBuilderView({ split, setSplit, onBack }: { split: WeeklySplit, set
   );
 }
 
-function WorkoutHistoryView({ onBack }: { onBack: () => void }) {
+function WorkoutHistoryView({ workoutHistory, onBack }: { workoutHistory: any, onBack: () => void }) {
+  const history = workoutHistory || {};
   const [refDate, setRefDate] = useState(new Date());
-  const [history, setHistory] = useState<Record<string, Record<string, any[]>>>({});
 
-  useEffect(() => {
-    const saved = localStorage.getItem('pulseflow_workout_history');
-    if (saved) {
-      try {
-        setHistory(JSON.parse(saved));
-      } catch (e) {
-        console.error("Failed to load history", e);
-      }
-    }
-  }, []);
+
 
   const weekInterval = useMemo(() => {
     const start = startOfWeek(refDate, { weekStartsOn: 1 });

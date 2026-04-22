@@ -13,7 +13,7 @@ import {
   Bell,
   BellOff
 } from "lucide-react";
-import { Pedometer } from "@capgo/capacitor-pedometer";
+import { CapacitorPedometer } from "@capgo/capacitor-pedometer";
 import { LocalNotifications } from "@capacitor/local-notifications";
 import { 
   BarChart, 
@@ -35,6 +35,7 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { subDays, format } from 'date-fns';
+import { HealthConnectCard } from './health-connect-card';
 
 interface StepsViewProps {
   currentSteps: number;
@@ -55,23 +56,28 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
     let active = true;
     const initHardware = async () => {
       try {
-        const support = await Pedometer.isSupported();
+        const support = await CapacitorPedometer.isSupported();
         if (!support.supported) {
           setPedometerError("Hardware not supported");
           return;
         }
 
         // Request physical activity permissions
-        await Pedometer.requestPermissions();
+        const permission = await CapacitorPedometer.checkPermissions();
+        if (permission.activity !== 'granted') {
+          const req = await CapacitorPedometer.requestPermissions();
+          if (req.activity !== 'granted') return;
+        }
         
         // Start Android hardware listener
-        await Pedometer.start();
+        await CapacitorPedometer.start();
         
         // Real-time hook into accelerometer
-        Pedometer.addListener("step", (data: any) => {
+        CapacitorPedometer.addListener("step", (data: any) => {
           if (data.steps && active) {
             // Push hardware steps to our Next.js global state
-            onUpdateSteps(data.steps - currentSteps);
+            onUpdateSteps(data.steps - (cachedStartSteps || data.steps));
+            setCachedStartSteps(data.steps);
           }
         });
       } catch (e: any) {
@@ -326,6 +332,9 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
           </div>
         </CardContent>
       </Card>
+
+      {/* Health Connect Toggle */}
+      <HealthConnectCard />
 
       {/* 3. Stats Summary */}
       <div className="space-y-4">

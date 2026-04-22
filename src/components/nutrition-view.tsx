@@ -129,6 +129,8 @@ interface NutritionViewProps {
   setLoggedMeals: React.Dispatch<React.SetStateAction<LoggedMeal[]>>;
   credits: number;
   setCredits: React.Dispatch<React.SetStateAction<number>>;
+  foodCache: Record<string, CachedFoodItem>;
+  setFoodCache: React.Dispatch<React.SetStateAction<Record<string, CachedFoodItem>>>;
   activeView?: 'log' | 'summary' | 'micro' | 'macro' | 'micro-detail';
   onNavigate: (tab: string) => void;
   initialShowSummary?: boolean; // Maintain compatibility
@@ -146,6 +148,8 @@ export function NutritionView({
   setLoggedMeals,
   credits,
   setCredits,
+  foodCache,
+  setFoodCache,
   activeView = 'log',
   onNavigate,
   initialShowSummary,
@@ -164,9 +168,7 @@ export function NutritionView({
   const [savedMeals, setSavedMeals] = useState<LoggedMeal[]>([]);
   const [allHistory, setAllHistory] = useState<LoggedMeal[]>([]);
   const [goalData, setGoalData] = useState<any>(null);
-  const [foodCache, setFoodCache] = useState<Record<string, CachedFoodItem>>(
-    {}
-  );
+  
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
@@ -174,13 +176,11 @@ export function NutritionView({
     const savedFavorites = localStorage.getItem('pulseflow_saved_meals');
     const savedHistory = localStorage.getItem('pulseflow_all_meals_history');
     const savedGoal = localStorage.getItem('pulseflow_goal_data');
-    const savedCache = localStorage.getItem('pulseflow_food_cache');
 
     if (savedRecent) setRecentMeals(JSON.parse(savedRecent));
     if (savedFavorites) setSavedMeals(JSON.parse(savedFavorites));
     if (savedHistory) setAllHistory(JSON.parse(savedHistory));
     if (savedGoal) setGoalData(JSON.parse(savedGoal));
-    if (savedCache) setFoodCache(JSON.parse(savedCache));
 
     setIsLoaded(true);
   }, []);
@@ -193,9 +193,8 @@ export function NutritionView({
         'pulseflow_all_meals_history',
         JSON.stringify(allHistory)
       );
-      localStorage.setItem('pulseflow_food_cache', JSON.stringify(foodCache));
     }
-  }, [recentMeals, savedMeals, allHistory, foodCache, isLoaded]);
+  }, [recentMeals, savedMeals, allHistory, isLoaded]);
 
   const tryLocalParse = (input: string): LoggedMeal | null | 'INVALID' => {
     const normalized = input.toLowerCase();

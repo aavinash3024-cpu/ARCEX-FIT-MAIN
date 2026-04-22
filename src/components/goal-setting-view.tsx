@@ -27,6 +27,7 @@ import {
 import { Slider } from "@/components/ui/slider";
 import { Badge } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
+import { useUser } from '@/firebase';
 
 type Objective = 'maintain' | 'gain' | 'loss';
 type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'extreme';
@@ -71,8 +72,12 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
     }
   }, [step, isSaved]);
 
+  const { user, isUserLoading } = useUser();
+
   useEffect(() => {
-    const saved = localStorage.getItem('pulseflow_goal_data');
+    if (isUserLoading) return;
+    const goalKey = user ? `arcex_${user.uid}_goal_data` : 'pulseflow_goal_data';
+    const saved = localStorage.getItem(goalKey) || localStorage.getItem('pulseflow_goal_data');
     if (saved) {
       try {
         const data = JSON.parse(saved);
@@ -94,7 +99,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
       }
     }
     setIsInitialized(true);
-  }, []);
+  }, [user, isUserLoading]);
 
   // History sync for hardware back button
   useEffect(() => {
@@ -184,7 +189,8 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
       calAdj, protAdj, carbRatio, isSaved: true,
       ...calculations
     };
-    localStorage.setItem('pulseflow_goal_data', JSON.stringify(dataToSave));
+    const goalKey = user ? `arcex_${user.uid}_goal_data` : 'pulseflow_goal_data';
+    localStorage.setItem(goalKey, JSON.stringify(dataToSave));
     setIsSaved(true);
     setHasExistingGoal(true);
     if (onGoalSaved) onGoalSaved();
@@ -198,7 +204,8 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
 
   const handleHeaderBack = () => {
     if (!isSaved && hasExistingGoal) {
-      const saved = localStorage.getItem('pulseflow_goal_data');
+      const goalKey = user ? `arcex_${user.uid}_goal_data` : 'pulseflow_goal_data';
+      const saved = localStorage.getItem(goalKey);
       if (saved) {
         const data = JSON.parse(saved);
         setGender(data.gender);

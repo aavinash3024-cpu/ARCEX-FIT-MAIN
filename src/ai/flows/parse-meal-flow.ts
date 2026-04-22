@@ -1,4 +1,4 @@
-'use server';
+﻿'use server';
 /**
  * @fileOverview An AI-powered flow to parse natural language meal descriptions into structured nutritional data with item-wise breakdown and micronutrient analysis.
  *

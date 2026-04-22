@@ -74,10 +74,18 @@ export default function PulseFlowApp() {
     Record<string, string[]>
   >({});
   const [credits, setCredits] = useState(20);
+  const [foodCache, setFoodCache] = useState<Record<string, any>>({});
+  
+  // Workout State (Lifted from WorkoutView)
+  const [workoutSplit, setWorkoutSplit] = useState<Record<string, any>>({});
+  const [extraMoves, setExtraMoves] = useState<any[]>([]);
+  const [loggedSets, setLoggedSets] = useState<Record<string, any[]>>({});
+  const [workoutHistory, setWorkoutHistory] = useState<Record<string, any>>({});
 
   const [isLoaded, setIsLoaded] = useState(false);
   const [showSplash, setShowSplash] = useState(true);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [isOnboardingChecked, setIsOnboardingChecked] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
 
@@ -99,6 +107,11 @@ export default function PulseFlowApp() {
       onboarding: `arcex_${uid}_onboarding_complete`,
       userProfile: `arcex_${uid}_user_profile`,
       credits: `arcex_${uid}_meal_credits_v2`,
+      foodCache: `arcex_${uid}_food_cache`,
+      workoutSplit: `arcex_${uid}_workout_split`,
+      extraMoves: `arcex_${uid}_extra_moves`,
+      workoutLogs: `arcex_${uid}_workout_logs`,
+      workoutHistory: `arcex_${uid}_workout_history`,
     }),
     []
   );
@@ -128,12 +141,12 @@ export default function PulseFlowApp() {
 
   // Choice B Sync Logic
   const syncDataToFirestore = async () => {
-    if (!user || !firestore) return;
+    if (!user || !firestore || !isLoaded) return;
     setIsSyncing(true);
     try {
       const todayStr = format(new Date(), 'yyyy-MM-dd');
 
-      // 1. Sync Daily Metrics
+      // 1. Sync Daily Metrics & History
       const metricsRef = doc(
         firestore,
         `userProfiles/${user.uid}/dailyMetrics`,
@@ -151,12 +164,13 @@ export default function PulseFlowApp() {
           hydrationMl: hydrationAmount,
           stepsCount: stepsCount,
           meals: loggedMeals,
+          workouts: loggedSets,
           updatedAt: new Date().toISOString(),
         },
         { merge: true }
       );
 
-      // 2. Sync Goal
+      // 2. Sync Goal & Weight History
       if (goalData) {
         const goalRef = doc(
           firestore,
@@ -167,6 +181,7 @@ export default function PulseFlowApp() {
           goalRef,
           {
             ...goalData,
+            weightHistory,
             userId: user.uid,
             updatedAt: new Date().toISOString(),
           },
@@ -174,7 +189,15 @@ export default function PulseFlowApp() {
         );
       }
 
-      // 3. Sync Profile Onboarding
+      // 3. Sync Workout Split & History
+      const workoutRef = doc(firestore, `userProfiles/${user.uid}/workouts`, 'split_and_history');
+      await setDoc(workoutRef, {
+        split: workoutSplit,
+        history: workoutHistory,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      // 4. Sync Profile
       const userRef = doc(firestore, 'userProfiles', user.uid);
       await setDoc(
         userRef,
@@ -189,6 +212,29 @@ export default function PulseFlowApp() {
       setIsSyncing(false);
     }
   };
+
+  // BACKGROUND SYNC LISTENERS
+  useEffect(() => {
+    if (!user || !isLoaded) return;
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'hidden') {
+        syncDataToFirestore();
+      }
+    };
+
+    const handleBeforeUnload = () => {
+      syncDataToFirestore();
+    };
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    window.addEventListener('beforeunload', handleBeforeUnload);
+
+    return () => {
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
+    };
+  }, [user, isLoaded, loggedMeals, hydrationAmount, stepsCount, goalData, workoutSplit, loggedSets]);
 
   // Splash Screen Timeout
   useEffect(() => {
@@ -288,13 +334,17 @@ export default function PulseFlowApp() {
 
     // CLOUD ONBOARDING CHECK
     const checkOnboarding = async () => {
-      if (!firestore) return;
+      if (!firestore) {
+        setIsOnboardingChecked(true);
+        return;
+      }
 
       // For anonymous users, rely solely on localStorage.
       if (user.isAnonymous) {
         const localOnboardingComplete =
           localStorage.getItem(keys.onboarding) === 'true';
         setShowOnboarding(!localOnboardingComplete);
+        setIsOnboardingChecked(true);
         return;
       }
 
@@ -304,6 +354,39 @@ export default function PulseFlowApp() {
         const userSnap = await getDoc(userRef);
         if (userSnap.exists() && userSnap.data().onboardingComplete) {
           setShowOnboarding(false);
+          
+          // Sync data if local storage is empty (e.g. fresh login)
+          if (!localStorage.getItem(keys.goal)) {
+            try {
+              const goalRef = doc(firestore, `userProfiles/${user.uid}/goals`, 'primary_goal');
+              const goalSnap = await getDoc(goalRef);
+              if (goalSnap.exists()) {
+                const gd = goalSnap.data();
+                setGoalData(gd);
+                localStorage.setItem(keys.goal, JSON.stringify(gd));
+              }
+              
+              const metricsRef = doc(firestore, `userProfiles/${user.uid}/dailyMetrics`, format(new Date(), 'yyyy-MM-dd'));
+              const metricsSnap = await getDoc(metricsRef);
+              if (metricsSnap.exists()) {
+                const md = metricsSnap.data();
+                if (md.stepsCount !== undefined) {
+                  setStepsCount(md.stepsCount);
+                  localStorage.setItem(keys.steps, md.stepsCount.toString());
+                }
+                if (md.hydrationMl !== undefined) {
+                  setHydrationAmount(md.hydrationMl);
+                  localStorage.setItem(keys.hydration, md.hydrationMl.toString());
+                }
+                if (md.meals !== undefined) {
+                  setLoggedMeals(md.meals);
+                  localStorage.setItem(keys.meals, JSON.stringify(md.meals));
+                }
+              }
+            } catch(syncErr) {
+              console.error('Failed to sync past data', syncErr);
+            }
+          }
         } else {
           // If doc doesn't exist OR onboarding isn't marked complete, show onboarding.
           // OnboardingView will create/update the document upon completion.
@@ -315,6 +398,8 @@ export default function PulseFlowApp() {
         const localOnboardingComplete =
           localStorage.getItem(keys.onboarding) === 'true';
         setShowOnboarding(!localOnboardingComplete);
+      } finally {
+        setIsOnboardingChecked(true);
       }
     };
     checkOnboarding();
@@ -341,14 +426,74 @@ export default function PulseFlowApp() {
       } catch (e) {}
     }
 
-    if (isNewDay) {
+    if (isNewDay && lastResetDate) {
+      // ARCHIVE BEFORE RESET
+      const oldHydrationHistory = JSON.parse(savedHydrationHistory || '{}');
+      oldHydrationHistory[lastResetDate] = Number(savedHydration || 0);
+      localStorage.setItem(keys.hydrationHistory, JSON.stringify(oldHydrationHistory));
+      setHydrationHistory(oldHydrationHistory);
+
+      const oldStepsHistory = JSON.parse(savedStepsHistory || '{}');
+      oldStepsHistory[lastResetDate] = Number(savedSteps || 0);
+      localStorage.setItem(keys.stepsHistory, JSON.stringify(oldStepsHistory));
+      setStepsHistory(oldStepsHistory);
+
+      // Archive Workouts
+      const oldWorkoutHistory = JSON.parse(localStorage.getItem(keys.workoutHistory) || '{}');
+      const todayWorkoutLogs = JSON.parse(localStorage.getItem(keys.workoutLogs) || '{"data":{}}');
+      oldWorkoutHistory[lastResetDate] = todayWorkoutLogs.data;
+      localStorage.setItem(keys.workoutHistory, JSON.stringify(oldWorkoutHistory));
+      setWorkoutHistory(oldWorkoutHistory);
+      
       setHydrationAmount(0);
       localStorage.setItem(keys.hydration, '0');
       setStepsCount(0);
       localStorage.setItem(keys.steps, '0');
+      setLoggedMeals([]);
+      localStorage.setItem(keys.meals, '[]');
+      setLoggedSets({});
+      localStorage.setItem(keys.workoutLogs, JSON.stringify({ date: todayStr, data: {} }));
     } else {
       if (savedHydration) setHydrationAmount(Number(savedHydration));
       if (savedSteps) setStepsCount(Number(savedSteps));
+      if (savedMeals) {
+        try {
+          setLoggedMeals(JSON.parse(savedMeals));
+        } catch (e) {}
+      }
+      
+      const savedWorkoutLogs = localStorage.getItem(keys.workoutLogs);
+      if (savedWorkoutLogs) {
+        try {
+          const parsed = JSON.parse(savedWorkoutLogs);
+          if (parsed.date === todayStr) setLoggedSets(parsed.data);
+          else setLoggedSets({});
+        } catch (e) {}
+      }
+    }
+
+    // Always Load Persistent Data (Never Wiped)
+    const savedFoodCache = localStorage.getItem(keys.foodCache);
+    if (savedFoodCache) {
+      try { setFoodCache(JSON.parse(savedFoodCache)); } catch (e) {}
+    }
+
+    const savedWorkoutSplit = localStorage.getItem(keys.workoutSplit);
+    if (savedWorkoutSplit) {
+      try { setWorkoutSplit(JSON.parse(savedWorkoutSplit)); } catch (e) {}
+    }
+
+    const savedExtraMoves = localStorage.getItem(keys.extraMoves);
+    if (savedExtraMoves) {
+      try {
+        const parsed = JSON.parse(savedExtraMoves);
+        if (parsed.date === todayStr) setExtraMoves(parsed.moves);
+      } catch (e) {}
+    }
+
+    const savedWorkoutHistoryData = localStorage.getItem(keys.workoutHistory);
+    if (savedWorkoutHistoryData) {
+      try { setWorkoutHistory(JSON.parse(savedWorkoutHistoryData)); } catch (e) {}
     }
     
     if (savedCreditsData) {
@@ -493,6 +638,41 @@ export default function PulseFlowApp() {
       localStorage.setItem(keys.notifications, JSON.stringify(notifications));
     }
   }, [notifications, isLoaded, user, getKeys]);
+
+  // CONTINUOUS WORKOUT PERSISTENCE
+  useEffect(() => {
+    if (isLoaded && user) {
+      const keys = getKeys(user.uid);
+      localStorage.setItem(keys.workoutSplit, JSON.stringify(workoutSplit));
+    }
+  }, [workoutSplit, isLoaded, user, getKeys]);
+
+  useEffect(() => {
+    if (isLoaded && user) {
+      const todayStr = format(new Date(), 'yyyy-MM-dd');
+      const keys = getKeys(user.uid);
+      localStorage.setItem(keys.extraMoves, JSON.stringify({ date: todayStr, moves: extraMoves }));
+    }
+  }, [extraMoves, isLoaded, user, getKeys]);
+
+  useEffect(() => {
+    if (isLoaded && user) {
+      const todayStr = format(new Date(), 'yyyy-MM-dd');
+      const keys = getKeys(user.uid);
+      localStorage.setItem(keys.workoutLogs, JSON.stringify({ date: todayStr, data: loggedSets }));
+      
+      const historyObj = { ...workoutHistory };
+      historyObj[todayStr] = loggedSets;
+      localStorage.setItem(keys.workoutHistory, JSON.stringify(historyObj));
+    }
+  }, [loggedSets, isLoaded, user, getKeys]);
+
+  useEffect(() => {
+    if (isLoaded && user) {
+      const keys = getKeys(user.uid);
+      localStorage.setItem(keys.foodCache, JSON.stringify(foodCache));
+    }
+  }, [foodCache, isLoaded, user, getKeys]);
 
   useEffect(() => {
     if (isLoaded && user) {
@@ -750,7 +930,7 @@ export default function PulseFlowApp() {
   const unreadCount = notifications.filter((n) => !n.isRead).length;
 
   const renderContent = () => {
-    if (showSplash || isUserLoading) return <SplashScreen />;
+    if (showSplash || isUserLoading || (user && !isOnboardingChecked)) return <SplashScreen />;
     if (!user) return <AuthView />;
     if (showOnboarding)
       return <OnboardingView onComplete={handleOnboardingComplete} />;
@@ -807,6 +987,8 @@ export default function PulseFlowApp() {
             setLoggedMeals={setLoggedMeals}
             credits={credits}
             setCredits={setCredits}
+            foodCache={foodCache}
+            setFoodCache={setFoodCache}
             activeView={nutrView === 'nutrition' ? 'log' : nutrView}
             onNavigate={navigateTo}
           />
@@ -821,6 +1003,13 @@ export default function PulseFlowApp() {
         return (
           <WorkoutView
             activeView={workoutView === 'workout' ? 'main' : workoutView}
+            split={workoutSplit}
+            setSplit={setWorkoutSplit}
+            extraMoves={extraMoves}
+            setExtraMoves={setExtraMoves}
+            loggedSets={loggedSets}
+            setLoggedSets={setLoggedSets}
+            workoutHistory={workoutHistory}
             onNavigate={navigateTo}
             onAddNotification={addNotification}
           />
@@ -881,9 +1070,11 @@ export default function PulseFlowApp() {
           <GoalSettingView
             onBack={() => window.history.back()}
             onGoalSaved={() => {
-              if (!user) return;
-              const keys = getKeys(user.uid);
-              setGoalData(JSON.parse(localStorage.getItem(keys.goal) || '{}'));
+              if (user) {
+                const keys = getKeys(user.uid);
+                const saved = localStorage.getItem(keys.goal);
+                if (saved) setGoalData(JSON.parse(saved));
+              }
             }}
           />
         );
