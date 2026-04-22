@@ -207,6 +207,7 @@ export function ProfileView({
         if (data.email) setProfileEmail(data.email);
         if (data.location) setProfileLocation(data.location);
         if (data.dob) setProfileDob(data.dob);
+        if (data.subscription) setSelectedPlanId(data.subscription.planId || 'yearly');
       } catch (e) {
         console.error('Failed to parse profile data', e);
       }
@@ -334,8 +335,8 @@ export function ProfileView({
       };
     }, [goalData, weightHistory]);
 
-  const handleSaveProfile = () => {
-    if (!user) return;
+  const handleSaveProfile = async () => {
+    if (!user || !firestore) return;
     triggerHaptic('success');
     setIsSaving(true);
 
@@ -345,11 +346,15 @@ export function ProfileView({
       email: profileEmail,
       location: profileLocation,
       dob: profileDob,
+      subscription: {
+        planId: selectedPlanId,
+        updatedAt: new Date().toISOString()
+      }
     };
     localStorage.setItem(`arcex_${uid}_user_profile`, JSON.stringify(profileData));
 
     // Update Firestore
-    if (firestore) {
+    try {
       const userRef = doc(firestore, 'userProfiles', uid);
       const nameParts = profileName.trim().split(' ');
       const firstName = nameParts[0] || 'User';
@@ -361,24 +366,30 @@ export function ProfileView({
         gender: profileGender,
         activityLevel: goalData?.activity || 'moderate',
         updatedAt: new Date().toISOString(),
+        subscription: profileData.subscription
       };
-      setDocumentNonBlocking(userRef, firestoreProfile, { merge: true });
+      
+      const { setDoc } = await import('firebase/firestore');
+      await setDoc(userRef, firestoreProfile, { merge: true });
+
+      if (goalData) {
+        const updatedGoal = {
+          ...goalData,
+          gender: profileGender,
+          age: parseInt(profileAge) || goalData.age,
+        };
+        localStorage.setItem(`arcex_${uid}_goal_data`, JSON.stringify(updatedGoal));
+        setGoalData(updatedGoal);
+        
+        const goalRef = doc(firestore, `userProfiles/${uid}/goals`, 'primary_goal');
+        await setDoc(goalRef, { ...updatedGoal, updatedAt: new Date().toISOString() }, { merge: true });
+      }
+    } catch (e) {
+       console.error("Profile save failed", e);
     }
 
-    if (goalData) {
-      const updatedGoal = {
-        ...goalData,
-        gender: profileGender,
-        age: parseInt(profileAge) || goalData.age,
-      };
-      localStorage.setItem(`arcex_${uid}_goal_data`, JSON.stringify(updatedGoal));
-      setGoalData(updatedGoal);
-    }
-
-    setTimeout(() => {
-      setIsSaving(false);
-      onBack();
-    }, 800);
+    setIsSaving(false);
+    onBack();
   };
 
   const handleLogout = async () => {
@@ -1355,35 +1366,6 @@ export function ProfileView({
               color="text-amber-600"
               bg="bg-amber-50"
               onClick={handleExportData}
-            />
-          </CardContent>
-        </Card>
-      </div>
-
-      <div className="px-1 space-y-3">
-        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">
-          Testing & Development
-        </h3>
-        <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
-          <CardContent className="p-0">
-            <SettingsButton
-              icon={RefreshCw}
-              label="Restart Setup Process"
-              subLabel="Re-run the compulsory onboarding"
-              color="text-amber-500"
-              bg="bg-amber-50"
-              onClick={handleRestartOnboarding}
-            />
-            <SettingsButton
-              icon={Layout}
-              label="Preview Splash Screen"
-              subLabel="Test the app entry animation"
-              color="text-primary"
-              bg="bg-primary/5"
-              onClick={() => {
-                triggerHaptic('light');
-                onShowSplash?.();
-              }}
             />
           </CardContent>
         </Card>

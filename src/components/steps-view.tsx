@@ -35,7 +35,6 @@ import {
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { subDays, format } from 'date-fns';
-import { HealthConnectCard } from './health-connect-card';
 
 interface StepsViewProps {
   currentSteps: number;
@@ -333,74 +332,65 @@ export function StepsView({ currentSteps, history = {}, onUpdateSteps, onBack }:
         </CardContent>
       </Card>
 
-      {/* Health Connect Toggle */}
-      <HealthConnectCard />
+      {/* Unified Engine Control Center - Sleek & Minimal */}
+      <Card className="border-none shadow-md bg-card/60 backdrop-blur-md overflow-hidden relative border border-white/5">
+        <CardContent className="p-4 space-y-4">
+          <div className="flex justify-between items-center px-1">
+            <h3 className="text-[9px] font-black text-muted-foreground uppercase tracking-[0.2em] opacity-40">
+              Engine Sync
+            </h3>
+            {pedometerError && (
+              <span className="text-[8px] font-black text-destructive uppercase tracking-widest animate-pulse">
+                Sensor Error
+              </span>
+            )}
+          </div>
 
-      {/* 3. Stats Summary */}
-      <div className="space-y-4">
-        <div className="grid grid-cols-2 gap-4">
-          <Card className="border-none shadow-sm bg-card">
-            <CardContent className="p-4 space-y-1 text-center">
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Weekly Avg</p>
-              <p className="text-lg font-black text-primary">{avgSteps.toLocaleString()}</p>
-              <p className="text-[8px] font-bold text-muted-foreground uppercase">Steps / Day</p>
-            </CardContent>
-          </Card>
-          <Card className="border-none shadow-sm bg-card">
-            <CardContent className="p-4 space-y-1 text-center">
-              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Week Total</p>
-              <p className="text-lg font-black text-foreground">{totalWeekSteps.toLocaleString()}</p>
-              <p className="text-[8px] font-bold text-muted-foreground uppercase">Total Volume</p>
-            </CardContent>
-          </Card>
-        </div>
-
-        <Card className="border-none shadow-sm bg-card border border-muted/20">
-          <CardContent className="p-4 flex justify-between items-center">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
-                <CheckCircle2 className="w-4 h-4 text-green-600" />
-              </div>
-              <div className="space-y-0.5">
-                <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none">Active Days</p>
-                <p className="text-xs font-bold text-foreground">{goalsMet} / 7 Days Met</p>
-              </div>
-            </div>
-            <div className="text-right">
-              <div className="bg-green-100 text-green-700 px-2 py-0.5 rounded-full text-[8px] font-black uppercase">
-                Consistent
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        {/* 4. Native Notification Integration */}
-        <Card className="border border-indigo-500/20 shadow-[0_0_15px_rgba(99,102,241,0.1)] bg-card overflow-hidden relative">
-          <div className="absolute inset-x-0 top-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-indigo-500"></div>
-          <CardContent className="p-5 flex justify-between items-center">
-            <div className="space-y-1 py-1">
-              <h3 className="text-xs font-bold text-foreground flex items-center gap-2">
-                <Footprints className="w-3.5 h-3.5 text-indigo-500" /> 
-                System Tracker
-              </h3>
-              <p className="text-[10px] text-muted-foreground max-w-[180px]">
-                {pedometerError ? <span className="text-destructive">{pedometerError}</span> : "Pin your live step count permanently to the Android Notification Bar."}
-              </p>
-            </div>
-            <Button
-              onClick={togglePin}
-              variant={isPinned ? "default" : "outline"}
-              className={`h-10 px-4 rounded-xl shadow-sm transition-all text-xs font-bold tracking-wide uppercase ${
-                isPinned 
-                ? "bg-indigo-600 hover:bg-indigo-700 text-white shadow-indigo-600/30" 
-                : ""
-              }`}
+          <div className="grid grid-cols-2 gap-3">
+            {/* Health Connect Toggle */}
+            <div 
+              onClick={async () => {
+                try {
+                  const req = await CapacitorPedometer.requestPermissions();
+                  if (req.activity === 'granted') {
+                    await CapacitorPedometer.start();
+                    toast({ title: "Health Sync Active", description: "Your steps are now syncing from high-res sensors." });
+                  }
+                } catch(e) {}
+              }}
+              className="bg-muted/10 hover:bg-muted/20 transition-all p-3 rounded-2xl flex items-center justify-between cursor-pointer group"
             >
-              {isPinned ? <span className="flex items-center"><Bell className="w-3 h-3 mr-1.5 opacity-80" /> Pinned</span> : <span className="flex items-center"><BellOff className="w-3 h-3 mr-1.5 opacity-60" /> Pin</span>}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+              <div className="flex items-center gap-2.5">
+                <div className="w-8 h-8 rounded-xl bg-background flex items-center justify-center shadow-inner group-hover:scale-110 transition-transform">
+                  <TrendingUp className="w-4 h-4 text-primary" />
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-black text-foreground uppercase tracking-tight">Sync</p>
+                  <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Health</p>
+                </div>
+              </div>
+              <div className="w-1.5 h-1.5 rounded-full bg-green-500 shadow-[0_0_8px_#22c55e]" />
+            </div>
+
+            {/* Notification Toggle */}
+            <div 
+              onClick={togglePin}
+              className={`transition-all p-3 rounded-2xl flex items-center justify-between cursor-pointer group ${isPinned ? 'bg-primary/10 border border-primary/10' : 'bg-muted/10'}`}
+            >
+              <div className="flex items-center gap-2.5">
+                <div className={`w-8 h-8 rounded-xl flex items-center justify-center shadow-inner transition-colors ${isPinned ? 'bg-primary text-white' : 'bg-background'}`}>
+                  {isPinned ? <Bell className="w-4 h-4" /> : <BellOff className="w-4 h-4 text-muted-foreground" />}
+                </div>
+                <div className="space-y-0.5">
+                  <p className="text-[9px] font-black text-foreground uppercase tracking-tight">Pin</p>
+                  <p className="text-[7px] font-bold text-muted-foreground uppercase opacity-60">Bar</p>
+                </div>
+              </div>
+              <div className={`w-1.5 h-1.5 rounded-full transition-all ${isPinned ? 'bg-primary shadow-[0_0_8px_#3b82f6]' : 'bg-muted-foreground/30'}`} />
+            </div>
+          </div>
+        </CardContent>
+      </Card>
     </div>
   );
 }

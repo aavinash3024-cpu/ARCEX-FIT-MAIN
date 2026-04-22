@@ -116,26 +116,39 @@ export default function PulseFlowApp() {
     []
   );
 
-  const triggerHaptic = (
+  const triggerHaptic = async (
     type: 'light' | 'medium' | 'success' | 'warning' = 'light'
   ) => {
     const enabled = localStorage.getItem('pulseflow_haptics') !== 'false';
-    if (!enabled || typeof window === 'undefined' || !window.navigator.vibrate)
-      return;
+    if (!enabled) return;
 
-    switch (type) {
-      case 'light':
-        window.navigator.vibrate(15);
-        break;
-      case 'medium':
-        window.navigator.vibrate(30);
-        break;
-      case 'success':
-        window.navigator.vibrate([20, 40, 20]);
-        break;
-      case 'warning':
-        window.navigator.vibrate([40, 40, 40]);
-        break;
+    try {
+      const { Haptics, ImpactStyle, NotificationType } = await import('@capacitor/haptics');
+      
+      switch (type) {
+        case 'light':
+          await Haptics.impact({ style: ImpactStyle.Light });
+          break;
+        case 'medium':
+          await Haptics.impact({ style: ImpactStyle.Medium });
+          break;
+        case 'success':
+          await Haptics.notification({ type: NotificationType.Success });
+          break;
+        case 'warning':
+          await Haptics.notification({ type: NotificationType.Warning });
+          break;
+      }
+    } catch (e) {
+      // Fallback for web if plugin fails
+      if (typeof window !== 'undefined' && window.navigator.vibrate) {
+        switch (type) {
+          case 'light': window.navigator.vibrate(15); break;
+          case 'medium': window.navigator.vibrate(30); break;
+          case 'success': window.navigator.vibrate([20, 40, 20]); break;
+          case 'warning': window.navigator.vibrate([40, 40, 40]); break;
+        }
+      }
     }
   };
 
@@ -145,6 +158,7 @@ export default function PulseFlowApp() {
     setIsSyncing(true);
     try {
       const todayStr = format(new Date(), 'yyyy-MM-dd');
+      const keys = getKeys(user.uid);
 
       // 1. Sync Daily Metrics & History
       const metricsRef = doc(
@@ -197,11 +211,36 @@ export default function PulseFlowApp() {
         updatedAt: new Date().toISOString()
       }, { merge: true });
 
-      // 4. Sync Profile
+      // 4. Sync Other Persistent Data
+      const miscRef = doc(firestore, `userProfiles/${user.uid}/settings`, 'misc');
+      await setDoc(miscRef, {
+        streak: streakData,
+        milestones: sentMilestones,
+        notifications: notifications.slice(0, 50), // Limit history in Firestore
+        credits: credits,
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
+
+      // 5. Sync Profile
       const userRef = doc(firestore, 'userProfiles', user.uid);
+      
+      // Get subscription data from local storage to sync
+      const savedProfile = localStorage.getItem(keys.userProfile);
+      let subscriptionData = null;
+      if (savedProfile) {
+        try {
+          const parsed = JSON.parse(savedProfile);
+          subscriptionData = parsed.subscription || null;
+        } catch(e) {}
+      }
+
       await setDoc(
         userRef,
-        { onboardingComplete: true, updatedAt: new Date().toISOString() },
+        { 
+          onboardingComplete: true, 
+          updatedAt: new Date().toISOString(),
+          subscription: subscriptionData
+        },
         { merge: true }
       );
 
@@ -278,8 +317,37 @@ export default function PulseFlowApp() {
     if (window.history.state === null) {
       window.history.replaceState({ tab: 'dashboard' }, '');
     }
-    return () => window.removeEventListener('popstate', handlePopState);
-  }, []);
+    // CHOICE C: NATIVE HARDWARE BACK BUTTON (ANDROID)
+    let backListener: any;
+    const initNativeApp = async () => {
+      try {
+        const { App } = await import('@capacitor/app');
+        backListener = await App.addListener('backButton', ({ canGoBack }) => {
+          // If we have a sub-view open (history entries), go back
+          if (canGoBack) {
+            window.history.back();
+          } else {
+            // Otherwise, if we are on a tab other than dashboard, return to dashboard
+            const currentTab = localStorage.getItem('arcex_last_tab') || 'dashboard';
+            if (currentTab !== 'dashboard') {
+              navigateTo('dashboard');
+            } else {
+              // On dashboard, we let the app exit
+              App.exitApp();
+            }
+          }
+        });
+      } catch (e) {
+        console.warn('Native App integration not available');
+      }
+    };
+    initNativeApp();
+
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      if (backListener) backListener.remove();
+    };
+  }, [user, firestore, getKeys, navigateTo]);
 
   const navigateTo = (tab: string) => {
     if (tab !== activeTab) {
@@ -355,17 +423,70 @@ export default function PulseFlowApp() {
         if (userSnap.exists() && userSnap.data().onboardingComplete) {
           setShowOnboarding(false);
           
-          // Sync data if local storage is empty (e.g. fresh login)
-          if (!localStorage.getItem(keys.goal)) {
+          // Always try to restore data if local storage is missing key items
+          if (!localStorage.getItem(keys.goal) || !localStorage.getItem(keys.workoutSplit)) {
             try {
+              const profileData = userSnap.data();
+              
+              // 1. Restore Profile & Subscription
+              if (profileData) {
+                const existingProfile = JSON.parse(localStorage.getItem(keys.userProfile) || '{}');
+                const mergedProfile = { ...existingProfile, ...profileData };
+                localStorage.setItem(keys.userProfile, JSON.stringify(mergedProfile));
+              }
+
+              // 2. Restore Goal
               const goalRef = doc(firestore, `userProfiles/${user.uid}/goals`, 'primary_goal');
               const goalSnap = await getDoc(goalRef);
               if (goalSnap.exists()) {
                 const gd = goalSnap.data();
                 setGoalData(gd);
+                if (gd.weightHistory) {
+                  setWeightHistory(gd.weightHistory);
+                  localStorage.setItem(keys.weight, JSON.stringify(gd.weightHistory));
+                }
                 localStorage.setItem(keys.goal, JSON.stringify(gd));
               }
               
+              // 3. Restore Workouts
+              const workoutRef = doc(firestore, `userProfiles/${user.uid}/workouts`, 'split_and_history');
+              const workoutSnap = await getDoc(workoutRef);
+              if (workoutSnap.exists()) {
+                const wd = workoutSnap.data();
+                if (wd.split) {
+                   setWorkoutSplit(wd.split);
+                   localStorage.setItem(keys.workoutSplit, JSON.stringify(wd.split));
+                }
+                if (wd.history) {
+                   setWorkoutHistory(wd.history);
+                   localStorage.setItem(keys.workoutHistory, JSON.stringify(wd.history));
+                }
+              }
+
+              // 4. Restore Misc (Streak, Credits, etc.)
+              const miscRef = doc(firestore, `userProfiles/${user.uid}/settings`, 'misc');
+              const miscSnap = await getDoc(miscRef);
+              if (miscSnap.exists()) {
+                const md = miscSnap.data();
+                if (md.streak) {
+                  setStreakData(md.streak);
+                  localStorage.setItem(keys.streak, JSON.stringify({...md.streak, lastDate: format(new Date(), 'yyyy-MM-dd')}));
+                }
+                if (md.credits !== undefined) {
+                  setCredits(md.credits);
+                  localStorage.setItem(keys.credits, JSON.stringify({ credits: md.credits, date: format(new Date(), 'yyyy-MM-dd') }));
+                }
+                if (md.notifications) {
+                  setNotifications(md.notifications);
+                  localStorage.setItem(keys.notifications, JSON.stringify(md.notifications));
+                }
+                if (md.milestones) {
+                  setSentMilestones(md.milestones);
+                  localStorage.setItem(keys.milestones, JSON.stringify({ date: format(new Date(), 'yyyy-MM-dd'), milestones: md.milestones }));
+                }
+              }
+
+              // 5. Restore Today's Metrics
               const metricsRef = doc(firestore, `userProfiles/${user.uid}/dailyMetrics`, format(new Date(), 'yyyy-MM-dd'));
               const metricsSnap = await getDoc(metricsRef);
               if (metricsSnap.exists()) {
@@ -381,6 +502,10 @@ export default function PulseFlowApp() {
                 if (md.meals !== undefined) {
                   setLoggedMeals(md.meals);
                   localStorage.setItem(keys.meals, JSON.stringify(md.meals));
+                }
+                if (md.workouts !== undefined) {
+                  setLoggedSets(md.workouts);
+                  localStorage.setItem(keys.workoutLogs, JSON.stringify({ date: format(new Date(), 'yyyy-MM-dd'), data: md.workouts }));
                 }
               }
             } catch(syncErr) {
@@ -1069,11 +1194,16 @@ export default function PulseFlowApp() {
         return (
           <GoalSettingView
             onBack={() => window.history.back()}
-            onGoalSaved={() => {
+            onGoalSaved={async () => {
               if (user) {
                 const keys = getKeys(user.uid);
                 const saved = localStorage.getItem(keys.goal);
-                if (saved) setGoalData(JSON.parse(saved));
+                if (saved) {
+                   const parsed = JSON.parse(saved);
+                   setGoalData(parsed);
+                   // Instant Sync to cloud
+                   await syncDataToFirestore();
+                }
               }
             }}
           />

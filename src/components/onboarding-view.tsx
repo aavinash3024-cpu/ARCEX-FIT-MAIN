@@ -172,35 +172,46 @@ export function OnboardingView({ onComplete }: OnboardingViewProps) {
       }));
       localStorage.setItem(`arcex_${uid}_onboarding_complete`, 'true');
 
-      if (firestore) {
-        const userRef = doc(firestore, 'userProfiles', uid);
-        const nameParts = name.trim().split(' ');
-        const firstName = nameParts[0] || 'User';
-        const lastName = nameParts.slice(1).join(' ') || '';
+      const handleComplete = async () => {
+        if (firestore) {
+          try {
+            const userRef = doc(firestore, 'userProfiles', uid);
+            const nameParts = name.trim().split(' ');
+            const firstName = nameParts[0] || 'User';
+            const lastName = nameParts.slice(1).join(' ') || '';
 
-        const profileData = {
-          id: uid,
-          email: user.email || `${uid}@pulseflow.anonymous`,
-          firstName, lastName, dateOfBirth: "1998-05-15",
-          heightCm: parseFloat(height), gender, activityLevel: activity,
-          onboardingComplete: true,
-          createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
-        };
-        setDocumentNonBlocking(userRef, profileData, { merge: true });
+            const profileData = {
+              id: uid,
+              email: user.email || `${uid}@pulseflow.anonymous`,
+              firstName, lastName, dateOfBirth: "1998-05-15",
+              heightCm: parseFloat(height), gender, activityLevel: activity,
+              onboardingComplete: true,
+              createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+            };
+            
+            const { setDoc } = await import('firebase/firestore');
+            await setDoc(userRef, profileData, { merge: true });
 
-        const goalRef = doc(firestore, `userProfiles/${uid}/goals`, 'primary_goal');
-        const gData = {
-          id: 'primary_goal', userId: uid,
-          type: objective === 'loss' ? 'weight_loss' : objective === 'gain' ? 'muscle_gain' : 'nutrition',
-          targetValue: parseFloat(targetWeight), targetUnit: 'kg',
-          startDate: format(new Date(), 'yyyy-MM-dd'), status: 'active',
-          description: `Goal to ${objective} weight to ${targetWeight}kg`,
-          createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
-        };
-        setDocumentNonBlocking(goalRef, gData, { merge: true });
-      }
+            const goalRef = doc(firestore, `userProfiles/${uid}/goals`, 'primary_goal');
+            const gData = {
+              id: 'primary_goal', userId: uid,
+              type: objective === 'loss' ? 'weight_loss' : objective === 'gain' ? 'muscle_gain' : 'nutrition',
+              targetValue: parseFloat(targetWeight), targetUnit: 'kg',
+              startDate: format(new Date(), 'yyyy-MM-dd'), status: 'active',
+              description: `Goal to ${objective} weight to ${targetWeight}kg`,
+              createdAt: new Date().toISOString(), updatedAt: new Date().toISOString(),
+              // Include the full goal parameters for the dashboard
+              ...dataToSave
+            };
+            await setDoc(goalRef, gData, { merge: true });
+          } catch (e) {
+            console.error('Onboarding sync failed', e);
+          }
+        }
+        onComplete();
+      };
 
-      onComplete();
+      handleComplete();
     } else {
       setStep(step + 1);
     }
