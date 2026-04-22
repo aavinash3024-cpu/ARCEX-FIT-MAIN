@@ -1373,6 +1373,35 @@ export function ProfileView({
 
       <div className="px-1 space-y-3">
         <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">
+          Testing & Development
+        </h3>
+        <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
+          <CardContent className="p-0">
+            <SettingsButton
+              icon={RefreshCw}
+              label="Restart Setup Process"
+              subLabel="Re-run the compulsory onboarding"
+              color="text-amber-500"
+              bg="bg-amber-50"
+              onClick={handleRestartOnboarding}
+            />
+            <SettingsButton
+              icon={Layout}
+              label="Preview Splash Screen"
+              subLabel="Test the app entry animation"
+              color="text-primary"
+              bg="bg-primary/5"
+              onClick={() => {
+                triggerHaptic('light');
+                onShowSplash?.();
+              }}
+            />
+          </CardContent>
+        </Card>
+      </div>
+
+      <div className="px-1 space-y-3">
+        <h3 className="text-[10px] font-black uppercase tracking-[0.25em] text-muted-foreground/60 px-3">
           Data & Security
         </h3>
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">

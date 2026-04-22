@@ -76,6 +76,11 @@ export default function PulseFlowApp() {
   const [credits, setCredits] = useState(20);
   const [foodCache, setFoodCache] = useState<Record<string, any>>({});
   
+  // Notification Logic
+  const unreadCount = useMemo(() => {
+    return notifications.filter(n => !n.isRead).length;
+  }, [notifications]);
+
   // Workout State (Lifted from WorkoutView)
   const [workoutSplit, setWorkoutSplit] = useState<Record<string, any>>({});
   const [extraMoves, setExtraMoves] = useState<any[]>([]);
@@ -88,11 +93,6 @@ export default function PulseFlowApp() {
   const [isOnboardingChecked, setIsOnboardingChecked] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const mainRef = useRef<HTMLDivElement>(null);
-
-  const unreadCount = useMemo(
-    () => notifications.filter((n) => !n.isRead).length,
-    [notifications]
-  );
 
   // Helper to get UID namespaced keys
   const getKeys = useCallback(
@@ -121,39 +121,26 @@ export default function PulseFlowApp() {
     []
   );
 
-  const triggerHaptic = async (
+  const triggerHaptic = (
     type: 'light' | 'medium' | 'success' | 'warning' = 'light'
   ) => {
     const enabled = localStorage.getItem('pulseflow_haptics') !== 'false';
-    if (!enabled) return;
+    if (!enabled || typeof window === 'undefined' || !window.navigator.vibrate)
+      return;
 
-    try {
-      const { Haptics, ImpactStyle, NotificationType } = await import('@capacitor/haptics');
-      
-      switch (type) {
-        case 'light':
-          await Haptics.impact({ style: ImpactStyle.Light });
-          break;
-        case 'medium':
-          await Haptics.impact({ style: ImpactStyle.Medium });
-          break;
-        case 'success':
-          await Haptics.notification({ type: NotificationType.Success });
-          break;
-        case 'warning':
-          await Haptics.notification({ type: NotificationType.Warning });
-          break;
-      }
-    } catch (e) {
-      // Fallback for web if plugin fails
-      if (typeof window !== 'undefined' && window.navigator.vibrate) {
-        switch (type) {
-          case 'light': window.navigator.vibrate(15); break;
-          case 'medium': window.navigator.vibrate(30); break;
-          case 'success': window.navigator.vibrate([20, 40, 20]); break;
-          case 'warning': window.navigator.vibrate([40, 40, 40]); break;
-        }
-      }
+    switch (type) {
+      case 'light':
+        window.navigator.vibrate(15);
+        break;
+      case 'medium':
+        window.navigator.vibrate(30);
+        break;
+      case 'success':
+        window.navigator.vibrate([20, 40, 20]);
+        break;
+      case 'warning':
+        window.navigator.vibrate([40, 40, 40]);
+        break;
     }
   };
 
@@ -322,56 +309,16 @@ export default function PulseFlowApp() {
     if (window.history.state === null) {
       window.history.replaceState({ tab: 'dashboard' }, '');
     }
-  }, [user, firestore, getKeys]);
+    return () => window.removeEventListener('popstate', handlePopState);
+  }, []);
 
-  // CHOICE C: NATIVE HARDWARE BACK BUTTON (ANDROID)
-  useEffect(() => {
-    let backListener: any;
-    
-    const initNativeApp = async () => {
-      try {
-        const { App } = await import('@capacitor/app');
-        backListener = await App.addListener('backButton', ({ canGoBack }) => {
-          if (canGoBack) {
-            window.history.back();
-          } else {
-            const currentTab = localStorage.getItem('arcex_last_tab') || 'dashboard';
-            if (currentTab !== 'dashboard') {
-              navigateTo('dashboard');
-            } else {
-              App.exitApp();
-            }
-          }
-        });
-      } catch (e) {
-        console.warn('Native App integration not available');
-      }
-    };
-    
-    initHardwareHaptics();
-    initNativeApp();
-
-    return () => {
-      if (backListener) backListener.remove();
-    };
-  }, [navigateTo]);
-
-  const initHardwareHaptics = async () => {
-    try {
-      await import('@capacitor/haptics');
-    } catch (e) {}
+  const navigateTo = (tab: string) => {
+    if (tab !== activeTab) {
+      triggerHaptic('light');
+      window.history.pushState({ tab }, '');
+      setActiveTab(tab);
+    }
   };
-
-  const navigateTo = useCallback(
-    (tab: string) => {
-      if (tab !== activeTab) {
-        triggerHaptic('light');
-        window.history.pushState({ tab }, '');
-        setActiveTab(tab);
-      }
-    },
-    [activeTab]
-  );
 
   const addNotification = (
     title: string,
@@ -1068,6 +1015,8 @@ export default function PulseFlowApp() {
     setStepsCount((prev) => Math.max(0, prev + amount));
   };
 
+  const unreadCount = notifications.filter((n) => !n.isRead).length;
+
   const renderContent = () => {
     if (showSplash || isUserLoading || (user && !isOnboardingChecked)) return <SplashScreen />;
     if (!user) return <AuthView />;
@@ -1122,6 +1071,7 @@ export default function PulseFlowApp() {
         const nutrView = activeTab.replace('nutrition-', '') as any;
         return (
           <NutritionView
+            uid={user?.uid}
             loggedMeals={loggedMeals}
             setLoggedMeals={setLoggedMeals}
             credits={credits}

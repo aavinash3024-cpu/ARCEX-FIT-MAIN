@@ -134,6 +134,7 @@ interface NutritionViewProps {
   activeView?: 'log' | 'summary' | 'micro' | 'macro' | 'micro-detail';
   onNavigate: (tab: string) => void;
   initialShowSummary?: boolean; // Maintain compatibility
+  uid?: string;
 }
 
 const MACRO_COLORS = {
@@ -153,6 +154,7 @@ export function NutritionView({
   activeView = 'log',
   onNavigate,
   initialShowSummary,
+  uid,
 }: NutritionViewProps) {
   const { toast } = useToast();
 
@@ -172,10 +174,11 @@ export function NutritionView({
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const savedRecent = localStorage.getItem('pulseflow_recent_meals');
-    const savedFavorites = localStorage.getItem('pulseflow_saved_meals');
-    const savedHistory = localStorage.getItem('pulseflow_all_meals_history');
-    const savedGoal = localStorage.getItem('pulseflow_goal_data');
+    if (!uid) return;
+    const savedRecent = localStorage.getItem(`arcex_${uid}_recent_meals`);
+    const savedFavorites = localStorage.getItem(`arcex_${uid}_saved_meals`);
+    const savedHistory = localStorage.getItem(`arcex_${uid}_all_meals_history`);
+    const savedGoal = localStorage.getItem(`arcex_${uid}_goal_data`);
 
     if (savedRecent) setRecentMeals(JSON.parse(savedRecent));
     if (savedFavorites) setSavedMeals(JSON.parse(savedFavorites));
@@ -183,18 +186,15 @@ export function NutritionView({
     if (savedGoal) setGoalData(JSON.parse(savedGoal));
 
     setIsLoaded(true);
-  }, []);
+  }, [uid]);
 
   useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('pulseflow_recent_meals', JSON.stringify(recentMeals));
-      localStorage.setItem('pulseflow_saved_meals', JSON.stringify(savedMeals));
-      localStorage.setItem(
-        'pulseflow_all_meals_history',
-        JSON.stringify(allHistory)
-      );
+    if (isLoaded && uid) {
+      localStorage.setItem(`arcex_${uid}_recent_meals`, JSON.stringify(recentMeals));
+      localStorage.setItem(`arcex_${uid}_saved_meals`, JSON.stringify(savedMeals));
+      localStorage.setItem(`arcex_${uid}_all_meals_history`, JSON.stringify(allHistory));
     }
-  }, [recentMeals, savedMeals, allHistory, isLoaded]);
+  }, [recentMeals, savedMeals, allHistory, isLoaded, uid]);
 
   const tryLocalParse = (input: string): LoggedMeal | null | 'INVALID' => {
     const normalized = input.toLowerCase();
