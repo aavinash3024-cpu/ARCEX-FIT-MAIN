@@ -18,12 +18,14 @@ import {
   Sparkles,
   Droplets,
   Zap,
+  Footprints,
 } from 'lucide-react';
 import { DashboardView } from '@/components/dashboard-view';
 import { NutritionView } from '@/components/nutrition-view';
 import { WorkoutView } from '@/components/workout-view';
 import { ProgressView } from '@/components/progress-view';
 import { HydrationView } from '@/components/hydration-view';
+import { StepsView } from '@/components/steps-view';
 import { TasksView, type Task } from '@/components/tasks-view';
 import { CalculatorsView } from '@/components/calculators-view';
 import { GoalSettingView } from '@/components/goal-setting-view';
@@ -78,6 +80,10 @@ export default function PulseFlowApp() {
   const [credits, setCredits] = useState(20);
   const [foodCache, setFoodCache] = useState<Record<string, any>>({});
   
+  // Steps State
+  const [stepsCount, setStepsCount] = useState(0);
+  const [stepsHistory, setStepsHistory] = useState<any[]>([]);
+
   // Workout State (Lifted from WorkoutView)
   const [workoutSplit, setWorkoutSplit] = useState<Record<string, any>>({});
   const [extraMoves, setExtraMoves] = useState<any[]>([]);
@@ -211,8 +217,9 @@ export default function PulseFlowApp() {
       await setDoc(miscRef, {
         streak: streakData,
         milestones: sentMilestones,
-        notifications: notifications.slice(0, 50), // Limit history in Firestore
+        notifications: notifications.slice(0, 50),
         credits: credits,
+        stepsHistory: stepsHistory,
         updatedAt: new Date().toISOString()
       }, { merge: true });
 
@@ -449,6 +456,10 @@ export default function PulseFlowApp() {
                 if (md.milestones) {
                   setSentMilestones(md.milestones);
                   localStorage.setItem(keys.milestones, JSON.stringify({ date: format(new Date(), 'yyyy-MM-dd'), milestones: md.milestones }));
+                }
+                if (md.stepsHistory) {
+                  setStepsHistory(md.stepsHistory);
+                  localStorage.setItem(keys.stepsHistory, JSON.stringify(md.stepsHistory));
                 }
               }
 
@@ -1016,7 +1027,13 @@ export default function PulseFlowApp() {
 
   const updateSteps = (amount: number) => {
     triggerHaptic('light');
-    setStepsCount((prev) => Math.max(0, prev + amount));
+    setStepsCount((prev) => {
+      const newVal = Math.max(0, prev + amount);
+      if (user) {
+         localStorage.setItem(`arcex_${user.uid}_steps`, newVal.toString());
+      }
+      return newVal;
+    });
   };
 
   const unreadCount = notifications.filter((n) => !n.isRead).length;
@@ -1131,6 +1148,16 @@ export default function PulseFlowApp() {
             currentMl={hydrationAmount}
             history={hydrationHistory}
             onUpdateMl={updateHydration}
+            onBack={() => window.history.back()}
+          />
+        );
+      case 'steps':
+        return (
+          <StepsView
+            currentSteps={stepsCount}
+            history={stepsHistory}
+            onUpdateSteps={updateSteps}
+            targetSteps={goalData?.stepsTarget || 10000}
             onBack={() => window.history.back()}
           />
         );
