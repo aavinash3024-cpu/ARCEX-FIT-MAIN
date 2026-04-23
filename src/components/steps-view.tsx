@@ -16,13 +16,17 @@ import {
   Pin,
   BellRing,
   AlertCircle,
-  Smartphone
+  Smartphone,
+  Activity
 } from "lucide-react";
 import { 
+  AreaChart,
+  Area,
   BarChart, 
   Bar, 
   XAxis, 
   YAxis, 
+  CartesianGrid,
   Tooltip, 
   ResponsiveContainer,
   Cell
@@ -57,14 +61,25 @@ export function StepsView({
 
   // --- HARDWARE INITIALIZATION ---
   useEffect(() => {
-    let active = true;
+    let timeoutId: any;
     const initHardware = async () => {
+      // Safety timeout to prevent infinite "Checking..."
+      timeoutId = setTimeout(() => {
+        if (permissionStatus === 'checking') {
+          setPermissionStatus('prompt');
+          setIsSupported(false);
+          setPedometerError("Connection timed out. Using manual tracking.");
+        }
+      }, 4000);
+
       try {
         const { CapacitorPedometer } = await import('@capgo/capacitor-pedometer');
         const support = await CapacitorPedometer.isSupported();
         setIsSupported(support.supported);
         
         if (!support.supported) {
+          clearTimeout(timeoutId);
+          setPermissionStatus('prompt');
           setPedometerError("Step counting sensor not found on this device.");
           return;
         }
@@ -75,20 +90,24 @@ export function StepsView({
         if (perm.activity === 'granted') {
           startTracking();
         }
+        clearTimeout(timeoutId);
       } catch (e: any) {
-        setPedometerError("Hardware communication error.");
+        clearTimeout(timeoutId);
+        setPermissionStatus('prompt');
+        setPedometerError("Sensors unreachable. Using manual tracking.");
       }
     };
 
     initHardware();
 
     return () => {
-      active = false;
+      if (timeoutId) clearTimeout(timeoutId);
       cleanup();
     };
   }, []);
 
   const requestPermissions = async () => {
+    setPermissionStatus('checking');
     try {
       const { CapacitorPedometer } = await import('@capgo/capacitor-pedometer');
       const res = await CapacitorPedometer.requestPermissions();
@@ -121,7 +140,7 @@ export function StepsView({
         }
       });
     } catch (e) {
-      setPedometerError("Failed to start hardware listener.");
+      setPedometerError("Background sensor failed.");
     }
   };
 
@@ -166,28 +185,33 @@ export function StepsView({
     } catch (e) {}
   };
 
-  // --- DATA VISUALIZATION ---
+  // --- DATA VISUALIZATI  const stats = useMemo(() => {
+    const vals = Object.values(history);
+    const avg = vals.length > 0 ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : currentSteps;
+    const streak = vals.filter(v => v >= targetSteps).length + (currentSteps >= targetSteps ? 1 : 0);
+    const calories = Math.round(currentSteps * 0.04);
+    return { avg, streak, calories };
+  }, [history, currentSteps, targetSteps]);
+
+  // Transform history record for charts
   const chartData = useMemo(() => {
-    const last7Days = Array.from({ length: 7 }, (_, i) => {
-      const d = subDays(new Date(), i);
-      const dateStr = format(d, 'yyyy-MM-dd');
-      const label = i === 0 ? 'Today' : format(d, 'EEE');
-      
-      const steps = i === 0 ? currentSteps : (history[dateStr] || 0);
+    return [6, 5, 4, 3, 2, 1, 0].map(daysAgo => {
+      const d = subDays(new Date(), daysAgo);
+      const dateKey = format(d, 'yyyy-MM-dd');
+      const label = format(d, 'EEE');
+      const val = dateKey === format(new Date(), 'yyyy-MM-dd') ? currentSteps : (history[dateKey] || 0);
       return {
-        name: label,
-        steps: steps,
-        fullDate: dateStr,
-        isToday: i === 0
+        day: label,
+        steps: val,
+        fullDate: dateKey
       };
-    }).reverse();
-    return last7Days;
+    });
   }, [history, currentSteps]);
 
   return (
-    <div className="flex flex-col h-screen bg-background animate-in fade-in duration-700">
+    <div className="space-y-4 pb-24 pt-4 animate-in fade-in slide-in-from-right-4 duration-500">
       {/* Header */}
-      <div className="fixed top-0 left-0 right-0 z-50 bg-background/80 backdrop-blur-xl border-b border-muted/20 px-4 py-4 flex items-center justify-between">
+      <div className="flex items-center gap-4 pt-2">
         <Button 
           variant="ghost" 
           size="icon" 
@@ -199,222 +223,190 @@ export function StepsView({
         >
           <ChevronLeft className="w-5 h-5" />
         </Button>
-        <div className="text-center flex-1 pr-9">
-          <h1 className="text-sm font-black uppercase tracking-[0.2em] text-foreground">Step Tracker</h1>
-          <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest mt-0.5">Hardware Analysis</p>
-        </div>
+        <h1 className="text-2xl font-bold font-headline">Step Tracker</h1>
       </div>
 
-      <div className="flex-1 overflow-y-auto px-4 pt-24 pb-32 space-y-8 no-scrollbar">
-        {/* Main Progress Sphere */}
-        <div className="flex justify-center relative">
-          <div className="w-64 h-64 relative flex items-center justify-center">
-            {/* Background Circle */}
-            <svg className="w-full h-full -rotate-90 transform">
-              <circle
-                cx="128"
-                cy="128"
-                r="115"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="12"
-                className="text-muted/10"
-              />
-              <circle
-                cx="128"
-                cy="128"
-                r="115"
-                fill="none"
-                stroke="url(#stepsGradient)"
-                strokeWidth="12"
-                strokeDasharray={722.5}
-                strokeDashoffset={722.5 - (722.5 * progress) / 100}
-                strokeLinecap="round"
-                className="transition-all duration-1000 ease-out"
-              />
-              <defs>
-                <linearGradient id="stepsGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" stopColor="#4ade80" />
-                  <stop offset="100%" stopColor="#3b82f6" />
-                </linearGradient>
-              </defs>
-            </svg>
+      {/* Main Stats Card (Hydration Style) */}
+      <Card className="border-none shadow-md overflow-hidden bg-card relative">
+        <CardContent className="p-6 flex flex-col items-center relative">
+          <div className="w-full flex justify-between items-center mb-6">
+            <div className="flex flex-col">
+              <h3 className="text-[10px] font-black text-foreground uppercase tracking-[0.2em]">Daily Progress</h3>
+              <p className="text-[9px] font-bold text-muted-foreground uppercase tracking-tight mt-0.5">Hardware Sense</p>
+            </div>
+            <div className="px-2.5 py-1 rounded-full bg-primary/10 border border-primary/20 flex items-center gap-1.5">
+              <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+              <span className="text-[8px] font-black text-primary uppercase">Active</span>
+            </div>
+          </div>
 
-            {/* Inner Content */}
-            <div className="absolute flex flex-col items-center text-center">
-              <div className="w-12 h-12 rounded-2xl bg-primary/10 flex items-center justify-center mb-2 animate-bounce">
-                <Footprints className="w-6 h-6 text-primary" />
-              </div>
-              <span className="text-4xl font-black tracking-tighter text-foreground tabular-nums">
-                {currentSteps.toLocaleString()}
-              </span>
-              <span className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.1em] mt-1">
-                Goal: {targetSteps.toLocaleString()}
-              </span>
-              <div className="mt-4 flex items-center gap-2">
-                <div className="px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/20">
-                  <span className="text-[10px] font-black text-emerald-500 uppercase">{progress}%</span>
+          <div className="relative flex items-center justify-center w-full mb-8">
+            <div className="relative w-40 h-40 flex items-center justify-center">
+              <svg className="w-full h-full -rotate-90 transform">
+                <circle cx="80" cy="80" r="70" fill="none" stroke="currentColor" strokeWidth="8" className="text-muted/10" />
+                <circle
+                  cx="80" cy="80" r="70" fill="none" stroke="url(#stepsGrad)" strokeWidth="8"
+                  strokeDasharray={440} strokeDashoffset={440 - (440 * progress) / 100}
+                  strokeLinecap="round" className="transition-all duration-1000 ease-out"
+                />
+                <defs>
+                  <linearGradient id="stepsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#10b981" />
+                    <stop offset="100%" stopColor="#3b82f6" />
+                  </linearGradient>
+                </defs>
+              </svg>
+              <div className="absolute flex flex-col items-center">
+                <div className="p-2 bg-primary/10 rounded-full mb-1">
+                  <Footprints className="w-5 h-5 text-primary" />
                 </div>
+                <span className="text-2xl font-black tabular-nums tracking-tighter">{currentSteps.toLocaleString()}</span>
+                <span className="text-[8px] font-black text-muted-foreground uppercase opacity-40">STEPS</span>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Permission Guard */}
-        {permissionStatus !== 'granted' && isSupported !== false && (
-          <Card className="border-none bg-primary/5 rounded-[2rem] overflow-hidden">
-            <CardContent className="p-6 space-y-4">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
-                  <ShieldCheck className="w-5 h-5 text-primary" />
-                </div>
-                <div>
-                  <h3 className="text-sm font-black tracking-tight">Access Required</h3>
-                  <p className="text-[10px] font-medium text-muted-foreground">Permission needed for physical activity sensors.</p>
-                </div>
-              </div>
-              <Button 
-                onClick={requestPermissions}
-                disabled={permissionStatus === 'checking'}
-                className="w-full rounded-xl bg-primary text-white font-black uppercase text-[10px] tracking-widest h-11"
-              >
-                {permissionStatus === 'checking' ? 'Checking...' : 'Enable Activity Tracking'}
-              </Button>
-            </CardContent>
-          </Card>
-        )}
-
-        {/* Error State */}
-        {pedometerError && (
-          <div className="p-4 rounded-2xl bg-destructive/5 border border-destructive/10 flex items-center gap-3">
-            <AlertCircle className="w-4 h-4 text-destructive" />
-            <p className="text-[10px] font-bold text-destructive uppercase tracking-wide">{pedometerError}</p>
-          </div>
-        )}
-
-        {/* 7-Day Analysis Graph */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between px-2">
-            <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 flex items-center gap-2">
-              <TrendingUp className="w-3 h-3 text-primary" />
-              Analysis Log
-            </h3>
-            <span className="text-[9px] font-bold text-muted-foreground uppercase tracking-widest">Past 7 Days</span>
-          </div>
-          
-          <Card className="border-none bg-card shadow-lg rounded-[2rem] overflow-hidden pt-6">
-            <CardContent className="p-4">
-              <div className="h-48 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={chartData}>
-                    <XAxis 
-                      dataKey="name" 
-                      axisLine={false} 
-                      tickLine={false} 
-                      tick={{ fontSize: 10, fontWeight: 700, fill: '#64748b' }} 
-                      dy={10}
-                    />
-                    <Tooltip 
-                      cursor={{ fill: 'transparent' }}
-                      content={({ active, payload }) => {
-                        if (active && payload && payload.length) {
-                          return (
-                            <div className="bg-card/90 backdrop-blur-md p-3 rounded-2xl border border-muted/20 shadow-xl">
-                              <p className="text-[9px] font-black text-muted-foreground uppercase mb-1">{payload[0].payload.fullDate}</p>
-                              <p className="text-sm font-black text-primary">{payload[0].value.toLocaleString()} steps</p>
-                            </div>
-                          );
-                        }
-                        return null;
-                      }}
-                    />
-                    <Bar 
-                      dataKey="steps" 
-                      radius={[6, 6, 6, 6]}
-                      barSize={24}
-                    >
-                      {chartData.map((entry, index) => (
-                        <Cell 
-                          key={`cell-${index}`} 
-                          fill={entry.isToday ? 'url(#activeBar)' : '#f1f5f9'} 
-                        />
-                      ))}
-                    </Bar>
-                    <defs>
-                      <linearGradient id="activeBar" x1="0" y1="0" x2="0" y2="100%">
-                        <stop offset="0%" stopColor="#3b82f6" />
-                        <stop offset="100%" stopColor="#2563eb" />
-                      </linearGradient>
-                    </defs>
-                  </BarChart>
-                </ResponsiveContainer>
-              </div>
-            </CardContent>
-          </Card>
-        </div>
-
-        {/* Feature Switches */}
-        <div className="space-y-3">
-          <h3 className="text-[11px] font-black uppercase tracking-[0.2em] text-muted-foreground/60 px-2">
-            Preferences
-          </h3>
-          <Card className="border-none bg-card shadow-md rounded-[2.5rem] overflow-hidden border border-muted/10">
-            <CardContent className="p-0">
-               {/* Pin to Notification */}
-               <button 
-                onClick={() => {
-                  triggerHaptic?.('medium');
-                  setIsPinned(!isPinned);
-                }}
-                className="w-full p-5 flex items-center justify-between transition-all hover:bg-muted/5Active Documentation: active:scale-[0.98] border-b border-muted/5 group last:border-0"
-               >
-                <div className="flex items-center gap-4">
-                  <div className={cn(
-                    "w-12 h-12 rounded-3xl flex items-center justify-center transition-all",
-                    isPinned ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground/40"
-                  )}>
-                    <Pin className={cn("w-5 h-5", isPinned && "rotate-45")} />
-                  </div>
-                  <div className="text-left">
-                    <span className="text-sm font-black text-foreground/90 block">Live Notification Pin</span>
-                    <span className="text-[10px] font-medium text-muted-foreground">Stay visible in the status bar</span>
-                  </div>
-                </div>
-                <div className={cn(
-                  "w-12 h-6 rounded-full relative transition-all duration-300",
-                  isPinned ? "bg-primary" : "bg-muted"
-                )}>
-                  <div className={cn(
-                    "absolute top-1 left-1 w-4 h-4 bg-white rounded-full shadow-sm transition-all duration-300",
-                    isPinned && "translate-x-6"
-                  )} />
-                </div>
-               </button>
-
-               {/* Reminders */}
-               <div className="w-full p-5 flex items-center justify-between group">
-                <div className="flex items-center gap-4">
-                  <div className="w-12 h-12 rounded-3xl flex items-center justify-center bg-indigo-50 text-indigo-500">
-                    <BellRing className="w-5 h-5" />
-                  </div>
-                  <div className="text-left">
-                    <span className="text-sm font-black text-foreground/90 block">Inactivity Alerts</span>
-                    <span className="text-[10px] font-medium text-muted-foreground">Remind me to walk every hour</span>
-                  </div>
-                </div>
-                <Badge variant="outline" className="text-[8px] font-black uppercase text-indigo-500 border-indigo-200">Soon</Badge>
+          <div className="w-full space-y-4">
+             <div className="flex justify-between items-end">
+               <div className="space-y-0.5">
+                 <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Goal Status</p>
+                 <p className="text-sm font-black text-foreground">
+                   {Math.max(0, targetSteps - currentSteps).toLocaleString()} <span className="text-[10px] text-muted-foreground font-bold">LEFT</span>
+                 </p>
                </div>
-            </CardContent>
-          </Card>
-        </div>
+               <div className="text-right">
+                 <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest">Daily Target</p>
+                 <p className="text-sm font-black text-foreground/60">{targetSteps.toLocaleString()}</p>
+               </div>
+             </div>
+             
+             <div className="flex items-center gap-2">
+               <button 
+                onClick={() => { triggerHaptic?.('light'); onUpdateSteps(500); }}
+                className="flex-1 h-10 border border-muted/20 bg-muted/5 rounded-xl text-[10px] font-black uppercase tracking-widest hover:bg-muted/10 active:scale-[0.98] transition-all"
+               >
+                 +500 Manual
+               </button>
+             </div>
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Device Sync Info */}
-        <div className="flex items-center gap-3 p-4 rounded-3xl bg-muted/40 border border-muted/10 opacity-70">
-          <Smartphone className="w-4 h-4 text-muted-foreground" />
-          <p className="text-[9px] font-bold text-muted-foreground uppercase leading-relaxed">
-            Syncing Directly with your Phone Accelerometer & Gyroscope Sensors for peak accuracy.
-          </p>
-        </div>
+      {/* Permission/Sync Status (If needed) */}
+      {permissionStatus !== 'granted' && (
+        <Card className="border-none bg-primary/5 rounded-2xl overflow-hidden shadow-sm">
+          <CardContent className="p-5 flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center">
+                <ShieldCheck className="w-5 h-5 text-primary" />
+              </div>
+              <div>
+                <h3 className="text-[11px] font-black uppercase tracking-tight">Permissions</h3>
+                <p className="text-[9px] font-medium text-muted-foreground leading-none">Sensor access needed</p>
+              </div>
+            </div>
+            <Button 
+              onClick={requestPermissions}
+              disabled={permissionStatus === 'checking'}
+              className="bg-primary hover:bg-primary/90 text-white rounded-xl px-4 h-9 font-black uppercase text-[8px] tracking-widest"
+            >
+              {permissionStatus === 'checking' ? 'Connecting...' : 'Allow Access'}
+            </Button>
+          </CardContent>
+        </Card>
+      )}
+
+      {/* Statistics Cards (Hydration Style) */}
+      <div className="grid grid-cols-2 gap-3">
+        <Card className="border-none bg-card shadow-sm border border-muted/5">
+          <CardContent className="p-4 flex flex-col gap-2">
+            <div className="w-8 h-8 rounded-full bg-emerald-500/10 flex items-center justify-center">
+              <Zap className="w-4 h-4 text-emerald-600" />
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none">Streak</p>
+              <p className="text-sm font-black text-foreground">{stats.streak} / 7 Days</p>
+            </div>
+          </CardContent>
+        </Card>
+        <Card className="border-none bg-card shadow-sm border border-muted/5">
+          <CardContent className="p-4 flex flex-col gap-2">
+            <div className="w-8 h-8 rounded-full bg-blue-500/10 flex items-center justify-center">
+              <Activity className="w-4 h-4 text-blue-600" />
+            </div>
+            <div className="space-y-0.5">
+              <p className="text-[9px] font-black text-muted-foreground uppercase tracking-widest leading-none">Avg Steps</p>
+              <p className="text-sm font-black text-foreground">{stats.avg.toLocaleString()}</p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* History Analysis Card (AreaChart Style) */}
+      <Card className="border-none shadow-md bg-card overflow-hidden">
+        <CardContent className="p-5 space-y-6">
+          <div className="flex justify-between items-center">
+            <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest flex items-center gap-2">
+              <Calendar className="w-3.5 h-3.5 text-primary" /> Last 7 Days
+            </h3>
+            <span className="text-[9px] font-bold text-muted-foreground uppercase opacity-40 tabular-nums">Weekly Activity</span>
+          </div>
+
+          <div className="h-[180px] w-full">
+            <ResponsiveContainer width="100%" height="100%">
+              <AreaChart data={chartData} margin={{ top: 10, right: 10, left: -25, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="stepsColor" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="5%" stopColor="#10b981" stopOpacity={0.2}/>
+                    <stop offset="95%" stopColor="#10b981" stopOpacity={0}/>
+                  </linearGradient>
+                </defs>
+                <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="hsl(var(--muted))" opacity={0.3} />
+                <XAxis dataKey="day" axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }} dy={10} />
+                <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 9, fontWeight: 700, fill: 'hsl(var(--muted-foreground))' }} />
+                <Tooltip 
+                  cursor={{ stroke: '#10b981', strokeWidth: 1 }}
+                  contentStyle={{ borderRadius: '12px', border: '1px solid hsl(var(--border))', backgroundColor: 'hsl(var(--card))', boxShadow: '0 8px 24px rgba(0,0,0,0.15)', fontSize: '10px', fontWeight: 'bold' }}
+                />
+                <Area type="monotone" dataKey="steps" stroke="#10b981" strokeWidth={2.5} fillOpacity={1} fill="url(#stepsColor)" dot={{ r: 3, fill: '#10b981', strokeWidth: 2, stroke: '#fff' }} />
+              </AreaChart>
+            </ResponsiveContainer>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Preferences Section */}
+      <section className="space-y-3">
+        <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-[0.2em] px-2">Hardware Options</h3>
+        <Card className="border-none bg-card shadow-sm border border-muted/10 rounded-2xl overflow-hidden">
+          <CardContent className="p-0">
+             <button 
+              onClick={() => { triggerHaptic?.('medium'); setIsPinned(!isPinned); }}
+              className="w-full p-5 flex items-center justify-between group active:bg-muted/5 transition-all"
+             >
+                <div className="flex items-center gap-4">
+                  <div className={cn("w-10 h-10 rounded-xl flex items-center justify-center transition-all", isPinned ? "bg-primary/10 text-primary" : "bg-muted text-muted-foreground/40")}>
+                    <Pin className={cn("w-4 h-4", isPinned && "rotate-45")} />
+                  </div>
+                  <div className="text-left">
+                    <span className="text-xs font-black text-foreground/90 block">Background Sync</span>
+                    <span className="text-[9px] font-bold text-muted-foreground uppercase opacity-60">Status Bar Notification</span>
+                  </div>
+                </div>
+                <div className={cn("w-10 h-5 rounded-full relative transition-all duration-300", isPinned ? "bg-primary" : "bg-muted")}>
+                  <div className={cn("absolute top-0.5 left-0.5 w-4 h-4 bg-white rounded-full transition-all shadow-sm", isPinned && "translate-x-5")} />
+                </div>
+             </button>
+          </CardContent>
+        </Card>
+      </section>
+
+      {/* Sensor Info */}
+      <div className="flex items-start gap-3 p-4 rounded-3xl bg-muted/20 border border-muted/5 opacity-60">
+        <Smartphone className="w-4 h-4 text-muted-foreground shrink-0 mt-0.5" />
+        <p className="text-[8px] font-bold text-muted-foreground uppercase tracking-tight leading-relaxed">
+          {pedometerError || "Sensors operating normally. Steps are analyzed using onboard hardware gait analysis for peak efficiency."}
+        </p>
       </div>
     </div>
   );
