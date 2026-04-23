@@ -37,9 +37,10 @@ type ActivityLevel = 'sedentary' | 'light' | 'moderate' | 'active' | 'extreme';
 interface CalculatorsViewProps {
   initialType?: CalculatorType;
   onBack: () => void;
+  triggerHaptic?: (type?: 'light' | 'medium' | 'success' | 'warning') => void;
 }
 
-export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsViewProps) {
+export function CalculatorsView({ initialType = 'bmr', onBack, triggerHaptic }: CalculatorsViewProps) {
   const [activeTab, setActiveTab] = useState<CalculatorType>(initialType);
 
   // Shared inputs
@@ -94,6 +95,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
       extreme: 1.9
     };
     const tdeeVal = bmrVal * activityMultipliers[activity];
+    triggerHaptic?.('medium');
     setBmrResults({ bmr: Math.round(bmrVal), tdee: Math.round(tdeeVal) });
   };
 
@@ -102,6 +104,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
     const r = parseFloat(reps);
     if (isNaN(w) || isNaN(r)) return;
     const result = w * (1 + (r / 30)); // Epley formula
+    triggerHaptic?.('medium');
     setOrmResult(Math.round(result));
   };
 
@@ -140,6 +143,7 @@ export function CalculatorsView({ initialType = 'bmr', onBack }: CalculatorsView
       else category = "Obese";
     }
 
+    triggerHaptic?.('medium');
     setBfResults({ percentage, lbm, category });
   };
 

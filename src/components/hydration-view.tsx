@@ -37,9 +37,10 @@ interface HydrationViewProps {
   history?: Record<string, number>;
   onUpdateMl: (amount: number) => void;
   onBack: () => void;
+  triggerHaptic?: (type?: 'light' | 'medium' | 'success' | 'warning') => void;
 }
 
-export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: HydrationViewProps) {
+export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack, triggerHaptic }: HydrationViewProps) {
   const [targetMl, setTargetMl] = useState(3000);
   const [isEditing, setIsEditing] = useState(false);
   const [tempTarget, setTempTarget] = useState(targetMl);
@@ -134,7 +135,10 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
           <div className="relative flex items-center justify-center w-full mb-6">
             {/* Minus Button Left */}
             <Button 
-              onClick={() => onUpdateMl(-250)}
+              onClick={() => {
+                triggerHaptic?.('light');
+                onUpdateMl(-250);
+              }}
               variant="outline" 
               size="icon" 
               className="absolute left-4 rounded-full h-12 w-12 border-blue-200 text-blue-500 hover:bg-blue-50 shadow-sm"
@@ -193,7 +197,10 @@ export function HydrationView({ currentMl, history = {}, onUpdateMl, onBack }: H
 
             {/* Plus Button Right */}
             <Button 
-              onClick={() => onUpdateMl(250)}
+              onClick={() => {
+                triggerHaptic?.('light');
+                onUpdateMl(250);
+              }}
               variant="outline" 
               size="icon" 
               disabled={currentMl >= 50000}

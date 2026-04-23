@@ -135,6 +135,7 @@ interface NutritionViewProps {
   onNavigate: (tab: string) => void;
   initialShowSummary?: boolean; // Maintain compatibility
   uid?: string;
+  triggerHaptic?: (type?: 'light' | 'medium' | 'success' | 'warning') => void;
 }
 
 const MACRO_COLORS = {
@@ -155,6 +156,7 @@ export function NutritionView({
   onNavigate,
   initialShowSummary,
   uid,
+  triggerHaptic
 }: NutritionViewProps) {
   const { toast } = useToast();
 
@@ -402,6 +404,7 @@ export function NutritionView({
         return [newMeal, ...filtered].slice(0, 20);
       });
       setMealInput('');
+      triggerHaptic?.('success');
     } catch (error) {
       console.error('Failed to parse meal', error);
       toast({
@@ -435,6 +438,7 @@ export function NutritionView({
     setLoggedMeals((prev) => [newEntry, ...prev]);
     setAllHistory((prev) => [newEntry, ...prev]);
     setCredits((prev) => Math.max(0, prev - 1));
+    triggerHaptic?.('success');
   };
 
   const saveMeal = (meal: LoggedMeal) => {
@@ -448,9 +452,11 @@ export function NutritionView({
       return;
     }
     setSavedMeals((prev) => [meal, ...prev].slice(0, 50));
+    triggerHaptic?.('light');
   };
 
   const deleteLoggedMeal = (id: string) => {
+    triggerHaptic?.('warning');
     setLoggedMeals((prev) => prev.filter((m) => m.id !== id));
     setAllHistory((prev) => prev.filter((m) => m.id !== id));
   };

@@ -35,7 +35,8 @@ interface StepsViewProps {
   onUpdateSteps: (amount: number) => void;
   targetSteps: number;
   onBack: () => void;
-  history?: any[];
+  history?: Record<string, number>;
+  triggerHaptic?: (type?: 'light' | 'medium' | 'success' | 'warning') => void;
 }
 
 export function StepsView({ 
@@ -43,7 +44,8 @@ export function StepsView({
   onUpdateSteps, 
   targetSteps, 
   onBack,
-  history = [] 
+  history = {},
+  triggerHaptic
 }: StepsViewProps) {
   const [permissionStatus, setPermissionStatus] = useState<'prompt' | 'granted' | 'denied' | 'checking'>('checking');
   const [isSupported, setIsSupported] = useState<boolean | null>(null);
@@ -171,10 +173,10 @@ export function StepsView({
       const dateStr = format(d, 'yyyy-MM-dd');
       const label = i === 0 ? 'Today' : format(d, 'EEE');
       
-      const dayData = history.find(h => h.date === dateStr);
+      const steps = i === 0 ? currentSteps : (history[dateStr] || 0);
       return {
         name: label,
-        steps: dayData ? dayData.steps : 0,
+        steps: steps,
         fullDate: dateStr,
         isToday: i === 0
       };
@@ -189,7 +191,10 @@ export function StepsView({
         <Button 
           variant="ghost" 
           size="icon" 
-          onClick={onBack}
+          onClick={() => {
+            triggerHaptic?.('light');
+            onBack();
+          }}
           className="rounded-full bg-muted/50 w-9 h-9"
         >
           <ChevronLeft className="w-5 h-5" />
@@ -357,7 +362,10 @@ export function StepsView({
             <CardContent className="p-0">
                {/* Pin to Notification */}
                <button 
-                onClick={() => setIsPinned(!isPinned)}
+                onClick={() => {
+                  triggerHaptic?.('medium');
+                  setIsPinned(!isPinned);
+                }}
                 className="w-full p-5 flex items-center justify-between transition-all hover:bg-muted/5Active Documentation: active:scale-[0.98] border-b border-muted/5 group last:border-0"
                >
                 <div className="flex items-center gap-4">

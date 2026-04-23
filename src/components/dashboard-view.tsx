@@ -53,6 +53,7 @@ interface DashboardViewProps {
   onViewProgress?: () => void;
   onViewGuide?: () => void;
   onViewNutritionSummary?: () => void;
+  triggerHaptic?: (type?: 'light' | 'medium' | 'success' | 'warning') => void;
 }
 
 const MetricSphere = ({ type, icon: Icon }: { type: 'steps' | 'hydration' | 'calories' | 'streak', icon: any }) => {
@@ -124,7 +125,8 @@ export function DashboardView({
   onViewGoalSetting,
   onViewProgress,
   onViewGuide,
-  onViewNutritionSummary
+  onViewNutritionSummary,
+  triggerHaptic
 }: DashboardViewProps) {
   const metricsRef = useRef<HTMLDivElement>(null);
   const toolsRef = useRef<HTMLDivElement>(null);
@@ -358,8 +360,11 @@ export function DashboardView({
   return (
     <div className="space-y-4 pb-24 pt-4">
       <Card 
-        onClick={onViewGuide}
-        className="border-none text-white overflow-hidden shadow-md cursor-pointer transition-all"
+        onClick={() => {
+          triggerHaptic?.('medium');
+          onViewGuide?.();
+        }}
+        className="border-none text-white overflow-hidden shadow-md cursor-pointer active:scale-[0.99] transition-all"
         style={{ background: 'linear-gradient(to right, #065A54, #08A391)' }}
       >
         <CardContent className="p-5 flex items-center gap-4 min-h-[100px]">
@@ -382,6 +387,64 @@ export function DashboardView({
           </div>
         </CardContent>
       </Card>
+
+      <section className="space-y-4">
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col">
+            <h2 className="text-lg font-black font-headline tracking-tight text-foreground flex items-center gap-2">
+              <Footprints className="w-5 h-5 text-emerald-500" />
+              Movement
+            </h2>
+            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Step Progress</p>
+          </div>
+          <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 border-none text-[8px] font-black uppercase px-2 py-0.5">
+            Live Track
+          </Badge>
+        </div>
+
+        <Card 
+          onClick={() => {
+            triggerHaptic?.('medium');
+            onViewSteps?.();
+          }}
+          className="border-none shadow-md overflow-hidden bg-card cursor-pointer group active:scale-[0.98] transition-all duration-200"
+        >
+          <CardContent className="p-5 flex items-center justify-between relative">
+            <div className="absolute right-0 top-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
+              <Footprints className="w-24 h-24 text-emerald-500 -rotate-12" />
+            </div>
+            
+            <div className="space-y-4 flex-1">
+              <div className="flex items-baseline gap-1">
+                <span className="text-3xl font-black tabular-nums tracking-tighter">
+                  {stepsCount.toLocaleString()}
+                </span>
+                <span className="text-xs font-bold text-muted-foreground uppercase opacity-40">Steps</span>
+              </div>
+              
+              <div className="space-y-1.5">
+                <div className="h-2 w-full bg-muted/30 rounded-full overflow-hidden">
+                  <div 
+                    className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 transition-all duration-1000 ease-out rounded-full"
+                    style={{ width: `${Math.min((stepsCount / (goalData?.stepsTarget || 10000)) * 100, 100)}%` }}
+                  />
+                </div>
+                <div className="flex justify-between text-[8px] font-black uppercase text-muted-foreground tracking-widest">
+                  <span>{Math.min(100, Math.round((stepsCount / (goalData?.stepsTarget || 10000)) * 100))}% of Goal</span>
+                  <span>Target: {(goalData?.stepsTarget || 10000).toLocaleString()}</span>
+                </div>
+              </div>
+            </div>
+
+            <div className="ml-6 flex flex-col items-center gap-2">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <Footprints className="w-6 h-6 text-emerald-500" />
+              </div>
+              <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
+            </div>
+          </CardContent>
+        </Card>
+      </section>
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">
@@ -409,11 +472,15 @@ export function DashboardView({
                 <Card 
                   key={idx} 
                   onClick={() => {
+                    triggerHaptic?.('light');
                     if (isCalories) onViewNutritionSummary?.();
+                    if (isHydration) onViewHydration?.();
+                    if (isSteps) onViewSteps?.();
+                    if (isStreak) onViewGoalSetting?.();
                   }}
                   className={cn(
-                    "min-w-[260px] flex-shrink-0 border-none shadow-sm bg-card snap-center",
-                    isCalories && "cursor-pointer transition-all"
+                    "min-w-[260px] flex-shrink-0 border-none shadow-sm bg-card snap-center cursor-pointer active:scale-[0.98] transition-all",
+                    isCalories && "hover:bg-accent/50"
                   )}
                 >
                   <CardContent className="p-3 flex flex-col justify-between h-32">
@@ -444,16 +511,24 @@ export function DashboardView({
                       {isHydration && (
                         <div className="flex items-center bg-muted/50 rounded-full px-2 py-0.5 gap-2 border border-border/50 shadow-sm">
                           <button 
-                            onClick={(e) => { e.stopPropagation(); onUpdateHydration(-250); }}
-                            className="text-primary hover:text-primary/70 transition-colors"
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              triggerHaptic?.('light');
+                              onUpdateHydration(-250); 
+                            }}
+                            className="p-1 text-primary hover:text-primary/70 transition-colors"
                           >
                             <Minus className="w-3 h-3" />
                           </button>
                           <span className="text-[9px] font-black text-foreground uppercase tracking-tighter">250ml</span>
                           <button 
-                            onClick={(e) => { e.stopPropagation(); onUpdateHydration(250); }}
+                            onClick={(e) => { 
+                              e.stopPropagation(); 
+                              triggerHaptic?.('light');
+                              onUpdateHydration(250); 
+                            }}
                             disabled={hydrationAmount >= 50000}
-                            className="text-primary hover:text-primary/70 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
+                            className="p-1 text-primary hover:text-primary/70 transition-colors disabled:opacity-30 disabled:cursor-not-allowed"
                           >
                             <Plus className="w-3 h-3" />
                           </button>
@@ -514,7 +589,9 @@ export function DashboardView({
                           </div>
                           {showDetails && (
                             <button 
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                triggerHaptic?.('medium');
                                 if (isHydration) onViewHydration?.();
                                 if (isSteps) onViewSteps?.();
                               }}
@@ -535,7 +612,10 @@ export function DashboardView({
             {metrics.map((_, i) => (
               <button 
                 key={i} 
-                onClick={() => scrollTo(metricsRef, i)}
+                onClick={() => {
+                  triggerHaptic?.('light');
+                  scrollTo(metricsRef, i);
+                }}
                 className={`h-1 rounded-full transition-all duration-300 outline-none ${i === activeMetric ? 'w-4 bg-primary' : 'w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50'}`} 
               />
             ))}
@@ -544,8 +624,11 @@ export function DashboardView({
       </section>
 
       <Card 
-        onClick={onViewNutritionSummary}
-        className="border-none shadow-sm overflow-hidden bg-card cursor-pointer transition-all"
+        onClick={() => {
+          triggerHaptic?.('medium');
+          onViewNutritionSummary?.();
+        }}
+        className="border-none shadow-sm overflow-hidden bg-card cursor-pointer active:scale-[0.99] transition-all"
       >
         <CardContent className="p-5 space-y-5">
           <div className="flex items-center justify-start">
@@ -615,7 +698,10 @@ export function DashboardView({
               {targetWeight > 0 ? `${Math.abs(currentWeight - targetWeight).toFixed(1)} kg to go` : "Set your target weight"}
             </p>
             <button 
-              onClick={onViewGoalSetting}
+              onClick={() => {
+                triggerHaptic?.('medium');
+                onViewGoalSetting?.();
+              }}
               className="text-[9px] font-black text-foreground uppercase flex items-center gap-1"
             >
               Details <ArrowRight className="w-3 h-3" />
@@ -686,8 +772,11 @@ export function DashboardView({
                 {calculators.map((calc, idx) => (
                   <button 
                     key={idx} 
-                    onClick={() => onViewCalculators?.(calc.label)}
-                    className="p-2 bg-primary/5 rounded-xl text-center border border-primary/10"
+                    onClick={() => {
+                      triggerHaptic?.('medium');
+                      onViewCalculators?.(calc.label);
+                    }}
+                    className="p-2 bg-primary/5 rounded-xl text-center border border-primary/10 active:scale-95 transition-transform"
                   >
                     <p className="text-[9px] font-black uppercase text-primary leading-tight">{calc.label}</p>
                     <p className="text-[7px] font-bold text-muted-foreground/60 uppercase">{calc.description}</p>
@@ -701,7 +790,10 @@ export function DashboardView({
           {[0, 1].map((i) => (
             <button 
               key={i} 
-              onClick={() => scrollTo(toolsRef, i)}
+              onClick={() => {
+                triggerHaptic?.('light');
+                scrollTo(toolsRef, i);
+              }}
               className={`h-1 rounded-full transition-all duration-300 outline-none ${i === activeTool ? 'w-4 bg-primary' : 'w-1.5 bg-muted-foreground/30 hover:bg-muted-foreground/50'}`} 
               />
           ))}
@@ -757,8 +849,11 @@ export function DashboardView({
                   </p>
                 )}
               </div>
-              <button 
-                onClick={() => onViewTasks?.()}
+            <button 
+                onClick={() => {
+                  triggerHaptic?.('medium');
+                  onViewTasks?.();
+                }}
                 className="text-[9px] font-black text-foreground uppercase flex items-center gap-1"
               >
                 See More <ChevronRight className="w-3 h-3" />

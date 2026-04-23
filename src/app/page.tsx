@@ -80,10 +80,6 @@ export default function PulseFlowApp() {
   const [credits, setCredits] = useState(20);
   const [foodCache, setFoodCache] = useState<Record<string, any>>({});
   
-  // Steps State
-  const [stepsCount, setStepsCount] = useState(0);
-  const [stepsHistory, setStepsHistory] = useState<any[]>([]);
-
   // Workout State (Lifted from WorkoutView)
   const [workoutSplit, setWorkoutSplit] = useState<Record<string, any>>({});
   const [extraMoves, setExtraMoves] = useState<any[]>([]);
@@ -1069,6 +1065,7 @@ export default function PulseFlowApp() {
             onViewSteps={() => navigateTo('steps')}
             onViewTasks={() => navigateTo('tasks')}
             onViewCalculators={(type) => {
+              triggerHaptic('medium');
               const map: any = {
                 '1 Rep Max': '1rm',
                 'Body Fat %': 'bodyfat',
@@ -1077,11 +1074,27 @@ export default function PulseFlowApp() {
               setActiveCalculator(map[type] || 'bmr');
               navigateTo('calculators');
             }}
-            onViewGoalSetting={() => navigateTo('goal-setting')}
-            onViewProgress={() => navigateTo('rank')}
-            onViewGoal={() => navigateTo('goal-setting')}
-            onViewGuide={() => navigateTo('guide')}
-            onViewNutritionSummary={() => navigateTo('nutrition-summary')}
+            onViewGoalSetting={() => {
+              triggerHaptic('medium');
+              navigateTo('goal-setting');
+            }}
+            onViewProgress={() => {
+              triggerHaptic('medium');
+              navigateTo('rank');
+            }}
+            onViewGoal={() => {
+              triggerHaptic('medium');
+              navigateTo('goal-setting');
+            }}
+            onViewGuide={() => {
+              triggerHaptic('medium');
+              navigateTo('guide');
+            }}
+            onViewNutritionSummary={() => {
+              triggerHaptic('medium');
+              navigateTo('nutrition-summary');
+            }}
+            triggerHaptic={triggerHaptic}
           />
         );
       case 'nutrition':
@@ -1101,6 +1114,7 @@ export default function PulseFlowApp() {
             setFoodCache={setFoodCache}
             activeView={nutrView === 'nutrition' ? 'log' : nutrView}
             onNavigate={navigateTo}
+            triggerHaptic={triggerHaptic}
           />
         );
       case 'workout':
@@ -1122,6 +1136,7 @@ export default function PulseFlowApp() {
             workoutHistory={workoutHistory}
             onNavigate={navigateTo}
             onAddNotification={addNotification}
+            triggerHaptic={triggerHaptic}
           />
         );
       case 'rank':
@@ -1140,6 +1155,7 @@ export default function PulseFlowApp() {
             onDeleteWeight={(date) =>
               setWeightHistory((prev) => prev.filter((e) => e.date !== date))
             }
+            triggerHaptic={triggerHaptic}
           />
         );
       case 'hydration':
@@ -1149,6 +1165,7 @@ export default function PulseFlowApp() {
             history={hydrationHistory}
             onUpdateMl={updateHydration}
             onBack={() => window.history.back()}
+            triggerHaptic={triggerHaptic}
           />
         );
       case 'steps':
@@ -1159,6 +1176,7 @@ export default function PulseFlowApp() {
             onUpdateSteps={updateSteps}
             targetSteps={goalData?.stepsTarget || 10000}
             onBack={() => window.history.back()}
+            triggerHaptic={triggerHaptic}
           />
         );
       case 'tasks':
@@ -1167,6 +1185,7 @@ export default function PulseFlowApp() {
             tasks={tasks}
             setTasks={setTask}
             onBack={() => window.history.back()}
+            triggerHaptic={triggerHaptic}
           />
         );
       case 'calculators':
@@ -1174,12 +1193,14 @@ export default function PulseFlowApp() {
           <CalculatorsView
             initialType={activeCalculator}
             onBack={() => window.history.back()}
+            triggerHaptic={triggerHaptic}
           />
         );
       case 'goal-setting':
         return (
           <GoalSettingView
             onBack={() => window.history.back()}
+            triggerHaptic={triggerHaptic}
             onGoalSaved={async () => {
               if (user) {
                 const keys = getKeys(user.uid);

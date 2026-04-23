@@ -36,6 +36,7 @@ type WeeklyRate = 0.25 | 0.5 | 0.75 | 1.0;
 interface GoalSettingViewProps {
   onBack: () => void;
   onGoalSaved?: () => void;
+  triggerHaptic?: (type?: 'light' | 'medium' | 'success' | 'warning') => void;
 }
 
 const MACRO_COLORS = {
@@ -45,7 +46,7 @@ const MACRO_COLORS = {
   fiber: "#10b981"
 };
 
-export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
+export function GoalSettingView({ onBack, onGoalSaved, triggerHaptic }: GoalSettingViewProps) {
   const [step, setStep] = useState(1);
   const [isSaved, setIsSaved] = useState(false);
   const [hasExistingGoal, setHasExistingGoal] = useState(false);
@@ -175,10 +176,12 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
     }
     const newStep = step + 1;
     window.history.pushState({ tab: 'goal-setting', goalStep: newStep }, '');
+    triggerHaptic?.('medium');
     setStep(newStep);
   };
   
   const prevStep = () => {
+    triggerHaptic?.('light');
     window.history.back();
   };
 
@@ -191,8 +194,7 @@ export function GoalSettingView({ onBack, onGoalSaved }: GoalSettingViewProps) {
     };
     const goalKey = user ? `arcex_${user.uid}_goal_data` : 'pulseflow_goal_data';
     localStorage.setItem(goalKey, JSON.stringify(dataToSave));
-    setIsSaved(true);
-    setHasExistingGoal(true);
+    triggerHaptic?.('success');
     if (onGoalSaved) onGoalSaved();
   };
 
