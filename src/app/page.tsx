@@ -57,6 +57,13 @@ export default function PulseFlowApp() {
   const { user, isUserLoading } = useUser();
 
   const [activeTab, setActiveTab] = useState('dashboard');
+  const activeTabRef = useRef(activeTab);
+
+  // Keep ref in sync with state for back listener closure
+  useEffect(() => {
+    activeTabRef.current = activeTab;
+  }, [activeTab]);
+
   const [activeCalculator, setActiveCalculator] =
     useState<'bmr' | '1rm' | 'bodyfat'>('bmr');
   const [tasks, setTask] = useState<Task[]>([]);
@@ -143,6 +150,7 @@ export default function PulseFlowApp() {
           break;
       }
     } catch (e) {
+      console.warn("Capacitor Haptics failed, falling back to Web Vibrate", e);
       if (typeof window !== 'undefined' && window.navigator.vibrate) {
         window.navigator.vibrate(type === 'light' ? 15 : 30);
       }
@@ -319,11 +327,19 @@ export default function PulseFlowApp() {
     const initBackListener = async () => {
       try {
         const { App } = await import('@capacitor/app');
+        
+        // Remove any existing listeners to avoid duplicates
+        await App.removeAllListeners();
+
         backListener = await App.addListener('backButton', ({ canGoBack }: { canGoBack: boolean }) => {
-          if (activeTab !== 'dashboard') {
-             window.history.back();
+          const currentTab = activeTabRef.current;
+          console.log("Hardware Back Pressed. Current Tab:", currentTab);
+
+          if (currentTab === 'dashboard' || currentTab === 'onboarding' || currentTab === 'auth' || !user) {
+            App.exitApp();
           } else {
-             App.exitApp();
+            // If we're in a subview, go back to dashboard
+            navigateTo('dashboard');
           }
         });
       } catch (e) {

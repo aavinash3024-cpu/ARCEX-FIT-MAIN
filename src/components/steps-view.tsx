@@ -185,7 +185,8 @@ export function StepsView({
     } catch (e) {}
   };
 
-  // --- DATA VISUALIZATI  const stats = useMemo(() => {
+  // --- DATA VISUALIZATION ---
+  const stats = useMemo(() => {
     const vals = Object.values(history);
     const avg = vals.length > 0 ? Math.round(vals.reduce((a, b) => a + b, 0) / vals.length) : currentSteps;
     const streak = vals.filter(v => v >= targetSteps).length + (currentSteps >= targetSteps ? 1 : 0);
