@@ -240,6 +240,17 @@ export function DashboardView({
       icon: Zap, 
       color: "bg-yellow-50" 
     },
+    { 
+      id: 'steps',
+      label: "Steps", 
+      value: stepsCount.toLocaleString(), 
+      unit: "steps", 
+      target: (goalData?.stepsTarget || 10000).toLocaleString(), 
+      current: stepsCount,
+      targetVal: goalData?.stepsTarget || 10000,
+      icon: Footprints, 
+      color: "bg-emerald-50" 
+    },
   ];
 
   const nutrients = [
@@ -377,63 +388,6 @@ export function DashboardView({
         </CardContent>
       </Card>
 
-      <section className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex flex-col">
-            <h2 className="text-lg font-black font-headline tracking-tight text-foreground flex items-center gap-2">
-              <Footprints className="w-5 h-5 text-emerald-500" />
-              Movement
-            </h2>
-            <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-widest leading-none">Step Progress</p>
-          </div>
-          <Badge variant="secondary" className="bg-emerald-500/10 text-emerald-600 hover:bg-emerald-500/10 border-none text-[8px] font-black uppercase px-2 py-0.5">
-            Live Track
-          </Badge>
-        </div>
-
-        <Card 
-          onClick={() => {
-            triggerHaptic?.('medium');
-            onViewSteps?.();
-          }}
-          className="border-none shadow-md overflow-hidden bg-card cursor-pointer group active:scale-[0.98] transition-all duration-200"
-        >
-          <CardContent className="p-5 flex items-center justify-between relative">
-            <div className="absolute right-0 top-0 p-4 opacity-[0.03] group-hover:opacity-[0.05] transition-opacity">
-              <Footprints className="w-24 h-24 text-emerald-500 -rotate-12" />
-            </div>
-            
-            <div className="space-y-4 flex-1">
-              <div className="flex items-baseline gap-1">
-                <span className="text-3xl font-black tabular-nums tracking-tighter">
-                  {stepsCount.toLocaleString()}
-                </span>
-                <span className="text-xs font-bold text-muted-foreground uppercase opacity-40">Steps</span>
-              </div>
-              
-              <div className="space-y-1.5">
-                <div className="h-2 w-full bg-muted/30 rounded-full overflow-hidden">
-                  <div 
-                    className="h-full bg-gradient-to-r from-emerald-400 to-teal-500 transition-all duration-1000 ease-out rounded-full"
-                    style={{ width: `${Math.min((stepsCount / (goalData?.stepsTarget || 10000)) * 100, 100)}%` }}
-                  />
-                </div>
-                <div className="flex justify-between text-[8px] font-black uppercase text-muted-foreground tracking-widest">
-                  <span>{Math.min(100, Math.round((stepsCount / (goalData?.stepsTarget || 10000)) * 100))}% of Goal</span>
-                  <span>Target: {(goalData?.stepsTarget || 10000).toLocaleString()}</span>
-                </div>
-              </div>
-            </div>
-
-            <div className="ml-6 flex flex-col items-center gap-2">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <Footprints className="w-6 h-6 text-emerald-500" />
-              </div>
-              <ChevronRight className="w-4 h-4 text-muted-foreground/30" />
-            </div>
-          </CardContent>
-        </Card>
-      </section>
 
       <section className="space-y-4">
         <div className="flex items-center justify-between">

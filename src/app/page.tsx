@@ -304,6 +304,7 @@ export default function PulseFlowApp() {
     }
 
     const handlePopState = (event: PopStateEvent) => {
+      triggerHaptic('light');
       if (event.state && event.state.tab) {
         setActiveTab(event.state.tab);
       } else {
@@ -312,10 +313,33 @@ export default function PulseFlowApp() {
     };
 
     window.addEventListener('popstate', handlePopState);
+    
+    // START: Capacitor Hardware Back Button Support
+    let backListener: any;
+    const initBackListener = async () => {
+      try {
+        const { App } = await import('@capacitor/app');
+        backListener = await App.addListener('backButton', ({ canGoBack }: { canGoBack: boolean }) => {
+          if (activeTab !== 'dashboard') {
+             window.history.back();
+          } else {
+             App.exitApp();
+          }
+        });
+      } catch (e) {
+        console.warn('Capacitor App plugin not available for back button');
+      }
+    };
+    initBackListener();
+    // END: Capacitor Hardware Back Button Support
+
     if (window.history.state === null) {
       window.history.replaceState({ tab: 'dashboard' }, '');
     }
-    return () => window.removeEventListener('popstate', handlePopState);
+    return () => {
+      window.removeEventListener('popstate', handlePopState);
+      if (backListener) backListener.remove();
+    };
   }, []);
 
   const navigateTo = (tab: string) => {

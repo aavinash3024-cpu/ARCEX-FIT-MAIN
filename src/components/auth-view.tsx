@@ -21,7 +21,7 @@ import {
   Stethoscope
 } from 'lucide-react';
 import { AnimatedBackground } from './animated-background';
-import { useAuth, initiateEmailSignIn, initiateEmailSignUp, initiateAnonymousSignIn, initiatePasswordReset, errorEmitter } from '@/firebase';
+import { useAuth, initiateEmailSignIn, initiateEmailSignUp, initiatePasswordReset, errorEmitter } from '@/firebase';
 import { onAuthStateChanged } from 'firebase/auth';
 import { cn } from '@/lib/utils';
 import { useToast } from "@/hooks/use-toast";
@@ -318,12 +318,6 @@ export function AuthView() {
     }
   };
 
-  const handleGuest = () => {
-    if (!auth || isLoading) return;
-    setIsLoading(true);
-    setError(null);
-    initiateAnonymousSignIn(auth);
-  };
 
   return (
     <div className="fixed inset-0 z-[40] flex flex-col bg-slate-950 overflow-hidden font-sans">
@@ -447,20 +441,6 @@ export function AuthView() {
                     </Button>
                   </form>
 
-                  <div className="relative py-2">
-                    <div className="absolute inset-0 flex items-center"><div className="w-full border-t border-white/5"></div></div>
-                    <div className="relative flex justify-center text-[8px] font-black uppercase tracking-[0.3em]"><span className="bg-slate-950 px-3 text-white/20">OR</span></div>
-                  </div>
-
-                  <Button 
-                    variant="ghost" 
-                    onClick={handleGuest}
-                    disabled={isLoading}
-                    className="w-full h-12 rounded-2xl bg-white/5 border border-white/5 text-white/60 hover:text-white hover:bg-white/10 font-black uppercase text-[10px] tracking-widest gap-2"
-                  >
-                    <User className="w-3.5 h-3.5" />
-                    Continue as Guest
-                  </Button>
                 </>
               )}
             </CardContent>

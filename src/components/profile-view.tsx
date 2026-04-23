@@ -1323,48 +1323,6 @@ export function ProfileView({
         <Card className="border-none shadow-md bg-card rounded-3xl overflow-hidden border border-muted/10">
           <CardContent className="p-0">
             <SettingsButton
-              icon={Zap}
-              label="Health Connect"
-              subLabel="Sync steps from your device"
-              color="text-green-600"
-              bg="bg-green-50"
-              onClick={async () => {
-                triggerHaptic('medium');
-                try {
-                  const { CapacitorPedometer } = await import('@capgo/capacitor-pedometer');
-                  const support = await CapacitorPedometer.isSupported();
-                  if (!support.supported) {
-                    toast({ 
-                      variant: 'destructive',
-                      title: 'Not Supported',
-                      description: 'Sensors not supported on this device.' 
-                    });
-                    return;
-                  }
-                  
-                  const status = await CapacitorPedometer.requestPermissions();
-                  if (status.activity === 'granted') {
-                    toast({
-                      title: 'Health Connect Active',
-                      description: 'Your steps are now syncing with arcex fit.',
-                    });
-                  } else {
-                    toast({
-                      variant: 'destructive',
-                      title: 'Permission Denied',
-                      description: 'Please enable Activity permissions in Android settings.',
-                    });
-                  }
-                } catch(e) {
-                   toast({
-                    variant: 'destructive',
-                    title: 'Sync Error',
-                    description: 'Failed to initialize Health Connect engine.',
-                  });
-                }
-              }}
-            />
-            <SettingsButton
               icon={Database}
               label="Export Data"
               subLabel="Download your wellness history"
