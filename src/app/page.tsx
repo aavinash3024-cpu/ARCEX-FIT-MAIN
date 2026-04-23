@@ -298,6 +298,7 @@ export default function PulseFlowApp() {
     }
   }, [isUserLoading, isLoaded]);
 
+
   useEffect(() => {
     if (mainRef.current) {
       mainRef.current.scrollTop = 0;
@@ -323,30 +324,31 @@ export default function PulseFlowApp() {
     window.addEventListener('popstate', handlePopState);
     
     // START: Capacitor Hardware Back Button Support
-    let backListener: any;
     const initBackListener = async () => {
       try {
         const { App } = await import('@capacitor/app');
-        
-        // Remove any existing listeners to avoid duplicates
-        await App.removeAllListeners();
-
-        backListener = await App.addListener('backButton', ({ canGoBack }: { canGoBack: boolean }) => {
+        const listener = await App.addListener('backButton', ({ canGoBack }) => {
           const currentTab = activeTabRef.current;
-          console.log("Hardware Back Pressed. Current Tab:", currentTab);
-
-          if (currentTab === 'dashboard' || currentTab === 'onboarding' || currentTab === 'auth' || !user) {
+          console.log('Native Back Button Pressed', { currentTab, canGoBack });
+          
+          if (['dashboard', 'auth', 'splash'].includes(currentTab)) {
             App.exitApp();
           } else {
-            // If we're in a subview, go back to dashboard
             navigateTo('dashboard');
           }
         });
+        return listener;
       } catch (e) {
-        console.warn('Capacitor App plugin not available for back button');
+        console.warn('Capacitor App plugin not available - back button listener skipped');
+        return null;
       }
     };
-    initBackListener();
+
+    let backListener: any;
+    if (isLoaded) {
+      initBackListener().then(l => backListener = l);
+    }
+
     // END: Capacitor Hardware Back Button Support
 
     if (window.history.state === null) {
@@ -363,6 +365,9 @@ export default function PulseFlowApp() {
       triggerHaptic('light');
       window.history.pushState({ tab }, '');
       setActiveTab(tab);
+      if (mainRef.current) {
+        mainRef.current.scrollTo({ top: 0, behavior: 'instant' });
+      }
     }
   };
 

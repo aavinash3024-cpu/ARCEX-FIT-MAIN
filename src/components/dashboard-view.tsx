@@ -240,6 +240,17 @@ export function DashboardView({
       icon: Zap, 
       color: "bg-yellow-50" 
     },
+    { 
+      id: 'steps',
+      label: "Steps", 
+      value: stepsCount.toLocaleString(), 
+      unit: "steps", 
+      target: (goalData?.stepsTarget || 10000).toLocaleString(), 
+      current: stepsCount,
+      targetVal: goalData?.stepsTarget || 10000,
+      icon: Footprints, 
+      color: "bg-green-50" 
+    },
   ];
 
   const nutrients = [
